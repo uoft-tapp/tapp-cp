@@ -1,0 +1,10 @@
+version: '2'
+services:
+  rails-app:
+    build: .
+    volumes:
+      - .:/srv/app
+    ports:
+      - "3000:3000"
+    command: >
+      rails server -b 0.0.0.0 -p 3000

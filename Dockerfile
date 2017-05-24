@@ -5,7 +5,7 @@ WORKDIR /srv/app
 RUN apk --update --upgrade add curl-dev build-base openssh \
 	tzdata libxml2 libxml2-dev libxslt libxslt-dev sqlite-dev nodejs
 
-COPY Gemfile* /srv/app
+COPY Gemfile* /srv/app/
 RUN bundle install
 
 COPY . /srv/app/
