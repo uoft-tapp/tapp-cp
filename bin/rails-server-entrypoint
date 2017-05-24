@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+(bundle check || bundle install) && bundle exec rails server $@

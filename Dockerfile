@@ -17,6 +17,9 @@ RUN apk add --no-cache curl && \
 COPY Gemfile* /srv/app/
 RUN bundle install
 
+COPY package.json /srv/app/
+COPY yarn.lock /srv/app/
+
 COPY . /srv/app/
 
 EXPOSE 3000
