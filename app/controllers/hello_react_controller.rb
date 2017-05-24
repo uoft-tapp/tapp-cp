@@ -1,0 +1,2 @@
+class HelloReactController < ApplicationController
+end
