@@ -21,5 +21,7 @@
 /yarn-error.log
 
 .byebug_history
+.rspec
+
 /public/packs
 /node_modules
