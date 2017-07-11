@@ -11,7 +11,7 @@ const Hello = props => (
 )
 
 Hello.defaultProps = {
-  name: 'Arseniy'
+  name: 'Landy'
 }
 
 Hello.propTypes = {

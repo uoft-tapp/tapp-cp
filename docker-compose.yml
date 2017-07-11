@@ -11,9 +11,11 @@ services:
     volumes:
       - .:/srv/app
     ports:
-      - "3000:3000"
+      - "5000:3000"
+    links:
+      - postgres
     command: >
-      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000
+      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000 -P /dev/null
 
   postgres:
     image: postgres:9.6-alpine
@@ -22,13 +24,13 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./db/pg/data:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
 
   webpack-dev-server:
     build: .
     volumes:
       - .:/srv/app
     ports:
-      - "8080:8080"
+      - "7070:8080"
     command: >
       ./bin/webpack-dev-server-entrypoint --host 0.0.0.0
