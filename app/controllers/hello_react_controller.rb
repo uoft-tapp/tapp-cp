@@ -10,6 +10,11 @@ class Contractor
   def initialize(file)
     @data = File.read("#{Rails.root}/db/#{file}")
     @parsed = JSON.parse(@data)
+    @directory = "#{Rails.root}/tmp/contracts"
+
+    unless Dir.exists?(@directory)
+      Dir.mkdir(@directory)
+    end
   end
 
   def get_parsed
@@ -20,7 +25,7 @@ class Contractor
     @parsed.each do |candidate|
       @sid = candidate["student_number"]
       @position = candidate["position"]
-      filename = "#{Rails.root}/tmp/contracts/#{@sid}-#{@position}-contract.pdf"
+      filename = "#{@directory}/#{@sid}-#{@position}-contract.pdf"
       contract = Contract.new(candidate)
       contract.build_contract
       contract.save_as(filename)
