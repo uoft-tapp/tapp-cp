@@ -18,11 +18,11 @@ default: &default
 
 development:
   <<: *default
-  database: tapp_development
+  database: cp_development
 
 test:
   <<: *default
-  database: tapp_test
+  database: cp_test
 
 production:
   <<: *default
