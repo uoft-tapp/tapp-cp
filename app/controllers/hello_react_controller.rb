@@ -2,6 +2,13 @@ class HelloReactController < ApplicationController
   def contracts
     @contractor = Contractor.new("seeds/offers.json")
     @contractor.build_contracts
+    @user = {
+      name: "Landy Simpson",
+      course: "CSC104H1F",
+      filename: "#{Rails.root}/tmp/contracts/1342088432-CSC104H1F-contract.pdf",
+      email: "landi.simpson@live.com"
+      }
+    CpMailer.contract_email(@user.as_json).deliver_now!
     render json: @contractor.get_parsed
   end
 end
