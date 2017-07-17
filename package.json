@@ -2,6 +2,7 @@
   "name": "MyTAPP",
   "private": true,
   "dependencies": {
+    "activeresource": "^2.0.11",
     "autoprefixer": "^7.1.1",
     "babel-core": "^6.24.1",
     "babel-loader": "7.x",
