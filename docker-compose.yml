@@ -32,6 +32,7 @@ services:
       - /var/lib/postgresql/data
     networks:
       - internal
+      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3001 -P /dev/null
 
   webpack-dev-server:
     build: .
