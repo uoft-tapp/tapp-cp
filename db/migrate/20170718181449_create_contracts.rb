@@ -1,8 +1,8 @@
 class CreateContracts < ActiveRecord::Migration[5.1]
   def change
     create_table :contracts do |t|
-      t.references :position_id, position: true, foreign_key: true
-      t.references :applicant_id, applicant: true, foreign_key: true
+      t.references :position, position: true, foreign_key: true
+      t.references :applicant, applicant: true, foreign_key: true
       t.text :hash
       t.boolean :accepted
       t.boolean :withdrawn

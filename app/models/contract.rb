@@ -1,4 +1,4 @@
 class Contract < ApplicationRecord
-  belongs_to :position_id
-  belongs_to :applicant_id
+  belongs_to :position
+  belongs_to :applicant
 end
