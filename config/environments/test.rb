@@ -39,4 +39,9 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  ENV['tapp'] = '172.21.0.1'
+  config.web_console.whitelisted_ips = "#{ENV['tapp']}/16"
+
+
 end
