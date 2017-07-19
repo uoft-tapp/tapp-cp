@@ -15,13 +15,12 @@ ActiveRecord::Schema.define(version: 20170718181449) do
   create_table "contracts", force: :cascade do |t|
     t.integer "position_id"
     t.integer "applicant_id"
-    t.text "hash"
-    t.boolean "accepted"
-    t.boolean "withdrawn"
-    t.boolean "printed"
-    t.integer "nag_count"
-    t.datetime "email_date"
-    t.datetime "deadline"
+    t.text "hash", null: false
+    t.boolean "accepted", default: false
+    t.boolean "withdrawn", default: false
+    t.boolean "printed", default: false
+    t.integer "nag_count", default: 0
+    t.datetime "deadline", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_contracts_on_applicant_id"
@@ -33,9 +32,9 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.integer "position_id"
     t.integer "instructor_id"
     t.integer "applicant_id"
-    t.boolean "objection"
-    t.boolean "sent"
-    t.boolean "accepted"
+    t.boolean "objection", default: false
+    t.boolean "sent", default: false
+    t.boolean "accepted", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"
