@@ -8,4 +8,15 @@ class ContractsController < ApplicationController
   def show
     render json: Contract.find(params[:id]).to_json
   end
+
+  def update
+    contract = Contract.find(params[:id])
+    contract.update_attributes!(contract_params)
+  end
+
+  private
+  def contract_params
+    params.permit(:accepted, :withdrawn)
+  end
+
 end

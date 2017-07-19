@@ -13,4 +13,15 @@ class OffersController < ApplicationController
     offer = Offer.find_by!(instructor_id: params[:instructor_id])
     render json: offer.to_json
   end
+
+  def update
+    offer = Offer.find(params[:id])
+    offer.update_attributes!(offer_params)
+  end
+
+  private
+  def offer_params
+    params.permit(:objection)
+  end
+
 end
