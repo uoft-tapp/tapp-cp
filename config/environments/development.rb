@@ -53,7 +53,6 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
 
-  ENV['tapp'] = '172.21.0.1'
-  config.web_console.whitelisted_ips = "#{ENV['tapp']}/16"
+  config.web_console.whitelisted_ips = "#{ENV['TAPP']}/16"
 
 end
