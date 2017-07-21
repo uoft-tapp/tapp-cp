@@ -12,9 +12,12 @@
 
 ActiveRecord::Schema.define(version: 20170718181449) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "contracts", force: :cascade do |t|
-    t.integer "position_id"
-    t.integer "applicant_id"
+    t.bigint "position_id"
+    t.bigint "applicant_id"
     t.text "hash", null: false
     t.boolean "accepted", default: false
     t.boolean "withdrawn", default: false
@@ -29,9 +32,9 @@ ActiveRecord::Schema.define(version: 20170718181449) do
   end
 
   create_table "offers", force: :cascade do |t|
-    t.integer "position_id"
-    t.integer "instructor_id"
-    t.integer "applicant_id"
+    t.bigint "position_id"
+    t.bigint "instructor_id"
+    t.bigint "applicant_id"
     t.boolean "objection", default: false
     t.boolean "sent", default: false
     t.boolean "accepted", default: false
