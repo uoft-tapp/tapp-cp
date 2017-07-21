@@ -6,7 +6,6 @@ class CreateContracts < ActiveRecord::Migration[5.1]
       t.boolean :accepted, default: false
       t.boolean :printed, default: false
       t.integer :nag_count, default: 0
-      t.datetime :deadline, null: false
 
       t.timestamps
     end

@@ -21,7 +21,6 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.boolean "accepted", default: false
     t.boolean "printed", default: false
     t.integer "nag_count", default: 0
-    t.datetime "deadline", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["link"], name: "index_contracts_on_link"

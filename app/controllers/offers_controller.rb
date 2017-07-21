@@ -28,10 +28,7 @@ class OffersController < ApplicationController
   def send_contract
     offer = Offer.find(params[:id])
     if !offer.contract
-      offer.create_contract!(
-        link: "my secret",
-        deadline: Time.now + (2*7*24*60*60)
-      )
+      offer.create_contract!(link: "my secret")
       # send out contract by email
       render json: {message: "You've just sent out the contract for this offer."}
     else
