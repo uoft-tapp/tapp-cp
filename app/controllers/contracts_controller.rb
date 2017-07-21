@@ -28,7 +28,7 @@ class ContractsController < ApplicationController
 
   private
   def contract_params
-    params.permit(:accepted, :withdrawn, :printed)
+    params.permit(:accepted, :printed)
   end
 
   def format_contract(contract)
