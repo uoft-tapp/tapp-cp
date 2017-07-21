@@ -64,7 +64,8 @@ class OffersController < ApplicationController
     offer["sent"] = (offer_rec.contract)? true:false
     if offer["sent"]
       offer["accepted"] = offer_rec.contract[:accepted]
-      offer["withdrawn"] = Time.now > offer_rec.contract[:deadline]
+      deadline = (offer_rec.contract[:created_at] + ENV["deadline"].to_i)
+      offer["withdrawn"] = Time.now > deadline
     end
     position = Position.find(offer["position_id"]).as_json
     offer["position"] = position["position"]
