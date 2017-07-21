@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 20170718181449) do
   create_table "contracts", force: :cascade do |t|
     t.bigint "position_id"
     t.bigint "applicant_id"
-    t.text "hash", null: false
+    t.text "link", null: false
     t.boolean "accepted", default: false
     t.boolean "withdrawn", default: false
     t.boolean "printed", default: false
@@ -27,13 +27,12 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_contracts_on_applicant_id"
-    t.index ["hash"], name: "index_contracts_on_hash"
+    t.index ["link"], name: "index_contracts_on_link"
     t.index ["position_id"], name: "index_contracts_on_position_id"
   end
 
   create_table "offers", force: :cascade do |t|
     t.bigint "position_id"
-    t.bigint "instructor_id"
     t.bigint "applicant_id"
     t.boolean "objection", default: false
     t.boolean "sent", default: false
@@ -41,7 +40,6 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"
-    t.index ["instructor_id"], name: "index_offers_on_instructor_id"
     t.index ["position_id"], name: "index_offers_on_position_id"
   end
 

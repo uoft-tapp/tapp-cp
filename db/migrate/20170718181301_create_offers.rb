@@ -2,7 +2,6 @@ class CreateOffers < ActiveRecord::Migration[5.1]
   def change
     create_table :offers do |t|
       t.references :position, index: true
-      t.references :instructor, index: true
       t.references :applicant, index: true
       t.boolean :objection, default: false
       t.boolean :sent, default: false

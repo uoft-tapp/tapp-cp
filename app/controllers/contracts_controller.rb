@@ -1,5 +1,5 @@
 class ContractsController < ApplicationController
-  protect_from_forgery with: :exception
+  protect_from_forgery with: :null_session
 
   def index
     render json: Contract.all.to_json
