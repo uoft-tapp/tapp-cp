@@ -19,6 +19,13 @@ class ContractsController < ApplicationController
     contract.update_attributes!(contract_params)
   end
 
+  def nag
+    contract = Contract.find(params[:id])
+    # send out email remainders
+    contract.update_attributes!(nag_count: contract[:nag_count]+1)
+    render json: {message: "You've nagged at this applicant for the #{contract[:nag_count]}-th time."}
+  end
+
   private
   def contract_params
     params.permit(:accepted, :withdrawn, :printed)

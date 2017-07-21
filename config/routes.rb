@@ -6,4 +6,6 @@ Rails.application.routes.draw do
   resources :offers
   resources :contracts
   get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
+  post "offers/:id/send-contract" => "offers#send_contract"
+  post "contracts/:id/nag" => "contracts#nag"
 end

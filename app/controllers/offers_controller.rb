@@ -25,6 +25,18 @@ class OffersController < ApplicationController
     offer.update_attributes!(offer_params)
   end
 
+  def send_contract
+    offer = Offer.find(params[:id])
+    if offer[:sent]
+      render json: {message: "You've already sent out the contract for this offer."}
+    else
+      # create contract
+      # send out contract by email
+      offer.update_attributes!(sent: true)
+      render json: {message: "You've just sent out the contract for this offer."}
+    end
+  end
+
   private
   def offer_params
     params.permit(:objection)

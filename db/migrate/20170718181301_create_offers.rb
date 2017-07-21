@@ -9,6 +9,5 @@ class CreateOffers < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    validates_uniqueness_of :position, :scope => [:applicant]
   end
 end
