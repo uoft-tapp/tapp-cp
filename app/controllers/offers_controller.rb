@@ -1,13 +1,13 @@
 class OffersController < ApplicationController
   protect_from_forgery with: :null_session
-  
+
   def index
     render json: get_all_offers
   end
 
   def show
     offer = Offer.find(params[:id]).as_json
-    render json: format_offers(offer)
+    render json: format_offer(offer)
   end
 
   def show_by_instructor
@@ -33,7 +33,7 @@ class OffersController < ApplicationController
   def get_all_offers
     offers = []
     Offer.all.as_json.each do |offer|
-      offers.push(format_offers(offer))
+      offers.push(format_offer(offer))
     end
     return offers
   end
@@ -48,8 +48,7 @@ class OffersController < ApplicationController
     return found
   end
 
-  def format_offers(offer)
-    puts offer[:id]
+  def format_offer(offer)
     position = Position.find(offer["id"]).as_json
     offer["position"] = position["position"]
     applicant = Applicant.find(offer["id"]).as_json

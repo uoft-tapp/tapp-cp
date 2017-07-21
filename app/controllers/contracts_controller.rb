@@ -2,11 +2,16 @@ class ContractsController < ApplicationController
   protect_from_forgery with: :null_session
 
   def index
-    render json: Contract.all.to_json
+    contracts = []
+    Contract.all.as_json.each do |contract|
+      contracts.push(format_contract(contract))
+    end
+    render json: contracts
   end
 
   def show
-    render json: Contract.find(params[:id]).to_json
+    contract = Contract.find(params[:id]).as_json
+    render json: format_contract(contract)
   end
 
   def update
@@ -16,7 +21,15 @@ class ContractsController < ApplicationController
 
   private
   def contract_params
-    params.permit(:accepted, :withdrawn)
+    params.permit(:accepted, :withdrawn, :printed)
+  end
+
+  def format_contract(contract)
+    position = Position.find(contract["id"]).as_json
+    contract["position"] = position["position"]
+    applicant = Applicant.find(contract["id"]).as_json
+    contract["applicant"] = applicant
+    return contract
   end
 
 end
