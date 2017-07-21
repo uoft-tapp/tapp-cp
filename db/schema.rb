@@ -16,8 +16,6 @@ ActiveRecord::Schema.define(version: 20170718181449) do
   enable_extension "plpgsql"
 
   create_table "contracts", force: :cascade do |t|
-    t.bigint "position_id"
-    t.bigint "applicant_id"
     t.bigint "offer_id"
     t.text "link", null: false
     t.boolean "accepted", default: false
@@ -27,18 +25,17 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.datetime "deadline", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["applicant_id"], name: "index_contracts_on_applicant_id"
     t.index ["link"], name: "index_contracts_on_link"
     t.index ["offer_id"], name: "index_contracts_on_offer_id"
-    t.index ["position_id"], name: "index_contracts_on_position_id"
   end
 
   create_table "offers", force: :cascade do |t|
     t.bigint "position_id"
     t.bigint "applicant_id"
     t.boolean "objection", default: false
-    t.boolean "sent", default: false
     t.integer "hours", null: false
+    t.integer "year"
+    t.string "session"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"

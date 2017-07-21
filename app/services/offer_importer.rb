@@ -13,6 +13,8 @@ class OfferImporter
         position_id: position["id"],
         applicant_id: applicant["id"],
         hours: offer["hours"],
+        session: offer["session"],
+        year: offer["year"],
       )
       offer.save!
     end

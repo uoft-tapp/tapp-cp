@@ -3,14 +3,14 @@ class ContractsController < ApplicationController
 
   def index
     contracts = []
-    Contract.all.as_json.each do |contract|
+    Contract.all.each do |contract|
       contracts.push(format_contract(contract))
     end
     render json: contracts
   end
 
   def show
-    contract = Contract.find(params[:id]).as_json
+    contract = Contract.find(params[:id])
     render json: format_contract(contract)
   end
 
@@ -32,9 +32,11 @@ class ContractsController < ApplicationController
   end
 
   def format_contract(contract)
-    position = Position.find(contract["id"]).as_json
+    offer = contract.offer
+    contract = contract.as_json
+    position = Position.find(offer[:position_id]).as_json
     contract["position"] = position["position"]
-    applicant = Applicant.find(contract["id"]).as_json
+    applicant = Applicant.find(offer[:applicant_id]).as_json
     contract["applicant"] = applicant
     return contract
   end

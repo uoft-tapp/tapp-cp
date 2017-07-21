@@ -1,8 +1,6 @@
 class CreateContracts < ActiveRecord::Migration[5.1]
   def change
     create_table :contracts do |t|
-      t.references :position, index: true
-      t.references :applicant, index: true
       t.references :offer, offer: true, index: true, foreign_key: true
       t.text :link, null: false
       t.boolean :accepted, default: false

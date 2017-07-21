@@ -6,7 +6,7 @@ class OffersController < ApplicationController
   end
 
   def show
-    offer = Offer.find(params[:id]).as_json
+    offer = Offer.find(params[:id])
     render json: format_offer(offer)
   end
 
@@ -27,13 +27,15 @@ class OffersController < ApplicationController
 
   def send_contract
     offer = Offer.find(params[:id])
-    if offer[:sent]
-      render json: {message: "You've already sent out the contract for this offer."}
-    else
-      # create contract
+    if !offer.contract
+      offer.create_contract!(
+        link: "my secret",
+        deadline: Time.now + (2*7*24*60*60)
+      )
       # send out contract by email
-      offer.update_attributes!(sent: true)
       render json: {message: "You've just sent out the contract for this offer."}
+    else
+      render json: {message: "You've already sent out the contract for this offer."}
     end
   end
 
@@ -44,7 +46,7 @@ class OffersController < ApplicationController
 
   def get_all_offers
     offers = []
-    Offer.all.as_json.each do |offer|
+    Offer.all.each do |offer|
       offers.push(format_offer(offer))
     end
     return offers
@@ -61,9 +63,12 @@ class OffersController < ApplicationController
   end
 
   def format_offer(offer)
-    position = Position.find(offer["id"]).as_json
+    sent = (offer.contract)? true:false
+    offer = offer.as_json
+    offer["sent"] = sent
+    position = Position.find(offer["position_id"]).as_json
     offer["position"] = position["position"]
-    applicant = Applicant.find(offer["id"]).as_json
+    applicant = Applicant.find(offer["applicant_id"]).as_json
     offer["applicant"] = applicant
     instructors = position["instructors"].as_json
     offer["instructors"] = []
