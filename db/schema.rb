@@ -19,7 +19,6 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.bigint "offer_id"
     t.text "link", null: false
     t.boolean "accepted", default: false
-    t.boolean "withdrawn", default: false
     t.boolean "printed", default: false
     t.integer "nag_count", default: 0
     t.datetime "deadline", null: false

@@ -38,6 +38,7 @@ class ContractsController < ApplicationController
     contract["position"] = position["position"]
     applicant = Applicant.find(offer[:applicant_id]).as_json
     contract["applicant"] = applicant
+    contract["withdrawn"] = Time.now > contract["deadline"]
     return contract
   end
 
