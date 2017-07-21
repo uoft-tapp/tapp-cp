@@ -5,7 +5,7 @@ class CreateOffers < ActiveRecord::Migration[5.1]
       t.references :applicant, index: true
       t.boolean :objection, default: false
       t.boolean :sent, default: false
-      t.boolean :accepted, default: false
+      t.integer :hours, null: false
 
       t.timestamps
     end

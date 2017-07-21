@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 20170718181449) do
   create_table "contracts", force: :cascade do |t|
     t.bigint "position_id"
     t.bigint "applicant_id"
+    t.bigint "offer_id"
     t.text "link", null: false
     t.boolean "accepted", default: false
     t.boolean "withdrawn", default: false
@@ -28,6 +29,7 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_contracts_on_applicant_id"
     t.index ["link"], name: "index_contracts_on_link"
+    t.index ["offer_id"], name: "index_contracts_on_offer_id"
     t.index ["position_id"], name: "index_contracts_on_position_id"
   end
 
@@ -36,11 +38,12 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.bigint "applicant_id"
     t.boolean "objection", default: false
     t.boolean "sent", default: false
-    t.boolean "accepted", default: false
+    t.integer "hours", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"
     t.index ["position_id"], name: "index_offers_on_position_id"
   end
 
+  add_foreign_key "contracts", "offers"
 end

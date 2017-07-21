@@ -1,4 +1,5 @@
 #!/bin/bash
+cp dev.env.default .env
 temp="`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' tapp_rails-app_1`"
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'file=($(cat .env))'
 file[6]="TAPP=$temp"
