@@ -62,10 +62,12 @@ class OffersController < ApplicationController
     return found
   end
 
-  def format_offer(offer)
-    sent = (offer.contract)? true:false
-    offer = offer.as_json
-    offer["sent"] = sent
+  def format_offer(offer_rec)
+    offer = offer_rec.as_json
+    offer["sent"] = (offer_rec.contract)? true:false
+    if offer["sent"]
+      offer["accepted"] = offer_rec.contract[:accepted]
+    end
     position = Position.find(offer["position_id"]).as_json
     offer["position"] = position["position"]
     applicant = Applicant.find(offer["applicant_id"]).as_json
