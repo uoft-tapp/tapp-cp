@@ -13,5 +13,6 @@ class CreateContracts < ActiveRecord::Migration[5.1]
       t.timestamps
     end
     add_index :contracts, :link
+    validates_uniqueness_of :position, :scope => [:applicant]  
   end
 end
