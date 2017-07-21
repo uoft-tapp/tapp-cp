@@ -1,0 +1,24 @@
+[
+  {
+    "utorid": "applicant1",
+    "student_number": "1342088432",
+    "first_name": "Mjolarkark",
+    "last_name": "Zedslamares",
+    "email": "mjolarkark.zedslamares@mail.utoronto.ca",
+    "position": "CSC104H1F",
+    "hours": 14,
+    "session": "Fall",
+    "year": "2017"
+  },
+  {
+    "utorid": "applicant2",
+    "student_number": "1722477828",
+    "first_name": "Zorkairmed",
+    "last_name": "Krired",
+    "email": "zorkairmed.krired@mail.utoronto.ca",
+    "position": "CSC108H1F",
+    "hours": 40,
+    "session": "Fall",
+    "year": "2017"
+  }
+]

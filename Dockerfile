@@ -3,7 +3,7 @@ FROM ruby:2.4.1-alpine
 WORKDIR /srv/app
 
 RUN apk --update --upgrade add curl-dev build-base openssh \
-	tzdata libxml2 libxml2-dev libxslt libxslt-dev sqlite-dev \
+	tzdata libxml2 libxml2-dev libxslt libxslt-dev postgresql-dev \
 	nodejs
 
 # Add Yarn to the mix
@@ -19,6 +19,7 @@ RUN bundle install
 
 COPY package.json /srv/app/
 COPY yarn.lock /srv/app/
+RUN yarn install
 
 COPY . /srv/app/
 

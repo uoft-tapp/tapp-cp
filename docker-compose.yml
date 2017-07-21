@@ -2,18 +2,35 @@ version: '2'
 services:
   rails-app:
     build: .
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
     volumes:
       - .:/srv/app
     ports:
-      - "3000:3000"
+      - "5000:3000"
+    links:
+      - postgres
     command: >
-      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000
+      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000 -P /dev/null
+
+  postgres:
+    image: postgres:9.6-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - /var/lib/postgresql/data
 
   webpack-dev-server:
     build: .
     volumes:
       - .:/srv/app
     ports:
-      - "8080:8080"
+      - "7070:8080"
     command: >
       ./bin/webpack-dev-server-entrypoint --host 0.0.0.0
