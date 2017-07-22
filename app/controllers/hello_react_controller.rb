@@ -8,7 +8,7 @@ class HelloReactController < ApplicationController
       filename: "#{Rails.root}/tmp/contracts/1342088432-CSC104H1F-contract.pdf",
       email: "mingtsengeh@gmail.com"
       }
-    test = CpMailer.contract_email(@user).deliver_now!
+    CpMailer.contract_email(@user).deliver_now!
     render json: @contractor.get_parsed
   end
 end
