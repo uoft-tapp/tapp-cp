@@ -1,5 +1,5 @@
 class CpMailer < ApplicationMailer
-  default from: 'cookies@mailinator.com'
+  default from: ENV['EMAIL_USER']
 
   layout "mailer"
 

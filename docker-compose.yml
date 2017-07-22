@@ -9,8 +9,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       TAPP: ${TAPP}
+      EMAIL_TYPE: ${EMAIL_TYPE}
       EMAIL_USER: ${EMAIL_USER}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_AUTH: ${EMAIL_AUTH}
     volumes:
       - .:/srv/app
     networks:
