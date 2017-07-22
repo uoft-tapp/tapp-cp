@@ -10,10 +10,15 @@ services:
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
     volumes:
       - .:/srv/app
+    networks:
+      - internal
+      - tapp_external
     ports:
       - "5000:3000"
     links:
       - postgres
+    external_links:
+      - tapp_rails-app:tapp
     command: >
       ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000 -P /dev/null
 
@@ -25,12 +30,22 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - /var/lib/postgresql/data
+    networks:
+      - internal
 
   webpack-dev-server:
     build: .
     volumes:
       - .:/srv/app
+    networks:
+      - internal
     ports:
       - "7070:8080"
     command: >
       ./bin/webpack-dev-server-entrypoint --host 0.0.0.0
+
+networks:
+  internal: # aka cp_internal
+    driver: bridge
+  tapp_external:
+    external: true
