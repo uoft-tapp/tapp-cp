@@ -28,15 +28,15 @@ Rails.application.configure do
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = true
-
+  config.action_mailer.default_url_options = { :host => 'localhost:5000' }
   config.action_mailer.perform_caching = true
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-     address: 'smtp.live.com',
-     port: 465,
-     domain: 'hotmail.com',
-     user_name: ENV['hotmail_user'],
-     password: ENV['hotmail_pass'],
+     address: 'smtp.gmail.com',
+     port: 587,
+     domain: 'gmail.com',
+     user_name: ENV['EMAIL_USER'],
+     password: ENV['EMAIL_PASSWORD'],
      authentication: 'plain',
      enable_starttls_auto: true
  }

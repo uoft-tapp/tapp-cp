@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
     volumes:
       - .:/srv/app
     ports:
