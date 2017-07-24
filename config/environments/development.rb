@@ -53,6 +53,4 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
 
-  config.web_console.whitelisted_ips = "#{ENV['TAPP']}/16"
-
 end
