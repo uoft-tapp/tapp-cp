@@ -26,9 +26,9 @@ class OffersController < ApplicationController
   end
 
   def send_contract
-    offer = Offer.find(params[:id])
+    offer = Offer.find(params[:offer_id])
     if !offer.contract
-      offer.create_contract!(link: "my secret")
+      offer.create_contract!(link: "mangled-link-for-accepting-offer")
       # send out contract by email
       render json: {message: "You've just sent out the contract for this offer."}
     else
@@ -43,10 +43,9 @@ class OffersController < ApplicationController
 
   def get_all_offers
     offers = []
-    Offer.all.each do |offer|
+    Offer.all.map do |offer|
       offers.push(format_offer(offer))
     end
-    return offers
   end
 
   def taught_by(offer, instructor_id)
@@ -61,7 +60,7 @@ class OffersController < ApplicationController
 
   def format_offer(offer_rec)
     offer = offer_rec.as_json
-    offer["sent"] = (offer_rec.contract)? true:false
+    offer["sent"] = offer_rec.contract.present?
     if offer["sent"]
       offer["accepted"] = offer_rec.contract[:accepted]
       deadline = (offer_rec.contract[:created_at] + ENV["deadline"].to_i)

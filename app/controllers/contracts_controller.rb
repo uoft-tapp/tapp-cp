@@ -2,10 +2,7 @@ class ContractsController < ApplicationController
   protect_from_forgery with: :null_session
 
   def index
-    contracts = []
-    Contract.all.each do |contract|
-      contracts.push(format_contract(contract))
-    end
+    contracts = Contract.all.includes(:offer).map { |c| format_contract(c) }
     render json: contracts
   end
 
@@ -20,9 +17,9 @@ class ContractsController < ApplicationController
   end
 
   def nag
-    contract = Contract.find(params[:id])
+    contract = Contract.find(params[:contract_id])
     # send out email remainders
-    contract.update_attributes!(nag_count: contract[:nag_count]+1)
+    contract.increment!(:nag_count, 1)
     render json: {message: "You've nagged at this applicant for the #{contract[:nag_count]}-th time."}
   end
 
@@ -33,14 +30,16 @@ class ContractsController < ApplicationController
 
   def format_contract(contract)
     offer = contract.offer
+    deadline = (contract[:created_at] + ENV["deadline"].to_i)
     contract = contract.as_json
     position = Position.find(offer[:position_id]).as_json
-    contract["position"] = position["position"]
     applicant = Applicant.find(offer[:applicant_id]).as_json
-    contract["applicant"] = applicant
-    contract["deadline"] = (contract["created_at"] + ENV["deadline"].to_i)
-    contract["withdrawn"] = Time.now > contract["deadline"]
-    return contract
+    return contract.merge({
+      position: position["position"],
+      applicant: applicant,
+      deadline: deadline,
+      contract: Time.now > deadline,
+    })
   end
 
 end
