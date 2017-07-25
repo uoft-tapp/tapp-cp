@@ -18,8 +18,8 @@ class ContractsController < ApplicationController
 
   def nag
     contract = Contract.find(params[:contract_id])
-    # send out email remainders
     contract.increment!(:nag_count, 1)
+    CpMailer.nag_email(format_contract(contract)).deliver_now
     render json: {message: "You've nagged at this applicant for the #{contract[:nag_count]}-th time."}
   end
 

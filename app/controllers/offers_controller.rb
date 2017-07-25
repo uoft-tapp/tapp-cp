@@ -24,7 +24,7 @@ class OffersController < ApplicationController
     offer = Offer.find(params[:offer_id])
     if !offer.contract
       offer.create_contract!(link: "mangled-link-for-accepting-offer")
-      # send out contract by email
+      CpMailer.contract_email(format_offer(offer)).deliver_now
       render json: {message: "You've just sent out the contract for this offer."}
     else
       render json: {message: "You've already sent out the contract for this offer."}

@@ -1,67 +1,12 @@
-class HelloReactController < ApplicationController
-  def contracts
-    @contractor = Contractor.new("seeds/offers.json")
-    @contractor.build_contracts
-    @user = {
-      name: "Landy Simpson",
-      course: "CSC104H1F",
-      filename: "#{Rails.root}/tmp/contracts/1342088432-CSC104H1F-contract.pdf",
-      email: "mingtsengeh@gmail.com"
-      }
-    CpMailer.contract_email(@user).deliver_now
-    render json: @contractor.get_parsed
-  end
-end
-
-class Contractor
-  def initialize(file)
-    @data = File.read("#{Rails.root}/db/#{file}")
-    @parsed = JSON.parse(@data)
-    @directory = "#{Rails.root}/tmp/contracts"
-
-    unless Dir.exists?(@directory)
-      Dir.mkdir(@directory)
-    end
-  end
-
-  def get_parsed
-    return @parsed
-  end
-
-  def build_contracts
-    @parsed.each do |candidate|
-      @sid = candidate["student_number"]
-      @position = candidate["position"]
-      filename = "#{@directory}/#{@sid}-#{@position}-contract.pdf"
-      contract = Contract.new(candidate)
-      contract.build_contract
-      contract.save_as(filename)
-    end
-  end
-end
-
-
-class Contract
+class ContractGenerator
   include Prawn::View
 
-  def initialize(candidate)
-    @first_name = candidate["first_name"]
-    @last_name = candidate["last_name"]
-    @email = candidate["email"]
-    @address = candidate["address"]
-    @phone = candidate["phone"]
-    @sid = candidate["student_number"]
-    @utorid = candidate["utorid"]
-    @position = candidate["position"]
-    @hours = candidate["hours"]
-    @session = candidate["session"]
-    @year = candidate["year"]
-    @start_date = "May 9, 2017"
-    @end_date = "Aug 31, 2017"
-
-  end
-
-  def build_contract
+  def initialize(offer)
+    @offer = offer
+    @offer[:session] = "Winter"
+    @offer[:year] = 2017
+    @offer[:start_date] = "May 9, 2017"
+    @offer[:end_date] = "Aug 31, 2017"
     define_grid(columns: 1, rows: 10, gutter: 0)
     insert_title
     insert_intro
@@ -83,7 +28,7 @@ class Contract
       font "Times-Roman"
       font_size 20
       text_box "TEACHING ASSISTANT CONTRACT", style: :bold, at: [0, 130], align: :center
-      text_box "#{@session} Session #{@year}", style: :bold, at: [0, 110], align: :center
+      text_box "#{@offer[:session]} Session #{@offer[:year]}", style: :bold, at: [0, 110], align: :center
     end
   end
 
@@ -91,12 +36,12 @@ class Contract
   def insert_intro
     grid([2,0],[3,0]).bounding_box do
       font_size 12
-      text "Dear #{@first_name} #{@last_name},"
+      text "Dear #{@offer[:applicant]["first_name"]} #{@offer[:applicant]["last_name"]},"
       move_down 5
       text "We are pleased to offer you a position as a Teaching Assistant in the Department of Computer Science " +
-      "during the period of <b>#{@start_date}</b> to <b>#{@end_date}</b>. Your assignment will be <b>#{@position}</b>. (We reserve the " +
+      "during the period of <b>#{@offer[:start_date]}</b> to <b>#{@offer[:end_date]}</b>. Your assignment will be <b>#{@offer["position"]}</b>. (We reserve the " +
       "right to change your appointment from this course to another course, if necessary). The total time involved " +
-      "in the assignment is <b>#{@hours}</b>. The salary for this position is governed by the collective agreement " +
+      "in the assignment is <b>#{@offer["hours"]}</b>. The salary for this position is governed by the collective agreement " +
       "between the University of Toronto and the Canadian Union of Public Employees, Local 3902, a copy of which " +
       "will be provided upon request. The current rate of pay for UG = $43.65; SGS I and SGS II/PDF = $43.65. " +
       "According to the collective agreement the total sum paid to you for the appointment described above will be :",
