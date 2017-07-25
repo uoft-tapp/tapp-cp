@@ -1,11 +1,12 @@
 class CpMailer < ApplicationMailer
   default from: ENV['EMAIL_USER']
+  ENV['recipient'] = "mingtsengeh@gmail.com"
 
   layout "mailer"
 
   def contract_email(offer)
     @offer = offer
-    email = "mingtsengeh@gmail.com"
+    email = ENV['recipient']
     # for real system use the following
     # currently, we have fake applicant with fake email, so it can't send
     # email = @offer[:applicant]["email"]
@@ -16,7 +17,7 @@ class CpMailer < ApplicationMailer
   end
 
   def nag_email(contract)
-    email = "mingtsengeh@gmail.com"
+    email = ENV['recipient']
     # for real system use the following
     # currently, we have fake applicant with fake email, so it can't send
     # email = @contract[:applicant]["email"]
@@ -25,8 +26,6 @@ class CpMailer < ApplicationMailer
     deadline = @contract[:deadline].in_time_zone('Eastern Time (US & Canada)')
     @contract[:deadline] = deadline.strftime("%I:%M%p on %B %d, %Y")
     @url = "http://google.com"
-    generator = ContractGenerator.new(offer)
-    attachments["contract.pdf"] = {mime_type: 'application/pdf', content: generator.render }
     mail(to: email, subject: "Reminder for TA Position: #{@contract[:position]}")
   end
 
