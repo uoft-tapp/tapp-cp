@@ -5,5 +5,8 @@ class ApplicationController < ActionController::Base
   private
   def record_not_found
     render status: :not_found, json: { status: 404 }
+
+  def main
+    render :main, layout: false
   end
 end
