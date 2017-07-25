@@ -1,7 +1,14 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  # for the administration side of CP
+  get 'admin/index'
+
+  # for user facing side of CP
+  get 'cp/index'
+
+  # temporary contract pdf generator
   get "/hello_react", to: "hello_react#contracts"
 
+  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :applicants
   resources :offers do
     post "send-contract" => "offers#send_contract"

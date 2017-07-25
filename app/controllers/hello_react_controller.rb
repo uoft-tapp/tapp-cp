@@ -1,9 +1,9 @@
 class HelloReactController < ApplicationController
-  def contracts
-    @contractor = Contractor.new("seeds/offers.json")
-    @contractor.build_contracts
-    render json: @contractor.get_parsed
-  end
+  # def contracts
+  #   @contractor = Contractor.new("seeds/offers.json")
+  #   @contractor.build_contracts
+  #   render json: @contractor.get_parsed
+  # end
 end
 
 class Contractor
