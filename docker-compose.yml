@@ -15,13 +15,13 @@ services:
       - internal
       - tapp_external
     ports:
-      - "5000:3000"
+      - "5000:5000"
     links:
       - postgres
     external_links:
       - tapp_rails-app:tapp
     command: >
-      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000 -P /dev/null
+      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 5000 -P /dev/null
 
   postgres:
     image: postgres:9.6-alpine
@@ -41,7 +41,7 @@ services:
     networks:
       - internal
     ports:
-      - "7070:8080"
+      - "7070:7070"
     command: >
       ./bin/webpack-dev-server-entrypoint --host 0.0.0.0
 
