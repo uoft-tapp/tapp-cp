@@ -6,8 +6,6 @@
   <body>
     <h1>Offers</h1>
     <form method="post">
-      <input type="submit" value="Send Contract">
-      <input id="offer_selected" type="hidden" name="offers">
       <table>
         <tr>
           <th>Select</th>
@@ -16,19 +14,19 @@
           <th>Position</th>
           <th>Hours</th>
           <th>Email</th>
-          <th>Status</th>
           <th>Sent</th>
+          <th>Status</th>
         </tr>
         <% @offers.each do |o| %>
           <tr>
-            <th><input type="checkbox" onclick="updateOfferSelected(this, <%=o["id"] %>);"></th>
+            <th><input type="submit" value="Send Contract" formaction="/offers/<%= o["id"]%>/send-contract"></th>
             <th><%= o[:applicant]["last_name"]%></th>
             <th><%= o[:applicant]["first_name"]%></th>
             <th><%= o[:position]%></th>
             <th><%= o["hours"]%></th>
             <th><%= o[:applicant]["email"]%></th>
-            <th><%= o[:accepted] && o[:withdrawn]%></th>
             <th><%= o[:sent]%></th>
+            <th><%= o[:accepted] && o[:withdrawn]%></th>
           </tr>
         <% end %>
       </table>
@@ -68,16 +66,7 @@
       </table>
     </form>
     <script>
-      offer_selected = [];
       contract_selected = [];
-      function updateOfferSelected(checkbox, val){
-        input = document.getElementById("offer_selected")
-        if (checkbox.checked)
-          offer_selected.push(val)
-        else
-          offer_selected.splice(offer_selected.indexOf(val),1);
-        input.value=JSON.stringify(offer_selected)
-      }
       function updateContractSelected(checkbox, val){
         input = document.getElementById("contract_selected")
         if (checkbox.checked)
