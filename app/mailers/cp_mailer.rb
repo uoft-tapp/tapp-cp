@@ -5,7 +5,7 @@ class CpMailer < ApplicationMailer
   layout "mailer"
 
   def contract_email(offer)
-    @offer = offer
+    @offer = offer[0]
     email = ENV['recipient']
     # for real system use the following
     # currently, we have fake applicant with fake email, so it can't send

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <form method="post">
+      <input type="submit" value="Nag" formaction="/contracts/nag">
+      <input type="submit" value="Print Contracts" formaction="/contracts/print">
+      <input id="selected" type="hidden" name="contracts">
+      <table style="margin-top: 10px;">
+        <tr style="text-align: left;">
+          <th>Select</th>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Position</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Contract Send Date</th>
+          <th>Deadline</th>
+          <th>Nag Count</th>
+          <th>Printed</th>
+        </tr>
+        <% @contracts.each do |c| %>
+          <tr>
+            <th><input type="checkbox" onclick="updateSelected(this, <%=c["id"] %>);"></th>
+            <th><%= c[:applicant]["last_name"]%></th>
+            <th><%= c[:applicant]["first_name"]%></th>
+            <th><%= c[:position]%></th>
+            <th><%= c[:applicant]["email"]%></th>
+            <th><%= c["accepted"] && c["withdrawn"]%></th>
+            <th><%= c["updated_at"]%></th>
+            <th><%= c[:deadline]%></th>
+            <th><%= c["nag_count"]%></th>
+            <th><%= c["printed"]%></th>
+          </tr>
+        <% end %>
+      </table>
+    </form>
+    <script>
+      selected = [];
+      function updateSelected(checkbox, val){
+        input = document.getElementById("selected")
+        if (checkbox.checked)
+          selected.push(val)
+        else
+          selected.splice(selected.indexOf(val),1);
+        input.value=JSON.stringify(selected)
+      }
+    </script>
+  </body>
+</html>

@@ -4,8 +4,9 @@ Rails.application.routes.draw do
   resources :offers do
     post "send-contract" => "offers#send_contract"
   end
-  resources :contracts do
-    post "nag" => "contracts#nag"
-  end
+  resources :contracts
   get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
+  post "contracts/print" => "contracts#print"
+  post "contracts/nag" => "contracts#nag"
+  get "test" => "app#test"
 end

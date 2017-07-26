@@ -1,18 +1,23 @@
 class ContractGenerator
   include Prawn::View
 
-  def initialize(offer)
-    @offer = offer
-    @offer[:session] = "Winter"
-    @offer[:year] = 2017
-    @offer[:start_date] = "May 9, 2017"
-    @offer[:end_date] = "Aug 31, 2017"
-    define_grid(columns: 1, rows: 10, gutter: 0)
-    insert_title
-    insert_intro
-    insert_calculations
-    insert_cupe
-    insert_signoff
+  def initialize(offers)
+    offers.each_with_index do |offer, index|
+      if index > 0
+        start_new_page
+      end
+      @offer = offer
+      @offer[:session] = "Winter"
+      @offer[:year] = 2017
+      @offer[:start_date] = "May 9, 2017"
+      @offer[:end_date] = "Aug 31, 2017"
+      define_grid(columns: 1, rows: 10, gutter: 0)
+      insert_title
+      insert_intro
+      insert_calculations
+      insert_cupe
+      insert_signoff
+    end
   end
 
   private
@@ -39,7 +44,7 @@ class ContractGenerator
       text "Dear #{@offer[:applicant]["first_name"]} #{@offer[:applicant]["last_name"]},"
       move_down 5
       text "We are pleased to offer you a position as a Teaching Assistant in the Department of Computer Science " +
-      "during the period of <b>#{@offer[:start_date]}</b> to <b>#{@offer[:end_date]}</b>. Your assignment will be <b>#{@offer["position"]}</b>. (We reserve the " +
+      "during the period of <b>#{@offer[:start_date]}</b> to <b>#{@offer[:end_date]}</b>. Your assignment will be <b>#{@offer[:position]}</b>. (We reserve the " +
       "right to change your appointment from this course to another course, if necessary). The total time involved " +
       "in the assignment is <b>#{@offer["hours"]}</b>. The salary for this position is governed by the collective agreement " +
       "between the University of Toronto and the Canadian Union of Public Employees, Local 3902, a copy of which " +

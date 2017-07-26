@@ -7,7 +7,7 @@ class OffersController < ApplicationController
 
   def show
     offer = Offer.find(params[:id])
-    render json: format_offer(offer)
+    render json: offer.format
   end
 
   def show_by_instructor
@@ -23,8 +23,8 @@ class OffersController < ApplicationController
   def send_contract
     offer = Offer.find(params[:offer_id])
     if !offer.contract
+      CpMailer.contract_email([offer.format]).deliver_now
       offer.create_contract!(link: "mangled-link-for-accepting-offer")
-      CpMailer.contract_email(format_offer(offer)).deliver_now
       render json: {message: "You've just sent out the contract for this offer."}
     else
       render json: {message: "You've already sent out the contract for this offer."}
@@ -38,7 +38,7 @@ class OffersController < ApplicationController
 
   def get_all_offers
     Offer.all.map do |offer|
-      format_offer(offer)
+      offer.format
     end
   end
 
@@ -49,28 +49,6 @@ class OffersController < ApplicationController
       end
     end
     return false
-  end
-
-  def format_offer(offer_rec)
-    offer = offer_rec.as_json
-    position = Position.find(offer["position_id"]).as_json
-    applicant = Applicant.find(offer["applicant_id"]).as_json
-    instructors = position["instructors"].as_json
-    data = {
-      sent: offer_rec.contract.present?,
-      position: position["position"],
-      applicant: applicant,
-      instructors: [],
-    }
-    if data[:sent]
-      data[:deadline] = offer_rec.get_deadline
-      data[:accepted] = offer_rec.contract[:accepted]
-      data[:withdrawn] = Time.now > data[:deadline]
-    end
-    instructors.each do |instructor|
-      data[:instructors].push(instructor)
-    end
-    return offer.merge(data)
   end
 
 end

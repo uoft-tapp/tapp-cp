@@ -2,13 +2,13 @@ class ContractsController < ApplicationController
   protect_from_forgery with: :null_session
 
   def index
-    contracts = Contract.all.includes(:offer).map { |c| format_contract(c) }
+    contracts = Contract.all.map { |c| c.format }
     render json: contracts
   end
 
   def show
     contract = Contract.find(params[:id])
-    render json: format_contract(contract)
+    render json: contract.format
   end
 
   def update
@@ -17,10 +17,24 @@ class ContractsController < ApplicationController
   end
 
   def nag
-    contract = Contract.find(params[:contract_id])
-    contract.increment!(:nag_count, 1)
-    CpMailer.nag_email(format_contract(contract)).deliver_now
-    render json: {message: "You've nagged at this applicant for the #{contract[:nag_count]}-th time."}
+    if params[:contracts] && params[:contracts]!=""
+      JSON.parse(params[:contracts]).each do |id|
+        contract = Contract.find(id)
+        if contract
+          contract.increment!(:nag_count, 1)
+          CpMailer.nag_email(contract.format).deliver_now
+        end
+      end
+      render json: {message: "You've sent the nag emails."}
+    end
+  end
+
+  def print
+    if params[:contracts] && params[:contracts]!=""
+      offers = get_printable_data(JSON.parse(params[:contracts]))
+      generator = ContractGenerator.new(offers)
+      send_data generator.render, filename: "contracts.pdf", disposition: "inline"
+    end
   end
 
   private
@@ -28,18 +42,16 @@ class ContractsController < ApplicationController
     params.permit(:accepted, :printed)
   end
 
-  def format_contract(contract)
-    offer = contract.offer
-    deadline = contract.get_deadline
-    contract = contract.as_json
-    position = Position.find(offer[:position_id]).as_json
-    applicant = Applicant.find(offer[:applicant_id]).as_json
-    return contract.merge({
-      position: position["position"],
-      applicant: applicant,
-      deadline: deadline,
-      contract: Time.now > deadline,
-    })
+  def get_printable_data(contracts)
+    offers = []
+    contracts.each do |id|
+      contract = Contract.find(id)
+      offer = Offer.find(contract[:id])
+      if offer
+        offers.push(offer.format)
+      end
+    end
+    return offers
   end
 
 end
