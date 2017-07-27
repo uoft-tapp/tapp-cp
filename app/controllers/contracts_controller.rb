@@ -30,7 +30,7 @@ class ContractsController < ApplicationController
 
   def format_contract(contract)
     offer = contract.offer
-    deadline = (contract.get_deadline)
+    deadline = contract.get_deadline
     contract = contract.as_json
     position = Position.find(offer[:position_id]).as_json
     applicant = Applicant.find(offer[:applicant_id]).as_json

@@ -21,9 +21,7 @@ class OffersController < ApplicationController
   end
 
   def send_contract
-    puts params
     offer = Offer.find(params[:offer_id])
-    puts offer
     if !offer.contract
       offer.create_contract!(link: "mangled-link-for-accepting-offer")
       # send out contract by email
