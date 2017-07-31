@@ -1,0 +1,20 @@
+<b>OFFICE USE ONLY</b>
+
+<b>Last Name:</b> <%= @offer[:applicant]["last_name"] %><%= Prawn::Text::NBSP * 5 %><b>First Name:</b> <%= @offer[:applicant]["first_name"] %><%= Prawn::Text::NBSP * 5 %><b>Student Number:</b> <%= @offer[:applicant]["student_number"] %>
+
+<b>ID Number:</b> ____________________________________________________
+
+<b>Personnel Number:</b> ___________________________________ <b>Name:</b> <%= @offer[:applicant]["first_name"] %> <%= @offer[:applicant]["last_name"] %>
+
+<b>Start:</b> <%= (Date.parse @offer[:session]["start_date"]).strftime("%d.%m.%Y") %><%= Prawn::Text::NBSP * 5 %>to<%= Prawn::Text::NBSP * 5 %><%= (Date.parse @offer[:session]["end_date"]).strftime("%d.%m.%Y") %>
+
+<b>Wage Type:</b> 01 15
+
+<b>Amount:</b> <%= '%.2f' % ((@offer["hours"]/4)* @offer[:UG_pay]) %>
+
+<b>Number/Unit:</b> <%= '%.2f' % (@offer["hours"]/4) %>
+
+<b>Assignment#:</b> TA <%= @offer[:position] %>/17
+
+<b>10 King's College Road, Sanford Fleming Building, Toronto, ON M5S 3G4
+Tel: 416-946-3036<%= Prawn::Text::NBSP * 5 %>Fax: 416:-978-1931</b>

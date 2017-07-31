@@ -11,10 +11,12 @@ class Offer < ApplicationRecord
     position = Position.find(offer["position_id"]).as_json
     applicant = Applicant.find(offer["applicant_id"]).as_json
     instructors = position["instructors"].as_json
+    session = Session.find(position["session_id"]).as_json
     data = {
       sent: self.contract.present?,
       position: position["position"],
       applicant: applicant,
+      session: session,
       instructors: [],
     }
     if data[:sent]
