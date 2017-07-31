@@ -7,27 +7,30 @@ class Offer < ApplicationRecord
   end
 
   def format
-    offer = self.as_json
-    position = Position.find(offer["position_id"]).as_json
-    applicant = Applicant.find(offer["applicant_id"]).as_json
-    instructors = position["instructors"].as_json
-    session = Session.find(position["session_id"]).as_json
+    offer = self.json
+    position = (Position.find(self[:position_id])).json
+    applicant = Applicant.find(self[:applicant_id]).json
+    instructors = JSON.parse(position[:instructors].to_json, symbolize_names: true)
+    session = Session.find(position[:session_id]).json
     data = {
       sent: self.contract.present?,
-      position: position["position"],
+      position: position[:position],
       applicant: applicant,
       session: session,
       instructors: [],
     }
     if data[:sent]
       data[:deadline] = self.get_deadline
-      data[:accepted] = self.contract[:accepted]
       data[:withdrawn] = Time.now > data[:deadline]
     end
     instructors.each do |instructor|
       data[:instructors].push(instructor)
     end
     return offer.merge(data)
+  end
+
+  def json
+    JSON.parse(self.to_json, symbolize_names: true)
   end
 
 end

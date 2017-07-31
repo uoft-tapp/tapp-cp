@@ -39,7 +39,7 @@ class ContractsController < ApplicationController
 
   private
   def contract_params
-    params.permit(:accepted, :printed)
+    params.permit(:printed)
   end
 
   def get_printable_data(contracts)

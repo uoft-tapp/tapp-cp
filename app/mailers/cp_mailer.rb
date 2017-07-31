@@ -11,8 +11,6 @@ class CpMailer < ApplicationMailer
     # currently, we have fake applicant with fake email, so it can't send
     # email = @offer[:applicant]["email"]
     @url = "http://google.com"
-    generator = ContractGenerator.new(offer)
-    attachments["contract.pdf"] = {mime_type: 'application/pdf', content: generator.render }
     mail(to: email, subject: "TA Position Offer: #{@offer[:position]}")
   end
 
@@ -31,7 +29,6 @@ class CpMailer < ApplicationMailer
 
   private
   def get_nag_suffix(nag_count)
-    puts nag_count
     case nag_count
     when 1
       return "st"

@@ -8,14 +8,20 @@ class Contract < ApplicationRecord
   def format
     offer = self.offer
     deadline = self.get_deadline
-    contract = self.as_json
-    position = Position.find(offer[:position_id]).as_json
-    applicant = Applicant.find(offer[:applicant_id]).as_json
+    contract = self.json
+    position = Position.find(offer[:position_id]).json
+    applicant = Applicant.find(offer[:applicant_id]).json
     return contract.merge({
-      position: position["position"],
+      position: position[:position],
       applicant: applicant,
       deadline: deadline,
       contract: Time.now > deadline,
+      status: offer[:status],
     })
   end
+
+  def json
+    JSON.parse(self.to_json, symbolize_names: true)
+  end
+
 end

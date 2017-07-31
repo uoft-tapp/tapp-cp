@@ -1,18 +1,18 @@
 <b>OFFICE USE ONLY</b>
 
-<b>Last Name:</b> <%= @offer[:applicant]["last_name"] %><%= Prawn::Text::NBSP * 5 %><b>First Name:</b> <%= @offer[:applicant]["first_name"] %><%= Prawn::Text::NBSP * 5 %><b>Student Number:</b> <%= @offer[:applicant]["student_number"] %>
+<b>Last Name:</b> <%= @offer[:applicant][:last_name] %><%= Prawn::Text::NBSP * 5 %><b>First Name:</b> <%= @offer[:applicant][:first_name] %><%= Prawn::Text::NBSP * 5 %><b>Student Number:</b> <%= @offer[:applicant][:student_number] %>
 
 <b>ID Number:</b> ____________________________________________________
 
-<b>Personnel Number:</b> ___________________________________ <b>Name:</b> <%= @offer[:applicant]["first_name"] %> <%= @offer[:applicant]["last_name"] %>
+<b>Personnel Number:</b> ___________________________________ <b>Name:</b> <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
 
-<b>Start:</b> <%= (Date.parse @offer[:session]["start_date"]).strftime("%d.%m.%Y") %><%= Prawn::Text::NBSP * 5 %>to<%= Prawn::Text::NBSP * 5 %><%= (Date.parse @offer[:session]["end_date"]).strftime("%d.%m.%Y") %>
+<b>Start:</b> <%= (Date.parse @offer[:session][:start_date]).strftime("%d.%m.%Y") %><%= Prawn::Text::NBSP * 5 %>to<%= Prawn::Text::NBSP * 5 %><%= (Date.parse @offer[:session][:end_date]).strftime("%d.%m.%Y") %>
 
 <b>Wage Type:</b> 01 15
 
-<b>Amount:</b> <%= '%.2f' % ((@offer["hours"]/4)* @offer[:UG_pay]) %>
+<b>Amount:</b> <%= '%.2f' % ((@offer[:hours]/4)* @offer[:UG_pay]) %>
 
-<b>Number/Unit:</b> <%= '%.2f' % (@offer["hours"]/4) %>
+<b>Number/Unit:</b> <%= '%.2f' % (@offer[:hours]/4) %>
 
 <b>Assignment#:</b> TA <%= @offer[:position][/[A-Z0-9]{3}\d{3,4}/] %><%= @offer[:position].split(/-\//)[0][@offer[:position].split(/-\//)[0].size-1] %>/17
 

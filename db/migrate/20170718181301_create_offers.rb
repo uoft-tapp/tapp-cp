@@ -7,6 +7,7 @@ class CreateOffers < ActiveRecord::Migration[5.1]
       t.integer :hours, null: false
       t.integer :year
       t.string :session
+      t.string :status, default: "Unsent"
 
       t.timestamps
     end
