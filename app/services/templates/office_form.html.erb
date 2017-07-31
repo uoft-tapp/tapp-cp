@@ -1,20 +1,28 @@
 <b>OFFICE USE ONLY</b>
 
-<b>Last Name:</b> <%= @offer[:applicant][:last_name] %><%= Prawn::Text::NBSP * 5 %><b>First Name:</b> <%= @offer[:applicant][:first_name] %><%= Prawn::Text::NBSP * 5 %><b>Student Number:</b> <%= @offer[:applicant][:student_number] %>
+<b>Returning Employees:</b>
 
-<b>ID Number:</b> ____________________________________________________
+<%= @tab %><b>Last Name:</b> <%= @offer[:applicant][:last_name] %><%= @whitespace %><b>First Name:</b> <%= @offer[:applicant][:first_name] %><%= @whitespace %><b>Student Number:</b> <%= @offer[:applicant][:student_number] %>
 
-<b>Personnel Number:</b> ___________________________________ <b>Name:</b> <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
+<%= @tab %><b>Personnel Number:</b> ___________________________________ <b>Name:</b> <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
 
-<b>Start:</b> <%= (Date.parse @offer[:session][:start_date]).strftime("%d.%m.%Y") %><%= Prawn::Text::NBSP * 5 %>to<%= Prawn::Text::NBSP * 5 %><%= (Date.parse @offer[:session][:end_date]).strftime("%d.%m.%Y") %>
+<%= @tab %><b>Start:</b> <%= (Date.parse @offer[:session][:start_date]).strftime("%d.%m.%Y") %><%= @whitespace %>to<%= @whitespace %><%= (Date.parse @offer[:session][:end_date]).strftime("%d.%m.%Y") %>
 
-<b>Wage Type:</b> 01 15
+<%= @tab %><b>Wage Type:</b> 01 15
 
-<b>Amount:</b> <%= '%.2f' % ((@offer[:hours]/4)* @offer[:UG_pay]) %>
+<%= @tab %><b>Amount:</b> <%= '%.2f' % ((@offer[:hours]/4)* @offer[:UG_pay]) %>
 
-<b>Number/Unit:</b> <%= '%.2f' % (@offer[:hours]/4) %>
+<%= @tab %><b>Number/Unit:</b> <%= '%.2f' % (@offer[:hours]/4) %>
 
-<b>Assignment#:</b> TA <%= @offer[:position][/[A-Z0-9]{3}\d{3,4}/] %><%= @offer[:position].split(/-\//)[0][@offer[:position].split(/-\//)[0].size-1] %>/17
+<%= @tab %><b>Assignment#:</b> TA <%= @offer[:position][/[A-Z0-9]{3}\d{3,4}/] %><%= @offer[:position].split(/-\//)[0][@offer[:position].split(/-\//)[0].size-1] %>/17
+
+<b>New Employees:</b>
+
+<%= @tab %><b>Personnel Number:</b> ___________________________________ <b>Start Date:</b> <%= (Date.parse @offer[:session][:start_date]).strftime("%d.%m.%Y") %>
+
+<%= @tab %><b>Last Name:</b> <%= @offer[:applicant][:last_name] %><%= @whitespace %><b>First Name:</b> <%= @offer[:applicant][:first_name] %><%= @whitespace %>
+
+<%= @tab %><b>Student Number:</b> <%= @offer[:applicant][:student_number] %>
 
 <b>10 King's College Road, Sanford Fleming Building, Toronto, ON M5S 3G4
-Tel: 416-946-3036<%= Prawn::Text::NBSP * 5 %>Fax: 416:-978-1931</b>
+Tel: 416-946-3036<%= @whitespace %>Fax: 416:-978-1931</b>

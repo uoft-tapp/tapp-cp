@@ -8,6 +8,8 @@ class ContractGenerator
         start_new_page
       end
       @offer = offer
+      @whitespace = Prawn::Text::NBSP * 5
+      @tab = Prawn::Text::NBSP * 10
       @offer[:UG_pay]= 43.65
       @offer[:SGS_pay]= 43.65
       define_grid(columns: 75, rows: 100, gutter: 0)
@@ -115,9 +117,9 @@ class ContractGenerator
 
   def create_form(grids, form_data)
     grid(grids[0], grids[1]).bounding_box() do
-      define_grid(columns: 1, rows: 9, gutter: 0)
+      define_grid(columns: 1, rows: form_data.size-2, gutter: 0)
       form_data.each_with_index do |value, index|
-        if index!=0 && index!=9
+        if index!=0 && index!=form_data.size-1
           grid([index-1,0], [index-1, 0]).bounding_box do
             font_size 9
             text value, inline_format: true
@@ -149,8 +151,8 @@ class ContractGenerator
 
   def set_form(form_data)
     set_text(get_grids(1, 6.9, 6.5, 0.2), get_style(3, form_data[0]))
-    set_text(get_grids(1, 10, 6.5, 0.5), get_style(2, form_data[9]))
-    create_form(get_grids(1, 7.4, 6.5, 2.9), form_data)
+    set_text(get_grids(1, 10, 6.5, 0.5), get_style(2, form_data[form_data.size-1]))
+    create_form(get_grids(1, 7.1, 6.5, 2.9), form_data)
   end
 
   def set_salary(salary_data)
