@@ -1,3 +1,4 @@
+require 'erb'
 class ContractGenerator
   include Prawn::View
 
@@ -11,89 +12,133 @@ class ContractGenerator
       @offer[:year] = 2017
       @offer[:start_date] = "May 9, 2017"
       @offer[:end_date] = "Aug 31, 2017"
-      define_grid(columns: 1, rows: 10, gutter: 0)
-      insert_title
-      insert_intro
-      insert_calculations
-      insert_cupe
-      insert_signoff
+      @offer[:UG_pay]= 43.65
+      @offer[:SGS_pay]= 43.65
+      define_grid(columns: 75, rows: 100, gutter: 0)
+      set_header(get_template_data("header"))
+      set_letter(get_template_data("letter"))
+      set_form(get_template_data("office_form"))
+      set_salary(get_template_data("salary"))
     end
   end
 
   private
-  def insert_title
-    grid([0,0], [1,0]).bounding_box do
-      stroke_color 100, 100, 0, 0
-      text "Logo will go here"
-      rectangle [-35, 180], 300, 100
-      stroke
+  def get_template_data(name)
+    file_data = File.read("#{Rails.root}/app/services/#{name}_template.html.erb").split("\n\n")
+    data = file_data.map do |item|
+      ERB.new(item).result(binding)
     end
+    return data
+  end
 
-    grid([1,0], [2,0]).bounding_box do
-      font "Times-Roman"
-      font_size 20
-      text_box "TEACHING ASSISTANT CONTRACT", style: :bold, at: [0, 130], align: :center
-      text_box "#{@offer[:session]} Session #{@offer[:year]}", style: :bold, at: [0, 110], align: :center
+  def get_style(type, text)
+    case type
+    when 1
+      return {
+        font: "Times-Roman",
+        font_size: 12,
+        text: text,
+        align: :left,
+      }
+    when 2
+      return {
+        font: "Times-Roman",
+        font_size: 12,
+        text: text,
+        align: :center,
+      }
+    when 3
+      return {
+        font: "Times-Roman",
+        font_size: 9,
+        text: text,
+        align: :left,
+      }
+    when 4
+      return {
+        font: "Times-Roman",
+        font_size: 9,
+        text: text,
+        align: :center,
+      }
     end
   end
 
-  private
-  def insert_intro
-    grid([2,0],[3,0]).bounding_box do
-      font_size 12
-      text "Dear #{@offer[:applicant]["first_name"]} #{@offer[:applicant]["last_name"]},"
-      move_down 5
-      text "We are pleased to offer you a position as a Teaching Assistant in the Department of Computer Science " +
-      "during the period of <b>#{@offer[:start_date]}</b> to <b>#{@offer[:end_date]}</b>. Your assignment will be <b>#{@offer[:position]}</b>. (We reserve the " +
-      "right to change your appointment from this course to another course, if necessary). The total time involved " +
-      "in the assignment is <b>#{@offer["hours"]}</b>. The salary for this position is governed by the collective agreement " +
-      "between the University of Toronto and the Canadian Union of Public Employees, Local 3902, a copy of which " +
-      "will be provided upon request. The current rate of pay for UG = $43.65; SGS I and SGS II/PDF = $43.65. " +
-      "According to the collective agreement the total sum paid to you for the appointment described above will be :",
-      indent_paragraphs: 30, inline_format: true
+  def get_grids(x, y, width, height)
+    x = (x*10)-5
+    y = (y*10)-5
+    end_x= x+(width*10)-1
+    end_y= y+(height*10) -1
+    return [[y, x], [end_y, end_x]]
+  end
+
+  def set_text(grids, data)
+    grid(grids[0], grids[1]).bounding_box() do
+      font data[:font]
+      font_size data[:font_size]
+      text data[:text], inline_format: true, align: data[:align]
     end
   end
 
-  private
-  def insert_calculations
-    grid([4,0],[5,0]).bounding_box do
-      stroke_color 100, 100, 0, 0
-      rectangle [100, 130], 300, 100
-      text_box "calculations go here", at: [120, 110]
-      stroke
+  def draw_line(grids, length)
+    grid(grids[0], grids[1]).bounding_box() do
+      stroke_horizontal_line 0, 470*length, at: 5
     end
   end
 
-  private
-  def insert_cupe
-    grid([6,0],[8,0]).bounding_box do
-      text "If this is your first appointment  after  becoming  a  Ph.D.  student,  you  will  be  guaranteed  three  more " +
-      "appointments of the same number of hours in subsequent years as per Article 16.05 of the CUPE 3902 (Unit 1) Collective Agreement." +
-      "If this is not your first appointment, you may still be owed one or more subsequent " +
-      "appointments under the aforementioned Article. If this is the case, you may consult the letter you received last April, where your " +
-      "appointment status was summarized. Please feel free to contact Karen Reid to seehow various guarantees fit together.",
-      indent_paragraphs: 30
-
-      move_down 10
-
-      text "You will soon be given the opportunity to review the Description of Duties and Allocation of Hours (DDAH) form, which will set out " +
-      "more specifically the duties of your position, and the hours assigned to each.",
-      indent_paragraphs: 30
-
-      text "Please also be advised that in accepting this offer of appointment, you are accepting the responsibility " +
-      "during the course of your appointment for contacting	your supervisor immediately if you have any questions " +
-      "or concerns relating to the hours of	work as set out in your job description, in order	that these may be " +
-      "discussed and resolved at the earliest opportunity. Do not make any alterations or add any written " +
-      "statements to the form, or the offer of employment will be invalidated.",
-    indent_paragraphs: 30
-    end
-
-  end
-
-  private
-  def insert_signoff
-    grid([9,0],[10,0]).bounding_box do
-      text "SIGNATURE"
+  def draw_image(grids)
+    grid(grids[0], grids[1]).bounding_box() do
+      stroke_bounds
     end
   end
+
+  def create_form(grids, form_data)
+    grid(grids[0], grids[1]).bounding_box() do
+      define_grid(columns: 1, rows: 9, gutter: 0)
+      form_data.each_with_index do |value, index|
+        if index != 0 && index!=10
+          grid([index-1,0], [index-1, 0]).bounding_box do
+            font_size 9
+            text value, inline_format: true
+          end
+        end
+      end
+    end
+  end
+
+  def set_header(header_data)
+    draw_image(get_grids(0.7, 0.4, 1.8, 0.9))
+    set_text(get_grids(0.7, 1.3, 1.8, 0.3), get_style(4, header_data[0]))
+
+    set_text(get_grids(2.5, 0.4, 3.5, 0.4), get_style(2, header_data[1]))
+    set_text(get_grids(6.1, 0.5, 1.4, 0.3), get_style(4, header_data[2]))
+
+    set_text(get_grids(4.5, 1.2, 3, 0.5), get_style(2, header_data[3]))
+  end
+
+  def set_letter(letter_data)
+    set_text(get_grids(1, 1.9, 6.5, 1.1), get_style(3, letter_data[0]))
+    set_text(get_grids(1, 4.2, 6.5, 1.5), get_style(3, letter_data[1]))
+
+    set_text(get_grids(4.5, 5.8, 3, 0.2), get_style(3, letter_data[2]))
+    draw_image(get_grids(4.5, 5.9, 3, 0.6))
+    set_text(get_grids(4.5, 6.6, 3, 0.2), get_style(3, letter_data[3]))
+    draw_line(get_grids(1, 6.8, 6.5, 0.1), 1)
+  end
+
+  def set_form(form_data)
+    set_text(get_grids(1, 6.9, 6.5, 0.2), get_style(3, form_data[0]))
+    set_text(get_grids(1, 10, 6.5, 0.5), get_style(2, form_data[10]))
+    create_form(get_grids(1, 7.1, 6.5, 2.9), form_data)
+  end
+
+  def set_salary(salary_data)
+    define_grid(columns: 75, rows: 100, gutter: 0)
+    grids = get_grids(2.5, 2.9, 3, 1.3)
+    grid(grids[0], grids[1]).bounding_box() do
+      define_grid(columns: 1, rows: 4, gutter: 0)
+      grid.show_all
+    end
+  end
+
 end

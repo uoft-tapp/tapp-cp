@@ -11,6 +11,8 @@ services:
       TAPP: ${TAPP}
       EMAIL_TYPE: ${EMAIL_TYPE}
       EMAIL_USER: ${EMAIL_USER}
+      TA_COORD: ${TA_COORD}
+      CUPE_SITE: ${CUPE_SITE}
     volumes:
       - .:/srv/app
     networks:
