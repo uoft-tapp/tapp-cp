@@ -1,6 +1,6 @@
 <b>OFFICE USE ONLY</b>
 
-<b>Returning Employees:</b>
+<b>Returning Employee:</b>
 
 <%= @tab %><b>Last Name:</b> <%= @offer[:applicant][:last_name] %><%= @whitespace %><b>First Name:</b> <%= @offer[:applicant][:first_name] %><%= @whitespace %><b>Student Number:</b> <%= @offer[:applicant][:student_number] %>
 
@@ -16,7 +16,7 @@
 
 <%= @tab %><b>Assignment#:</b> TA <%= @offer[:position][/[A-Z0-9]{3}\d{3,4}/] %><%= @offer[:position].split(/-\//)[0][@offer[:position].split(/-\//)[0].size-1] %>/17
 
-<b>New Employees:</b>
+<b>New Employee:</b>
 
 <%= @tab %><b>Personnel Number:</b> ___________________________________ <b>Start Date:</b> <%= (Date.parse @offer[:session][:start_date]).strftime("%d.%m.%Y") %>
 
