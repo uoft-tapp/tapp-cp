@@ -157,13 +157,13 @@ class ContractGenerator
     define_grid(columns: 75, rows: 100, gutter: 0)
     grids = get_grids(2.5, 3.1, 1.6, 1)
     grid(grids[0], grids[1]).bounding_box() do
-      define_grid(columns: 1, rows: 4, gutter: 0)
-      set_text([[3, 0],[3, 0]], get_style(7, salary_data[1]))
+      data = salary_data[0].split("\n")
+      define_grid(columns: 1, rows: data.size+1, gutter: 0)
+      set_text([[data.size, 0],[data.size, 0]], get_style(7, salary_data[1]))
       grid([0,0], [2,0]).bounding_box do
-        define_grid(columns: 4, rows: 3, gutter: 0)
-        draw_line([[2, 0], [2, 3]], 0.25)
-        draw_line([[1, 3], [1, 3]], 0.065)
-        data = salary_data[0].split("\n")
+        define_grid(columns: 4, rows: data.size, gutter: 0)
+        draw_line([[data.size-1, 0], [data.size-1, 3]], 0.25)
+        draw_line([[data.size-2, 3], [data.size-2, 3]], 0.065)
         data.each_with_index do |row, index|
           values = row.split(",")
           set_text([[index, 0],[index, 2]], get_style(6, values[0]))
