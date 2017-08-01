@@ -95,11 +95,14 @@ class ContractGenerator
     return [[y, x], [end_y, end_x]]
   end
 
-  def set_text(grids, data)
+  def set_text(grids, data, stroke = false)
     grid(grids[0], grids[1]).bounding_box() do
       font data[:font]
       font_size data[:font_size]
       text data[:text], inline_format: true, align: data[:align]
+      if stroke
+        stroke_bounds
+      end
     end
   end
 
@@ -115,18 +118,25 @@ class ContractGenerator
     end
   end
 
-  def create_form(grids, form_data)
-    grid(grids[0], grids[1]).bounding_box() do
-      define_grid(columns: 1, rows: form_data.size-2, gutter: 0)
-      form_data.each_with_index do |value, index|
-        if index!=0 && index!=form_data.size-1
-          grid([index-1,0], [index-1, 0]).bounding_box do
-            font_size 9
-            text value, inline_format: true
+  def get_table_data(form_data)
+    table_data = []
+    i = -1
+    max = 1
+    form_data.each_with_index do |value, index|
+      if index!=0 && index!=form_data.size-1
+        if value[0..1]=='\t'
+          data = value[2..(value.length-1)].split(":")
+          (table_data[i][:table]).push(data)
+          if data.size > max
+            max = data.size
           end
+        else
+          i = i+1
+          table_data[i] = {label: value, table: [], index: [index-1, index]}
         end
       end
     end
+    return [table_data, max]
   end
 
   def set_header(header_data)
@@ -152,7 +162,26 @@ class ContractGenerator
   def set_form(form_data)
     set_text(get_grids(1, 6.9, 6.5, 0.2), get_style(3, form_data[0]))
     set_text(get_grids(1, 10, 6.5, 0.5), get_style(2, form_data[form_data.size-1]))
-    create_form(get_grids(1, 7.1, 6.5, 2.9), form_data)
+    set_form_table(get_grids(1, 7.05, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
+  end
+
+  def set_form_table(grids, table_data, rows)
+    grid(grids[0], grids[1]).bounding_box do
+      define_grid(columns: table_data[1], rows: rows, gutter: 0)
+      table_data[0].each do |table|
+        set_table_helper(table, table_data[1])
+      end
+    end
+  end
+
+  def set_table_helper(table, num_columns)
+    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(7, table[:label]))
+    table[:table].each_with_index do |row, row_num|
+      draw_line([[row_num+table[:index][1], 0], [row_num+table[:index][1], num_columns]], 1)
+      row.each_with_index do |column, index|
+        set_text([[row_num+table[:index][1], index],[row_num+table[:index][1], index]], get_style(7, column))
+      end
+    end
   end
 
   def set_salary(salary_data)
