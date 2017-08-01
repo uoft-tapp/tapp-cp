@@ -95,13 +95,25 @@ class ContractGenerator
     return [[y, x], [end_y, end_x]]
   end
 
-  def set_text(grids, data, stroke = false)
+  def set_text(grids, data, fill = false, top_padding = false)
     grid(grids[0], grids[1]).bounding_box() do
       font data[:font]
       font_size data[:font_size]
-      text data[:text], inline_format: true, align: data[:align]
-      if stroke
+      if top_padding
+        move_down 3
+      end
+      if fill
         stroke_bounds
+        text "#{Prawn::Text::NBSP * 3}#{data[:text]}", inline_format: true, align: data[:align]
+        if data[:text]==""
+          stroke do
+            fill_color 'DDDDDD'
+            fill_and_stroke_rectangle [0,bounds.height], bounds.width, bounds.height
+            fill_color '000000'
+          end
+        end
+      else
+        text data[:text], inline_format: true, align: data[:align]
       end
     end
   end
@@ -175,11 +187,24 @@ class ContractGenerator
   end
 
   def set_table_helper(table, num_columns)
-    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(7, table[:label]))
+    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(7, table[:label]), false, true)
     table[:table].each_with_index do |row, row_num|
-      draw_line([[row_num+table[:index][1], 0], [row_num+table[:index][1], num_columns]], 1)
+      row_multiplier= num_columns/row.length.to_f
       row.each_with_index do |column, index|
-        set_text([[row_num+table[:index][1], index],[row_num+table[:index][1], index]], get_style(7, column))
+        column = column.strip
+        curr_row = row_num+table[:index][1]
+        horizontal_1 =  index*row_multiplier
+        if index == row.length-1 && row_multiplier ==1
+          horizontal_2 =  horizontal_1
+        else
+          horizontal_2 =  (index+1)*row_multiplier-1
+        end
+        grids = [[curr_row, horizontal_1], [curr_row, horizontal_2]]
+        if index%2 == 0
+          set_text(grids, get_style(7, "<b>#{column}</b>"), true, true)
+        else
+          set_text(grids, get_style(7, "#{column}"), true, true)
+        end
       end
     end
   end
