@@ -13,6 +13,7 @@ services:
       EMAIL_USER: ${EMAIL_USER}
       TA_COORD: ${TA_COORD}
       CUPE_SITE: ${CUPE_SITE}
+      RECIPIENT: ${RECIPIENT}
     volumes:
       - .:/srv/app
     networks:

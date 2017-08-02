@@ -1,28 +1,18 @@
 class CpMailer < ApplicationMailer
   default from: ENV['EMAIL_USER']
-  ENV['recipient'] = "mingtsengeh@gmail.com"
-
   layout "mailer"
 
   def contract_email(offer)
-    @offer = offer[0]
-    email = ENV['recipient']
-    # for real system use the following
-    # currently, we have fake applicant with fake email, so it can't send
-    # email = @offer[:applicant]["email"]
+    email = get_email(@offer)
     @url = "http://google.com"
     mail(to: email, subject: "TA Position Offer: #{@offer[:position]}")
   end
 
   def nag_email(contract)
-    email = ENV['recipient']
-    # for real system use the following
-    # currently, we have fake applicant with fake email, so it can't send
-    # email = @contract[:applicant]["email"]
+    email = get_email(@contract)
     @contract = contract
-    @contract[:nag_suffix] = get_nag_suffix(@contract["nag_count"])
-    deadline = @contract[:deadline].in_time_zone('Eastern Time (US & Canada)')
-    @contract[:deadline] = deadline.strftime("%I:%M%p on %B %d, %Y")
+    @contract[:nag_suffix] = get_nag_suffix(@contract[:nag_count])
+    @contract[:deadline] = format_time(@contract[:deadline],"%I:%M%p on %B %d, %Y")
     @url = "http://google.com"
     mail(to: email, subject: "Reminder for TA Position: #{@contract[:position]}")
   end
@@ -39,6 +29,19 @@ class CpMailer < ApplicationMailer
     else
       return "th"
     end
+  end
+
+  def get_email(email)
+    if ENV['RAILS_ENV'] == 'development'
+      return ENV['RECIPIENT']
+    elsif ENV['RAILS_ENV'] == 'production'
+      return email[:applicant][:email]
+    end
+  end
+
+  def format_time(time, form)
+    time = time.in_time_zone('Eastern Time (US & Canada)')
+    return time.strftime(form)
   end
 
 end
