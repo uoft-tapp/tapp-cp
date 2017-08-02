@@ -33,6 +33,16 @@ class ContractGenerator
     return "#{Rails.root}/app/services/templates/fonts/#{name}.ttf"
   end
 
+  def format_time(time, form)
+    time = (Date.parse time).in_time_zone('Eastern Time (US & Canada)')
+    case form
+    when 1
+      return time.strftime("%B %e, %Y")
+    when 2
+      return time.strftime("%d.%m.%Y")
+    end
+  end
+
   def get_style(type, text)
     case type
     when 1

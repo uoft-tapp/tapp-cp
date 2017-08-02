@@ -8,7 +8,7 @@
 
 \tPersonnel Number: :Name:<%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
 
-\tStart Date: <%= (Date.parse @offer[:session][:start_date]).strftime("%d.%m.%Y") %>:End Date: <%= (Date.parse @offer[:session][:end_date]).strftime("%d.%m.%Y") %>
+\tStart Date: <%= format_time(@offer[:session][:start_date],2) %>:End Date: <%= format_time(@offer[:session][:end_date],2) %>
 
 \tWage Type: 01 15
 
@@ -20,7 +20,7 @@
 
 <b>New Employee:</b>
 
-\tPersonnel Number: :Start Date: <%= (Date.parse @offer[:session][:start_date]).strftime("%d.%m.%Y") %>
+\tPersonnel Number: :Start Date: <%= format_time(@offer[:session][:start_date],2) %>
 
 \tForm-of-add: :Last Name: <%= @offer[:applicant][:last_name] %>:First Name: <%= @offer[:applicant][:first_name] %>
 
