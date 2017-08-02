@@ -1,4 +1,5 @@
 class Offer < ApplicationRecord
+  include Model
   validates_uniqueness_of :position_id, scope: [:applicant_id]
   has_one :contract
 
@@ -28,9 +29,4 @@ class Offer < ApplicationRecord
     end
     return offer.merge(data)
   end
-
-  def json
-    JSON.parse(self.to_json, symbolize_names: true)
-  end
-
 end

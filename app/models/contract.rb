@@ -1,4 +1,5 @@
 class Contract < ApplicationRecord
+  include Model
   belongs_to :offer
 
   def get_deadline
@@ -18,10 +19,6 @@ class Contract < ApplicationRecord
       contract: Time.now > deadline,
       status: offer[:status],
     })
-  end
-
-  def json
-    JSON.parse(self.to_json, symbolize_names: true)
   end
 
 end
