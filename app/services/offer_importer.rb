@@ -3,7 +3,6 @@ class OfferImporter
     data = File.read("#{Rails.root}/db/seeds/#{file}.json")
     raise JSON::ParserError.new("the source file is empty") if data.strip.length == 0
     @offers = JSON.parse(data).fetch("offers")
-    puts @offers
   end
 
   def import_data
