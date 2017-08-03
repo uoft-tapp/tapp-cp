@@ -1,0 +1,52 @@
+{
+    "offers": [
+        {
+            "course_id": "C4M101H1F",
+            "round_id": 110,
+            "utorid": "applicant1",
+            "hours": 40,
+            "session": "Winter",
+            "year": 2017
+        },
+        {
+            "course_id": "CSC385H1F",
+            "round_id": 110,
+            "utorid": "applicant1",
+            "hours": 25,
+            "session": "Winter",
+            "year": 2017
+        },
+        {
+            "course_id": "CSC469H1F/2208HF",
+            "round_id": 110,
+            "utorid": "applicant13",
+            "hours": 30,
+            "session": "Winter",
+            "year": 2017
+        },
+        {
+            "course_id": "CSC494H1F",
+            "round_id": 110,
+            "utorid": "applicant175",
+            "hours": 56,
+            "session": "Winter",
+            "year": 2017
+        },
+        {
+            "course_id": "C4M101H1F",
+            "round_id": 110,
+            "utorid": "applicant12",
+            "hours": 90,
+            "session": "Winter",
+            "year": 2017
+        },
+        {
+            "course_id": "CSC108H1F-A",
+            "round_id": 110,
+            "utorid": "applicant14",
+            "hours": 40,
+            "session": "Winter",
+            "year": 2017
+        }
+    ]
+}

@@ -8,6 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      TAPP: ${TAPP}
     volumes:
       - .:/srv/app
     networks:
