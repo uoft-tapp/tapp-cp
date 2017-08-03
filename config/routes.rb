@@ -3,12 +3,12 @@ Rails.application.routes.draw do
   resources :applicants
   resources :offers do
     post "send-contract" => "offers#send_contract"
-    post "accept" => "offers#accept"
-    post "reject" => "offers#reject"
+    post "decision/:code" => "offers#set_status"
   end
   resources :contracts
   get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
   post "contracts/print" => "contracts#print"
   post "contracts/nag" => "contracts#nag"
   get "test" => "app#test"
+  get "decision/:utorid/:position_id" => "app#decision"
 end

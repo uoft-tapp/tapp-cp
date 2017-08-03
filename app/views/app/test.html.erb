@@ -9,6 +9,7 @@
       <table>
         <tr>
           <th>Action</th>
+          <th>Decision Link</th>
           <th>Last Name</th>
           <th>First Name</th>
           <th>Position</th>
@@ -20,6 +21,7 @@
         <% @offers.each do |o| %>
           <tr>
             <th><input type="submit" value="Send Contract" formaction="/offers/<%= o[:id]%>/send-contract"></th>
+            <th><a href="decision/<%= o[:applicant][:utorid]%>/<%= o[:position_id]%>">Link</a></th>
             <th><%= o[:applicant][:last_name]%></th>
             <th><%= o[:applicant][:first_name]%></th>
             <th><%= o[:position]%></th>

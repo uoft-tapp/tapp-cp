@@ -10,8 +10,8 @@ class OfferImporter
       position = Position.find_by_position(offer["course_id"], offer["round_id"])
       applicant = Applicant.find_by_utorid(offer["utorid"])
       offer = Offer.create!(
-        position_id: position["id"],
-        applicant_id: applicant["id"],
+        position_id: position[:id],
+        applicant_id: applicant[:id],
         hours: offer["hours"],
         session: offer["session"],
         year: offer["year"],
