@@ -4,33 +4,48 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
   </head>
   <style>
-    body, div, p, label, input, button{
+    body, div, form, p, label, input, button{
       margin: 0; padding: 0;
     }
-    div{
-      width: 640px;
+    form, div{
+      width: 800px;
       margin: 0 auto;
       padding: 0;
       text-align: center;
     }
+    div{
+      margin-top: 10px;
+      border-top: #DDD solid 1px;
+      padding: 5px;
+    }
     #pdf_view_port{
       width: 100vw;
-      height: calc(100vh - 150px);
+      height: calc(100vh - 200px);
+    }
+    #acceptForm{
+      opacity: 0;
+    }
+    label{
+      padding: 0 10px;
     }
   </style>
 
   <body>
     <embed id="pdf_view_port" type='application/pdf'/>
+    <form>
+      <p>I hereby accept the Teaching Assistanship position offered here:</p>
+      <br/>
+      <label><input onchange="showAcceptForm()" name="decision" type="radio" value="accept"/>Accept</label>
+      <label><input onchange="showAcceptForm()" name="decision" type="radio" value="reject"/>Reject</label>
+      <br/>
+      <label id="acceptForm">To accept the contract type your name: <input type="text" name="signature_name" required="required"></label>
+      <br/><br/>
+      <button type='button' onclick=''>Submit</button>
+    </form>
     <div>
-    <p>I hereby accept the Teaching Assistanship position offered here:</p>
-    <br/><br/>
-    <label><input name="decision" type="radio" value="accept"/>Accept</label>
-    <label><input name="decision" type="radio" value="reject"/>Reject</label>
-    <br/>
-    <label>To accept the contract type your name: <input type="text" name="signature_name" required="required"></label>
-    <br/>
-    <button>Submit</button>
-    <div>
+      <p><b>Important:</b> In order to arrange payroll, if this is your first DCS TAship or your SIN number has been changed since last TAship, you must see Lisa DeCaro in person during office hours (M-F, 9:30-11, 2-3:30) office SF 3302F.</p>
+      <p>If you have questions, please email Lisa DeCaro <a href="mailto:lisab@cs.toronto.edu">lisab@cs.toronto.edu</a>.</p>
+    </div>
 
     <script>
       function fetchPdfData(){
@@ -49,6 +64,23 @@
           let viewPort= document.getElementById("pdf_view_port");
           viewPort.setAttribute("src", fileURL);
         });
+      }
+      function showAcceptForm(){
+        let decision = document.getElementsByName('decision');
+        let acceptForm= document.getElementById('acceptForm');
+        let selected = null;
+        decision.forEach(function(item, index){
+          if (item.checked)
+            selected = index;
+        });
+        if (selected !=null){
+          if(decision[selected].value=='accept'){
+            acceptForm.style.opacity="1";
+          }
+          else{
+            acceptForm.style.opacity="0";
+          }
+        }
       }
       fetchPdfData();
     </script>
