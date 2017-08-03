@@ -3,15 +3,38 @@
   <head>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
   </head>
+  <style>
+    body, div, p, label, input, button{
+      margin: 0; padding: 0;
+    }
+    div{
+      width: 640px;
+      margin: 0 auto;
+      padding: 0;
+      text-align: center;
+    }
+    #pdf_view_port{
+      width: 100vw;
+      height: calc(100vh - 150px);
+    }
+  </style>
+
   <body>
-    <h1>Decision View: Contract <%=@contract_id %></h1>
-    <button>Accept</button>
-    <button>Reject</button>
+    <embed id="pdf_view_port" type='application/pdf'/>
+    <div>
+    <p>I hereby accept the Teaching Assistanship position offered here:</p>
+    <br/><br/>
+    <label><input name="decision" type="radio" value="accept"/>Accept</label>
+    <label><input name="decision" type="radio" value="reject"/>Reject</label>
+    <br/>
+    <label>To accept the contract type your name: <input type="text" name="signature_name" required="required"></label>
+    <br/>
+    <button>Submit</button>
+    <div>
 
     <script>
       function fetchPdfData(){
         let data = {"contracts": '[<%= @contract_id %>]'}
-        console.log(data);
         fetch("/contracts/print", {
           headers: {
             Accept: 'application/json',
@@ -22,9 +45,9 @@
         }).then(function(response) {
           return response.blob();
         }).then(function(response) {
-          var fileURL = URL.createObjectURL(response);
-          <embed ng-src=fileURL style="width:200px;height:200px;"></embed> 
-          //window.open(fileURL);
+          let fileURL = URL.createObjectURL(response);
+          let viewPort= document.getElementById("pdf_view_port");
+          viewPort.setAttribute("src", fileURL);
         });
       }
       fetchPdfData();
