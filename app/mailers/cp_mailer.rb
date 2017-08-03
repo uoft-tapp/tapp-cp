@@ -3,13 +3,14 @@ class CpMailer < ApplicationMailer
   layout "mailer"
 
   def contract_email(offer)
-    email = get_email(@offer)
+    email = get_email(offer)
+    @offer = offer
     @url = "http://google.com"
     mail(to: email, subject: "TA Position Offer: #{@offer[:position]}")
   end
 
   def nag_email(contract)
-    email = get_email(@contract)
+    email = get_email(contract)
     @contract = contract
     @contract[:nag_suffix] = get_nag_suffix(@contract[:nag_count])
     @contract[:deadline] = format_time(@contract[:deadline],"%I:%M%p on %B %d, %Y")
