@@ -37,6 +37,24 @@ class ContractsController < ApplicationController
     end
   end
 
+  def set_status
+    status = get_status(params[:code])
+    contract = Contract.find(params[:contract_id])
+    if contract
+      offer = contract.offer
+      if offer[:status] == "Pending"
+        offer.update_attributes!(status: status[:name])
+        render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
+      elsif offer[:status] == "Unsent"
+        render json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
+      else
+        render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
+      end
+    else
+      render status: 404, json: {success: false, message: "Contract #{params[:contract_id]} does not exist."}
+    end
+  end
+
   private
   def contract_params
     params.permit(:printed)
@@ -52,6 +70,17 @@ class ContractsController < ApplicationController
       end
     end
     return offers
+  end
+
+  def get_status(code)
+    case code
+    when "accept"
+      return {name: "Accepted", action: "accept"}
+    when "reject"
+      return {name: "Rejected", action: "reject"}
+    when "withdraw"
+      return {name: "Withdrawn", action: "withdraw"}
+    end
   end
 
 end

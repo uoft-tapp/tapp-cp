@@ -13,7 +13,7 @@
       padding: 0;
       text-align: center;
     }
-    div{
+    .admonishment{
       margin-top: 10px;
       border-top: #DDD solid 1px;
       padding: 5px;
@@ -31,58 +31,127 @@
   </style>
 
   <body>
-    <embed id="pdf_view_port" type='application/pdf'/>
-    <form>
+    <embed id="pdf_view_port" type='application/pdf' name="contract.pdf"/>
+    <form id='decision'>
       <p>I hereby accept the Teaching Assistanship position offered here:</p>
       <br/>
       <label><input onchange="showAcceptForm()" name="decision" type="radio" value="accept"/>Accept</label>
       <label><input onchange="showAcceptForm()" name="decision" type="radio" value="reject"/>Reject</label>
       <br/>
-      <label id="acceptForm">To accept the contract type your name: <input type="text" name="signature_name" required="required"></label>
+      <label id="acceptForm">To accept the contract type your name:
+        <input id="signature" type="text" name="signature_name" required="required">
+      </label>
       <br/><br/>
-      <button type='button' onclick=''>Submit</button>
+      <button type='button' onclick='submitDecision()'>Submit</button>
     </form>
-    <div>
+    <div id='status'>
+    </div>
+    <div class='admonishment'>
       <p><b>Important:</b> In order to arrange payroll, if this is your first DCS TAship or your SIN number has been changed since last TAship, you must see Lisa DeCaro in person during office hours (M-F, 9:30-11, 2-3:30) office SF 3302F.</p>
       <p>If you have questions, please email Lisa DeCaro <a href="mailto:lisab@cs.toronto.edu">lisab@cs.toronto.edu</a>.</p>
     </div>
 
     <script>
-      function fetchPdfData(){
-        let data = {"contracts": '[<%= @contract_id %>]'}
-        fetch("/contracts/print", {
+      function setupPage(offer_status, fetch=false){
+        if (fetch)
+          fetchPdfData();
+        let status = document.getElementById('status');
+        let decision = document.getElementById('decision');
+        if (offer_status == 'pending'){
+          status.style.display='none';
+          decision.style.display='block';
+        }
+        else{
+          status.style.display='block';
+          decision.style.display='none';
+          status.innerHTML = `<h2>Status: </h2>
+          <p>This offer has been `+offer_status+'.</p>';
+        }
+      }
+      function postHelper(url, data, action, blob=false){
+        fetch(url, {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
           },
-          method: 'POST',
           body: JSON.stringify(data),
+          method: 'POST',
         }).then(function(response) {
-          return response.blob();
-        }).then(function(response) {
-          let fileURL = URL.createObjectURL(response);
-          let viewPort= document.getElementById("pdf_view_port");
-          viewPort.setAttribute("src", fileURL);
+          if (blob){
+            return response.blob();
+          }
+          else{
+            return response.json();
+          }
+        }).then(function(response){
+            action(response);
         });
       }
+      function fetchPdfData(){
+        let data = {"contracts": '[<%= @contract_id %>]'}
+        postHelper("/contracts/print", data, setPdfViewPort, true);
+      }
+      function setPdfViewPort(response){
+        let fileURL = URL.createObjectURL(response);
+        let viewPort= document.getElementById("pdf_view_port");
+        viewPort.setAttribute("src", fileURL);
+      }
       function showAcceptForm(){
-        let decision = document.getElementsByName('decision');
         let acceptForm= document.getElementById('acceptForm');
+        let decision= getDecision();
+        if (decision !=null){
+          if(decision.value=='accept')
+            acceptForm.style.opacity="1";
+          else
+            acceptForm.style.opacity="0";
+        }
+      }
+      function getDecision(){
+        let decision = document.getElementsByName('decision');
         let selected = null;
         decision.forEach(function(item, index){
           if (item.checked)
-            selected = index;
+            selected = item;
         });
-        if (selected !=null){
-          if(decision[selected].value=='accept'){
-            acceptForm.style.opacity="1";
+        return selected;
+      }
+      function submitDecision(){
+        let decision = getDecision();
+        let signature = document.getElementById('signature');
+        if (decision != null){
+          if(decision.value=='accept'){
+            if (signature.value.trim()!=""){
+              postStatus(decision.value, signature.value.trim());
+            }
+            else{
+              alert("Error: you haven't signed your name yet.");
+            }
           }
-          else{
-            acceptForm.style.opacity="0";
+          else if (decision.value=='reject'){
+            postStatus(decision.value);
           }
         }
+        else{
+          alert("Error: you haven't chosen whether to accept or reject.")
+        }
       }
-      fetchPdfData();
+      function postStatus(status, signature = null){
+        let res = confirm("Are you sure you want to "+status+" the TAship for this offer?");
+        let data = {}
+        if (signature!=null){
+          data["signature"] = signature;
+        }
+        if (res) {
+          postHelper("/contracts/<%= @contract_id %>/decision/"+status, data, updateStatus);
+        }
+      }
+      function updateStatus(response){
+        alert(response.message);
+        if (response.success){
+          setupPage(response.status);
+        }
+      }
+      setupPage('<%= @offer[:status].downcase %>', true);
     </script>
   </body>
 </html>

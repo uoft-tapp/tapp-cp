@@ -14,6 +14,7 @@ class AppController < ActionController::Base
         if offer
           if offer.contract
             @contract_id = offer.contract.id
+            @offer = offer.format
             render :decision, layout: false
           else
             render status: 404, json: {message: "Offer #{offer.json[:id]} hasn't been sent."}
