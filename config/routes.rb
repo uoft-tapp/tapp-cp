@@ -1,9 +1,6 @@
 Rails.application.routes.draw do
-  # for the administration side of CP
-  get '/admin', to: "admin#index"
-
   # for user facing side of CP
-  get 'cp', to: "cp#index"
+  get '/index.html/(*z)', to: "cp#index"
 
   # temporary contract pdf generator
   get "/hello_react", to: "hello_react#contracts"
