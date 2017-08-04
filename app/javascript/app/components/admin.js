@@ -1,10 +1,16 @@
 import React from 'react';
 import { Grid, Row, Col, ButtonToolbar, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { routeConfig } from '../routeConfig.js';
+
+import { rconfig } from '../routeConfig.js';
+import { TableMenu } from './tablemenu.js';
+import { AdminTable } from './table.js';
 
 class Admin extends React.Component {
-  render() {
+  constructor(props) {
+    super(props);
+    this.component = props.proto;
+    this.offers = this.component.getOffers();
     // table/menu configuration
     this.config = [
       {
@@ -27,9 +33,33 @@ class Admin extends React.Component {
         data: p => p.applicant.student_number,
         sortData: p => p.applicant.student_number,
       },
+      {
+        header: 'Printed',
+      },
+      {
+        header: 'Accepted',
+      },
+      {
+        header: 'Objection',
+      },
+      {
+        header: 'Nag Count',
+      },
     ];
+  }
 
-    return <h1> "HERE" </h1>;
+  render() {
+    return (
+      <Grid fluid id="admin-grid">
+        <TableMenu
+          config={this.config}
+          sort={(field, state) => this.component.toggleSort(field)}
+          activeFields={this.component.getSortState()}
+        />
+
+        <AdminTable config={this.config} offers={this.component.getOffers()} />
+      </Grid>
+    );
   }
 }
 

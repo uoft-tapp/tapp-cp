@@ -41,7 +41,7 @@ function parseOffers(resp) {
     newOffer;
 
   resp.forEach(offer => {
-    applicants[offer.applicant.id] = {
+    offers[offer.id] = {
       lastName: offer.applicant.last_name,
       firstName: offer.applicant.first_name,
       utorid: offer.applicant.utorid,
@@ -49,26 +49,14 @@ function parseOffers(resp) {
       phone: offer.applicant.phone,
       studentNumber: offer.applicant.student_number,
       address: offer.applicant.address,
-    };
-
-    newOffer = {
-      offer_id: offer.id,
       position: offer.position_id,
       hours: offer.hours,
       year: offer.years,
       session: offer.session,
       objection: offer.objection,
     };
-
-    if (offers[offer.applicant.id]) {
-      offers[offer.applicant.id].push(newOffer);
-    } else {
-      offers[offer.applicant.id] = [newOffer];
-    }
   });
-
-  appState.setApplicants(fromJS(applicants));
-  appState.setOffers(fromJS(offers));
+  appState.setOffers(offers);
 }
 //
 function parseContracts(resp) {
@@ -82,7 +70,7 @@ function parseContracts(resp) {
     };
   });
 
-  appState.setContacts(fromJS(contracts));
+  appState.setContacts(contracts);
 }
 
-export { fetchApplicants, fetchOffers, fetchContracts };
+export { fetchOffers, fetchContracts };

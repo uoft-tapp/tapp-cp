@@ -6,19 +6,24 @@
 //
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
+import '../app-styles';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import * as fetch from '../app/fetch.js';
 import { appState } from '../app/appState.js';
+import * as fetch from '../app/fetch.js';
 import { rconfig } from '../app/routeConfig.js';
+
 import { Admin } from '../app/components/admin.js';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
+
+    /// I NEED PROMISEESSSSSS
     fetch.fetchOffers();
   }
 
@@ -27,13 +32,13 @@ class App extends React.Component {
   }
 
   render() {
-    return <RouterInst {...appState} />;
+    return <RouterInst proto={appState} />;
   }
 }
 
 function RouterInst(props) {
   return (
-    <Router>
+    <Router basename="index.html">
       <Switch>
         <Route
           path={rconfig.admin.route}
@@ -47,8 +52,6 @@ function RouterInst(props) {
     </Router>
   );
 }
-
 document.addEventListener('DOMContentLoaded', () => {
-  console.log(document.getElementById('root'));
   ReactDOM.render(<App />, document.getElementById('root'));
 });
