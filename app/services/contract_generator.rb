@@ -94,6 +94,13 @@ class ContractGenerator
         text: text,
         align: :justify,
       }
+    when 8
+      return {
+        font: get_font("signature"),
+        font_size: 25,
+        text: text,
+        align: :left,
+      }
     end
   end
 
@@ -176,8 +183,10 @@ class ContractGenerator
     set_text(get_grids(1, 4.2, 6.5, 1.7), get_style(6, letter_data[1]))
 
     set_text(get_grids(4.5, 5.8, 3, 0.2), get_style(3, letter_data[2]))
-    draw_image(get_grids(4.5, 5.9, 3, 0.6))
-    set_text(get_grids(4.5, 6.6, 3, 0.2), get_style(3, letter_data[3]))
+
+    set_text(get_grids(4.5, 5.9, 3, 0.6), get_style(8, ENV['TA_COORD']))
+
+    set_text(get_grids(4.5, 6.4, 3, 0.2), get_style(3, letter_data[3]))
     draw_line(get_grids(1, 6.8, 6.5, 0.1), 1)
   end
 
