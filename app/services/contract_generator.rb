@@ -13,10 +13,10 @@ class ContractGenerator
       @offer[:UG_pay]= 43.65
       @offer[:SGS_pay]= 43.65
       define_grid(columns: 75, rows: 100, gutter: 0)
-      set_header(get_template_data("header"))
-      set_letter(get_template_data("letter"))
-      set_form(get_template_data("office_form"))
-      set_salary(get_template_data("salary"))
+      header_end = set_header(0.7, 0.5, get_template_data("header"))
+      letter_end = set_letter(header_end, get_template_data("letter"))
+      set_form(letter_end, get_template_data("office_form"))
+      set_salary(header_end, get_template_data("salary"))
     end
   end
 
@@ -141,9 +141,10 @@ class ContractGenerator
     end
   end
 
-  def draw_image(grids)
+  def set_logo(grids)
+    logo = "#{Rails.root}/app/assets/images/dcs_logo_blue.jpg"
     grid(grids[0], grids[1]).bounding_box() do
-      stroke_bounds
+      image logo, at: [0,bounds.height], scale: 0.4
     end
   end
 
@@ -168,32 +169,37 @@ class ContractGenerator
     return [table_data, max]
   end
 
-  def set_header(header_data)
-    draw_image(get_grids(0.7, 0.4, 1.8, 0.9))
-    set_text(get_grids(0.7, 1.3, 1.8, 0.3), get_style(5, header_data[0]))
+  def set_header(x, y, header_data)
+    set_logo(get_grids(x, y-0.1, 1.8, 0.9))
 
-    set_text(get_grids(2.5, 0.4, 3.5, 0.4), get_style(1, header_data[1]))
-    set_text(get_grids(6.1, 0.5, 1.4, 0.3), get_style(4, header_data[2]))
+    set_text(get_grids(x, y+0.4, 1.8, 0.3), get_style(5, header_data[0]))
 
-    set_text(get_grids(4.5, 1.2, 3, 0.5), get_style(2, header_data[3]))
+    set_text(get_grids(x+1.8, y-0.1, 3.5, 0.4), get_style(1, header_data[1]))
+    set_text(get_grids(x+5.4, y, 1.4, 0.3), get_style(4, header_data[2]))
+
+    set_text(get_grids(x+3.8, y+0.5, 3, 0.5), get_style(2, header_data[3]))
+
+    return y+1
   end
 
-  def set_letter(letter_data)
-    set_text(get_grids(1, 1.9, 6.5, 1.3), get_style(6, letter_data[0]))
-    set_text(get_grids(1, 4.2, 6.5, 1.7), get_style(6, letter_data[1]))
-
-    set_text(get_grids(4.5, 5.8, 3, 0.2), get_style(3, letter_data[2]))
-
-    set_text(get_grids(4.5, 5.9, 3, 0.6), get_style(8, ENV['TA_COORD']))
-
-    set_text(get_grids(4.5, 6.4, 3, 0.2), get_style(3, letter_data[3]))
-    draw_line(get_grids(1, 6.8, 6.5, 0.1), 1)
+  def set_letter(y, letter_data)
+    set_text(get_grids(1, y, 6.5, 1.3), get_style(6, letter_data[0]))
+    set_text(get_grids(1, y+2.3, 6.5, 1.7), get_style(6, letter_data[1]))
+    return set_signature(5, y+4, letter_data)
   end
 
-  def set_form(form_data)
-    set_text(get_grids(1, 6.9, 6.5, 0.2), get_style(3, form_data[0]))
-    set_text(get_grids(1, 10, 6.5, 0.5), get_style(2, form_data[form_data.size-1]))
-    set_form_table(get_grids(1, 7.05, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
+  def set_signature(x, y, letter_data)
+    set_text(get_grids(x, y, 3, 0.2), get_style(3, letter_data[2]))
+    set_text(get_grids(x, y+0.1, 3, 0.6), get_style(8, ENV['TA_COORD']))
+    set_text(get_grids(x, y+0.6, 3, 0.2), get_style(3, letter_data[3]))
+    draw_line(get_grids(1, y+0.8, 6.5, 0.1), 1)
+    return y+0.9
+  end
+
+  def set_form(y, form_data)
+    set_text(get_grids(1, y, 6.5, 0.2), get_style(3, form_data[0]))
+    set_text(get_grids(1, y+3.2, 6.5, 0.5), get_style(2, form_data[form_data.size-1]))
+    set_form_table(get_grids(1, y+0.15, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
   end
 
   def set_form_table(grids, table_data, rows)
@@ -228,9 +234,9 @@ class ContractGenerator
     end
   end
 
-  def set_salary(salary_data)
+  def set_salary(y, salary_data)
     define_grid(columns: 75, rows: 100, gutter: 0)
-    grids = get_grids(2.5, 3.1, 1.6, 1)
+    grids = get_grids(2.5, y+1.2, 1.6, 1)
     grid(grids[0], grids[1]).bounding_box() do
       data = salary_data[0].split("\n")
       define_grid(columns: 1, rows: data.size+1, gutter: 0)
