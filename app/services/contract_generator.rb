@@ -10,23 +10,27 @@ class ContractGenerator
       @offer = offer
       @whitespace = Prawn::Text::NBSP * 5
       @tab = Prawn::Text::NBSP * 10
-      @offer[:UG_pay]= 43.65
-      @offer[:SGS_pay]= 43.65
+      @offer[:pay]= 43.65
       define_grid(columns: 75, rows: 100, gutter: 0)
       header_end = set_header(0.7, 0.5, get_template_data("header"))
-      letter_end = set_letter(header_end, get_template_data("letter"))
-      set_form(letter_end, get_template_data("office_form"))
-      set_salary(header_end, get_template_data("salary"))
+      letter_end= set_letter(header_end, get_template_data("letter"))
+      signature_end = set_signature(5, letter_end, get_template_data("signature"))
+      set_form(signature_end, get_template_data("office_form"))
     end
   end
 
   private
   def get_template_data(name)
-    file_data = File.read("#{Rails.root}/app/services/templates/#{name}.html.erb").split("\n\n")
-    data = file_data.map do |item|
-      ERB.new(item).result(binding)
+    file_data = File.read("#{Rails.root}/app/services/templates/#{name}.html.erb")
+    if file_data
+      file_data = file_data.split("\n\n")
+      data = file_data.map do |item|
+        ERB.new(item).result(binding)
+      end
+      return data
+    else
+      return []
     end
-    return data
   end
 
   def get_font(name)
@@ -41,6 +45,33 @@ class ContractGenerator
     when 2
       return time.strftime("%d.%m.%Y")
     end
+  end
+
+  def list_instructors(instructors)
+    list = ""
+    instructors.each_with_index do |instructor, index|
+      if index!=0
+        if index==instructors.length-1
+          list+=" and Professor "
+        else
+          list+= ", Professor "
+        end
+      end
+      list+=instructor[:name]
+    end
+    return list
+  end
+
+  def set_link(link, text = false)
+    if !text
+      return "<u><color rgb='#0000ff'><link href='#{link}'>#{link}</link></color></u>"
+    else
+      return "<u><color rgb='#0000ff'><link href='#{link}'>#{text}</link></color></u>"
+    end
+  end
+
+  def format_duties(duties)
+    return "<list>duties..."
   end
 
   def get_style(type, text)
@@ -172,33 +203,131 @@ class ContractGenerator
   def set_header(x, y, header_data)
     set_logo(get_grids(x, y-0.1, 1.8, 0.9))
 
-    set_text(get_grids(x, y+0.4, 1.8, 0.3), get_style(5, header_data[0]))
+    set_text(get_grids(x+1.8, y-0.1, 3.5, 0.4), get_style(1, header_data[0]))
+    set_text(get_grids(x+5.4, y, 1.4, 0.3), get_style(4, header_data[1]))
 
-    set_text(get_grids(x+1.8, y-0.1, 3.5, 0.4), get_style(1, header_data[1]))
-    set_text(get_grids(x+5.4, y, 1.4, 0.3), get_style(4, header_data[2]))
-
-    set_text(get_grids(x+3.8, y+0.5, 3, 0.5), get_style(2, header_data[3]))
+    set_text(get_grids(x+3.8, y+0.5, 3, 0.5), get_style(2, header_data[2]))
 
     return y+1
   end
 
   def set_letter(y, letter_data)
-    set_text(get_grids(1, y, 6.5, 1.3), get_style(6, letter_data[0]))
-    set_text(get_grids(1, y+2.3, 6.5, 1.7), get_style(6, letter_data[1]))
-    return set_signature(5, y+4, letter_data)
+    grids = get_grids(1, y-0.3, 6.5, 9)
+    text =[]
+    num_lines = 0
+    grid(grids[0], grids[1]).bounding_box do
+      letter_data.each do |content|
+        move_down 10
+        num_lines = num_lines +  1
+        if content[0..5]=="<list>"
+          indent(20) do
+            num_lines = set_text_box("• #{content[6..content.length-1]}", num_lines)
+          end
+        elsif content[0..7]=="<salary>"
+          num_lines = set_text_box("salary table", num_lines)
+        else
+          num_lines = set_text_box(content, num_lines)
+        end
+      end
+    end
+    return get_y_by_line(num_lines)
   end
 
-  def set_signature(x, y, letter_data)
-    set_text(get_grids(x, y, 3, 0.2), get_style(3, letter_data[2]))
+  def get_y_by_line(num_lines)
+    if page_count == 1
+      return (num_lines*0.16)+0.4
+    else
+      return ((num_lines - (((page_count-2)*66)+59))*0.16)+0.4
+    end
+  end
+
+  def set_text_box(text, num_lines)
+    num_lines = num_lines + get_num_line(text)
+    if page_count == 1
+      if num_lines > 59
+        start_new_page
+        move_up 50
+      end
+    else
+      if ((page_count-1)*66)+59< num_lines
+        start_new_page
+        move_up 50
+      end
+    end
+    text text, inline_format: true, font: "Times-Roman", size: 10, align: :justify
+    return num_lines
+  end
+
+  def get_num_line(text)
+    words = text.split(/\s/)
+    num_lines = text.split("\n").length
+    char = 0
+    words.each_with_index do |word, index|
+      if word.include? '          '
+        char=char+7
+      end
+      word = word.strip
+      word = rid_tags(word)
+      margin_error =  word.split(/[.,:;l1]/).length
+      char=char-(margin_error-1)*0.3
+      char, num_lines = parse_word(word, index, char, num_lines)
+    end
+    return num_lines
+  end
+
+  def parse_word(word, index, char, num_lines)
+    if index!=0 && word!=''
+      char=char+1
+    end
+    if 105 - (char+word.length)>=0
+      char+=word.length
+    elsif 105 - (char+word.length)<0
+      partible = word.split("-")
+      if partible.length == 1
+        char=0
+        num_lines+=1
+      else
+        partible.each do |part|
+          if 105 - (char+part.length)>=0
+            char=char+word.length
+          elsif 105 - (char+part.length)<0
+            char = 0
+            num_lines+=1
+          end
+        end
+      end
+    end
+    return char, num_lines
+  end
+
+  def rid_tags(text)
+    regex = ['          ', /<[a-zA\-:.z=\'\/#0-9\s\w]+>/,
+      /href='[a-zA-Z0-9.:#\-\/=]+'>/, /<color/, /rgb=\'#0000ff\'><link/]
+    regex.each do |reg|
+      text = text.gsub(reg, "")
+    end
+    return text
+  end
+
+  def set_signature(x, y, signature_data)
+    if y > 9.3
+      start_new_page
+      y = 0.5
+    end
+    set_text(get_grids(x, y, 3, 0.2), get_style(3, signature_data[0]))
     set_text(get_grids(x, y+0.1, 3, 0.6), get_style(8, ENV['TA_COORD']))
-    set_text(get_grids(x, y+0.6, 3, 0.2), get_style(3, letter_data[3]))
-    draw_line(get_grids(1, y+0.8, 6.5, 0.1), 1)
-    return y+0.9
+    set_text(get_grids(x, y+0.6, 3, 0.6), get_style(3, signature_data[1]))
+    return y+1.2
   end
 
   def set_form(y, form_data)
+    if y > 9.3
+      start_new_page
+      y = 0.5
+    else
+      draw_line(get_grids(1, y-0.1, 7.5, 0.1), 1)
+    end
     set_text(get_grids(1, y, 6.5, 0.2), get_style(3, form_data[0]))
-    set_text(get_grids(1, y+3.2, 6.5, 0.5), get_style(2, form_data[form_data.size-1]))
     set_form_table(get_grids(1, y+0.15, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
   end
 

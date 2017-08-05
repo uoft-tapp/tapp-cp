@@ -12,7 +12,7 @@
 
 \tWage Type: 01 15
 
-\tAmount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:UG_pay]) %>
+\tAmount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:pay]) %>
 
 \tNumber/Unit: <%= '%.2f' % (@offer[:hours]/4) %>
 
@@ -37,6 +37,3 @@
 \tPosition: :Fund Centre: :Work Contract: :
 
 \tUofT Student number: <%= @offer[:applicant][:student_number] %>
-
-<b>10 King's College Road, Sanford Fleming Building, Toronto, ON M5S 3G4
-Tel: 416-946-3036<%= @whitespace %>Fax: 416:-978-1931</b>
