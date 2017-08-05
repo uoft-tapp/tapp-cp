@@ -11,11 +11,13 @@ class ContractGenerator
       @whitespace = Prawn::Text::NBSP * 5
       @tab = Prawn::Text::NBSP * 10
       @offer[:pay]= 43.65
+      @offer[:vac_pay] = 94.28
       define_grid(columns: 75, rows: 100, gutter: 0)
       header_end = set_header(0.7, 0.5, get_template_data("header"))
-      letter_end= set_letter(header_end, get_template_data("letter"))
+      letter_end,salary_start, salary_page= set_letter(header_end, get_template_data("letter"))
       signature_end = set_signature(5, letter_end, get_template_data("signature"))
       set_form(signature_end, get_template_data("office_form"))
+      set_salary(salary_start, salary_page, get_template_data("salary"))
     end
   end
 
@@ -26,7 +28,7 @@ class ContractGenerator
       file_data = file_data.split("\n\n")
       data = file_data.map do |item|
         ERB.new(item).result(binding)
-      end
+    end
       return data
     else
       return []
@@ -215,6 +217,8 @@ class ContractGenerator
     grids = get_grids(1, y-0.3, 6.5, 9)
     text =[]
     num_lines = 0
+    salary_start = 0
+    salary_page = 1
     grid(grids[0], grids[1]).bounding_box do
       letter_data.each do |content|
         move_down 10
@@ -224,13 +228,16 @@ class ContractGenerator
             num_lines = set_text_box("• #{content[6..content.length-1]}", num_lines)
           end
         elsif content[0..7]=="<salary>"
-          num_lines = set_text_box("salary table", num_lines)
+          salary_start = get_y_by_line(num_lines)-0.6
+          salary_page = page_count
+          move_down 70
+          num_lines = set_text_box("", num_lines+10)
         else
           num_lines = set_text_box(content, num_lines)
         end
       end
     end
-    return get_y_by_line(num_lines)
+    return get_y_by_line(num_lines), salary_start, salary_page
   end
 
   def get_y_by_line(num_lines)
@@ -363,17 +370,18 @@ class ContractGenerator
     end
   end
 
-  def set_salary(y, salary_data)
+  def set_salary(y, page, salary_data)
+    go_to_page(page)
     define_grid(columns: 75, rows: 100, gutter: 0)
-    grids = get_grids(2.5, y+1.2, 1.6, 1)
+    grids = get_grids(2.5, y+1.2, 2.5, 1)
     grid(grids[0], grids[1]).bounding_box() do
       data = salary_data[0].split("\n")
       define_grid(columns: 1, rows: data.size+1, gutter: 0)
       set_text([[data.size, 0],[data.size, 0]], get_style(7, salary_data[1]))
       grid([0,0], [2,0]).bounding_box do
         define_grid(columns: 4, rows: data.size, gutter: 0)
-        draw_line([[data.size-1, 0], [data.size-1, 3]], 0.25)
-        draw_line([[data.size-2, 3], [data.size-2, 3]], 0.065)
+        draw_line([[data.size-1, 0], [data.size-1, 3]], 0.39)
+        draw_line([[data.size-2, 3], [data.size-2, 3]], 0.1)
         data.each_with_index do |row, index|
           values = row.split(",")
           set_text([[index, 0],[index, 2]], get_style(6, values[0]))
