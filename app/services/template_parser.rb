@@ -25,6 +25,23 @@ class TemplateParser
     end
   end
 
+  def get_num_line(text)
+    words = text.split(/\s/)
+    num_lines = text.split("\n").length
+    char = 0
+    words.each_with_index do |word, index|
+      if word.include? '          '
+        char=char+7
+      end
+      word = word.strip
+      word = rid_tags(word)
+      margin_error =  word.split(/[.,:;l1]/).length
+      char=char-(margin_error-1)*0.3
+      char, num_lines = parse_word(word, index, char, num_lines)
+    end
+    return num_lines
+  end
+
   private
   def set_template_data(name)
     file_data = File.read("#{Rails.root}/app/services/templates/#{name}.html.erb")
@@ -70,59 +87,39 @@ class TemplateParser
   end
 
 
-
-
-
-    def get_num_line(text)
-      words = text.split(/\s/)
-      num_lines = text.split("\n").length
-      char = 0
-      words.each_with_index do |word, index|
-        if word.include? '          '
-          char=char+7
-        end
-        word = word.strip
-        word = rid_tags(word)
-        margin_error =  word.split(/[.,:;l1]/).length
-        char=char-(margin_error-1)*0.3
-        char, num_lines = parse_word(word, index, char, num_lines)
-      end
-      return num_lines
+  def parse_word(word, index, char, num_lines)
+    if index!=0 && word!=''
+      char=char+1
     end
-
-    def parse_word(word, index, char, num_lines)
-      if index!=0 && word!=''
-        char=char+1
-      end
-      if 105 - (char+word.length)>=0
-        char+=word.length
-      elsif 105 - (char+word.length)<0
-        partible = word.split("-")
-        if partible.length == 1
-          char=0
-          num_lines+=1
-        else
-          partible.each do |part|
-            if 105 - (char+part.length)>=0
-              char=char+word.length
-            elsif 105 - (char+part.length)<0
-              char = 0
-              num_lines+=1
-            end
+    if 105 - (char+word.length)>=0
+      char+=word.length
+    elsif 105 - (char+word.length)<0
+      partible = word.split("-")
+      if partible.length == 1
+        char=0
+        num_lines+=1
+      else
+        partible.each do |part|
+          if 105 - (char+part.length)>=0
+            char=char+word.length
+          elsif 105 - (char+part.length)<0
+            char = 0
+            num_lines+=1
           end
         end
       end
-      return char, num_lines
     end
+    return char, num_lines
+  end
 
-    def rid_tags(text)
-      regex = ['          ', /<[a-zA\-:.z=\'\/#0-9\s\w]+>/,
-        /href='[a-zA-Z0-9.:#\-\/=]+'>/, /<color/, /rgb=\'#0000ff\'><link/]
-      regex.each do |reg|
-        text = text.gsub(reg, "")
-      end
-      return text
+  def rid_tags(text)
+    regex = ['          ', /<[a-zA\-:.z=\'\/#0-9\s\w]+>/,
+      /href='[a-zA-Z0-9.:#\-\/=]+'>/, /<color/, /rgb=\'#0000ff\'><link/]
+    regex.each do |reg|
+      text = text.gsub(reg, "")
     end
+    return text
+  end
 
 
 end

@@ -15,10 +15,11 @@ class ContractGenerator
       templates = ["header", "letter", "signature", "office_form", "salary"]
       @parser = TemplateParser.new(templates, @offer)
       header_end = set_header(0.7, 0.5, @parser.get_data("header"))
-      #letter_end,salary_start, salary_page= set_letter(header_end, parser.get_data("letter"))
-      #signature_end = set_signature(5, letter_end, parser.get_data("signature"))
-      set_form(4, @parser.get_data("office_form"))
-      #set_salary(salary_start, salary_page, parser.get_data("salary"))
+      letter_end,salary_start,salary_page,last_page = set_letter(header_end, @parser.get_data("letter"))
+      signature_end = set_signature(5, letter_end, @parser.get_data("signature"))
+      set_form(signature_end, @parser.get_data("office_form"))
+      set_salary(salary_start, salary_page, @parser.get_data("salary"))
+      go_to_page(last_page)
     end
   end
 
@@ -64,7 +65,7 @@ class ContractGenerator
         text: text,
         align: :justify,
       }
-    when 8
+    when 6
       return {
         font: get_font("signature"),
         font_size: 25,
@@ -84,6 +85,7 @@ class ContractGenerator
 
   def set_text(grids, data, fill = false, top_padding = false)
     grid(grids[0], grids[1]).bounding_box() do
+      puts data
       font data[:font]
       font_size data[:font_size]
       if top_padding
@@ -164,19 +166,19 @@ class ContractGenerator
         type_data = @parser.get_type(content)
         if type_data[:type] == "list"
           indent(20) do
-            num_lines = set_text_box(type_data[:data], num_lines)
+            num_lines = set_letter_text(type_data[:data], num_lines)
           end
         elsif type_data[:type] == "salary"
           salary_start = get_y_by_line(num_lines)-0.6
           salary_page = page_count
           move_down 70
-          num_lines = set_text_box("", num_lines+10)
+          num_lines = set_letter_text("", num_lines+10)
         else
-          num_lines = set_text_box(content, num_lines)
+          num_lines = set_letter_text(content, num_lines)
         end
       end
     end
-    return get_y_by_line(num_lines), salary_start, salary_page
+    return get_y_by_line(num_lines), salary_start, salary_page, page_count
   end
 
   def get_y_by_line(num_lines)
@@ -187,8 +189,8 @@ class ContractGenerator
     end
   end
 
-  def set_text_box(text, num_lines)
-    num_lines = num_lines + get_num_line(text)
+  def set_letter_text(text, num_lines)
+    num_lines = num_lines + @parser.get_num_line(text)
     if page_count == 1
       if num_lines > 59
         start_new_page
