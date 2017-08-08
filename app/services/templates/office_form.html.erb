@@ -2,38 +2,38 @@
 
 <b>Personnel Number Search:</b>
 
-\tLast Name: <%= @offer[:applicant][:last_name] %>:First Name:<%= @offer[:applicant][:first_name] %>:Student Number: <%= @offer[:applicant][:student_number] %>
+<tablerow>Last Name: <%= @offer[:applicant][:last_name] %>:First Name:<%= @offer[:applicant][:first_name] %>:Student Number: <%= @offer[:applicant][:student_number] %>
 
 <b>Returning Employee:</b>
 
-\tPersonnel Number: :Name:<%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
+<tablerow>Personnel Number: :Name:<%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
 
-\tStart Date: <%= format_time(@offer[:session][:start_date],2) %>:End Date: <%= format_time(@offer[:session][:end_date],2) %>
+<tablerow>Start Date: <%= format_time(@offer[:session][:start_date],2) %>:End Date: <%= format_time(@offer[:session][:end_date],2) %>
 
-\tWage Type: 01 15
+<tablerow>Wage Type: 01 15
 
-\tAmount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:pay]) %>
+<tablerow>Amount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:pay]) %>
 
-\tNumber/Unit: <%= '%.2f' % (@offer[:hours]/4) %>
+<tablerow>Number/Unit: <%= '%.2f' % (@offer[:hours]/4) %>
 
-\tAssignment Number: TA <%= @offer[:position][/[A-Z0-9]{3}\d{3,4}/] %><%= @offer[:position].split(/-\//)[0][@offer[:position].split(/-\//)[0].size-1] %>/17
+<tablerow>Assignment Number: TA <%= @offer[:position][/[A-Z0-9]{3}\d{3,4}/] %><%= @offer[:position].split(/-\//)[0][@offer[:position].split(/-\//)[0].size-1] %>/17
 
 <b>New Employee:</b>
 
-\tPersonnel Number: :Start Date: <%= format_time(@offer[:session][:start_date],2) %>
+<tablerow>Personnel Number: :Start Date: <%= format_time(@offer[:session][:start_date],2) %>
 
-\tForm-of-add: :Last Name: <%= @offer[:applicant][:last_name] %>:First Name: <%= @offer[:applicant][:first_name] %>
+<tablerow>Form-of-add: :Last Name: <%= @offer[:applicant][:last_name] %>:First Name: <%= @offer[:applicant][:first_name] %>
 
-\tBirth date: :SIN: :Gender: :
+<tablerow>Birth date: :SIN: :Gender: :
 
-\tHome Address: :
+<tablerow>Home Address: :
 
-\tCity: :Postal Code: :
+<tablerow>City: :Postal Code: :
 
-\tProvince: :Country: :
+<tablerow>Province: :Country: :
 
-\tBank Key: :Bank Account: :
+<tablerow>Bank Key: :Bank Account: :
 
-\tPosition: :Fund Centre: :Work Contract: :
+<tablerow>Position: :Fund Centre: :Work Contract: :
 
-\tUofT Student number: <%= @offer[:applicant][:student_number] %>
+<tablerow>UofT Student number: <%= @offer[:applicant][:student_number] %>

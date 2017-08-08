@@ -1,4 +1,3 @@
-require 'erb'
 class ContractGenerator
   include Prawn::View
 
@@ -13,114 +12,52 @@ class ContractGenerator
       @offer[:pay]= 43.65
       @offer[:vac_pay] = 94.28
       define_grid(columns: 75, rows: 100, gutter: 0)
-      header_end = set_header(0.7, 0.5, get_template_data("header"))
-      letter_end,salary_start, salary_page= set_letter(header_end, get_template_data("letter"))
-      signature_end = set_signature(5, letter_end, get_template_data("signature"))
-      set_form(signature_end, get_template_data("office_form"))
-      set_salary(salary_start, salary_page, get_template_data("salary"))
+      templates = ["header", "letter", "signature", "office_form", "salary"]
+      @parser = TemplateParser.new(templates, @offer)
+      header_end = set_header(0.7, 0.5, @parser.get_data("header"))
+      #letter_end,salary_start, salary_page= set_letter(header_end, parser.get_data("letter"))
+      #signature_end = set_signature(5, letter_end, parser.get_data("signature"))
+      set_form(4, @parser.get_data("office_form"))
+      #set_salary(salary_start, salary_page, parser.get_data("salary"))
     end
   end
 
   private
-  def get_template_data(name)
-    file_data = File.read("#{Rails.root}/app/services/templates/#{name}.html.erb")
-    if file_data
-      file_data = file_data.split("\n\n")
-      data = file_data.map do |item|
-        ERB.new(item).result(binding)
-    end
-      return data
-    else
-      return []
-    end
-  end
-
   def get_font(name)
     return "#{Rails.root}/app/services/templates/fonts/#{name}.ttf"
-  end
-
-  def format_time(time, form)
-    time = (Date.parse time).in_time_zone('Eastern Time (US & Canada)')
-    case form
-    when 1
-      return time.strftime("%B %e, %Y")
-    when 2
-      return time.strftime("%d.%m.%Y")
-    end
-  end
-
-  def list_instructors(instructors)
-    list = ""
-    instructors.each_with_index do |instructor, index|
-      if index!=0
-        if index==instructors.length-1
-          list+=" and Professor "
-        else
-          list+= ", Professor "
-        end
-      end
-      list+=instructor[:name]
-    end
-    return list
-  end
-
-  def set_link(link, text = false)
-    if !text
-      return "<u><color rgb='#0000ff'><link href='#{link}'>#{link}</link></color></u>"
-    else
-      return "<u><color rgb='#0000ff'><link href='#{link}'>#{text}</link></color></u>"
-    end
-  end
-
-  def format_duties(duties)
-    return "<list>duties..."
   end
 
   def get_style(type, text)
     case type
     when 1
       return {
-        font: get_font("cmcsc10"),
-        font_size: 16,
+        font: "Times-Roman",
+        font_size: 12,
         text: text,
         align: :center,
       }
     when 2
       return {
         font: "Times-Roman",
-        font_size: 12,
+        font_size: 9,
         text: text,
-        align: :center,
+        align: :left,
       }
     when 3
       return {
         font: "Times-Roman",
         font_size: 9,
         text: text,
-        align: :left,
+        align: :center,
       }
     when 4
       return {
         font: "Times-Roman",
         font_size: 9,
         text: text,
-        align: :center,
-      }
-    when 5
-      return {
-        font: get_font("cmcsc10"),
-        font_size: 7.4,
-        text: text,
-        align: :center,
-      }
-    when 6
-      return {
-        font: "Times-Roman",
-        font_size: 9,
-        text: text,
         align: :justify,
       }
-    when 7
+    when 5
       return {
         font: "Times-Roman",
         font_size: 7,
@@ -174,12 +111,6 @@ class ContractGenerator
     end
   end
 
-  def set_logo(grids)
-    logo = "#{Rails.root}/app/assets/images/dcs_logo_blue.jpg"
-    grid(grids[0], grids[1]).bounding_box() do
-      image logo, at: [0,bounds.height], scale: 0.4
-    end
-  end
 
   def get_table_data(form_data)
     table_data = []
@@ -187,11 +118,11 @@ class ContractGenerator
     max = 1
     form_data.each_with_index do |value, index|
       if index!=0 && index!=form_data.size-1
-        if value[0..1]=='\t'
-          data = value[2..(value.length-1)].split(":")
-          (table_data[i][:table]).push(data)
-          if data.size > max
-            max = data.size
+        type_data = @parser.get_type(value)
+        if type_data[:type] == "tablerow"
+          (table_data[i][:table]).push(type_data[:data])
+          if type_data[:data].size > max
+            max = type_data[:data].size
           end
         else
           i = i+1
@@ -202,13 +133,20 @@ class ContractGenerator
     return [table_data, max]
   end
 
+  def set_logo(grids)
+    logo = "#{Rails.root}/app/assets/images/dcs_logo_blue.jpg"
+    grid(grids[0], grids[1]).bounding_box() do
+      image logo, at: [0,bounds.height], scale: 0.4
+    end
+  end
+
   def set_header(x, y, header_data)
     set_logo(get_grids(x, y-0.1, 1.8, 0.9))
 
     set_text(get_grids(x+1.8, y-0.1, 3.5, 0.4), get_style(1, header_data[0]))
-    set_text(get_grids(x+5.4, y, 1.4, 0.3), get_style(4, header_data[1]))
+    set_text(get_grids(x+5.4, y, 1.4, 0.3), get_style(3, header_data[1]))
 
-    set_text(get_grids(x+3.8, y+0.5, 3, 0.5), get_style(2, header_data[2]))
+    set_text(get_grids(x+3.8, y+0.5, 3, 0.5), get_style(1, header_data[2]))
 
     return y+1
   end
@@ -223,11 +161,12 @@ class ContractGenerator
       letter_data.each do |content|
         move_down 10
         num_lines = num_lines +  1
-        if content[0..5]=="<list>"
+        type_data = @parser.get_type(content)
+        if type_data[:type] == "list"
           indent(20) do
-            num_lines = set_text_box("• #{content[6..content.length-1]}", num_lines)
+            num_lines = set_text_box(type_data[:data], num_lines)
           end
-        elsif content[0..7]=="<salary>"
+        elsif type_data[:type] == "salary"
           salary_start = get_y_by_line(num_lines)-0.6
           salary_page = page_count
           move_down 70
@@ -265,65 +204,14 @@ class ContractGenerator
     return num_lines
   end
 
-  def get_num_line(text)
-    words = text.split(/\s/)
-    num_lines = text.split("\n").length
-    char = 0
-    words.each_with_index do |word, index|
-      if word.include? '          '
-        char=char+7
-      end
-      word = word.strip
-      word = rid_tags(word)
-      margin_error =  word.split(/[.,:;l1]/).length
-      char=char-(margin_error-1)*0.3
-      char, num_lines = parse_word(word, index, char, num_lines)
-    end
-    return num_lines
-  end
-
-  def parse_word(word, index, char, num_lines)
-    if index!=0 && word!=''
-      char=char+1
-    end
-    if 105 - (char+word.length)>=0
-      char+=word.length
-    elsif 105 - (char+word.length)<0
-      partible = word.split("-")
-      if partible.length == 1
-        char=0
-        num_lines+=1
-      else
-        partible.each do |part|
-          if 105 - (char+part.length)>=0
-            char=char+word.length
-          elsif 105 - (char+part.length)<0
-            char = 0
-            num_lines+=1
-          end
-        end
-      end
-    end
-    return char, num_lines
-  end
-
-  def rid_tags(text)
-    regex = ['          ', /<[a-zA\-:.z=\'\/#0-9\s\w]+>/,
-      /href='[a-zA-Z0-9.:#\-\/=]+'>/, /<color/, /rgb=\'#0000ff\'><link/]
-    regex.each do |reg|
-      text = text.gsub(reg, "")
-    end
-    return text
-  end
-
   def set_signature(x, y, signature_data)
     if y > 9.3
       start_new_page
       y = 0.5
     end
-    set_text(get_grids(x, y, 3, 0.2), get_style(3, signature_data[0]))
-    set_text(get_grids(x, y+0.1, 3, 0.6), get_style(8, ENV['TA_COORD']))
-    set_text(get_grids(x, y+0.6, 3, 0.6), get_style(3, signature_data[1]))
+    set_text(get_grids(x, y, 3, 0.2), get_style(2, signature_data[0]))
+    set_text(get_grids(x, y+0.1, 3, 0.6), get_style(6, ENV['TA_COORD']))
+    set_text(get_grids(x, y+0.6, 3, 0.6), get_style(2, signature_data[1]))
     return y+1.2
   end
 
@@ -334,7 +222,7 @@ class ContractGenerator
     else
       draw_line(get_grids(1, y-0.1, 7.5, 0.1), 1)
     end
-    set_text(get_grids(1, y, 6.5, 0.2), get_style(3, form_data[0]))
+    set_text(get_grids(1, y, 6.5, 0.2), get_style(2, form_data[0]))
     set_form_table(get_grids(1, y+0.15, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
   end
 
@@ -348,7 +236,7 @@ class ContractGenerator
   end
 
   def set_table_helper(table, num_columns)
-    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(7, table[:label]), false, true)
+    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(5, table[:label]), false, true)
     table[:table].each_with_index do |row, row_num|
       row_multiplier= num_columns/row.length.to_f
       row.each_with_index do |column, index|
@@ -362,9 +250,9 @@ class ContractGenerator
         end
         grids = [[curr_row, horizontal_1], [curr_row, horizontal_2]]
         if index%2 == 0
-          set_text(grids, get_style(7, "<b>#{column}</b>"), true, true)
+          set_text(grids, get_style(5, "<b>#{column}</b>"), true, true)
         else
-          set_text(grids, get_style(7, "#{column}"), true, true)
+          set_text(grids, get_style(5, "#{column}"), true, true)
         end
       end
     end
@@ -377,15 +265,15 @@ class ContractGenerator
     grid(grids[0], grids[1]).bounding_box() do
       data = salary_data[0].split("\n")
       define_grid(columns: 1, rows: data.size+1, gutter: 0)
-      set_text([[data.size, 0],[data.size, 0]], get_style(7, salary_data[1]))
+      set_text([[data.size, 0],[data.size, 0]], get_style(5, salary_data[1]))
       grid([0,0], [2,0]).bounding_box do
         define_grid(columns: 4, rows: data.size, gutter: 0)
         draw_line([[data.size-1, 0], [data.size-1, 3]], 0.39)
         draw_line([[data.size-2, 3], [data.size-2, 3]], 0.1)
         data.each_with_index do |row, index|
           values = row.split(",")
-          set_text([[index, 0],[index, 2]], get_style(6, values[0]))
-          set_text([[index, 3],[index, 3]], get_style(6, values[1]))
+          set_text([[index, 0],[index, 2]], get_style(4, values[0]))
+          set_text([[index, 3],[index, 3]], get_style(4, values[1]))
         end
       end
     end
