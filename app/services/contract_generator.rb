@@ -15,10 +15,10 @@ class ContractGenerator
       templates = ["header", "letter", "signature", "office_form", "salary"]
       @parser = TemplateParser.new(templates, @offer)
       header_end = set_header(0.7, 0.5, @parser.get_data("header"))
-      letter_end,salary_start,salary_page,last_page = set_letter(header_end, @parser.get_data("letter"))
-      signature_end = set_signature(5, letter_end, @parser.get_data("signature"))
-      set_form(signature_end, @parser.get_data("office_form"))
-      set_salary(salary_start, salary_page, @parser.get_data("salary"))
+      salary_page = set_letter(header_end, @parser.get_data("letter"))
+      signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
+      last_page = set_form(signature_end, @parser.get_data("office_form"))
+      set_salary(@salary_start, salary_page, @parser.get_data("salary"))
       go_to_page(last_page)
     end
   end
@@ -85,7 +85,6 @@ class ContractGenerator
 
   def set_text(grids, data, fill = false, top_padding = false)
     grid(grids[0], grids[1]).bounding_box() do
-      puts data
       font data[:font]
       font_size data[:font_size]
       if top_padding
@@ -160,7 +159,7 @@ class ContractGenerator
     salary_start = 0
     salary_page = 1
     grid(grids[0], grids[1]).bounding_box do
-      letter_data.each do |content|
+      letter_data.each_with_index do |content, index|
         move_down 10
         num_lines = num_lines +  1
         type_data = @parser.get_type(content)
@@ -169,7 +168,9 @@ class ContractGenerator
             num_lines = set_letter_text(type_data[:data], num_lines)
           end
         elsif type_data[:type] == "salary"
-          salary_start = get_y_by_line(num_lines)-0.6
+          if !@salary_start
+            @salary_start = get_y_by_line(num_lines)-0.6
+          end
           salary_page = page_count
           move_down 70
           num_lines = set_letter_text("", num_lines+10)
@@ -178,7 +179,10 @@ class ContractGenerator
         end
       end
     end
-    return get_y_by_line(num_lines), salary_start, salary_page, page_count
+    if !@letter_end
+      @letter_end = get_y_by_line(num_lines)
+    end
+    return salary_page
   end
 
   def get_y_by_line(num_lines)
@@ -226,6 +230,7 @@ class ContractGenerator
     end
     set_text(get_grids(1, y, 6.5, 0.2), get_style(2, form_data[0]))
     set_form_table(get_grids(1, y+0.15, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
+    return page_count
   end
 
   def set_form_table(grids, table_data, rows)
