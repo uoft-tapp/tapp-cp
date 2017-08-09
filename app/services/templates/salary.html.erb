@@ -1,6 +1,6 @@
-Salary<sup>*</sup>, $<%= '%.2f' % (@offer[:pay]* @offer[:hours]) %>
-4% vacation pay<sup>†</sup>, $<%= '%.2f' % @offer[:vac_pay] %>
-Total, $<%= '%.2f' % ((@offer[:pay]* @offer[:hours])+@offer[:vac_pay]) %>
+Salary<sup>*</sup>, $<%= '%.2f' % (@offer[:session][:pay]* @offer[:hours]) %>
+4% vacation pay<sup>†</sup>, $<%= '%.2f' % (@offer[:session][:pay]*2.16) %>
+Total, $<%= '%.2f' % ((@offer[:session][:pay]* @offer[:hours])+(@offer[:session][:pay]*2.16)) %>
 
 <sup>*</sup>To be paid in 4 monthly installments
 <sup>†</sup>To be paid with the monthly payment

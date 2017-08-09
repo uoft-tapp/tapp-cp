@@ -12,7 +12,7 @@
 
 <tablerow>Wage Type: 01 15
 
-<tablerow>Amount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:pay]) %>
+<tablerow>Amount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:session][:pay]) %>
 
 <tablerow>Number/Unit: <%= '%.2f' % (@offer[:hours]/4) %>
 
