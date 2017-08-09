@@ -4,6 +4,9 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
   </head>
   <body>
+    <h1>Offers Importer</h1>
+    <input id="import" type="file"/></br></br>
+    <button onclick="loadFile()">Import Offer</button>
     <h1>Offers</h1>
     <form method="post">
       <table>
@@ -100,6 +103,17 @@
           }
         })
       }
+      function postHelper(url, data, message){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'POST',
+            body: JSON.stringify(data)
+        };
+        fetchHelper(url, init, message);
+      }
       function updateSession(input, id){
         let data = {pay: input.value};
         let init = {
@@ -112,20 +126,45 @@
         fetchHelper("/sessions/"+id, init, "Pay updated");
       }
       function withdraw(id, status){
-        let init = {
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-            method: 'POST'
-        };
         if(status=="Pending"){
-          fetchHelper("/contracts/"+id+"/decision/withdraw", init, "Status Updated");
+          postHelper("/contracts/"+id+"/decision/withdraw", {}, "Status Updated");
         }
         else{
           alert("Error: you can't change the status of this contract. It's already been "+status.toLowerCase()+".");
         }
       }
+      function loadFile() {
+          let files = document.getElementById('import').files;
+          if (files.length > 0) {
+              let message =
+                  'Are you sure you want to import "' + files[0].name + '" into the database?';
+              if (files[0].type == 'application/json') {
+                  if (confirm(message)) {
+                      uploadFile(files[0]);
+                  }
+              } else {
+                  alert('Error: The file you uploaded is not a JSON.');
+              }
+          } else {
+              alert('Error: No file chosen.');
+          }
+      }
+
+      function uploadFile(file) {
+          let reader = new FileReader();
+          reader.onload = function(event) {
+              let data = JSON.parse(event.target.result);
+
+              if (data['offers'] !== undefined) {
+                  data = { chass_offers: data };
+                  postHelper("/import/offers", data, "Offers Imported");
+              } else {
+                  alert("Error: This is not Chass Offers JSON.")
+              }
+          };
+          reader.readAsText(file);
+      }
+
     </script>
   </body>
 </html>

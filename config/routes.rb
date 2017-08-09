@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
   post "contracts/print" => "contracts#print"
   post "contracts/nag" => "contracts#nag"
+  post "import/offers" => "import#import_offers"
 
   #temp-testing views
   get "test" => "app#test"
