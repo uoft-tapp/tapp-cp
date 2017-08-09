@@ -2,6 +2,8 @@ class AppController < ActionController::Base
   def test
     @contracts = Contract.all.map { |c| c.format }
     @offers = Offer.all.map {|o| o.format }
+    @sessions = Session.all.map {|s| s.json }
+    puts @sessions
     render :test, layout: false
   end
 

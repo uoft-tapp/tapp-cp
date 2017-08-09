@@ -46,6 +46,7 @@
           <th>Position</th>
           <th>Email</th>
           <th>Status</th>
+          <th>Action</th>
           <th>Contract Send Date</th>
           <th>Deadline</th>
           <th>Nag Count</th>
@@ -59,14 +60,26 @@
             <th><%= c[:position]%></th>
             <th><%= c[:applicant][:email]%></th>
             <th><%= Offer.find(c[:offer_id])[:status]%></th>
-            <th><%= c[:updated_at]%></th>
-            <th><%= c[:deadline]%></th>
+            <th><button type="button" onclick="withdraw(<%= c[:id]%>, '<%= Offer.find(c[:offer_id])[:status]%>')">Withdraw</button></th>
+            <th><%= (c[:updated_at].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
+            <th><%= (c[:deadline].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
             <th><%= c[:nag_count]%></th>
             <th><%= c[:printed]%></th>
           </tr>
         <% end %>
       </table>
     </form>
+    <h1>Sessions</h1>
+    <ul>
+      <% @sessions.each do |s| %>
+        <li>
+          <h2><%= s[:semester] %> <%= s[:year] %></h2>
+          <p>Start Date: <%= (Date.parse s[:start_date]).strftime("%B %e, %Y") %></p>
+          <p>End Date: <%= (Date.parse s[:end_date]).strftime("%B %e, %Y") %></p>
+          <p>Pay: <input type="number" value="<%= "%.2f" % s[:pay]%>" step="0.01" min="0.00" onblur="updateSession(this, <%=s[:id]%>)"/></p>
+        </li>
+      <% end %>
+    </ul>
     <script>
       contract_selected = [];
       function updateContractSelected(checkbox, val){
@@ -77,7 +90,42 @@
           contract_selected.splice(contract_selected.indexOf(val),1);
         input.value=JSON.stringify(contract_selected)
       }
+      function fetchHelper(url, init, message){
+        fetch(url, init).then(function(response) {
+          if (response.ok){
+            return alert(message);
+          }
+          else{
+            return alert("Error: update failed");
+          }
+        })
+      }
+      function updateSession(input, id){
+        let data = {pay: input.value};
+        let init = {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'PUT',
+            body: JSON.stringify(data)
+        };
+        fetchHelper("/sessions/"+id, init, "Pay updated");
+      }
+      function withdraw(id, status){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'POST'
+        };
+        if(status=="Pending"){
+          fetchHelper("/contracts/"+id+"/decision/withdraw", init, "Status Updated");
+        }
+        else{
+          alert("Error: you can't change the status of this contract. It's already been "+status.toLowerCase()+".");
+        }
+      }
     </script>
-    <p><%=ENV['RAILS_ENV']%></p>
   </body>
 </html>

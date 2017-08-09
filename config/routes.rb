@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   resources :contracts do
     post "decision/:code" => "contracts#set_status"
   end
+  resources :sessions
+  
   get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
   post "contracts/print" => "contracts#print"
   post "contracts/nag" => "contracts#nag"
