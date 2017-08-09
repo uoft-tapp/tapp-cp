@@ -22,7 +22,9 @@ class ContractsController < ApplicationController
         contract = Contract.find(id)
         if contract
           contract.increment!(:nag_count, 1)
-          CpMailer.nag_email(contract.format).deliver_now
+          if ENV['RAILS_ENV'] != 'test'
+            CpMailer.nag_email(contract.format).deliver_now
+          end
         end
       end
       render json: {message: "You've sent the nag emails."}
@@ -40,18 +42,14 @@ class ContractsController < ApplicationController
   def set_status
     status = get_status(params[:code])
     contract = Contract.find(params[:contract_id])
-    if contract
-      offer = contract.offer
-      if offer[:status] == "Pending"
-        offer.update_attributes!(status: status[:name])
-        render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
-      elsif offer[:status] == "Unsent"
-        render json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
-      else
-        render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
-      end
+    offer = contract.offer
+    if offer[:status] == "Pending"
+      offer.update_attributes!(status: status[:name])
+      render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
+    elsif offer[:status] == "Unsent"
+      render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
     else
-      render status: 404, json: {success: false, message: "Contract #{params[:contract_id]} does not exist."}
+      render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
     end
   end
 
@@ -64,7 +62,7 @@ class ContractsController < ApplicationController
     offers = []
     contracts.each do |id|
       contract = Contract.find(id)
-      offer = Offer.find(contract[:id])
+      offer = Offer.find(contract[:offer_id])
       if offer
         offers.push(offer.format)
       end

@@ -44,19 +44,19 @@ RSpec.describe OffersController, type: :controller do
   end
 
   describe "POST /offers/" do
-    context ":id/send-contract" do
+    context ":offer_id/send-contract" do
       before(:each) do
         expect(offer.contract).to eq(nil)
       end
       it "returns a message of whether the contract has been sent" do
-        post :send_contract, params: {id: offer[:id]}
+        post :send_contract, params: {offer_id: offer[:id]}
         offer.reload
         expect(response.status).to eq(200)
         expect(response.body).to eq({
           message: "You've just sent out the contract for this offer."
         }.to_json)
         expect(offer.contract.as_json).not_to be_empty
-        post :send_contract, params: {id: offer[:id]}
+        post :send_contract, params: {offer_id: offer[:id]}
         offer.reload
         expect(response.status).to eq(200)
         expect(offer.contract.as_json).not_to be_empty

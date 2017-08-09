@@ -8,10 +8,12 @@ Rails.application.routes.draw do
     post "decision/:code" => "contracts#set_status"
   end
   resources :sessions
-  
+
   get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
   post "contracts/print" => "contracts#print"
   post "contracts/nag" => "contracts#nag"
+
+  #temp-testing views
   get "test" => "app#test"
   get "decision/:utorid/:position_id" => "app#decision"
 end

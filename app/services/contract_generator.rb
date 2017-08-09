@@ -1,5 +1,6 @@
 class ContractGenerator
   include Prawn::View
+  Prawn::Font::AFM.hide_m17n_warning = true
 
   def initialize(offers)
     offers.each_with_index do |offer, index|
@@ -9,8 +10,6 @@ class ContractGenerator
       @offer = offer
       @whitespace = Prawn::Text::NBSP * 5
       @tab = Prawn::Text::NBSP * 10
-      @offer[:pay]= 43.65
-      @offer[:vac_pay] = 94.28
       define_grid(columns: 75, rows: 100, gutter: 0)
       templates = ["header", "letter", "signature", "office_form", "salary"]
       @parser = TemplateParser.new(templates, @offer)
