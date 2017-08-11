@@ -3,15 +3,13 @@ Rails.application.routes.draw do
   resources :applicants
   resources :offers do
     post "send-contract" => "offers#send_contract"
-  end
-  resources :contracts do
-    post "decision/:code" => "contracts#set_status"
+    post "decision/:code" => "offers#set_status"
+    post "hr-status/:code" => "offers#update_hr_status"
   end
   resources :sessions
 
-  get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
-  post "contracts/print" => "contracts#combine_contracts_print"
-  post "contracts/nag" => "contracts#batch_email_nags"
+  post "offers/print" => "offers#combine_contracts_print"
+  post "offers/nag" => "offers#batch_email_nags"
   post "import/offers" => "import#import_offers"
 
   #temp-testing views

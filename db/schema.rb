@@ -10,35 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170718181449) do
+ActiveRecord::Schema.define(version: 20170718181301) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "contracts", force: :cascade do |t|
-    t.bigint "offer_id"
-    t.text "link", null: false
-    t.boolean "printed", default: false
-    t.integer "nag_count", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["link"], name: "index_contracts_on_link"
-    t.index ["offer_id"], name: "index_contracts_on_offer_id"
-  end
-
   create_table "offers", force: :cascade do |t|
     t.bigint "position_id"
     t.bigint "applicant_id"
-    t.boolean "objection", default: false
     t.integer "hours", null: false
     t.integer "year"
     t.string "session"
     t.string "status", default: "Unsent"
+    t.string "hr_status"
+    t.text "link"
+    t.datetime "print_time"
+    t.datetime "send_date"
+    t.integer "nag_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"
     t.index ["position_id"], name: "index_offers_on_position_id"
   end
 
-  add_foreign_key "contracts", "offers"
 end

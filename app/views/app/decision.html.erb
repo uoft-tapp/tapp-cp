@@ -88,8 +88,8 @@
         });
       }
       function fetchPdfData(){
-        let data = {"contracts": '[<%= @contract_id %>]'}
-        postHelper("/contracts/print", data, setPdfViewPort, true);
+        let data = {"contracts": '[<%= @offer[:id] %>]'}
+        postHelper("/offers/print", data, setPdfViewPort, true);
       }
       function setPdfViewPort(response){
         let fileURL = URL.createObjectURL(response);
@@ -142,7 +142,7 @@
           data["signature"] = signature;
         }
         if (res) {
-          postHelper("/contracts/<%= @contract_id %>/decision/"+status, data, updateStatus);
+          postHelper("/offers/<%= @offer[:id] %>/decision/"+status, data, updateStatus);
         }
       }
       function updateStatus(response){

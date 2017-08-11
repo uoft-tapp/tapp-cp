@@ -38,8 +38,8 @@
     </form>
     <h1>Contracts</h1>
     <form method="post">
-      <input type="submit" value="Nag" formaction="/contracts/nag">
-      <input type="submit" value="Print Contracts" formaction="/contracts/print">
+      <input type="submit" value="Nag" formaction="/offers/nag">
+      <input type="submit" value="Print Contracts" formaction="/offers/print">
       <input id="contract_selected" type="hidden" name="contracts">
       <table style="margin-top: 10px;">
         <tr style="text-align: left;">
@@ -55,20 +55,22 @@
           <th>Nag Count</th>
           <th>Printed</th>
         </tr>
-        <% @contracts.each do |c| %>
-          <tr>
-            <th><input type="checkbox" onclick="updateContractSelected(this, <%=c[:id] %>);"></th>
-            <th><%= c[:applicant][:last_name]%></th>
-            <th><%= c[:applicant][:first_name]%></th>
-            <th><%= c[:position]%></th>
-            <th><%= c[:applicant][:email]%></th>
-            <th><%= Offer.find(c[:offer_id])[:status]%></th>
-            <th><button type="button" onclick="withdraw(<%= c[:id]%>, '<%= Offer.find(c[:offer_id])[:status]%>')">Withdraw</button></th>
-            <th><%= (c[:updated_at].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
-            <th><%= (c[:deadline].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
-            <th><%= c[:nag_count]%></th>
-            <th><%= c[:printed]%></th>
-          </tr>
+        <% @offers.each do |c| %>
+          <% if c[:send_date] %>
+            <tr>
+              <th><input type="checkbox" onclick="updateContractSelected(this, <%=c[:id] %>);"></th>
+              <th><%= c[:applicant][:last_name]%></th>
+              <th><%= c[:applicant][:first_name]%></th>
+              <th><%= c[:position]%></th>
+              <th><%= c[:applicant][:email]%></th>
+              <th><%= c[:status]%></th>
+              <th><button type="button" onclick="withdraw(<%= c[:id]%>, '<%=c[:status]%>')">Withdraw</button></th>
+              <th><%= (c[:updated_at].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
+              <th><%= c[:deadline]? ((c[:deadline].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y")):"" %></th>
+              <th><%= c[:nag_count]%></th>
+              <th><%= c[:printed]%></th>
+            </tr>
+          <% end %>
         <% end %>
       </table>
     </form>
@@ -92,6 +94,7 @@
         else
           contract_selected.splice(contract_selected.indexOf(val),1);
         input.value=JSON.stringify(contract_selected)
+        console.log(input);
       }
       function fetchHelper(url, init, message){
         fetch(url, init).then(function(response) {
@@ -127,7 +130,7 @@
       }
       function withdraw(id, status){
         if(status=="Pending"){
-          postHelper("/contracts/"+id+"/decision/withdraw", {}, "Status Updated");
+          postHelper("/offers/"+id+"/decision/withdraw", {}, "Status Updated");
         }
         else{
           alert("Error: you can't change the status of this contract. It's already been "+status.toLowerCase()+".");
