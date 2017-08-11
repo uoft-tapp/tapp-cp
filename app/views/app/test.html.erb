@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Offers Importer</h1>
+    <input id="import" type="file"/></br></br>
+    <button onclick="loadFile()">Import Offer</button>
+    <h1>Offers</h1>
+    <form method="post">
+      <table>
+        <tr>
+          <th>Action</th>
+          <th>Decision Link</th>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Position</th>
+          <th>Hours</th>
+          <th>Email</th>
+          <th>Sent</th>
+          <th>Status</th>
+        </tr>
+        <% @offers.each do |o| %>
+          <tr>
+            <th><input type="submit" value="Send Contract" formaction="/offers/<%= o[:id]%>/send-contract"></th>
+            <th><a href="decision/<%= o[:applicant][:utorid]%>/<%= o[:position_id]%>">Link</a></th>
+            <th><%= o[:applicant][:last_name]%></th>
+            <th><%= o[:applicant][:first_name]%></th>
+            <th><%= o[:position]%></th>
+            <th><%= o[:hours]%></th>
+            <th><%= o[:applicant][:email]%></th>
+            <th><%= o[:sent]%></th>
+            <th><%= o[:status]%></th>
+          </tr>
+        <% end %>
+      </table>
+    </form>
+    <h1>Contracts</h1>
+    <form method="post">
+      <input type="submit" value="Nag" formaction="/contracts/nag">
+      <input type="submit" value="Print Contracts" formaction="/contracts/print">
+      <input id="contract_selected" type="hidden" name="contracts">
+      <table style="margin-top: 10px;">
+        <tr style="text-align: left;">
+          <th>Select</th>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Position</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Action</th>
+          <th>Contract Send Date</th>
+          <th>Deadline</th>
+          <th>Nag Count</th>
+          <th>Printed</th>
+        </tr>
+        <% @contracts.each do |c| %>
+          <tr>
+            <th><input type="checkbox" onclick="updateContractSelected(this, <%=c[:id] %>);"></th>
+            <th><%= c[:applicant][:last_name]%></th>
+            <th><%= c[:applicant][:first_name]%></th>
+            <th><%= c[:position]%></th>
+            <th><%= c[:applicant][:email]%></th>
+            <th><%= Offer.find(c[:offer_id])[:status]%></th>
+            <th><button type="button" onclick="withdraw(<%= c[:id]%>, '<%= Offer.find(c[:offer_id])[:status]%>')">Withdraw</button></th>
+            <th><%= (c[:updated_at].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
+            <th><%= (c[:deadline].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
+            <th><%= c[:nag_count]%></th>
+            <th><%= c[:printed]%></th>
+          </tr>
+        <% end %>
+      </table>
+    </form>
+    <h1>Sessions</h1>
+    <ul>
+      <% @sessions.each do |s| %>
+        <li>
+          <h2><%= s[:semester] %> <%= s[:year] %></h2>
+          <p>Start Date: <%= (Date.parse s[:start_date]).strftime("%B %e, %Y") %></p>
+          <p>End Date: <%= (Date.parse s[:end_date]).strftime("%B %e, %Y") %></p>
+          <p>Pay: <input type="number" value="<%= "%.2f" % s[:pay]%>" step="0.01" min="0.00" onblur="updateSession(this, <%=s[:id]%>)"/></p>
+        </li>
+      <% end %>
+    </ul>
+    <script>
+      contract_selected = [];
+      function updateContractSelected(checkbox, val){
+        input = document.getElementById("contract_selected")
+        if (checkbox.checked)
+          contract_selected.push(val)
+        else
+          contract_selected.splice(contract_selected.indexOf(val),1);
+        input.value=JSON.stringify(contract_selected)
+      }
+      function fetchHelper(url, init, message){
+        fetch(url, init).then(function(response) {
+          if (response.ok){
+            return alert(message);
+          }
+          else{
+            return alert("Error: update failed");
+          }
+        })
+      }
+      function postHelper(url, data, message){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'POST',
+            body: JSON.stringify(data)
+        };
+        fetchHelper(url, init, message);
+      }
+      function updateSession(input, id){
+        let data = {pay: input.value};
+        let init = {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'PUT',
+            body: JSON.stringify(data)
+        };
+        fetchHelper("/sessions/"+id, init, "Pay updated");
+      }
+      function withdraw(id, status){
+        if(status=="Pending"){
+          postHelper("/contracts/"+id+"/decision/withdraw", {}, "Status Updated");
+        }
+        else{
+          alert("Error: you can't change the status of this contract. It's already been "+status.toLowerCase()+".");
+        }
+      }
+      function loadFile() {
+          let files = document.getElementById('import').files;
+          if (files.length > 0) {
+              let message =
+                  'Are you sure you want to import "' + files[0].name + '" into the database?';
+              if (files[0].type == 'application/json') {
+                  if (confirm(message)) {
+                      uploadFile(files[0]);
+                  }
+              } else {
+                  alert('Error: The file you uploaded is not a JSON.');
+              }
+          } else {
+              alert('Error: No file chosen.');
+          }
+      }
+
+      function uploadFile(file) {
+          let reader = new FileReader();
+          reader.onload = function(event) {
+              let data = JSON.parse(event.target.result);
+
+              if (data['offers'] !== undefined) {
+                  data = { chass_offers: data };
+                  postHelper("/import/offers", data, "Offers Imported");
+              } else {
+                  alert("Error: This is not Chass Offers JSON.")
+              }
+          };
+          reader.readAsText(file);
+      }
+
+    </script>
+  </body>
+</html>

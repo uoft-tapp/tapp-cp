@@ -1,0 +1,9 @@
+Dear <%= @contract[:applicant][:first_name] %> <%= @contract[:applicant][:last_name] %>,
+====================================
+
+You have yet to accept or reject your offer for the TAship of <%= @contract[:position] %>.
+
+If you have not accept your offer by <%= @contract[:deadline] %>, your offer will be resceded. Check your dates and decide soon. This is your <%= @contract[:nag_count] %><%= @contract[:nag_suffix] %> warning.
+
+Follow the link below to submit your final decision:
+<%= @url %>

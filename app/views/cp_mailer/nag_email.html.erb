@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <p>Dear <%= @contract[:applicant][:first_name] %> <%= @contract[:applicant][:last_name] %>,</p>
+    <p>
+      You have yet to accept or reject your offer for the TAship of <%= @contract[:position] %>.
+    </p>
+    <p>
+      If you have not accept your offer by <%= @contract[:deadline] %>, your offer will be receded. Check your dates and decide soon. This is your <%= @contract[:nag_count] %><%= @contract[:nag_suffix] %> warning.
+    </p>
+    <p>
+      Follow the link below to submit your final decision:<br/>
+      <%= @url %>
+    </p>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+<b>OFFICE USE ONLY</b>
+
+<b>Personnel Number Search:</b>
+
+<tablerow>Last Name: <%= @offer[:applicant][:last_name] %>:First Name:<%= @offer[:applicant][:first_name] %>:Student Number: <%= @offer[:applicant][:student_number] %>
+
+<b>Returning Employee:</b>
+
+<tablerow>Personnel Number: :Name:<%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
+
+<tablerow>Start Date: <%= format_time(@offer[:session][:start_date],2) %>:End Date: <%= format_time(@offer[:session][:end_date],2) %>
+
+<tablerow>Wage Type: 01 15
+
+<tablerow>Amount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:session][:pay]) %>
+
+<tablerow>Number/Unit: <%= '%.2f' % (@offer[:hours]/4) %>
+
+<tablerow>Assignment Number: TA <%= @offer[:position][/[A-Z0-9]{3}\d{3,4}/] %><%= @offer[:position].split(/-\//)[0][@offer[:position].split(/-\//)[0].size-1] %>/17
+
+<b>New Employee:</b>
+
+<tablerow>Personnel Number: :Start Date: <%= format_time(@offer[:session][:start_date],2) %>
+
+<tablerow>Form-of-add: :Last Name: <%= @offer[:applicant][:last_name] %>:First Name: <%= @offer[:applicant][:first_name] %>
+
+<tablerow>Birth date: :SIN: :Gender: :
+
+<tablerow>Home Address: :
+
+<tablerow>City: :Postal Code: :
+
+<tablerow>Province: :Country: :
+
+<tablerow>Bank Key: :Bank Account: :
+
+<tablerow>Position: :Fund Centre: :Work Contract: :
+
+<tablerow>UofT Student number: <%= @offer[:applicant][:student_number] %>
