@@ -18,7 +18,6 @@ ActiveRecord::Schema.define(version: 20170718181449) do
   create_table "contracts", force: :cascade do |t|
     t.bigint "offer_id"
     t.text "link", null: false
-    t.boolean "accepted", default: false
     t.boolean "printed", default: false
     t.integer "nag_count", default: 0
     t.datetime "created_at", null: false
@@ -34,6 +33,7 @@ ActiveRecord::Schema.define(version: 20170718181449) do
     t.integer "hours", null: false
     t.integer "year"
     t.string "session"
+    t.string "status", default: "Unsent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"

@@ -6,11 +6,34 @@ RSpec.describe ContractsController, type: :controller do
     Offer.create!(
         position_id: 6,
         applicant_id: 1,
-        hours: 60
+        hours: 60,
+        status: "Pending"
+    )
+  end
+  let(:unsent_offer) do
+    Offer.create!(
+        position_id: 6,
+        applicant_id: 2,
+        hours: 60,
+        status: "Unsent"
+    )
+  end
+  let(:accepted_offer) do
+    Offer.create!(
+        position_id: 6,
+        applicant_id: 3,
+        hours: 60,
+        status: "Accepted"
     )
   end
   let(:contract) do
     offer.create_contract!(link: "my link")
+  end
+  let(:unsent_contract) do
+    unsent_offer.create_contract!(link: "my link")
+  end
+  let(:accepted_contract) do
+    accepted_offer.create_contract!(link: "my link")
   end
 
 
@@ -39,36 +62,127 @@ RSpec.describe ContractsController, type: :controller do
     end
   end
 
-  describe "POST /contracts/" do
-    context ":id/nag" do
+  describe "POST /contracts/"
+    context "nag" do
       before(:each) do
         expect(contract[:nag_count]).to eq(0)
       end
       it "return a message of the number of time a applicant has been nagged at" do
-        post :nag, params: {id: contract[:id]}
+        post :batch_email_nags, params: {contracts: ([contract[:id]]).to_s}
         contract.reload
         expect(response.status).to eq(200)
         expect(contract[:nag_count]).to eq(1)
-        expect(response.body).to eq({
-          message: "You've nagged at this applicant for the #{contract[:nag_count]}-th time."
-        }.to_json)
+        res = ({ message: "You've sent the nag emails."}).to_json
+        expect(response.body).to eq(res)
       end
     end
-  end
 
-  describe "PATCH /contracts/:id" do
-    before(:each) do
-      expect(contract[:accepted]).to eq(false)
-      expect(contract[:printed]).to eq(false)
-    end
-    it "returns status 204 and updates contract" do
-      patch :update, params: {id: contract[:id], accepted: true, printed: true}
-      contract.reload
-      expect(response.status).to eq(204)
-      expect(contract[:accepted]).to eq(true)
-      expect(contract[:printed]).to eq(true)
-    end
-  end
+    context ":contract_id/decision/:code" do
+      context "when contract_id doesn't exists" do
+        it "returns a status 404" do
+          post :set_status, params: {contract_id: "poop", code: "accept"}
+          expect(response.status).to eq(404)
+        end
+      end
+      context "when contract_id does exists" do
+        context "when status is pending" do
+          context "code = accept" do
+            it "updates the contract status to Accepted" do
+              post :set_status, params: {contract_id: contract[:id], code: "accept"}
+              expect(response.status).to eq(200)
+              body = {success: true, status: "accepted", message: "You've just accepted this offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
 
+          context "code = reject" do
+            it "updates the contract status to Rejected" do
+              post :set_status, params: {contract_id: contract[:id], code: "reject"}
+              expect(response.status).to eq(200)
+              body = {success: true, status: "rejected", message: "You've just rejected this offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = withdraw" do
+            it "updates the contract status to Withdrawn" do
+              post :set_status, params: {contract_id: contract[:id], code: "withdraw"}
+              expect(response.status).to eq(200)
+              body = {success: true, status: "withdrawn", message: "You've just withdrawn this offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+        end
+
+        context "when status is unsent" do
+          context "code = accept" do
+            it "returns a status 404 with a message" do
+              post :set_status, params: {contract_id: unsent_contract[:id], code: "accept"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot accept an unsent offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = reject" do
+            it "updates the contract status to Rejected" do
+              post :set_status, params: {contract_id: unsent_contract[:id], code: "reject"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject an unsent offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = withdraw" do
+            it "updates the contract status to Withdrawn" do
+              post :set_status, params: {contract_id: unsent_contract[:id], code: "withdraw"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot withdraw an unsent offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+        end
+
+        context "when status decided" do
+          context "code = accept" do
+            it "returns a status 404 with a message" do
+              post :set_status, params: {contract_id: accepted_contract[:id], code: "accept"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = reject" do
+            it "updates the contract status to Rejected" do
+              post :set_status, params: {contract_id: accepted_contract[:id], code: "reject"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = withdraw" do
+            it "updates the contract status to Withdrawn" do
+              post :set_status, params: {contract_id: accepted_contract[:id], code: "withdraw"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+        end
+      end
+
+    end
+
+    context "print" do
+      it "sends a PDF blob" do
+        post :combine_contracts_print, params: {contracts: ([contract[:id]]).to_s}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contracts.pdf\"")
+      end
+    end
 
 end

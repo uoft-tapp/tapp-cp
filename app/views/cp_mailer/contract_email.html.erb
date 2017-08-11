@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Congratulations, <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %></h1>
+    <p>
+      You have successfully been choosen to TA <%= @offer[:position] %>
+    </p>
+    <p>
+      Click the url below accept this offer: <%= @url %>.
+    </p>
+    <p>Have a great day!</p>
+  </body>
+</html>

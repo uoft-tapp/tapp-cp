@@ -2,13 +2,13 @@ class ContractsController < ApplicationController
   protect_from_forgery with: :null_session
 
   def index
-    contracts = Contract.all.includes(:offer).map { |c| format_contract(c) }
+    contracts = Contract.all.map { |c| c.format }
     render json: contracts
   end
 
   def show
     contract = Contract.find(params[:id])
-    render json: format_contract(contract)
+    render json: contract.format
   end
 
   def update
@@ -16,30 +16,69 @@ class ContractsController < ApplicationController
     contract.update_attributes!(contract_params)
   end
 
-  def nag
+  def batch_email_nags
+    if params[:contracts] && params[:contracts]!=""
+      JSON.parse(params[:contracts]).each do |id|
+        contract = Contract.find(id)
+        if contract
+          contract.increment!(:nag_count, 1)
+          if ENV['RAILS_ENV'] != 'test'
+            CpMailer.nag_email(contract.format).deliver_now
+          end
+        end
+      end
+      render json: {message: "You've sent the nag emails."}
+    end
+  end
+
+  def combine_contracts_print
+    if params[:contracts] && params[:contracts]!=""
+      offers = get_printable_data(JSON.parse(params[:contracts]))
+      generator = ContractGenerator.new(offers)
+      send_data generator.render, filename: "contracts.pdf", disposition: "inline"
+    end
+  end
+
+  def set_status
+    status = get_status(params[:code])
     contract = Contract.find(params[:contract_id])
-    # send out email remainders
-    contract.increment!(:nag_count, 1)
-    render json: {message: "You've nagged at this applicant for the #{contract[:nag_count]}-th time."}
+    offer = contract.offer
+    if offer[:status] == "Pending"
+      offer.update_attributes!(status: status[:name])
+      render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
+    elsif offer[:status] == "Unsent"
+      render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
+    else
+      render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
+    end
   end
 
   private
   def contract_params
-    params.permit(:accepted, :printed)
+    params.permit(:printed)
   end
 
-  def format_contract(contract)
-    offer = contract.offer
-    deadline = contract.get_deadline
-    contract = contract.as_json
-    position = Position.find(offer[:position_id]).as_json
-    applicant = Applicant.find(offer[:applicant_id]).as_json
-    return contract.merge({
-      position: position["position"],
-      applicant: applicant,
-      deadline: deadline,
-      contract: Time.now > deadline,
-    })
+  def get_printable_data(contracts)
+    offers = []
+    contracts.each do |id|
+      contract = Contract.find(id)
+      offer = Offer.find(contract[:offer_id])
+      if offer
+        offers.push(offer.format)
+      end
+    end
+    return offers
+  end
+
+  def get_status(code)
+    case code
+    when "accept"
+      return {name: "Accepted", action: "accept"}
+    when "reject"
+      return {name: "Rejected", action: "reject"}
+    when "withdraw"
+      return {name: "Withdrawn", action: "withdraw"}
+    end
   end
 
 end
