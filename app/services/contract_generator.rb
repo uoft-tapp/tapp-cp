@@ -64,6 +64,13 @@ class ContractGenerator
     end
   end
 
+  # In Prawn, text/image can be inserted by drawing them within a grid. A grid
+  # contains its top-left coordinates and its bottom-right coordinates.
+  # In the initialize(), each page was basically divided into a 85 X 110 grid.
+  # This basically sets up the page coordinates by 0.1 inches since it is by default
+  # an A4 document. The function below basically takes the x, y as inches converts them
+  # to grid arrays. It also takes width and height in inches and calculate the coordinates
+  # for the bottom-right corner of the grid.
   def get_grids(x, y, width, height)
     x = (x*10)-5
     y = (y*10)-5
@@ -72,6 +79,13 @@ class ContractGenerator
     return [[y, x], [end_y, end_x]]
   end
 
+  # set_text() create a grid at the coordinates specified by grids.
+  # It also sets the font, font_size, alignment of the text in parameter, data,
+  # inside the created grid. "fill", by default, is false so that there is no
+  # border or background color to the grid created. The "top_padding" is also
+  # false by default, so that there is no unintended top_padding to the text within
+  # the grid.
+  # "fill" and "top_padding" are used as part of the office only form to create the grid.
   def set_text(grids, data, fill = false, top_padding = false)
     grid(grids[0], grids[1]).bounding_box() do
       font data[:font]
@@ -95,13 +109,16 @@ class ContractGenerator
     end
   end
 
+  # draws a horizontal according to the fraction of 7.5 inches (because margin
+  # for the document is 0.5 inches on all sides)
   def draw_line(grids, length)
     grid(grids[0], grids[1]).bounding_box() do
       stroke_horizontal_line 0, 470*length, at: 5
     end
   end
 
-
+  # reads forms data, which an array of strings, and extract for a "tablerow"
+  # and gets the max number of columns needed in the form table
   def get_table_data(form_data)
     table_data = []
     i = -1
