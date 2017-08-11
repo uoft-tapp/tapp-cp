@@ -16,7 +16,7 @@ class ContractsController < ApplicationController
     contract.update_attributes!(contract_params)
   end
 
-  def nag
+  def batch_email_nags
     if params[:contracts] && params[:contracts]!=""
       JSON.parse(params[:contracts]).each do |id|
         contract = Contract.find(id)
@@ -31,7 +31,7 @@ class ContractsController < ApplicationController
     end
   end
 
-  def print
+  def combine_contracts_print
     if params[:contracts] && params[:contracts]!=""
       offers = get_printable_data(JSON.parse(params[:contracts]))
       generator = ContractGenerator.new(offers)

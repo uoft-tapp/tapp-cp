@@ -68,7 +68,7 @@ RSpec.describe ContractsController, type: :controller do
         expect(contract[:nag_count]).to eq(0)
       end
       it "return a message of the number of time a applicant has been nagged at" do
-        post :nag, params: {contracts: ([contract[:id]]).to_s}
+        post :batch_email_nags, params: {contracts: ([contract[:id]]).to_s}
         contract.reload
         expect(response.status).to eq(200)
         expect(contract[:nag_count]).to eq(1)
@@ -177,7 +177,7 @@ RSpec.describe ContractsController, type: :controller do
 
     context "print" do
       it "sends a PDF blob" do
-        post :print, params: {contracts: ([contract[:id]]).to_s}
+        post :combine_contracts_print, params: {contracts: ([contract[:id]]).to_s}
         expect(response.status).to eq(200)
         expect(response.content_type).to eq("application/pdf")
         expect(response.header["Content-Disposition"]).to eq(

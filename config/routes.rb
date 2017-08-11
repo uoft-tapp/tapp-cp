@@ -10,8 +10,8 @@ Rails.application.routes.draw do
   resources :sessions
 
   get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
-  post "contracts/print" => "contracts#print"
-  post "contracts/nag" => "contracts#nag"
+  post "contracts/print" => "contracts#combine_contracts_print"
+  post "contracts/nag" => "contracts#batch_email_nags"
   post "import/offers" => "import#import_offers"
 
   #temp-testing views
