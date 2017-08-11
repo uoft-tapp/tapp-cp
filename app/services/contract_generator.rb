@@ -1,6 +1,10 @@
 class ContractGenerator
   include Prawn::View
   Prawn::Font::AFM.hide_m17n_warning = true
+  TITLE = 1
+  REGULAR_LEFT_ALIGN = 2
+  SMALL_LEFT_ALIGN = 3
+  SIGNATURE = 4
 
   def initialize(offers)
     offers.each_with_index do |offer, index|
@@ -29,42 +33,28 @@ class ContractGenerator
 
   def get_style(type, text)
     case type
-    when 1
+    when TITLE
       return {
         font: "Times-Roman",
         font_size: 12,
         text: text,
         align: :center,
       }
-    when 2
+    when REGULAR_LEFT_ALIGN
       return {
         font: "Times-Roman",
         font_size: 9,
         text: text,
         align: :left,
       }
-    when 3
-      return {
-        font: "Times-Roman",
-        font_size: 9,
-        text: text,
-        align: :center,
-      }
-    when 4
-      return {
-        font: "Times-Roman",
-        font_size: 9,
-        text: text,
-        align: :justify,
-      }
-    when 5
+    when SMALL_LEFT_ALIGN
       return {
         font: "Times-Roman",
         font_size: 7,
         text: text,
         align: :justify,
       }
-    when 6
+    when SIGNATURE
       return {
         font: get_font("signature"),
         font_size: 25,
@@ -143,10 +133,10 @@ class ContractGenerator
   def set_header(x, y, header_data)
     set_logo(get_grids(x, y-0.1, 1.8, 0.9))
 
-    set_text(get_grids(x+1.8, y-0.1, 3.5, 0.4), get_style(1, header_data[0]))
-    set_text(get_grids(x+5.4, y, 1.4, 0.3), get_style(3, header_data[1]))
+    set_text(get_grids(x+1.8, y-0.1, 3.5, 0.4), get_style(TITLE, header_data[0]))
+    set_text(get_grids(x+5.4, y, 1.4, 0.3), get_style(REGULAR_LEFT_ALIGN, header_data[1]))
 
-    set_text(get_grids(x+3.8, y+0.5, 3, 0.5), get_style(1, header_data[2]))
+    set_text(get_grids(x+3.8, y+0.5, 3, 0.5), get_style(TITLE, header_data[2]))
 
     return y+1
   end
@@ -214,9 +204,9 @@ class ContractGenerator
       start_new_page
       y = 0.5
     end
-    set_text(get_grids(x, y, 3, 0.2), get_style(2, signature_data[0]))
-    set_text(get_grids(x, y+0.1, 3, 0.6), get_style(6, ENV['TA_COORD']))
-    set_text(get_grids(x, y+0.6, 3, 0.6), get_style(2, signature_data[1]))
+    set_text(get_grids(x, y, 3, 0.2), get_style(REGULAR_LEFT_ALIGN, signature_data[0]))
+    set_text(get_grids(x, y+0.1, 3, 0.6), get_style(SIGNATURE, ENV['TA_COORD']))
+    set_text(get_grids(x, y+0.6, 3, 0.6), get_style(REGULAR_LEFT_ALIGN, signature_data[1]))
     return y+1.2
   end
 
@@ -227,7 +217,7 @@ class ContractGenerator
     else
       draw_line(get_grids(1, y-0.1, 7.5, 0.1), 1)
     end
-    set_text(get_grids(1, y, 6.5, 0.2), get_style(2, form_data[0]))
+    set_text(get_grids(1, y, 6.5, 0.2), get_style(REGULAR_LEFT_ALIGN, form_data[0]))
     set_form_table(get_grids(1, y+0.15, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
     return page_count
   end
@@ -242,7 +232,7 @@ class ContractGenerator
   end
 
   def set_table_helper(table, num_columns)
-    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(5, table[:label]), false, true)
+    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(REGULAR_LEFT_ALIGN, table[:label]), false, true)
     table[:table].each_with_index do |row, row_num|
       row_multiplier= num_columns/row.length.to_f
       row.each_with_index do |column, index|
@@ -256,9 +246,9 @@ class ContractGenerator
         end
         grids = [[curr_row, horizontal_1], [curr_row, horizontal_2]]
         if index%2 == 0
-          set_text(grids, get_style(5, "<b>#{column}</b>"), true, true)
+          set_text(grids, get_style(REGULAR_LEFT_ALIGN, "<b>#{column}</b>"), true, true)
         else
-          set_text(grids, get_style(5, "#{column}"), true, true)
+          set_text(grids, get_style(REGULAR_LEFT_ALIGN, "#{column}"), true, true)
         end
       end
     end
@@ -271,15 +261,15 @@ class ContractGenerator
     grid(grids[0], grids[1]).bounding_box() do
       data = salary_data[0].split("\n")
       define_grid(columns: 1, rows: data.size+1, gutter: 0)
-      set_text([[data.size, 0],[data.size, 0]], get_style(5, salary_data[1]))
+      set_text([[data.size, 0],[data.size, 0]], get_style(SMALL_LEFT_ALIGN, salary_data[1]))
       grid([0,0], [2,0]).bounding_box do
         define_grid(columns: 4, rows: data.size, gutter: 0)
         draw_line([[data.size-1, 0], [data.size-1, 3]], 0.39)
         draw_line([[data.size-2, 3], [data.size-2, 3]], 0.1)
         data.each_with_index do |row, index|
           values = row.split(",")
-          set_text([[index, 0],[index, 2]], get_style(4, values[0]))
-          set_text([[index, 3],[index, 3]], get_style(4, values[1]))
+          set_text([[index, 0],[index, 2]], get_style(REGULAR_LEFT_ALIGN, values[0]))
+          set_text([[index, 3],[index, 3]], get_style(REGULAR_LEFT_ALIGN, values[1]))
         end
       end
     end
