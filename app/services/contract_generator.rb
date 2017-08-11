@@ -191,6 +191,7 @@ class ContractGenerator
     return salary_page
   end
 
+  # gets the y coordinate of the paragraph on the page by num_lines
   def get_y_by_line(num_lines)
     if page_count == 1
       return (num_lines*0.16)+0.4
