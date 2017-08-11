@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
+  ToggleButtonGroup,
+  ToggleButton,
   ButtonToolbar,
   ButtonGroup,
   Button,
@@ -21,22 +23,36 @@ class TableMenu extends React.Component {
   render() {
     return (
       <div className="table-menu">
-        <ButtonToolbar>
-          {this.props.config.map(field =>
-            <DropdownButton
-              title={field.header}
-              key={'sort-' + field.header}
-              id={'sort-' + field.header}
-              noCaret>
-              <MenuItem
-                eventKey={'sort-' + field.header + '-down'}
-                onSelect={() => this.props.sort(field.header)}>
-                <span>
-                  {' '}{field.header} {this.icon['-1']}{' '}
-                </span>
-              </MenuItem>
-            </DropdownButton>
-          )}
+        <ButtonToolbar id="table-toolbar">
+          <ButtonGroup id="table-sortfields-group">
+            {this.props.sortFields.map(field =>
+              <DropdownButton
+                title={
+                  <span>
+                    {' '}{field.header} {this.icon['1']}{' '}
+                  </span>
+                }
+                key={'sort-' + field.header}
+                id={'sort-' + field.header}
+                noCaret>
+                <MenuItem
+                  eventKey={'sort-' + field.header + '-down'}
+                  onSelect={() => this.props.sort(field.header)}>
+                  <span>
+                    {' '}{field.header} {this.icon['-1']}{' '}
+                  </span>
+                </MenuItem>
+              </DropdownButton>
+            )}
+          </ButtonGroup>
+
+          <ToggleButtonGroup id="table-toggle-group" type="checkbox">
+            {this.props.toggleFields.map(field =>
+              <ToggleButton key={'toggle-' + field.header} value={field.header}>
+                {field.header}
+              </ToggleButton>
+            )}
+          </ToggleButtonGroup>
         </ButtonToolbar>
       </div>
     );

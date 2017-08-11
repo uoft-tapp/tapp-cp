@@ -13,23 +13,11 @@ const Theader = props =>
     </tr>
   </thead>;
 
-const Tbody = props =>
-  <tbody>
-    <tr>
-      {props.offers.map((field, i) =>
-        <td>
-          {' '}{field}{' '}
-        </td>
-      )}
-    </tr>
-  </tbody>;
-
 class AdminTable extends React.Component {
   render() {
     return (
       <Table striped bordered condensed hover>
         <Theader config={this.props.config} />
-        <Tbody offers={this.props.offers} />
       </Table>
     );
   }

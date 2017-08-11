@@ -18,6 +18,7 @@ import * as fetch from '../app/fetch.js';
 import { rconfig } from '../app/routeConfig.js';
 
 import { Admin } from '../app/components/admin.js';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 class App extends React.Component {
   constructor(props) {
@@ -39,16 +40,19 @@ class App extends React.Component {
 function RouterInst(props) {
   return (
     <Router basename="index.html">
-      <Switch>
-        <Route
-          path={rconfig.admin.route}
-          render={() => <Admin navKey={rconfig.admin.key} {...props} />}
-        />
-        <Route
-          path={rconfig.cp.route}
-          render={() => <Contract navKey={rconfig.cp.key} {...props} />}
-        />
-      </Switch>
+      <div>
+        <Navbar fixedTop fluid />
+        <Switch>
+          <Route
+            path={rconfig.admin.route}
+            render={() => <Admin navKey={rconfig.admin.key} {...props} />}
+          />
+          <Route
+            path={rconfig.cp.route}
+            render={() => <Contract navKey={rconfig.cp.key} {...props} />}
+          />
+        </Switch>
+      </div>
     </Router>
   );
 }
