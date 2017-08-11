@@ -12,13 +12,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 import { appState } from '../app/appState.js';
 import * as fetch from '../app/fetch.js';
 import { rconfig } from '../app/routeConfig.js';
 
 import { Admin } from '../app/components/admin.js';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import { Navigation } from '../app/components/navbar.js';
 
 class App extends React.Component {
   constructor(props) {
@@ -41,7 +42,7 @@ function RouterInst(props) {
   return (
     <Router basename="index.html">
       <div>
-        <Navbar fixedTop fluid />
+        <Navigation {...props} />
         <Switch>
           <Route
             path={rconfig.admin.route}

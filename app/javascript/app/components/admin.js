@@ -36,32 +36,24 @@ class Admin extends React.Component {
         sortData: p => p.applicant.student_number,
       },
       {
-        header: 'Session',
-        sortField: true,
-      },
-      {
         header: 'Position',
         sortField: true,
       },
       {
-        header: 'Sent',
+        header: 'Hours',
         sortField: false,
       },
       {
-        header: 'Printed',
+        header: 'Status',
         sortField: false,
       },
       {
-        header: 'Accepted',
+        header: 'HRIS Status',
         sortField: false,
       },
       {
-        header: 'Objection',
+        header: 'DDAH Status',
         sortField: false,
-      },
-      {
-        header: 'Nag Count',
-        sortField: true,
       },
     ];
     this.offers = [
@@ -197,6 +189,12 @@ class Admin extends React.Component {
         ],
       },
     ];
+  }
+
+  componentWillMount() {
+    if (this.component.getCurrentTab() != this.props.navKey) {
+      this.component.setCurrentTab(this.props.navKey);
+    }
   }
 
   render() {

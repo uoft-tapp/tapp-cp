@@ -1,13 +1,23 @@
 const rconfig = {
   admin: {
-    label: 'HR Admin',
+    label: 'Admin',
     route: '/admin',
     key: 'admin',
   },
   cp: {
     label: 'Contract',
-    route: '/student',
+    route: '/contract',
     key: 'contract-presentment',
+  },
+  ddah: {
+    label: 'DDAH',
+    route: '/ddah',
+    key: 'ddah-form',
+  },
+  logout: {
+    label: 'Logout',
+    route: 'logout',
+    key: 'logout-user',
   },
 };
 
