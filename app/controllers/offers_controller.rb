@@ -63,8 +63,6 @@ class OffersController < ApplicationController
     puts "update_hr_status"
   end
 
-  def update_
-
   private
   def get_all_offers
     Offer.all.map do |offer|
