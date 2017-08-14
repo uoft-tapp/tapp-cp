@@ -68,6 +68,7 @@
           <p>This offer has been `+offer_status+'.</p>';
         }
       }
+      // helper factoring out frequently used code around a fetch
       function fetchHelper(url, init, action, blob=false){
         fetch(url, init).then(function(response) {
           if (blob){
