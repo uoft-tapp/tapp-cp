@@ -4,7 +4,10 @@ class Offer < ApplicationRecord
   has_one :contract
 
   def get_deadline
-    self.contract[:created_at] + (2*7*24*60*60)
+    offer = self.json
+    if offer[:send_date]
+      DateTime.parse(offer[:send_date]).days_ago(-21)
+    end
   end
 
   def format
@@ -14,15 +17,14 @@ class Offer < ApplicationRecord
     instructors = JSON.parse(position[:instructors].to_json, symbolize_names: true)
     session = Session.find(position[:session_id]).json
     data = {
-      sent: self.contract.present?,
       position: position[:position],
       applicant: applicant,
       session: session,
       instructors: [],
+      deadline: self.get_deadline,
     }
-    if data[:sent]
+    if offer[:send_date]
       data[:deadline] = self.get_deadline
-      data[:withdrawn] = Time.now > data[:deadline]
     end
     instructors.each do |instructor|
       data[:instructors].push(instructor)

@@ -2,16 +2,14 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :applicants
   resources :offers do
-    post "send-contract" => "offers#send_contract"
-  end
-  resources :contracts do
-    post "decision/:code" => "contracts#set_status"
+    post "decision/:code" => "offers#set_status"
+    get "contract" => "offers#get_contract"
   end
   resources :sessions
 
-  get "offers/instructor/:instructor_id" => "offers#show_by_instructor"
-  post "contracts/print" => "contracts#combine_contracts_print"
-  post "contracts/nag" => "contracts#batch_email_nags"
+  post "offers/send-contracts" => "offers#send_contracts"
+  post "offers/print" => "offers#combine_contracts_print"
+  post "offers/nag" => "offers#batch_email_nags"
   post "import/offers" => "import#import_offers"
 
   #temp-testing views

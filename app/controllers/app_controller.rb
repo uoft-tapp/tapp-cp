@@ -1,6 +1,5 @@
 class AppController < ActionController::Base
   def test
-    @contracts = Contract.all.map { |c| c.format }
     @offers = Offer.all.map {|o| o.format }
     @sessions = Session.all.map {|s| s.json }
     puts @sessions
@@ -14,8 +13,7 @@ class AppController < ActionController::Base
       if position
         offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
         if offer
-          if offer.contract
-            @contract_id = offer.contract.id
+          if offer[:send_date]
             @offer = offer.format
             render :decision, layout: false
           else
