@@ -71,7 +71,7 @@
               <th><%= (c[:updated_at].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
               <th><%= c[:deadline]? ((c[:deadline].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y")):"" %></th>
               <th><%= c[:nag_count]%></th>
-              <th><%= c[:print_date]? c[:print_date]: "n/a"%></th>
+              <th><%= c[:print_time]? c[:print_time]: "n/a"%></th>
             </tr>
           <% end %>
         <% end %>
@@ -112,6 +112,7 @@
           }
         }).then(function(response){
           if (file){
+            location.reload();
             let fileURL = URL.createObjectURL(response);
             pdf = window.open(fileURL);
             pdf.document.onload= pdf.print();

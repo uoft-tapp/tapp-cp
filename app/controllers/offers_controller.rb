@@ -46,6 +46,7 @@ class OffersController < ApplicationController
   def combine_contracts_print
     if params[:contracts] && params[:contracts]!=""
       offers = get_printable_data(params[:contracts])
+      update_print_status(offers)
       generator = ContractGenerator.new(offers)
       send_data generator.render, filename: "contracts.pdf", disposition: "inline"
     end
@@ -84,6 +85,13 @@ class OffersController < ApplicationController
       end
     end
     return offers
+  end
+
+  def update_print_status(offers)
+    offers.each do |offer|
+      offer = Offer.find(offer[:id])
+      offer.update_attributes!({hr_status: "Printed", print_time: DateTime.now})
+    end
   end
 
   def get_status(code)
