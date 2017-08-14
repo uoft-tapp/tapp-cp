@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   post "offers/print" => "offers#combine_contracts_print"
   post "offers/nag" => "offers#batch_email_nags"
   post "import/offers" => "import#import_offers"
+  post "import/locked-assignments" => "import#import_locked_assignments"
 
   #temp-testing views
   get "test" => "app#test"
