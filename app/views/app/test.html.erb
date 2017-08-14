@@ -51,6 +51,7 @@
       <table style="margin-top: 10px;">
         <tr style="text-align: left;">
           <th>Select</th>
+          <th>File</th>
           <th>Last Name</th>
           <th>First Name</th>
           <th>Student Number</th>
@@ -66,6 +67,7 @@
           <% if c[:send_date] %>
             <tr>
               <th><input type="checkbox" onclick="updateContractSelected(this, <%=c[:id] %>);"></th>
+              <th><button type="button" onclick="showContract(<%=c[:id] %>)">Contract</button></th>
               <th><%= c[:applicant][:last_name]%></th>
               <th><%= c[:applicant][:first_name]%></th>
               <th><%= c[:applicant][:student_number]%></th>
@@ -112,7 +114,7 @@
           email_selected.splice(email_selected.indexOf(email),1);
         }
       }
-      function fetchHelper(url, init, message, file){
+      function fetchHelper(url, init, message, file, print){
         fetch(url, init).then(function(response) {
           if (response.status==204){
             return {message: message};
@@ -127,10 +129,14 @@
           }
         }).then(function(response){
           if (file){
-            location.reload();
             let fileURL = URL.createObjectURL(response);
-            pdf = window.open(fileURL);
-            pdf.document.onload= pdf.print();
+            if (print){
+              pdf = window.open(fileURL);
+              pdf.document.onload= pdf.print();
+            }
+            else{
+              window.location= fileURL;
+            }
           }
           else{
             location.reload();
@@ -138,7 +144,7 @@
           }
         })
       }
-      function postHelper(url, data, message="", file=false){
+      function postHelper(url, data, message="", file=false, print= false){
         let init = {
             headers: {
                 Accept: 'application/json',
@@ -147,9 +153,9 @@
             method: 'POST',
             body: JSON.stringify(data)
         };
-        fetchHelper(url, init, message,file);
+        fetchHelper(url, init, message,file, print);
       }
-      function putHelper(url, data, message="", file=false){
+      function putHelper(url, data, message="", file=false, print = false){
         let init = {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
@@ -177,7 +183,10 @@
         postHelper("/offers/nag", {contracts:contract_selected}, "")
       }
       function print(){
-        postHelper("/offers/print", {contracts:contract_selected}, "", true)
+        postHelper("/offers/print", {contracts:contract_selected, update: true}, "", true, true)
+      }
+      function showContract(id){
+        postHelper("/offers/print", {contracts: [id], update: false}, "", true)
       }
       function updateSession(input, id){
         let data = {pay: input.value};
