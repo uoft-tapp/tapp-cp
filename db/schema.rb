@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20170718181301) do
     t.string "session"
     t.string "status", default: "Unsent"
     t.string "hr_status"
+    t.string "ddah_status"
     t.text "link"
     t.datetime "print_time"
     t.datetime "send_date"
