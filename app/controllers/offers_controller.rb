@@ -10,6 +10,11 @@ class OffersController < ApplicationController
     render json: offer.format
   end
 
+  def update
+    offer = Offer.find(params[:id])
+    offer.update_attributes(offer_params)
+  end
+
   def send_contract
     offer = Offer.find(params[:offer_id])
     if !offer[:send_date]
@@ -59,11 +64,11 @@ class OffersController < ApplicationController
     end
   end
 
-  def update_hr_status
-    puts "update_hr_status"
+  private
+  def offer_params
+    params.permit(:hr_status, :ddah_status)
   end
 
-  private
   def get_all_offers
     Offer.all.map do |offer|
       offer.format

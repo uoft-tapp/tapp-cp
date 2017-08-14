@@ -4,7 +4,6 @@ Rails.application.routes.draw do
   resources :offers do
     post "send-contract" => "offers#send_contract"
     post "decision/:code" => "offers#set_status"
-    post "hr-status/:code" => "offers#update_hr_status"
   end
   resources :sessions
 
