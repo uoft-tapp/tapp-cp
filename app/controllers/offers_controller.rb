@@ -70,7 +70,9 @@ class OffersController < ApplicationController
   def combine_contracts_print
     if params[:contracts] && params[:contracts]!=""
       offers = get_printable_data(params[:contracts])
+      puts params[:update]
       if params[:update]
+        puts "update"
         update_print_status(offers)
       end
       generator = ContractGenerator.new(offers, true)

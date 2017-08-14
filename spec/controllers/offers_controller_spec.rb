@@ -197,7 +197,19 @@ RSpec.describe OffersController, type: :controller do
 
     end
 
-    context "print" do
+    context "print with update" do
+      it "sends a PDF blob" do
+        post :combine_contracts_print, params: {contracts: [offer[:id]], update: true}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contracts.pdf\"")
+        offer.reload
+        expect(offer[:hr_status]).to eq("Printed")
+      end
+    end
+
+    context "print without update" do
       it "sends a PDF blob" do
         post :combine_contracts_print, params: {contracts: [offer[:id]]}
         expect(response.status).to eq(200)
@@ -205,7 +217,7 @@ RSpec.describe OffersController, type: :controller do
         expect(response.header["Content-Disposition"]).to eq(
           "inline; filename=\"contracts.pdf\"")
         offer.reload
-        expect(offer[:hr_status]).to eq("Printed")
+        expect(offer[:hr_status]).to eq(nil)
       end
     end
 
