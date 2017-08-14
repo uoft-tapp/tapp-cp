@@ -2,7 +2,7 @@ require 'rails_helper'
 RSpec.describe SessionsController, type: :controller do
 
   let(:session) do
-    Session.find(1).json
+    Session.all.first.json
   end
 
 
@@ -35,12 +35,12 @@ RSpec.describe SessionsController, type: :controller do
     context "when a number" do
       it "updates the session" do
         pay = session[:pay]
-        patch :update, params: {id: session[:id], session: {pay: 100}}
-        session = Session.find(1).json
+        patch :update, params: {id: session[:id], pay: 100}
+        session = Session.all.first.json
         expect(response.status).to eq(204)
         expect(session[:pay]).to eq(100)
-        patch :update, params: {id: session[:id], session: {pay: pay}}
-        session = Session.find(1).json
+        patch :update, params: {id: session[:id], pay: pay}
+        session = Session.all.first.json
         expect(response.status).to eq(204)
         expect(session[:pay]).to eq(pay)
       end
@@ -49,7 +49,7 @@ RSpec.describe SessionsController, type: :controller do
     context "when not a number" do
       it "does not update the session" do
         pay = session[:pay]
-        patch :update, params: {id: session[:id], session: {pay: "poop"}}
+        patch :update, params: {id: session[:id], pay: "poop"}
         expect(response.status).to eq(204)
         expect(session[:pay]).to eq(pay)
       end

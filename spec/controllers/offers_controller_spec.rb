@@ -53,24 +53,24 @@ RSpec.describe OffersController, type: :controller do
   end
 
   describe "POST /offers/" do
-    context ":offer_id/send-contract" do
+    context "send-contracts" do
       before(:each) do
         expect(offer[:status]).to eq("Unsent")
       end
       it "returns a message of whether the contract has been sent" do
-        post :send_contract, params: {offer_id: offer[:id]}
+        post :send_contracts, params: {offers: [offer[:id]]}
         offer.reload
         expect(response.status).to eq(200)
         expect(response.body).to eq({
-          message: "You've just sent out the contract for this offer."
+          message: "You've successfully sent out all the contracts."
         }.to_json)
         expect(offer[:status]).to eq("Pending")
-        post :send_contract, params: {offer_id: offer[:id]}
+        post :send_contracts, params: {offers: [offer[:id]]}
         offer.reload
-        expect(response.status).to eq(200)
+        expect(response.status).to eq(404)
         expect(offer[:status]).to eq("Pending")
         expect(response.body).to eq({
-          message: "You've already sent out the contract for this offer."
+          message: "Exceptions:\nYou've already sent out a contract to #{offer.format[:applicant][:email]}."
         }.to_json)
       end
     end
@@ -213,6 +213,25 @@ RSpec.describe OffersController, type: :controller do
       expect(response.status).to eq(204)
       expect(offer[:hr_status]).to eq("printed")
       expect(offer[:ddah_status]).to eq("accepted")
+    end
+  end
+
+  describe "PATCH /offers/batch-update" do
+    before(:each) do
+      expect(offer[:hr_status]).to eq(nil)
+      expect(offer[:ddah_status]).to eq(nil)
+    end
+    it "returns status 204 and updates offer" do
+      patch :update, params: {id: "batch-update", offers: [offer[:id]], hr_status: "printed", ddah_status: "accepted"}
+      offer.reload
+      expect(response.status).to eq(204)
+      expect(offer[:hr_status]).to eq("printed")
+      expect(offer[:ddah_status]).to eq("accepted")
+    end
+    it "returns status 404 when there is no offers" do
+      patch :update, params: {id: "batch-update", hr_status: "printed", ddah_status: "accepted"}
+      offer.reload
+      expect(response.status).to eq(404)
     end
   end
 
