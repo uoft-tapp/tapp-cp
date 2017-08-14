@@ -149,6 +149,16 @@
         };
         fetchHelper(url, init, message,file);
       }
+      function putHelper(url, data, message="", file=false){
+        let init = {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'PUT',
+            body: JSON.stringify(data),
+        };
+        fetchHelper(url, init, message,file);
+      }
       function send_contract(){
         postHelper("/offers/send-contracts", {offers: offer_selected})
       }
@@ -156,6 +166,12 @@
         var a = document.createElement('A');
         a.href = "mailto:"+email_selected.join(";");
         a.click();
+      }
+      function hr_processed(){
+        putHelper("/offers/batch-update", {offers:offer_selected, hr_status: "Processed"}, "HR status updated")
+      }
+      function ddah_accepted(){
+        putHelper("/offers/batch-update", {offers:offer_selected, ddah_status: "Accepted"}, "DDAH status updated")
       }
       function nag(){
         postHelper("/offers/nag", {contracts:contract_selected}, "")

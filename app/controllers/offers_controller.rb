@@ -11,8 +11,14 @@ class OffersController < ApplicationController
   end
 
   def update
-    offer = Offer.find(params[:id])
-    offer.update_attributes(offer_params)
+    if params[:offers]
+      params[:offers].each do |id|
+        offer = Offer.find(id)
+        offer.update_attributes!(offer_params)
+      end
+    else
+      render status: 404, json: {message: "Error: No offers given."}
+    end
   end
 
   def send_contracts
@@ -103,7 +109,11 @@ class OffersController < ApplicationController
   def update_print_status(offers)
     offers.each do |offer|
       offer = Offer.find(offer[:id])
-      offer.update_attributes!({hr_status: "Printed", print_time: DateTime.now})
+      if offer[:hr_status] == "Processed"
+        offer.update_attributes!({print_time: DateTime.now})
+      else
+        offer.update_attributes!({hr_status: "Printed", print_time: DateTime.now})
+      end
     end
   end
 
