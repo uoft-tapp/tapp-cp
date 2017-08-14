@@ -80,7 +80,7 @@ RSpec.describe OffersController, type: :controller do
         expect(offer[:nag_count]).to eq(0)
       end
       it "return a message of the number of time a applicant has been nagged at" do
-        post :batch_email_nags, params: {contracts: ([offer[:id]]).to_s}
+        post :batch_email_nags, params: {contracts: [offer[:id]]}
         offer.reload
         expect(response.status).to eq(200)
         expect(offer[:nag_count]).to eq(1)
@@ -189,7 +189,7 @@ RSpec.describe OffersController, type: :controller do
 
     context "print" do
       it "sends a PDF blob" do
-        post :combine_contracts_print, params: {contracts: ([offer[:id]]).to_s}
+        post :combine_contracts_print, params: {contracts: [offer[:id]]}
         expect(response.status).to eq(200)
         expect(response.content_type).to eq("application/pdf")
         expect(response.header["Content-Disposition"]).to eq(

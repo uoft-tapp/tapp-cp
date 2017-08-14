@@ -30,7 +30,7 @@ class OffersController < ApplicationController
 
   def batch_email_nags
     if params[:contracts] && params[:contracts]!=""
-      JSON.parse(params[:contracts]).each do |id|
+      params[:contracts].each do |id|
         offer = Offer.find(id)
         if offer
           offer.increment!(:nag_count, 1)
@@ -45,7 +45,7 @@ class OffersController < ApplicationController
 
   def combine_contracts_print
     if params[:contracts] && params[:contracts]!=""
-      offers = get_printable_data(JSON.parse(params[:contracts]))
+      offers = get_printable_data(params[:contracts])
       generator = ContractGenerator.new(offers)
       send_data generator.render, filename: "contracts.pdf", disposition: "inline"
     end
