@@ -113,7 +113,8 @@
         }).then(function(response){
           if (file){
             let fileURL = URL.createObjectURL(response);
-            window.location = fileURL;
+            pdf = window.open(fileURL);
+            pdf.document.onload= pdf.print();
           }
           else{
             location.reload();
