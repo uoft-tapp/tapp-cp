@@ -194,6 +194,8 @@ RSpec.describe OffersController, type: :controller do
         expect(response.content_type).to eq("application/pdf")
         expect(response.header["Content-Disposition"]).to eq(
           "inline; filename=\"contracts.pdf\"")
+        offer.reload
+        expect(offer[:hr_status]).to eq("Printed")
       end
     end
 

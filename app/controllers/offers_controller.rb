@@ -15,16 +15,29 @@ class OffersController < ApplicationController
     offer.update_attributes(offer_params)
   end
 
-  def send_contract
-    offer = Offer.find(params[:offer_id])
-    if !offer[:send_date]
-      if ENV['RAILS_ENV'] != 'test'
-        CpMailer.contract_email(offer.format).deliver_now
+  def send_contracts
+    errors = ["Exceptions:"]
+    if params[:offers]
+      params[:offers].each do |id|
+        offer = Offer.find(id)
+        if !offer[:send_date]
+          if ENV['RAILS_ENV'] != 'test'
+            begin
+              CpMailer.contract_email(offer.format).deliver_now
+            rescue StandardError => e
+              errors.push("Could not send a contract to #{offer[:applicant][:email]}.")
+            end
+          end
+          offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
+        else
+          errors.push("You've already sent out a contract to #{offer.format[:applicant][:email]}.")
+        end
       end
-      offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
-      render json: {message: "You've just sent out the contract for this offer."}
+    end
+    if errors.length == 1
+      render status: 200, json: {message: "You've successfully sent out all the contracts."}
     else
-      render json: {message: "You've already sent out the contract for this offer."}
+      render status: 404, json: {message: errors.join("\n")}
     end
   end
 
@@ -53,10 +66,10 @@ class OffersController < ApplicationController
   end
 
   def set_status
-    status = get_status(params[:code])
+    status = get_status(params)
     offer = Offer.find(params[:offer_id])
     if offer[:status] == "Pending"
-      offer.update_attributes!({status: status[:name]})
+      update_status(offer, status)
       render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
     elsif offer[:status] == "Unsent"
       render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
@@ -94,10 +107,18 @@ class OffersController < ApplicationController
     end
   end
 
+  def update_status(offer, status)
+    if status[:action]=="accept"
+      offer.update_attributes!({status: status[:name], signature: status[:signature]})
+    else
+      offer.update_attributes!({status: status[:name]})
+    end
+  end
+
   def get_status(code)
-    case code
+    case params[:code]
     when "accept"
-      return {name: "Accepted", action: "accept"}
+      return {name: "Accepted", action: "accept", signature: params[:signature]}
     when "reject"
       return {name: "Rejected", action: "reject"}
     when "withdraw"

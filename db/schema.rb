@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20170718181301) do
     t.datetime "print_time"
     t.datetime "send_date"
     t.integer "nag_count", default: 0
+    t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"

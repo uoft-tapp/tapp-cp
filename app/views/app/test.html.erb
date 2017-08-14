@@ -9,9 +9,13 @@
     <button onclick="loadFile()">Import Offer</button>
     <h1>Offers</h1>
     <form method="post">
+      <input type="button" value="Send Contract" onclick="send_contract()">
+      <input type="button" value="Email" onclick="email()">
+      <input type="button" value="Set as HR-Processed" onclick="hr_processed()">
+      <input type="button" value="Set as DDAH-accepted" onclick="ddah_accepted()">
       <table>
         <tr>
-          <th>Action</th>
+          <th>Select</th>
           <th>Decision Link</th>
           <th>Last Name</th>
           <th>First Name</th>
@@ -25,7 +29,7 @@
         </tr>
         <% @offers.each do |o| %>
           <tr>
-            <th><input type="button" value="Send Contract" onclick="send_contract(<%= o[:id]%>)"></th>
+            <th><input type="checkbox" onclick="updateOfferSelected(this, <%=o[:id] %>, '<%=o[:applicant][:email]%>');"></th>
             <th><a href="decision/<%= o[:applicant][:utorid]%>/<%= o[:position_id]%>">Link</a></th>
             <th><%= o[:applicant][:last_name]%></th>
             <th><%= o[:applicant][:first_name]%></th>
@@ -90,12 +94,23 @@
     </ul>
     <script>
       contract_selected = [];
+      offer_selected = [];
+      email_selected = [];
       function updateContractSelected(checkbox, val){
-        input = document.getElementById("contract_selected")
         if (checkbox.checked)
           contract_selected.push(val)
         else
           contract_selected.splice(contract_selected.indexOf(val),1);
+      }
+      function updateOfferSelected(checkbox, val, email){
+        if (checkbox.checked){
+          offer_selected.push(val);
+          email_selected.push(email);
+        }
+        else{
+          offer_selected.splice(offer_selected.indexOf(val),1);
+          email_selected.splice(email_selected.indexOf(email),1);
+        }
       }
       function fetchHelper(url, init, message, file){
         fetch(url, init).then(function(response) {
@@ -134,8 +149,13 @@
         };
         fetchHelper(url, init, message,file);
       }
-      function send_contract(id){
-        postHelper("/offers/"+id+"/send-contract", {})
+      function send_contract(){
+        postHelper("/offers/send-contracts", {offers: offer_selected})
+      }
+      function email(){
+        var a = document.createElement('A');
+        a.href = "mailto:"+email_selected.join(";");
+        a.click();
       }
       function nag(){
         postHelper("/offers/nag", {contracts:contract_selected}, "")
