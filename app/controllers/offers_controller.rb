@@ -11,13 +11,18 @@ class OffersController < ApplicationController
   end
 
   def update
-    if params[:offers]
-      params[:offers].each do |id|
-        offer = Offer.find(id)
-        offer.update_attributes!(offer_params)
+    if params[:id] == "batch-update"
+      if params[:offers]
+        params[:offers].each do |id|
+          offer = Offer.find(id)
+          offer.update_attributes!(offer_params)
+        end
+      else
+        render status: 404, json: {message: "Error: No offers given."}
       end
     else
-      render status: 404, json: {message: "Error: No offers given."}
+      offer = Offer.find(params[:id])
+      offer.update_attributes!(offer_params)
     end
   end
 
