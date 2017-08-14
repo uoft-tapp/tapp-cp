@@ -79,7 +79,7 @@ class OffersController < ApplicationController
   def get_contract
     offer = Offer.find(params[:offer_id])
     generator = ContractGenerator.new([offer.format])
-    send_data generator.render, filename: "contracts.pdf", disposition: "inline"
+    send_data generator.render, filename: "contract.pdf", disposition: "inline"
   end
 
   def set_status

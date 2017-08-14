@@ -50,6 +50,16 @@ RSpec.describe OffersController, type: :controller do
       end
     end
 
+    context "/contract" do
+      it "sends a PDF blob" do
+        get :get_contract, params: {offer_id: offer[:id]}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contract.pdf\"")
+      end
+    end
+
   end
 
   describe "POST /offers/" do
