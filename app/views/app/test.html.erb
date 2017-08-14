@@ -7,6 +7,8 @@
     <h1>Offers Importer</h1>
     <input id="import" type="file"/></br></br>
     <button onclick="loadFile()">Import Offer</button>
+    <h1>Locked Assignments Importer</h1>
+    <button onclick="importAssignments()">Import Locked Assignments</button>
     <h1>Offers</h1>
     <form method="post">
       <input type="button" value="Send Contract" onclick="send_contract()">
@@ -164,6 +166,9 @@
             body: JSON.stringify(data),
         };
         fetchHelper(url, init, message,file);
+      }
+      function importAssignments(){
+        postHelper("/import/locked-assignments", {}, "Offers Imported")
       }
       function send_contract(){
         postHelper("/offers/send-contracts", {offers: offer_selected})

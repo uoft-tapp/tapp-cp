@@ -1,26 +1,43 @@
 class OfferImporter
-  def initialize(data)
-    @offers = data[:offers]
-  end
 
-  def import_data
-    @offers.each do |offer|
+  def import_json(data)
+    data[:offers].each do |offer|
       position = Position.find_by_position(offer["course_id"], offer["round_id"])
       applicant = Applicant.find_by_utorid(offer["utorid"])
       ident = {position_id: position[:id], applicant_id: applicant[:id]}
       exists = "offer with position #{offer[:position]} for applicant #{offer[:utorid]} already exists"
-      data = {
-        position_id: position[:id],
-        applicant_id: applicant[:id],
-        hours: offer["hours"],
-        session: offer["session"],
-        year: offer["year"],
-      }
+      data = get_data(position, applicant, offer["hours"],offer["session"], offer["year"])
       insertion_helper(Offer, data, ident, exists)
     end
   end
 
+  def import_assignments
+    Assignment.all.each do |assignment|
+      assignment = assignment.json
+      if assignment[:export_date]
+        position = Position.find(assignment[:position_id]).json
+        applicant = Applicant.find(assignment[:applicant_id]).json
+        session = Session.find(position[:session_id]).json
+
+        ident = {position_id: position[:id], applicant_id: assignment[:applicant_id]}
+        exists = "offer with position #{position[:position]} for applicant #{applicant[:utorid]} already exists"
+        data = get_data(position, applicant, assignment[:hours], session[:semester], session[:year])
+        insertion_helper(Offer, data, ident, exists)
+      end
+    end
+  end
+
   private
+  def get_data(position, applicant, hours, session, year)
+    {
+      position_id: position[:id],
+      applicant_id: applicant[:id],
+      hours: hours,
+      session: session,
+      year: year,
+    }
+  end
+
   def insertion_helper(model, data, ident, exists)
     unless model.where(ident).exists?
       db_model = model.create(data)
