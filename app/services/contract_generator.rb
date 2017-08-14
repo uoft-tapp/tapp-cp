@@ -6,7 +6,7 @@ class ContractGenerator
   SMALL_LEFT_ALIGN = 3
   SIGNATURE = 4
 
-  def initialize(offers)
+  def initialize(offers, office=false)
     offers.each_with_index do |offer, index|
       if index > 0
         start_new_page
@@ -19,10 +19,17 @@ class ContractGenerator
       @parser = TemplateParser.new(templates, @offer)
       header_end = set_header(0.7, 0.5, @parser.get_data("header"))
       salary_page = set_letter(header_end, @parser.get_data("letter"))
-      signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
-      last_page = set_form(signature_end, @parser.get_data("office_form"))
-      set_salary(@salary_start, salary_page, @parser.get_data("salary"))
-      go_to_page(last_page)
+      if office
+        signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
+        last_page = set_form(signature_end, @parser.get_data("office_form"))
+        set_salary(@salary_start, salary_page, @parser.get_data("salary"))
+        go_to_page(last_page)
+      else
+        signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
+        last_page = page_count
+        set_salary(@salary_start, salary_page, @parser.get_data("salary"))
+        go_to_page(last_page)
+      end
     end
   end
 

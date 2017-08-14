@@ -71,9 +71,15 @@ class OffersController < ApplicationController
     if params[:contracts] && params[:contracts]!=""
       offers = get_printable_data(params[:contracts])
       update_print_status(offers)
-      generator = ContractGenerator.new(offers)
+      generator = ContractGenerator.new(offers, true)
       send_data generator.render, filename: "contracts.pdf", disposition: "inline"
     end
+  end
+
+  def get_contract
+    offer = Offer.find(params[:offer_id])
+    generator = ContractGenerator.new([offer.format])
+    send_data generator.render, filename: "contracts.pdf", disposition: "inline"
   end
 
   def set_status

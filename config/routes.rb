@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resources :applicants
   resources :offers do
     post "decision/:code" => "offers#set_status"
+    get "contract" => "offers#get_contract"
   end
   resources :sessions
 
