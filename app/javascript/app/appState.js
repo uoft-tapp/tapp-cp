@@ -11,8 +11,7 @@ function AppState() {
     },
 
     sortStates: {},
-    offers: { fetching: 0, list: null },
-    contract: { fetching: 0, list: null },
+    offers: { fetching: 0, list: [], err: null },
   });
 
   this._listeners = [];
@@ -27,24 +26,23 @@ AppState.prototype.notifyAll = function() {
 };
 
 /* GETTERS AND SETTERS */
-AppState.prototype.setOffers = function(offers) {
-  this._data = this._data.setIn(['offers', 'list'], offers);
-  this.notifyAll();
+AppState.prototype.successfulFetch = function() {
+  let offers = this._data.getIn(['offers', 'list']);
+  this._data = this._data.setIn(['offers, fetching'], offers.length);
 };
 
-AppState.prototype.setContracts = function(contracts) {
-  this._data = this._data.setIn(['contracts', 'list'], contracts);
+AppState.prototype.setFetchingList = function(state) {
+  this._data = this._data.setIn(['offers, fetching'], state);
+};
+
+AppState.prototype.setOffers = function(offers) {
+  this._data = this._data.setIn(['offers', 'list'], offers);
   this.notifyAll();
 };
 
 AppState.prototype.getOffers = function() {
   let offers = this._data.getIn(['offers', 'list']);
   return offers;
-};
-
-AppState.prototype.getContracts = function() {
-  let contracts = this._data.getIn(['contracts']).toJSON().list;
-  return contracts;
 };
 
 /* SORTING FUNCTIONS */

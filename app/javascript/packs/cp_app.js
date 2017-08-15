@@ -15,7 +15,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 import { appState } from '../app/appState.js';
-import * as fetch from '../app/fetch.js';
+import * as data from '../app/fetch.js';
 import { rconfig } from '../app/routeConfig.js';
 
 import { Admin } from '../app/components/admin.js';
@@ -24,9 +24,7 @@ import { Navigation } from '../app/components/navbar.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
-
-    /// I NEED PROMISEESSSSSS
-    fetch.fetchOffers();
+    data.fetcher();
   }
 
   componentDidMount() {

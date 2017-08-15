@@ -5,7 +5,7 @@
 :root {
   --footer-height: 4vh; /* includes margins */
   --navbar-height: 71px; /* includes margins */
-  --applicant-table-menu-height: calc(34px + 1vh);
+  --admin-table-menu-height: calc(34px + 1vh);
   --main-div-height: calc(100vh - var(--navbar-height) - var(--footer-height));
   --min-row-height: 32px;
   --course-list-panel-width: calc(15em + 8px); /* includes margins */
@@ -60,61 +60,6 @@ footer div p {
 
 #admin-grid .table-body {
   /* note that this assumes that the header is at most one row high */
-  max-height: calc(
-    var(--main-div-height) - var(--applicant-table-menu-height) - var(--min-row-height)
-  );
+  max-height: calc(var(--main-div-height) - var(--admin-table-menu-height) - var(--min-row-height));
   overflow: auto;
-}
-
-.admin-table table {
-  margin: 0;
-}
-
-.highlightOnHover:hover {
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.form_table {
-  width: 100%;
-}
-.form_table td {
-  vertical-align: top;
-}
-.form_table .course {
-  font-weight: bold;
-}
-/* margin between text boxes in the first three columns */
-.form_table #col-1 p + p,
-.form_table #col-2 p + p,
-.form_table #col-3 form + form {
-  margin-top: 5px;
-}
-
-/* left padding for all but the left column */
-.form_table td + td {
-  padding-left: var(--sep-width);
-}
-
-.form_table p {
-  margin: 0;
-}
-
-.form_table input {
-  width: 100%;
-  height: var(--text-input-height);
-}
-
-/* numerical field labels */
-.form_table #col-2 {
-  width: var(--col-2-width);
-}
-.form_table #col-2 p {
-  height: var(--text-input-height);
-  line-height: var(--text-input-height);
-}
-.form_table #col-2 p b {
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 1em;
 }

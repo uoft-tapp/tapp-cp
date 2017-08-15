@@ -6,7 +6,7 @@ function defaultFailure() {
   return 'OH NO';
 }
 
-function fetching(method, uri, success, failure = defaultFailure) {
+function fetchingData(method, uri, success, failure = defaultFailure) {
   var initialize = {
     method: method,
     headers: {
@@ -14,63 +14,65 @@ function fetching(method, uri, success, failure = defaultFailure) {
     },
   };
 
+  // this returns a promise
   return fetch(uri, initialize)
     .then(function(resp) {
       if (resp.ok) {
         return resp.json().then(resp => success(resp));
       }
-
       return failure(resp);
     })
-    .catch(function(error) {
-      return failure(error);
+    .catch(function(err) {
+      return failure(err);
     });
 }
 
-function fetchOffers() {
-  fetching('GET', '/offers', parseOffers);
+function fetcher() {
+  appState.setFetchingList(true);
+  let promise = fetchingData('GET', '/offers', parseData);
+  promise
+    .then(function(result) {
+      appState.setOffers(result);
+      appState.successfulFetch();
+    })
+    .catch(function(err) {
+      appState.setFetchingList(false);
+    });
 }
 
-function fetchContracts() {
-  fetching('GET', '/contracts', parseContracts);
-}
-
-function parseOffers(resp) {
-  let offers = {},
-    applicants = {},
-    newOffer;
+function parseData(resp) {
+  let offers = {};
 
   resp.forEach(offer => {
     offers[offer.id] = {
-      lastName: offer.applicant.last_name,
-      firstName: offer.applicant.first_name,
-      utorid: offer.applicant.utorid,
+      applicant_id: offer.applicant_id,
+      first_name: offer.applicant.first_name,
+      last_name: offer.applicant.last_name,
+      student_number: offer.applicant.student_number,
       email: offer.applicant.email,
-      phone: offer.applicant.phone,
-      studentNumber: offer.applicant.student_number,
-      address: offer.applicant.address,
-      position: offer.position_id,
-      hours: offer.hours,
-      year: offer.years,
-      session: offer.session,
-      objection: offer.objection,
+      contract_details: {
+        position: offer.position,
+        sessional_year: offer.session.year,
+        sessional_semester: offer.session.semester,
+        hours: offer.hours,
+        start_date: offer.session.start_date,
+        end_date: offer.session.end_date,
+        pay: offer.session.pay,
+        link: offer.link,
+        signature: offer.signature,
+      },
+      contract_statuses: {
+        nag_count: offer.nag_count,
+        status: offer.status,
+        hr_status: offer.hr_status,
+        ddah_status: offer.ddah_status,
+        sent_at: offer.send_date,
+        printed_at: offer.print_time,
+      },
     };
   });
-  appState.setOffers(offers);
-}
-//
-function parseContracts(resp) {
-  var contracts = {};
 
-  resp.forEach(contract => {
-    contracts[contract.offer_id] = {
-      link: contract.link,
-      printed: contract.printed,
-      nag_count: contract.nag_count,
-    };
-  });
-
-  appState.setContacts(contracts);
+  return offers;
 }
 
-export { fetchOffers, fetchContracts };
+export { fetcher };
