@@ -7,68 +7,81 @@
     <h1>Offers Importer</h1>
     <input id="import" type="file"/></br></br>
     <button onclick="loadFile()">Import Offer</button>
+    <h1>Locked Assignments Importer</h1>
+    <button onclick="importAssignments()">Import Locked Assignments</button>
     <h1>Offers</h1>
     <form method="post">
+      <input type="button" value="Send Contract" onclick="send_contract()">
+      <input type="button" value="Email" onclick="email()">
+      <input type="button" value="Set as HR-Processed" onclick="hr_processed()">
+      <input type="button" value="Set as DDAH-accepted" onclick="ddah_accepted()">
       <table>
         <tr>
-          <th>Action</th>
+          <th>Select</th>
           <th>Decision Link</th>
           <th>Last Name</th>
           <th>First Name</th>
+          <th>Student Number</th>
           <th>Position</th>
           <th>Hours</th>
-          <th>Email</th>
           <th>Sent</th>
           <th>Status</th>
+          <th>HR status</th>
+          <th>DDAH status</th>
         </tr>
         <% @offers.each do |o| %>
           <tr>
-            <th><input type="submit" value="Send Contract" formaction="/offers/<%= o[:id]%>/send-contract"></th>
+            <th><input type="checkbox" onclick="updateOfferSelected(this, <%=o[:id] %>, '<%=o[:applicant][:email]%>');"></th>
             <th><a href="decision/<%= o[:applicant][:utorid]%>/<%= o[:position_id]%>">Link</a></th>
             <th><%= o[:applicant][:last_name]%></th>
             <th><%= o[:applicant][:first_name]%></th>
+            <th><%= o[:applicant][:student_number]%></th>
             <th><%= o[:position]%></th>
             <th><%= o[:hours]%></th>
-            <th><%= o[:applicant][:email]%></th>
-            <th><%= o[:sent]%></th>
+            <th><%= o[:status]!="Unsent" %></th>
             <th><%= o[:status]%></th>
+            <th><%= o[:hr_status]? o[:hr_status]: "n/a"%></th>
+            <th><%= o[:ddah_status]? o[:ddah_status]: "n/a"%></th>
           </tr>
         <% end %>
       </table>
     </form>
     <h1>Contracts</h1>
     <form method="post">
-      <input type="submit" value="Nag" formaction="/contracts/nag">
-      <input type="submit" value="Print Contracts" formaction="/contracts/print">
-      <input id="contract_selected" type="hidden" name="contracts">
+      <input type="button" value="Nag" onclick="nag()">
+      <input type="button" value="Print Contracts" onclick="print()">
       <table style="margin-top: 10px;">
         <tr style="text-align: left;">
           <th>Select</th>
+          <th>File</th>
           <th>Last Name</th>
           <th>First Name</th>
+          <th>Student Number</th>
           <th>Position</th>
-          <th>Email</th>
           <th>Status</th>
           <th>Action</th>
           <th>Contract Send Date</th>
           <th>Deadline</th>
           <th>Nag Count</th>
-          <th>Printed</th>
+          <th>Print Date</th>
         </tr>
-        <% @contracts.each do |c| %>
-          <tr>
-            <th><input type="checkbox" onclick="updateContractSelected(this, <%=c[:id] %>);"></th>
-            <th><%= c[:applicant][:last_name]%></th>
-            <th><%= c[:applicant][:first_name]%></th>
-            <th><%= c[:position]%></th>
-            <th><%= c[:applicant][:email]%></th>
-            <th><%= Offer.find(c[:offer_id])[:status]%></th>
-            <th><button type="button" onclick="withdraw(<%= c[:id]%>, '<%= Offer.find(c[:offer_id])[:status]%>')">Withdraw</button></th>
-            <th><%= (c[:updated_at].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
-            <th><%= (c[:deadline].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
-            <th><%= c[:nag_count]%></th>
-            <th><%= c[:printed]%></th>
-          </tr>
+        <% @offers.each do |c| %>
+          <% if c[:send_date] %>
+            <tr>
+              <th><input type="checkbox" onclick="updateContractSelected(this, <%=c[:id] %>);"></th>
+              <th><button type="button" onclick="showContract(<%=c[:id] %>)">Contract</button></th>
+              <th><%= c[:applicant][:last_name]%></th>
+              <th><%= c[:applicant][:first_name]%></th>
+              <th><%= c[:applicant][:student_number]%></th>
+              <th><%= c[:position]%></th>
+              <th><%= c[:status]%></th>
+              <th><button type="button" onclick="withdraw(<%= c[:id]%>, '<%=c[:status]%>')">Withdraw</button></th>
+              <th><%= (c[:updated_at].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y") %></th>
+              <th><%= c[:deadline]? ((c[:deadline].in_time_zone('Eastern Time (US & Canada)')).strftime("%B %e, %Y")):"" %></th>
+              <th><%= c[:nag_count]%></th>
+              <th><%= c[:print_time]? c[:print_time]: "n/a"%></th>
+            </tr>
+          <% end %>
         <% end %>
       </table>
     </form>
@@ -85,25 +98,55 @@
     </ul>
     <script>
       contract_selected = [];
+      offer_selected = [];
+      email_selected = [];
       function updateContractSelected(checkbox, val){
-        input = document.getElementById("contract_selected")
         if (checkbox.checked)
           contract_selected.push(val)
         else
           contract_selected.splice(contract_selected.indexOf(val),1);
-        input.value=JSON.stringify(contract_selected)
       }
-      function fetchHelper(url, init, message){
+      function updateOfferSelected(checkbox, val, email){
+        if (checkbox.checked){
+          offer_selected.push(val);
+          email_selected.push(email);
+        }
+        else{
+          offer_selected.splice(offer_selected.indexOf(val),1);
+          email_selected.splice(email_selected.indexOf(email),1);
+        }
+      }
+      function fetchHelper(url, init, message, file, print){
         fetch(url, init).then(function(response) {
-          if (response.ok){
-            return alert(message);
+          if (response.status==204){
+            return {message: message};
           }
           else{
-            return alert("Error: update failed");
+            if (file){
+              return response.blob();
+            }
+            else{
+              return response.json();
+            }
+          }
+        }).then(function(response){
+          if (file){
+            let fileURL = URL.createObjectURL(response);
+            if (print){
+              pdf = window.open(fileURL);
+              pdf.document.onload= pdf.print();
+            }
+            else{
+              window.location= fileURL;
+            }
+          }
+          else{
+            location.reload();
+            alert(response.message);
           }
         })
       }
-      function postHelper(url, data, message){
+      function postHelper(url, data, message="", file=false, print= false){
         let init = {
             headers: {
                 Accept: 'application/json',
@@ -112,7 +155,43 @@
             method: 'POST',
             body: JSON.stringify(data)
         };
-        fetchHelper(url, init, message);
+        fetchHelper(url, init, message,file, print);
+      }
+      function putHelper(url, data, message="", file=false, print = false){
+        let init = {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'PUT',
+            body: JSON.stringify(data),
+        };
+        fetchHelper(url, init, message,file);
+      }
+      function importAssignments(){
+        postHelper("/import/locked-assignments", {}, "Offers Imported")
+      }
+      function send_contract(){
+        postHelper("/offers/send-contracts", {offers: offer_selected})
+      }
+      function email(){
+        var a = document.createElement('A');
+        a.href = "mailto:"+email_selected.join(";");
+        a.click();
+      }
+      function hr_processed(){
+        putHelper("/offers/batch-update", {offers:offer_selected, hr_status: "Processed"}, "HR status updated")
+      }
+      function ddah_accepted(){
+        putHelper("/offers/batch-update", {offers:offer_selected, ddah_status: "Accepted"}, "DDAH status updated")
+      }
+      function nag(){
+        postHelper("/offers/nag", {contracts:contract_selected}, "")
+      }
+      function print(){
+        postHelper("/offers/print", {contracts:contract_selected, update: true}, "", true, true)
+      }
+      function showContract(id){
+        postHelper("/offers/print", {contracts: [id], update: false}, "", true)
       }
       function updateSession(input, id){
         let data = {pay: input.value};
@@ -127,7 +206,7 @@
       }
       function withdraw(id, status){
         if(status=="Pending"){
-          postHelper("/contracts/"+id+"/decision/withdraw", {}, "Status Updated");
+          postHelper("/offers/"+id+"/decision/withdraw", {});
         }
         else{
           alert("Error: you can't change the status of this contract. It's already been "+status.toLowerCase()+".");

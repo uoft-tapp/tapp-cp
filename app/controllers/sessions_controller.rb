@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
 
   def update
     session = Session.find(params[:id])
-    session.update_attributes(pay: params[:session][:pay])
+    session.update_attributes(pay: params[:pay])
   end
 
 end

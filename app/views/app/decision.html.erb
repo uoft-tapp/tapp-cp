@@ -68,15 +68,9 @@
           <p>This offer has been `+offer_status+'.</p>';
         }
       }
-      function postHelper(url, data, action, blob=false){
-        fetch(url, {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-          },
-          body: JSON.stringify(data),
-          method: 'POST',
-        }).then(function(response) {
+      // helper factoring out frequently used code around a fetch
+      function fetchHelper(url, init, action, blob=false){
+        fetch(url, init).then(function(response) {
           if (blob){
             return response.blob();
           }
@@ -87,9 +81,28 @@
             action(response);
         });
       }
+      function postHelper(url, data, action, blob=false){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'POST',
+            body: JSON.stringify(data)
+        };
+        fetchHelper(url, init, action, blob);
+      }
+      function getHelper(url, action, blob=false){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+            },
+            method: 'GET',
+        };
+        fetchHelper(url, init, action, blob);
+      }
       function fetchPdfData(){
-        let data = {"contracts": '[<%= @contract_id %>]'}
-        postHelper("/contracts/print", data, setPdfViewPort, true);
+        getHelper("/offers/"+'<%= @offer[:id] %>'+"/contract", setPdfViewPort, true);
       }
       function setPdfViewPort(response){
         let fileURL = URL.createObjectURL(response);
@@ -142,7 +155,7 @@
           data["signature"] = signature;
         }
         if (res) {
-          postHelper("/contracts/<%= @contract_id %>/decision/"+status, data, updateStatus);
+          postHelper("/offers/<%= @offer[:id] %>/decision/"+status, data, updateStatus);
         }
       }
       function updateStatus(response){

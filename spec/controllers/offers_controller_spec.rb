@@ -6,7 +6,23 @@ RSpec.describe OffersController, type: :controller do
     Offer.create!(
         position_id: 6,
         applicant_id: 1,
-        hours: 60
+        hours: 60,
+    )
+  end
+  let(:sent_offer) do
+    Offer.create!(
+        position_id: 6,
+        applicant_id: 2,
+        hours: 60,
+        status: "Pending"
+    )
+  end
+  let(:accepted_offer) do
+    Offer.create!(
+        position_id: 6,
+        applicant_id: 3,
+        hours: 60,
+        status: "Accepted"
     )
   end
 
@@ -34,48 +50,210 @@ RSpec.describe OffersController, type: :controller do
       end
     end
 
-    context "when /offers/instructor/{instructor_id}" do
-      it "returns all offers made for the course instructor {instructor_id} is teaching" do
-        get :show_by_instructor, params: {instructor_id: 1}
+    context "/contract" do
+      it "sends a PDF blob" do
+        get :get_contract, params: {offer_id: offer[:id]}
         expect(response.status).to eq(200)
-        expect(response.body).not_to be_empty
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contract.pdf\"")
       end
     end
+
   end
 
   describe "POST /offers/" do
-    context ":offer_id/send-contract" do
+    context "send-contracts" do
       before(:each) do
-        expect(offer.contract).to eq(nil)
+        expect(offer[:status]).to eq("Unsent")
       end
       it "returns a message of whether the contract has been sent" do
-        post :send_contract, params: {offer_id: offer[:id]}
+        post :send_contracts, params: {offers: [offer[:id]]}
         offer.reload
         expect(response.status).to eq(200)
         expect(response.body).to eq({
-          message: "You've just sent out the contract for this offer."
+          message: "You've successfully sent out all the contracts."
         }.to_json)
-        expect(offer.contract.as_json).not_to be_empty
-        post :send_contract, params: {offer_id: offer[:id]}
+        expect(offer[:status]).to eq("Pending")
+        post :send_contracts, params: {offers: [offer[:id]]}
         offer.reload
-        expect(response.status).to eq(200)
-        expect(offer.contract.as_json).not_to be_empty
+        expect(response.status).to eq(404)
+        expect(offer[:status]).to eq("Pending")
         expect(response.body).to eq({
-          message: "You've already sent out the contract for this offer."
+          message: "Exceptions:\nYou've already sent out a contract to #{offer.format[:applicant][:email]}."
         }.to_json)
       end
     end
+
+    context "nag" do
+      before(:each) do
+        expect(offer[:nag_count]).to eq(0)
+      end
+      it "return a message of the number of time a applicant has been nagged at" do
+        post :batch_email_nags, params: {contracts: [offer[:id]]}
+        offer.reload
+        expect(response.status).to eq(200)
+        expect(offer[:nag_count]).to eq(1)
+        res = ({ message: "You've sent the nag emails."}).to_json
+        expect(response.body).to eq(res)
+      end
+    end
+
+    context ":offer_id/decision/:code" do
+      context "when contract_id doesn't exists" do
+        it "returns a status 404" do
+          post :set_status, params: {offer_id: "poop", code: "accept"}
+          expect(response.status).to eq(404)
+        end
+      end
+      context "when offer_id does exists" do
+        context "when status is pending" do
+          context "code = accept" do
+            it "updates the offer status to Accepted" do
+              post :set_status, params: {offer_id: sent_offer[:id], code: "accept"}
+              expect(response.status).to eq(200)
+              body = {success: true, status: "accepted", message: "You've just accepted this offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = reject" do
+            it "updates the offer status to Rejected" do
+              post :set_status, params: {offer_id: sent_offer[:id], code: "reject"}
+              expect(response.status).to eq(200)
+              body = {success: true, status: "rejected", message: "You've just rejected this offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = withdraw" do
+            it "updates the offer status to Withdrawn" do
+              post :set_status, params: {offer_id: sent_offer[:id], code: "withdraw"}
+              expect(response.status).to eq(200)
+              body = {success: true, status: "withdrawn", message: "You've just withdrawn this offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+        end
+
+        context "when status is Unsent" do
+          context "code = accept" do
+            it "returns a status 404 with a message" do
+              post :set_status, params: {offer_id: offer[:id], code: "accept"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot accept an unsent offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = reject" do
+            it "updates the offer status to Rejected" do
+              post :set_status, params: {offer_id: offer[:id], code: "reject"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject an unsent offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = withdraw" do
+            it "updates the offer status to Withdrawn" do
+              post :set_status, params: {offer_id: offer[:id], code: "withdraw"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot withdraw an unsent offer."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+        end
+
+        context "when status decided" do
+          context "code = accept" do
+            it "returns a status 404 with a message" do
+              post :set_status, params: {offer_id: accepted_offer[:id], code: "accept"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = reject" do
+            it "updates the offer status to Rejected" do
+              post :set_status, params: {offer_id: accepted_offer[:id], code: "reject"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+
+          context "code = withdraw" do
+            it "updates the offer status to Withdrawn" do
+              post :set_status, params: {offer_id: accepted_offer[:id], code: "withdraw"}
+              expect(response.status).to eq(404)
+              body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+              expect(response.body).to eq(body.to_json)
+            end
+          end
+        end
+      end
+
+    end
+
+    context "print with update" do
+      it "sends a PDF blob" do
+        post :combine_contracts_print, params: {contracts: [offer[:id]], update: true}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contracts.pdf\"")
+        offer.reload
+        expect(offer[:hr_status]).to eq("Printed")
+      end
+    end
+
+    context "print without update" do
+      it "sends a PDF blob" do
+        post :combine_contracts_print, params: {contracts: [offer[:id]]}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contracts.pdf\"")
+        offer.reload
+        expect(offer[:hr_status]).to eq(nil)
+      end
+    end
+
+
   end
 
   describe "PATCH /offers/:id" do
     before(:each) do
-      expect(offer[:objection]).to eq(false)
+      expect(offer[:hr_status]).to eq(nil)
+      expect(offer[:ddah_status]).to eq(nil)
     end
     it "returns status 204 and updates offer" do
-      patch :update, params: {id: offer[:id], objection: true}
+      patch :update, params: {id: offer[:id], hr_status: "printed", ddah_status: "accepted"}
       offer.reload
       expect(response.status).to eq(204)
-      expect(offer[:objection]).to eq(true)
+      expect(offer[:hr_status]).to eq("printed")
+      expect(offer[:ddah_status]).to eq("accepted")
+    end
+  end
+
+  describe "PATCH /offers/batch-update" do
+    before(:each) do
+      expect(offer[:hr_status]).to eq(nil)
+      expect(offer[:ddah_status]).to eq(nil)
+    end
+    it "returns status 204 and updates offer" do
+      patch :update, params: {id: "batch-update", offers: [offer[:id]], hr_status: "printed", ddah_status: "accepted"}
+      offer.reload
+      expect(response.status).to eq(204)
+      expect(offer[:hr_status]).to eq("printed")
+      expect(offer[:ddah_status]).to eq("accepted")
+    end
+    it "returns status 404 when there is no offers" do
+      patch :update, params: {id: "batch-update", hr_status: "printed", ddah_status: "accepted"}
+      offer.reload
+      expect(response.status).to eq(404)
     end
   end
 
