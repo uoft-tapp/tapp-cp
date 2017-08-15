@@ -2,7 +2,7 @@ Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %
 
 <%= @tab %>I am pleased to offer you an appointment as a Teaching Assistant in the Department of Computer Science. The starting date of your appointment will be <b><%= format_time(@offer[:session][:start_date],1) %></b> and this appointment will end on <b><%= format_time(@offer[:session][:end_date],1) %></b> with no further notice to you.
 
-Your appointment will be for <b><%= '%.2f' % @offer[:hours] %></b> hours for <b><%= @offer[:position] %></b>, and your supervisor will be Professor <%= list_instructors(@offer[:instructors]) %>.  You will be paid $<%= '%.2f' % @offer[:session][:pay] %>/hour, the [SGS II or SGS I, or UG, etc.] rate for this position.  You will be paid in 4 instalments, once per month for the period of your appointment. Your salary will be paid by direct deposit.
+Your appointment will be for <b><%= '%.2f' % @offer[:hours] %></b> hours for <b><%= @offer[:position] %></b>, and your supervisor will be Professor <%= list_instructors(@offer[:instructors]) %>.  You will be paid $<%= '%.2f' % @offer[:session][:pay] %>/hour.  You will be paid in instalments, once per month for the period of your appointment. Your salary will be paid by direct deposit.
 
 <salary>
 
@@ -45,15 +45,10 @@ In the event that you have a disability that would impact upon how you would res
 
 The law requires the Employment Standards Act Poster to be provided to all employees; it is available on the HR & Equity website at <%= set_link("http://www.labour.gov.on.ca/english/es/pubs/poster.php")%>. This poster describes the minimum rights and obligations contained in the <i>Employment Standards Act</i>. Please note that in many respects this offer of employment exceeds the minimum requirements set out in the <i>Act</i>.
 
-Your duties will include:
+If this is your first appointment after becoming a Ph.D. student, you will be guaranteed five more appointments of the same number of hours in subsequent years as per Article 16.06 of the CUPE 3902 (Unit 1) Collective Agreement. If this is not your first appointment, you may still be owed one or more subsequent
+appointments under the aforementioned Article. If this is the case, you may consult the letter you received last April, where your appointment status was summarized. Please feel free to contact <%= ENV['TA_COORD']%>to see how various guarantees fit together.
 
-<list>duty 1
-
-<list>duty 2
-
-You will be expected to complete all grading for all student work that is completed during the term of the appointment, up to and including final exams.
-
-Within 15 working days after the date of this letter, you will be given the opportunity to review the Description of Duties and Allocation of Hours (DDAH) form, which will set out more specifically the duties of your position, and the hours assigned to each.
+You should contact your supervisor as soon as possible to discuss any questions you have about your duties. You will soon be given the opportunity to review the Description of Duties and Allocation of Hours (DDAH) form, which will set out more specifically the duties of your position, and the hours assigned to each.
 
 Please sign below to indicate your acceptance of this offer, and return a copy of this letter to me as soon as possible but no later than 2 days after you have been provided with the DDAH form. If we have not heard from you by this deadline, this offer may be withdrawn. If you are unable to accept this offer, please advise me immediately.
 
