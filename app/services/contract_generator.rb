@@ -17,17 +17,18 @@ class ContractGenerator
       @whitespace = Prawn::Text::NBSP * 5
       @tab = Prawn::Text::NBSP * 10
       define_grid(columns: 75, rows: 100, gutter: 0)
-      templates = ["header", "letter", "signature", "office_form", "salary"]
+      templates = ["header", "letter", "general_info", "signature", "office_form", "salary"]
       @parser = TemplateParser.new(templates, @offer)
       header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("header"))
       salary_page = set_letter(header_end, @parser.get_data("letter"))
+      signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
+      start_new_page
+      set_letter(HEADER_X_COORD, @parser.get_data("general_info"))
       if no_office_use_only_box
-        signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
         last_page = set_form(signature_end, @parser.get_data("office_form"))
         set_salary(@salary_start, salary_page, @parser.get_data("salary"))
         go_to_page(last_page)
       else
-        signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
         last_page = page_count
         set_salary(@salary_start, salary_page, @parser.get_data("salary"))
         go_to_page(last_page)
@@ -227,10 +228,11 @@ class ContractGenerator
   end
 
   def set_signature(x, y, signature_data)
-    if y > 9.3
+    if y > 10
       start_new_page
       y = 0.5
     end
+    y = y - 0.5
     set_text(get_grids(x, y, 3, 0.2), get_style(REGULAR_LEFT_ALIGN, signature_data[0]))
     set_text(get_grids(x, y+0.1, 3, 0.6), get_style(SIGNATURE, ENV['TA_COORD']))
     set_text(get_grids(x, y+0.6, 3, 0.6), get_style(REGULAR_LEFT_ALIGN, signature_data[1]))
