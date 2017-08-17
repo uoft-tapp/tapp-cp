@@ -18,9 +18,9 @@ function THeader(props) {
 
 function Row(props) {
   return (
-    <tr key={'offer-' + props.offer_id + '-row'}>
+    <tr key={'offer-' + props.offerID + '-row'} id={'offer-' + props.offerID}>
       {props.config.map((field, i) =>
-        <td key={'offer-' + props.offer_id + '-row-' + i}>
+        <td key={'offer-' + props.offerID + '-row-' + i}>
           {field.data(props.offer)}
         </td>
       )}
@@ -30,12 +30,14 @@ function Row(props) {
 
 class AdminTable extends React.Component {
   render() {
+    console.log(this.props.offers);
     return (
       <Table striped bordered condensed hover>
         <THeader config={this.props.config} />
         <tbody>
-          this.props.offers().map((offer) =>
-          {<Row offer_id={key} offer={value} {...this.props} />})
+          {Object.entries(this.props.getOffers()).map(([key, value]) =>
+            <Row key={'offer-' + key} offerID={key} offer={value} config={this.props.config} />
+          )}
         </tbody>
       </Table>
     );

@@ -14,14 +14,14 @@ class Admin extends React.Component {
       {
         header: 'Last Name',
         sortField: true,
-        data: p => p.lastName,
-        sortData: p => p.lastName,
+        data: p => p.last_name,
+        sortData: p => p.last_name,
       },
       {
         header: 'First Name',
         sortField: true,
-        data: p => p.firstName,
-        sortData: p => p.firstName,
+        data: p => p.first_name,
+        sortData: p => p.first_name,
       },
       {
         header: 'Email',
@@ -38,22 +38,34 @@ class Admin extends React.Component {
       {
         header: 'Position',
         sortField: true,
+        data: p => p.contract_details.position,
+        sortData: p => p.contract_details.position,
       },
       {
         header: 'Hours',
         sortField: false,
+        data: p => p.contract_details.hours,
+        sortData: p => p.contract_details.hours,
       },
       {
         header: 'Status',
         sortField: false,
+        data: p => p.contract_statuses.status,
+        sortData: p => p.contract_statuses.status,
       },
       {
         header: 'HRIS Status',
         sortField: false,
+        data: p =>
+          p.contract_statuses.hr_status == undefined ? '-' : p.contract_statuses.hr_status,
+        sortData: p => p.contract_statuses.hr_status,
       },
       {
         header: 'DDAH Status',
         sortField: false,
+        data: p =>
+          p.contract_statuses.ddah_status == undefined ? '-' : p.contract_statuses.ddah_status,
+        sortData: p => p.contract_statuses.ddah_status,
       },
     ];
   }
@@ -68,13 +80,20 @@ class Admin extends React.Component {
     return (
       <Grid fluid id="admin-grid">
         <TableMenu
+          config={this.config}
+          clearFilters={() => this.component.clearFilters()}
           sortFields={this.config.filter(field => field.sortField)}
-          toggleFields={this.config.filter(field => !field.sortField)}
+          filterFields={this.config.filter(field => !field.sortField)}
+          toggleFilters={field => this.component.toggleFilters(field)}
           sort={(field, state) => this.component.toggleSort(field)}
-          activeFields={this.component.getSortState()}
+          activeFields={this.component.getSortFields()}
         />
 
-        <AdminTable config={this.config} offers={this.component.getOffers()} />
+        <AdminTable
+          config={this.config}
+          getOffers={() => this.component.getOffers()}
+          {...this.props}
+        />
       </Grid>
     );
   }

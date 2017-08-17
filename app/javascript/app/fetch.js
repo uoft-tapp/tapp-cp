@@ -29,8 +29,10 @@ function fetchingData(method, uri, success, failure = defaultFailure) {
 
 function fetcher() {
   appState.setFetchingList(true);
-  let promise = fetchingData('GET', '/offers', parseData);
-  promise
+
+  let fetchPromise = fetchingData('GET', '/offers', parseData);
+
+  fetchPromise
     .then(function(result) {
       appState.setOffers(result);
       appState.successfulFetch();

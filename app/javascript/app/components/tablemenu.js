@@ -24,6 +24,7 @@ class TableMenu extends React.Component {
     return (
       <div className="table-menu">
         <ButtonToolbar id="table-toolbar">
+          <Button onClick={this.props.clearFilters}> Clear Filters </Button>
           <ButtonGroup id="table-sortfields-group">
             {this.props.sortFields.map(field =>
               <DropdownButton
@@ -46,8 +47,11 @@ class TableMenu extends React.Component {
             )}
           </ButtonGroup>
 
-          <ToggleButtonGroup id="table-toggle-group" type="checkbox">
-            {this.props.toggleFields.map(field =>
+          <ToggleButtonGroup
+            id="table-toggle-group"
+            type="checkbox"
+            onChange={this.props.toggleFilters}>
+            {this.props.filterFields.map(field =>
               <ToggleButton key={'toggle-' + field.header} value={field.header}>
                 {field.header}
               </ToggleButton>

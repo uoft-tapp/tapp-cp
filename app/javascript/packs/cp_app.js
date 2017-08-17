@@ -24,6 +24,7 @@ import { Navigation } from '../app/components/navbar.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
+
     data.fetcher();
   }
 

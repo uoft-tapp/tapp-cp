@@ -1,8 +1,8 @@
 import React from 'react';
-import { fromJS, isImmutable } from 'immutable';
+import deepcopy from 'deepcopy';
 
 function AppState() {
-  this._data = fromJS({
+  this._data = {
     navigation: {
       admin: { role: 'admin', user: 'username' },
       instructor: { role: 'instructor', user: 'username' },
@@ -10,9 +10,34 @@ function AppState() {
       currentTab: null,
     },
 
-    sortStates: {},
+    hradmin: {
+      sortFields: {},
+      filtersFields: [],
+    },
     offers: { fetching: 0, list: [], err: null },
-  });
+  };
+
+  this.get_or_set = function(property, value, setting = false) {
+    let properties = property.split('.');
+    return properties.reduce(function(data, subproperty, i) {
+      if (setting && i == properties.length - 1) {
+        return (data[subproperty] = value);
+      } else {
+        return data[subproperty];
+      }
+    }, this._data);
+  };
+
+  this.set = function(property, value) {
+    this.get_or_set(property, value, true);
+  };
+
+  this.get = function(property) {
+    let result = this.get_or_set(property);
+    return deepcopy(result);
+  };
+
+  //TD make a quick getter and setter that the app state functions use deepcopy in there
 
   this._listeners = [];
 }
@@ -27,65 +52,68 @@ AppState.prototype.notifyAll = function() {
 
 /* GETTERS AND SETTERS */
 AppState.prototype.successfulFetch = function() {
-  let offers = this._data.getIn(['offers', 'list']);
-  this._data = this._data.setIn(['offers, fetching'], offers.length);
+  this.set('offers.fetching', offers.length);
 };
 
 AppState.prototype.setFetchingList = function(state) {
-  this._data = this._data.setIn(['offers, fetching'], state);
+  if (typeof state == 'boolean') this.set('offers.fetching', state);
 };
 
 AppState.prototype.setOffers = function(offers) {
-  this._data = this._data.setIn(['offers', 'list'], offers);
+  this.set('offers.list', offers);
   this.notifyAll();
 };
 
 AppState.prototype.getOffers = function() {
-  let offers = this._data.getIn(['offers', 'list']);
-  return offers;
+  return this.get('offers.list');
 };
 
-/* SORTING FUNCTIONS */
+/* SORTING/FILTERING FUNCTIONS */
 
-AppState.prototype.toggleSort = function(field) {
-  var sortStates = this._data.getIn(['sortStates']).toJSON();
-
+AppState.prototype.toggleHRSort = function(field) {
   // if sortingStates is undefined
+  let sortStates = this.get('sortFields');
   if (!sortStates) {
-    this._data = this._data.updateIn(['sortStates', field], field => true);
+    this.set('hradmin.sortFields.' + field, true);
   } else {
-    var curState = this._data.getIn(['sortStates']).toJSON()[field];
-    this._data = this._data.updateIn(['sortStates', field], field => !curState);
+    var state = this.get('hradmin.sortFields.' + field);
+    this.set('hradmin.sortFields.' + field, !state);
   }
 
   this.notifyAll();
 };
 
-AppState.prototype.getSortState = function() {
-  let conversion = this._data.getIn(['sortStates']).toJSON();
-  return conversion;
+AppState.prototype.toggleHRFilters = function(field) {
+  this.get('hradmin.filterFields');
+  this.notifyAll();
+};
+
+AppState.prototype.getSortFields = function() {
+  return this.get('hradmin.sortFields');
+};
+
+AppState.prototype.clearFilters = function() {
+  this._data.filterStates = {};
+  this.notifyAll();
 };
 
 /* NAVIGATIONAL */
 AppState.prototype.getCurrentTab = function() {
-  return this._data.getIn(['navigation', 'currentTab']);
+  return this.get('navigation.currentTab');
 };
 
 AppState.prototype.setCurrentTab = function(key) {
-  this._data.setIn(['navigation', 'currentTab'], key);
+  this.set('navigation.currentTab', key);
+  this.notifyAll();
 };
 
 /* Authentication/Users */
-AppState.prototype.getCurrentUserRole = function() {
-  return this._data.getIn(['navigation', 'admin', 'role']);
+AppState.prototype.getCurrentUserRole = function(id) {
+  return this.get('navigation.admin.role');
 };
 
-AppState.prototype.getCurrentUserName = function() {
-  return this._data.getIn(['navigation', 'admin', 'user']);
-};
-
-AppState.prototype.toString = function() {
-  return this._data.toJS();
+AppState.prototype.getCurrentUserName = function(id) {
+  return this.get('navigation.admin.user');
 };
 
 let appState = new AppState();
