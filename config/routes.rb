@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # for user facing side of CP
+  get '/index.html/(*z)', to: "cp#index"
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :applicants
   resources :offers do
