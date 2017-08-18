@@ -29,6 +29,6 @@ class Offer < ApplicationRecord
     instructors.each do |instructor|
       data[:instructors].push(instructor)
     end
-    return offer.merge(data)
+    return offer.merge(data).except(:link)
   end
 end
