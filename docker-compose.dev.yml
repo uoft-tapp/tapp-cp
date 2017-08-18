@@ -1,0 +1,18 @@
+version: '2'
+services:
+  rails-app:
+    volumes:
+      - .:/srv/app
+    command: >
+      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 5000 -P /dev/null
+
+  webpack-dev-server:
+    build: .
+    volumes:
+      - .:/srv/app
+    networks:
+      - internal
+    ports:
+      - "7070:7070"
+    command: >
+      ./bin/webpack-dev-server-entrypoint --host 0.0.0.0

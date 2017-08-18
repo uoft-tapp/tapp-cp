@@ -26,4 +26,5 @@ test:
 
 production:
   <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB") %>
   # Use DATABASE_URL environment variable
