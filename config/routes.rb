@@ -19,4 +19,7 @@ Rails.application.routes.draw do
   #temp-testing views
   get "test" => "app#test"
   get "decision/:utorid/:position_id" => "app#decision"
+
+  #mangled links
+  get "pb/view/:mangled" => "app#student_view"
 end

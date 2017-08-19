@@ -1,4 +1,5 @@
 class AppController < ApplicationController
+  include Mangler
   def main
     render :main, layout: false
   end
@@ -6,11 +7,19 @@ class AppController < ApplicationController
   def test
     @offers = Offer.all.map {|o| o.format }
     @sessions = Session.all.map {|s| s.json }
-    puts @sessions
     render :test, layout: false
   end
 
   def decision
+    show_decision_view(params)
+  end
+
+  def student_view
+    show_decision_view(decrypt(params[:mangled], 16))
+  end
+
+  private
+  def show_decision_view(params)
     applicant = Applicant.find_by_utorid(params[:utorid])
     if applicant
       position = Position.find(params[:position_id]).json

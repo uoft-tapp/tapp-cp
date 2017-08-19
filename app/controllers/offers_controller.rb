@@ -1,5 +1,6 @@
 class OffersController < ApplicationController
   protect_from_forgery with: :null_session
+  include Mangler
 
   def index
     render json: get_all_offers
@@ -34,7 +35,8 @@ class OffersController < ApplicationController
         if !offer[:send_date]
           if ENV['RAILS_ENV'] != 'test'
             begin
-              CpMailer.contract_email(offer.format).deliver_now
+              link = crypt(get_utorid_position(offer.format), id, "view")
+              CpMailer.contract_email(offer.format, link).deliver_now
             rescue StandardError => e
               errors.push("Could not send a contract to #{offer[:applicant][:email]}.")
             end
@@ -59,7 +61,8 @@ class OffersController < ApplicationController
         if offer
           offer.increment!(:nag_count, 1)
           if ENV['RAILS_ENV'] != 'test'
-            CpMailer.nag_email(offer.format).deliver_now
+            link = crypt(get_utorid_position(offer.format), id, "view")
+            CpMailer.nag_email(offer.format, link).deliver_now
           end
         end
       end
@@ -147,6 +150,13 @@ class OffersController < ApplicationController
     when "withdraw"
       return {name: "Withdrawn", action: "withdraw"}
     end
+  end
+
+  def get_utorid_position(offer)
+    {
+      utorid: offer[:applicant][:utorid],
+      position_id: offer[:position_id],
+    }
   end
 
 end
