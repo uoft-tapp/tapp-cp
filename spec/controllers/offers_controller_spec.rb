@@ -50,16 +50,6 @@ RSpec.describe OffersController, type: :controller do
       end
     end
 
-    context "/contract" do
-      it "sends a PDF blob" do
-        get :get_contract, params: {offer_id: offer[:id]}
-        expect(response.status).to eq(200)
-        expect(response.content_type).to eq("application/pdf")
-        expect(response.header["Content-Disposition"]).to eq(
-          "inline; filename=\"contract.pdf\"")
-      end
-    end
-
   end
 
   describe "POST /offers/" do
@@ -99,10 +89,10 @@ RSpec.describe OffersController, type: :controller do
       end
     end
 
-    context ":offer_id/decision/:code" do
+    context ":offer_id/decision/:status" do
       context "when contract_id doesn't exists" do
         it "returns a status 404" do
-          post :set_status, params: {offer_id: "poop", code: "accept"}
+          post :set_status, params: {offer_id: "poop", status: "accept"}
           expect(response.status).to eq(404)
         end
       end
@@ -110,7 +100,7 @@ RSpec.describe OffersController, type: :controller do
         context "when status is pending" do
           context "code = accept" do
             it "updates the offer status to Accepted" do
-              post :set_status, params: {offer_id: sent_offer[:id], code: "accept"}
+              post :set_status, params: {offer_id: sent_offer[:id], status: "accept"}
               expect(response.status).to eq(200)
               body = {success: true, status: "accepted", message: "You've just accepted this offer."}
               expect(response.body).to eq(body.to_json)
@@ -119,7 +109,7 @@ RSpec.describe OffersController, type: :controller do
 
           context "code = reject" do
             it "updates the offer status to Rejected" do
-              post :set_status, params: {offer_id: sent_offer[:id], code: "reject"}
+              post :set_status, params: {offer_id: sent_offer[:id], status: "reject"}
               expect(response.status).to eq(200)
               body = {success: true, status: "rejected", message: "You've just rejected this offer."}
               expect(response.body).to eq(body.to_json)
@@ -128,7 +118,7 @@ RSpec.describe OffersController, type: :controller do
 
           context "code = withdraw" do
             it "updates the offer status to Withdrawn" do
-              post :set_status, params: {offer_id: sent_offer[:id], code: "withdraw"}
+              post :set_status, params: {offer_id: sent_offer[:id], status: "withdraw"}
               expect(response.status).to eq(200)
               body = {success: true, status: "withdrawn", message: "You've just withdrawn this offer."}
               expect(response.body).to eq(body.to_json)
@@ -139,7 +129,7 @@ RSpec.describe OffersController, type: :controller do
         context "when status is Unsent" do
           context "code = accept" do
             it "returns a status 404 with a message" do
-              post :set_status, params: {offer_id: offer[:id], code: "accept"}
+              post :set_status, params: {offer_id: offer[:id], status: "accept"}
               expect(response.status).to eq(404)
               body = {success: false, message: "You cannot accept an unsent offer."}
               expect(response.body).to eq(body.to_json)
@@ -148,7 +138,7 @@ RSpec.describe OffersController, type: :controller do
 
           context "code = reject" do
             it "updates the offer status to Rejected" do
-              post :set_status, params: {offer_id: offer[:id], code: "reject"}
+              post :set_status, params: {offer_id: offer[:id], status: "reject"}
               expect(response.status).to eq(404)
               body = {success: false, message: "You cannot reject an unsent offer."}
               expect(response.body).to eq(body.to_json)
@@ -157,7 +147,7 @@ RSpec.describe OffersController, type: :controller do
 
           context "code = withdraw" do
             it "updates the offer status to Withdrawn" do
-              post :set_status, params: {offer_id: offer[:id], code: "withdraw"}
+              post :set_status, params: {offer_id: offer[:id], status: "withdraw"}
               expect(response.status).to eq(404)
               body = {success: false, message: "You cannot withdraw an unsent offer."}
               expect(response.body).to eq(body.to_json)
@@ -168,7 +158,7 @@ RSpec.describe OffersController, type: :controller do
         context "when status decided" do
           context "code = accept" do
             it "returns a status 404 with a message" do
-              post :set_status, params: {offer_id: accepted_offer[:id], code: "accept"}
+              post :set_status, params: {offer_id: accepted_offer[:id], status: "accept"}
               expect(response.status).to eq(404)
               body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
               expect(response.body).to eq(body.to_json)
@@ -177,7 +167,7 @@ RSpec.describe OffersController, type: :controller do
 
           context "code = reject" do
             it "updates the offer status to Rejected" do
-              post :set_status, params: {offer_id: accepted_offer[:id], code: "reject"}
+              post :set_status, params: {offer_id: accepted_offer[:id], status: "reject"}
               expect(response.status).to eq(404)
               body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
               expect(response.body).to eq(body.to_json)
@@ -186,7 +176,7 @@ RSpec.describe OffersController, type: :controller do
 
           context "code = withdraw" do
             it "updates the offer status to Withdrawn" do
-              post :set_status, params: {offer_id: accepted_offer[:id], code: "withdraw"}
+              post :set_status, params: {offer_id: accepted_offer[:id], status: "withdraw"}
               expect(response.status).to eq(404)
               body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
               expect(response.body).to eq(body.to_json)
