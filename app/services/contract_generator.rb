@@ -22,13 +22,13 @@ class ContractGenerator
       header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("header"))
       salary_page = set_letter(header_end, @parser.get_data("letter"))
       signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
-      start_new_page
-      set_letter(HEADER_X_COORD, @parser.get_data("general_info"))
       if no_office_use_only_box
         last_page = set_form(signature_end, @parser.get_data("office_form"))
         set_salary(@salary_start, salary_page, @parser.get_data("salary"))
         go_to_page(last_page)
       else
+        start_new_page
+        set_letter(HEADER_X_COORD, @parser.get_data("general_info"))
         last_page = page_count
         set_salary(@salary_start, salary_page, @parser.get_data("salary"))
         go_to_page(last_page)
