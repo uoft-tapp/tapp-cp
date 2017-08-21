@@ -96,7 +96,7 @@ class ContractGenerator
       font data[:font]
       font_size data[:font_size]
       if top_padding
-        move_down 3
+        move_down 12
       end
       if fill
         stroke_bounds
@@ -144,7 +144,7 @@ class ContractGenerator
     end
     return [table_data, max]
   end
-
+3
   def set_logo(grids)
     logo = "#{Rails.root}/app/assets/images/dcs_logo_blue.jpg"
     grid(grids[0], grids[1]).bounding_box() do
@@ -242,7 +242,7 @@ class ContractGenerator
       draw_line(get_grids(1, y-0.1, 7.5, 0.1), 1)
     end
     set_text(get_grids(1, y, 6.5, 0.2), get_style(REGULAR_LEFT_ALIGN, form_data[0]))
-    set_form_table(get_grids(1, y+0.15, 6.5, 2.9), get_table_data(form_data), form_data.size-2)
+    set_form_table(get_grids(1, y+0.15, 6.5, 7.5), get_table_data(form_data), form_data.size-2)
     return page_count
   end
 
