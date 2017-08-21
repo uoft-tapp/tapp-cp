@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe OffersController, type: :controller do
-
   let(:offer) do
     Offer.create!(
         position_id: 6,
         applicant_id: 1,
         hours: 60,
+        link: "mangled-link",
     )
   end
   let(:sent_offer) do
@@ -14,7 +14,8 @@ RSpec.describe OffersController, type: :controller do
         position_id: 6,
         applicant_id: 2,
         hours: 60,
-        status: "Pending"
+        status: "Pending",
+        link: "mangled-link",
     )
   end
   let(:accepted_offer) do
@@ -22,7 +23,8 @@ RSpec.describe OffersController, type: :controller do
         position_id: 6,
         applicant_id: 3,
         hours: 60,
-        status: "Accepted"
+        status: "Accepted",
+        link: "mangled-link",
     )
   end
 
@@ -90,7 +92,7 @@ RSpec.describe OffersController, type: :controller do
     end
 
     context ":offer_id/decision/:status" do
-      context "when contract_id doesn't exists" do
+      context "when offer_id doesn't exists" do
         it "returns a status 404" do
           post :set_status, params: {offer_id: "poop", status: "accept"}
           expect(response.status).to eq(404)
@@ -245,6 +247,117 @@ RSpec.describe OffersController, type: :controller do
       offer.reload
       expect(response.status).to eq(404)
     end
+  end
+
+  describe "GET pb/:mangled/pdf" do
+    context "when :mangled is valid" do
+      it "returns status 200 a pdf" do
+        get :get_contract_mangled, params: {mangled: offer[:link]}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contract.pdf\"")
+      end
+    end
+
+    context "when :mangled is invalid" do
+      it "returns status 404 and an error message" do
+        get :get_contract_mangled, params: {mangled: "poops"}
+        expect(response.status).to eq(404)
+      end
+    end
+  end
+
+  describe "POST pb/:mangled/:status" do
+    context "when offer_id does exists" do
+      context "when status is pending" do
+        context "code = accept" do
+          it "updates the offer status to Accepted" do
+            post :set_status_mangled, params: {mangled: sent_offer[:link], status: "accept"}
+            expect(response.status).to eq(200)
+            body = {success: true, status: "accepted", message: "You've just accepted this offer."}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+
+        context "code = reject" do
+          it "updates the offer status to Rejected" do
+            post :set_status_mangled, params: {mangled: sent_offer[:link], status: "reject"}
+            expect(response.status).to eq(200)
+            body = {success: true, status: "rejected", message: "You've just rejected this offer."}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+
+        context "code = withdraw" do
+          it "updates the offer status to Withdrawn" do
+            post :set_status_mangled, params: {mangled: sent_offer[:link], status: "withdraw"}
+            expect(response.status).to eq(404)
+            body = {success: false, message: "Error: no permission to set such status"}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+      end
+
+      context "when status is Unsent" do
+        context "code = accept" do
+          it "returns a status 404 with a message" do
+            post :set_status_mangled, params: {mangled: offer[:link], status: "accept"}
+            expect(response.status).to eq(404)
+            body = {success: false, message: "You cannot accept an unsent offer."}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+
+        context "code = reject" do
+          it "updates the offer status to Rejected" do
+            post :set_status_mangled, params: {mangled: offer[:link], status: "reject"}
+            expect(response.status).to eq(404)
+            body = {success: false, message: "You cannot reject an unsent offer."}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+
+        context "code = withdraw" do
+          it "updates the offer status to Withdrawn" do
+            post :set_status_mangled, params: {mangled: offer[:link], status: "withdraw"}
+            expect(response.status).to eq(404)
+            body = {success: false, message: "Error: no permission to set such status"}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+      end
+
+      context "when status decided" do
+        context "code = accept" do
+          it "returns a status 404 with a message" do
+            post :set_status_mangled, params: {mangled: accepted_offer[:link], status: "accept"}
+            expect(response.status).to eq(404)
+            body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+
+        context "code = reject" do
+          it "updates the offer status to Rejected" do
+            post :set_status_mangled, params: {mangled: accepted_offer[:link], status: "reject"}
+            expect(response.status).to eq(404)
+            body = {success: false, message: "You cannot reject this offer. This offer has already been accepted."}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+
+        context "code = withdraw" do
+          it "updates the offer status to Withdrawn" do
+            post :set_status_mangled, params: {mangled: accepted_offer[:link], status: "withdraw"}
+            expect(response.status).to eq(404)
+            body = {success: false, message: "Error: no permission to set such status"}
+            expect(response.body).to eq(body.to_json)
+          end
+        end
+      end
+    end
+
   end
 
 end

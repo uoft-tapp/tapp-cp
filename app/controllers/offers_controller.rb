@@ -92,7 +92,7 @@ class OffersController < ApplicationController
     if params[:status] == "accept" || params[:status]== "reject"
       set_status_helper({offer_id: offer_id, status: params[:status]})
     else
-      render status: 404, json: {message: "Error: no permission to set such status"}
+      render status: 404, json: {success: false, message: "Error: no permission to set such status"}
     end
   end
 
