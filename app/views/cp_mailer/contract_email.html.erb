@@ -6,10 +6,11 @@
   <body>
     <p>Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>,</p>
     <p>
-      You have successfully been choosen to TA <%= @offer[:position] %>
+      We would like to offer you a position as a TA for <%= @offer[:position] %>.
     </p>
     <p>
-      Click the url below accept this offer: <%= @url %>.
+      Please click the link below to view your offer and accept or reject it:<br/>
+      <%= @url %>.
     </p>
     <p>Have a great day!</p>
   </body>
