@@ -82,23 +82,22 @@ class OffersController < ApplicationController
     end
   end
 
-  def get_contract
-    offer = Offer.find(params[:offer_id])
-    generator = ContractGenerator.new([offer.format])
-    send_data generator.render, filename: "contract.pdf", disposition: "inline"
+  def get_contract_mangled
+    offer_id = get_offer_id(params[:mangled])
+    get_contract_helper({offer_id: offer_id})
+  end
+
+  def set_status_mangled
+    offer_id = get_offer_id(params[:mangled])
+    if params[:status] == "accept" || params[:status]== "reject"
+      set_status_helper({offer_id: offer_id, status: params[:status]})
+    else
+      render status: 404, json: {message: "Error: no permission to set such status"}
+    end
   end
 
   def set_status
-    status = get_status(params)
-    offer = Offer.find(params[:offer_id])
-    if offer[:status] == "Pending"
-      update_status(offer, status)
-      render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
-    elsif offer[:status] == "Unsent"
-      render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
-    else
-      render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
-    end
+    set_status_helper(params)
   end
 
   private
@@ -134,6 +133,19 @@ class OffersController < ApplicationController
     end
   end
 
+  def set_status_helper(params)
+    status = get_status(params)
+    offer = Offer.find(params[:offer_id])
+    if offer[:status] == "Pending"
+      update_status(offer, status)
+      render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
+    elsif offer[:status] == "Unsent"
+      render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
+    else
+      render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
+    end
+  end
+
   def update_status(offer, status)
     if status[:action]=="accept"
       offer.update_attributes!({status: status[:name], signature: status[:signature]})
@@ -143,7 +155,7 @@ class OffersController < ApplicationController
   end
 
   def get_status(code)
-    case params[:code]
+    case params[:status]
     when "accept"
       return {name: "Accepted", action: "accept", signature: params[:signature]}
     when "reject"
@@ -158,6 +170,12 @@ class OffersController < ApplicationController
       utorid: offer[:applicant][:utorid],
       position_id: offer[:position_id],
     }
+  end
+
+  def get_contract_helper(params)
+    offer = Offer.find(params[:offer_id])
+    generator = ContractGenerator.new([offer.format])
+    send_data generator.render, filename: "contract.pdf", disposition: "inline"
   end
 
 end

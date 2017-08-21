@@ -5,8 +5,7 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   resources :applicants
   resources :offers do
-    post "decision/:code" => "offers#set_status"
-    get "contract" => "offers#get_contract"
+    post "decision/:status" => "offers#set_status"
   end
   resources :sessions
 
@@ -22,4 +21,6 @@ Rails.application.routes.draw do
 
   #mangled links
   get "pb/:mangled" => "app#student_view"
+  get "pb/:mangled/pdf" => "offers#get_contract_mangled"
+  post "pb/:mangled/:status" => "offers#set_status_mangled"
 end

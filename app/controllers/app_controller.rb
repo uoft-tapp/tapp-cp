@@ -32,7 +32,8 @@ class AppController < ApplicationController
         offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
         if offer
           if offer[:send_date]
-            @offer = offer.format
+            @offer = offer.format.except(:id)
+            @mangled = offer[:link]
             render :decision, layout: false
           else
             render status: 404, json: {message: "Offer #{offer.json[:id]} hasn't been sent."}
