@@ -35,8 +35,9 @@ class OffersController < ApplicationController
         if !offer[:send_date]
           if ENV['RAILS_ENV'] != 'test'
             begin
-              link = crypt(get_utorid_position(offer.format), id, "view")
-              CpMailer.contract_email(offer.format, link).deliver_now
+              mangled = crypt(get_utorid_position(offer.format), id)
+              offer.update_attributes!(link: mangled)
+              CpMailer.contract_email(offer.format, get_route(mangled)).deliver_now
             rescue StandardError => e
               errors.push("Could not send a contract to #{offer[:applicant][:email]}.")
             end
@@ -61,8 +62,8 @@ class OffersController < ApplicationController
         if offer
           offer.increment!(:nag_count, 1)
           if ENV['RAILS_ENV'] != 'test'
-            link = crypt(get_utorid_position(offer.format), id, "view")
-            CpMailer.nag_email(offer.format, link).deliver_now
+            mangled = offer[:link]
+            CpMailer.nag_email(offer.format, get_route(mangled)).deliver_now
           end
         end
       end

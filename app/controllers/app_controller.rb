@@ -15,7 +15,12 @@ class AppController < ApplicationController
   end
 
   def student_view
-    show_decision_view(decrypt(params[:mangled], 16))
+    offer_id = get_offer_id(params[:mangled])
+    if offer_id
+      show_decision_view(decrypt(params[:mangled], offer_id))
+    else
+      render status: 404, json: {message: "There is no such page."}
+    end
   end
 
   private

@@ -21,5 +21,5 @@ Rails.application.routes.draw do
   get "decision/:utorid/:position_id" => "app#decision"
 
   #mangled links
-  get "pb/view/:mangled" => "app#student_view"
+  get "pb/:mangled" => "app#student_view"
 end
