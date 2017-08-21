@@ -4,8 +4,6 @@ Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %
 
 Your appointment will be for <b><%= '%.2f' % @offer[:hours] %></b> hours for <b><%= @offer[:position] %></b>, and your supervisor will be Professor <%= list_instructors(@offer[:instructors]) %>.  You will be paid $<%= '%.2f' % @offer[:session][:pay] %>/hour.  You will be paid in instalments, once per month for the period of your appointment. Your salary will be paid by direct deposit.
 
-<salary>
-
 This appointment is being granted on the basis that you are a student or Post-Doctoral Fellow (PDF) at the University of Toronto on the starting date of the appointment. If you are not a student on the starting date of this appointment, this offer is revoked and the University will have no obligations under this letter.
 
 As a Teaching Assistant, you will be a member of the Canadian Union of Public Employees (CUPE) Local 3902, Unit 1 bargaining unit.  Your employment will be governed by the terms and conditions of the collective agreement between the University of Toronto and CUPE Local 3902, which may be found on the web at:

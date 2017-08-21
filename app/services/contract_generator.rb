@@ -24,14 +24,9 @@ class ContractGenerator
       signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
       if no_office_use_only_box
         last_page = set_form(signature_end, @parser.get_data("office_form"))
-        set_salary(@salary_start, salary_page, @parser.get_data("salary"))
-        go_to_page(last_page)
       else
         start_new_page
         set_letter(HEADER_X_COORD, @parser.get_data("general_info"))
-        last_page = page_count
-        set_salary(@salary_start, salary_page, @parser.get_data("salary"))
-        go_to_page(last_page)
       end
     end
   end
@@ -213,12 +208,12 @@ class ContractGenerator
   def set_letter_text(text, num_lines)
     num_lines = num_lines + @parser.get_num_line(text)
     if page_count == 1
-      if num_lines > 59
+      if num_lines > 67
         start_new_page
         move_up 50
       end
     else
-      if ((page_count-1)*66)+59< num_lines
+      if ((page_count-1)*66)+67< num_lines
         start_new_page
         move_up 50
       end
@@ -278,27 +273,6 @@ class ContractGenerator
           set_text(grids, get_style(REGULAR_LEFT_ALIGN, "<b>#{column}</b>"), true, true)
         else
           set_text(grids, get_style(REGULAR_LEFT_ALIGN, "#{column}"), true, true)
-        end
-      end
-    end
-  end
-
-  def set_salary(y, page, salary_data)
-    go_to_page(page)
-    define_grid(columns: 75, rows: 100, gutter: 0)
-    grids = get_grids(2.5, y+1.2, 2.5, 1)
-    grid(grids[0], grids[1]).bounding_box() do
-      data = salary_data[0].split("\n")
-      define_grid(columns: 1, rows: data.size+1, gutter: 0)
-      set_text([[data.size, 0],[data.size, 0]], get_style(SMALL_LEFT_ALIGN, salary_data[1]))
-      grid([0,0], [2,0]).bounding_box do
-        define_grid(columns: 4, rows: data.size, gutter: 0)
-        draw_line([[data.size-1, 0], [data.size-1, 3]], 0.39)
-        draw_line([[data.size-2, 3], [data.size-2, 3]], 0.1)
-        data.each_with_index do |row, index|
-          values = row.split(",")
-          set_text([[index, 0],[index, 2]], get_style(REGULAR_LEFT_ALIGN, values[0]))
-          set_text([[index, 3],[index, 3]], get_style(REGULAR_LEFT_ALIGN, values[1]))
         end
       end
     end
