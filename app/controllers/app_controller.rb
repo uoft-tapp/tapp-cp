@@ -1,4 +1,8 @@
-class AppController < ActionController::Base
+class AppController < ApplicationController
+  def main
+    render :main, layout: false
+  end
+
   def test
     @offers = Offer.all.map {|o| o.format }
     @sessions = Session.all.map {|s| s.json }

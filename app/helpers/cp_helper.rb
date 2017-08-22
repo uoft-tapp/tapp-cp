@@ -1,2 +1,0 @@
-module CpHelper
-end
