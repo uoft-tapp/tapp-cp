@@ -7,6 +7,8 @@ services:
       args:
           RAILS_ENV: ${RAILS_ENV}
     environment:
+      TAPP_PORT: ${TAPP_PORT}
+      CP_PORT: ${CP_PORT}
       POSTGRES_HOST: postgres
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -27,8 +29,7 @@ services:
       - postgres
     external_links:
       - tapp_rails-app:tapp
-    command: >
-      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 5000 -P /dev/null
+
 
   postgres:
     image: postgres:9.6-alpine
