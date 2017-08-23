@@ -39,7 +39,7 @@ class App extends React.Component {
 
 function RouterInst(props) {
   return (
-    <Router basename="index.html">
+    <Router basename="cp">
       <div>
         <Navigation {...props} />
         <Switch>
