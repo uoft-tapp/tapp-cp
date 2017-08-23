@@ -1,9 +1,10 @@
 
-Congratulations, <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
+Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>,
 ====================================
 
-You have successfully been choosen to TA <%= @offer[:position] %>
+We would like to offer you a position as a TA for <%= @offer[:position] %>.
 
-Click the url below accept this offer: <%= @url %>.
+Please click the link below to view your offer and accept or reject it:
+<%= @url %>.
 
 Have a great day!
