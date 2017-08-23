@@ -5,6 +5,7 @@ class ContractGenerator
   REGULAR_LEFT_ALIGN = 2
   SMALL_LEFT_ALIGN = 3
   SIGNATURE = 4
+  INITIAL = 5
   HEADER_X_COORD = 0.7
   HEADER_Y_COORD = 0.5
 
@@ -21,9 +22,10 @@ class ContractGenerator
       @parser = TemplateParser.new(templates, @offer)
       header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("header"))
       salary_page = set_letter(header_end, @parser.get_data("letter"))
-      signature_end = set_signature(5, @letter_end, @parser.get_data("signature"))
+      set_ta_coord_signature(@letter_end, @parser.get_data("signature"))
+      set_applicant_signature(@letter_end, offer)
       if no_office_use_only_box
-        last_page = set_form(signature_end, @parser.get_data("office_form"))
+        set_form(@parser.get_data("office_form"))
       else
         start_new_page
         set_letter(HEADER_X_COORD, @parser.get_data("general_info"))
@@ -33,7 +35,13 @@ class ContractGenerator
 
   private
   def get_font(name)
-    return "#{Rails.root}/app/services/templates/fonts/#{name}.ttf"
+    ttf = "#{Rails.root}/app/services/templates/fonts/#{name}.ttf"
+    font_families.update(
+    name => { bold: ttf,
+                italic: ttf,
+                bold_italic: ttf,
+                normal: ttf })
+    return name
   end
 
   def get_style(type, text)
@@ -63,6 +71,13 @@ class ContractGenerator
       return {
         font: get_font("signature"),
         font_size: 25,
+        text: text,
+        align: :left,
+      }
+    when INITIAL
+      return {
+        font: "Times-Roman",
+        font_size: 16,
         text: text,
         align: :left,
       }
@@ -222,27 +237,31 @@ class ContractGenerator
     return num_lines
   end
 
-  def set_signature(x, y, signature_data)
+  def set_ta_coord_signature(y, signature_data)
     if y > 10
       start_new_page
       y = 0.5
     end
     y = y - 0.5
+    x = 5
     set_text(get_grids(x, y, 3, 0.2), get_style(REGULAR_LEFT_ALIGN, signature_data[0]))
-    set_text(get_grids(x, y+0.1, 3, 0.6), get_style(SIGNATURE, ENV['TA_COORD']))
+    set_text(get_grids(x, y+0.15, 3, 0.6), get_style(SIGNATURE, ENV['TA_COORD']))
     set_text(get_grids(x, y+0.6, 3, 0.6), get_style(REGULAR_LEFT_ALIGN, signature_data[1]))
-    return y+1.2
   end
 
-  def set_form(y, form_data)
-    if y > 9.3
-      start_new_page
-      y = 0.5
-    else
-      draw_line(get_grids(1, y-0.1, 7.5, 0.1), 1)
+  def set_applicant_signature(y, offer)
+    x = HEADER_X_COORD+0.3
+    draw_line(get_grids(x, y-0.4, 3, 0.6), 0.4)
+    set_text(get_grids(x, y+0.2, 3, 0.6), get_style(SMALL_LEFT_ALIGN, "Applicant Signature".upcase))
+    if offer[:signature]
+      set_text(get_grids(x, y-0.05, 3, 0.6), get_style(INITIAL, offer[:signature]))
     end
-    set_text(get_grids(1, y, 6.5, 0.2), get_style(REGULAR_LEFT_ALIGN, form_data[0]))
-    set_form_table(get_grids(1, y+0.15, 6.5, 7.5), get_table_data(form_data), form_data.size-2)
+  end
+
+  def set_form(form_data)
+    start_new_page
+    set_text(get_grids(1, HEADER_Y_COORD, 6.5, 0.2), get_style(REGULAR_LEFT_ALIGN, form_data[0]))
+    set_form_table(get_grids(1, HEADER_Y_COORD+0.15, 6.5, 7.5), get_table_data(form_data), form_data.size-2)
     return page_count
   end
 
