@@ -10,8 +10,6 @@ services:
     build: .
     volumes:
       - .:/srv/app
-    networks:
-      - internal
     ports:
       - "7070:7070"
     command: >
