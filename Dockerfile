@@ -1,4 +1,8 @@
 FROM ruby:2.4.1-alpine
+ARG RAILS_ENV
+ENV RAILS_ENV=${RAILS_ENV:-development}
+
+RUN echo "Building with RAILS_ENV=${RAILS_ENV}"
 
 WORKDIR /srv/app
 
@@ -15,7 +19,13 @@ RUN apk add --no-cache curl && \
   apk del --purge curl
 
 COPY Gemfile* /srv/app/
-RUN bundle install
+
+
+RUN if [ ${RAILS_ENV} = 'production' ]; then \
+	bundle install --without development test --deployment; \
+else \
+	bundle install; \
+fi
 
 COPY package.json /srv/app/
 COPY yarn.lock /srv/app/
@@ -23,5 +33,12 @@ RUN yarn install
 
 COPY . /srv/app/
 
-EXPOSE 3000
-CMD ["rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+RUN if [ ${RAILS_ENV} = 'production' ]; then \
+	bundle exec rake webpacker:compile; \
+fi
+
+EXPOSE 5000
+
+#TODO apparently cannot use variable in CMD instruction, but i hate the 5000 here!
+#CMD ["rails", "server", "-b", "0.0.0.0", "-p", ${CP_PORT}]
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "5000"]

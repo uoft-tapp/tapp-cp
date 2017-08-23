@@ -1,8 +1,14 @@
 version: '2'
 services:
+
   rails-app:
-    build: .
+    build:
+      context: .
+      args:
+          RAILS_ENV: ${RAILS_ENV}
     environment:
+      TAPP_PORT: ${TAPP_PORT}
+      CP_PORT: ${CP_PORT}
       POSTGRES_HOST: postgres
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -14,19 +20,16 @@ services:
       TA_COORD: ${TA_COORD}
       CUPE_SITE: ${CUPE_SITE}
       RECIPIENT: ${RECIPIENT}
-    volumes:
-      - .:/srv/app
     networks:
-      - internal
-      - tapp_external
+      - default
+      - tapp_frontend
     ports:
       - "5000:5000"
     links:
       - postgres
     external_links:
       - tapp_rails-app:tapp
-    command: >
-      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 5000 -P /dev/null
+
 
   postgres:
     image: postgres:9.6-alpine
@@ -36,22 +39,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - /var/lib/postgresql/data
-    networks:
-      - internal
-
-  webpack-dev-server:
-    build: .
-    volumes:
-      - .:/srv/app
-    networks:
-      - internal
-    ports:
-      - "7070:7070"
-    command: >
-      ./bin/webpack-dev-server-entrypoint --host 0.0.0.0
 
 networks:
-  internal: # aka cp_internal
-    driver: bridge
-  tapp_external:
+  tapp_frontend:
     external: true

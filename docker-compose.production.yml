@@ -1,0 +1,7 @@
+version: '2'
+services:
+  rails-app:
+    environment:
+      # config/environments/production -> in order to serve static files
+      RAILS_SERVE_STATIC_FILES: 1
+    
