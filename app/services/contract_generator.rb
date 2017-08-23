@@ -106,12 +106,12 @@ class ContractGenerator
   # false by default, so that there is no unintended top_padding to the text within
   # the grid.
   # "fill" and "top_padding" are used as part of the office only form to create the grid.
-  def set_text(grids, data, fill = false, top_padding = false)
+  def set_text(grids, data, fill = false, top_padding = false, pad = 7)
     grid(grids[0], grids[1]).bounding_box() do
       font data[:font]
       font_size data[:font_size]
       if top_padding
-        move_down 12
+        move_down pad
       end
       if fill
         stroke_bounds
@@ -159,7 +159,7 @@ class ContractGenerator
     end
     return [table_data, max]
   end
-3
+
   def set_logo(grids)
     logo = "#{Rails.root}/app/assets/images/dcs_logo_blue.jpg"
     grid(grids[0], grids[1]).bounding_box() do
@@ -260,8 +260,8 @@ class ContractGenerator
 
   def set_form(form_data)
     start_new_page
-    set_text(get_grids(1, HEADER_Y_COORD, 6.5, 0.2), get_style(REGULAR_LEFT_ALIGN, form_data[0]))
-    set_form_table(get_grids(1, HEADER_Y_COORD+0.15, 6.5, 7.5), get_table_data(form_data), form_data.size-2)
+    set_text(get_grids(0.5, HEADER_Y_COORD, 7.5, 0.2), get_style(REGULAR_LEFT_ALIGN, form_data[0]))
+    set_form_table(get_grids(0.5, HEADER_Y_COORD+0.15, 7.5, 9), get_table_data(form_data), form_data.size-2)
     return page_count
   end
 
@@ -275,7 +275,7 @@ class ContractGenerator
   end
 
   def set_table_helper(table, num_columns)
-    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(REGULAR_LEFT_ALIGN, table[:label]), false, true)
+    set_text([[table[:index][0], 0],[table[:index][0], num_columns-1]], get_style(REGULAR_LEFT_ALIGN, table[:label]), false, true, 20)
     table[:table].each_with_index do |row, row_num|
       row_multiplier= num_columns/row.length.to_f
       row.each_with_index do |column, index|
@@ -289,7 +289,7 @@ class ContractGenerator
         end
         grids = [[curr_row, horizontal_1], [curr_row, horizontal_2]]
         if index%2 == 0
-          set_text(grids, get_style(REGULAR_LEFT_ALIGN, "<b>#{column}</b>"), true, true)
+          set_text(grids, get_style(REGULAR_LEFT_ALIGN, "<b>#{column}</b>"), true, true, 12)
         else
           set_text(grids, get_style(REGULAR_LEFT_ALIGN, "#{column}"), true, true)
         end
