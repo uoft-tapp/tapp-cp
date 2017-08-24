@@ -159,6 +159,7 @@
         }
       }
       function updateStatus(response){
+        fetchPdfData();
         alert(response.message);
         if (response.success){
           setupPage(response.status);
