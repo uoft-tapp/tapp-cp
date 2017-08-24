@@ -6,7 +6,7 @@
 //
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
-import '../app-styles';
+import '../cp-styles';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -14,12 +14,12 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
-import { appState } from '../app/appState.js';
-import * as data from '../app/fetch.js';
-import { rconfig } from '../app/routeConfig.js';
+import { appState } from '../cp/appState.js';
+import * as data from '../cp/fetch.js';
+import { rconfig } from '../cp/routeConfig.js';
 
-import { Admin } from '../app/components/admin.js';
-import { Navigation } from '../app/components/navbar.js';
+import { Admin } from '../cp/components/admin.js';
+import { Navigation } from '../cp/components/navbar.js';
 
 class App extends React.Component {
   constructor(props) {

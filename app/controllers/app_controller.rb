@@ -1,6 +1,14 @@
 class AppController < ApplicationController
   include Mangler
-  def main
+
+  ''' TAPP functions '''
+  def tapp
+    render :main, layout: false
+  end
+
+  ''' CP functions '''
+  
+  def cp
     render :main, layout: false
   end
 

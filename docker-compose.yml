@@ -7,14 +7,11 @@ services:
       args:
           RAILS_ENV: ${RAILS_ENV}
     environment:
-      TAPP_PORT: ${TAPP_PORT}
-      CP_PORT: ${CP_PORT}
       POSTGRES_HOST: postgres
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
-      TAPP: ${TAPP}
       EMAIL_TYPE: ${EMAIL_TYPE}
       EMAIL_USER: ${EMAIL_USER}
       TA_COORD: ${TA_COORD}
@@ -22,15 +19,11 @@ services:
       RECIPIENT: ${RECIPIENT}
     networks:
       - default
-      - tapp_frontend
     ports:
-      - "5000:5000"
+      - "3000:3000"
     links:
       - postgres
-    external_links:
-      - tapp_rails-app:tapp
-
-
+      
   postgres:
     image: postgres:9.6-alpine
     environment:
@@ -39,7 +32,3 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - /var/lib/postgresql/data
-
-networks:
-  tapp_frontend:
-    external: true

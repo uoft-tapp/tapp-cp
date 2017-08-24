@@ -4,13 +4,13 @@ services:
     volumes:
       - .:/srv/app
     command: >
-      ./bin/rails-server-entrypoint -b 0.0.0.0 -p ${CP_PORT} -P /dev/null
+      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000 -P /dev/null
 
   webpack-dev-server:
     build: .
     volumes:
       - .:/srv/app
     ports:
-      - "7070:7070"
+      - "8080:8080"
     command: >
       ./bin/webpack-dev-server-entrypoint --host 0.0.0.0

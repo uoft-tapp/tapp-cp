@@ -1,15 +1,36 @@
 Rails.application.routes.draw do
-  # for user facing side of CP
-  get '/cp/(*z)', to: "app#index"
+  get '/tapp/(*z)', to: "app#tapp"
+  get '/cp/(*z)', to: "app#cp"
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  resources :applicants
+  # TAPP resources
+  resources :applicants do
+    resources :assignments, except: [:show]
+    resources :applications, only: [:index]
+  end
+  resources :assignments, only: [:index, :show]
+  resources :applications, only: [:index, :show]
+  resources :positions
+  resources :instructors
+
+  # CP resources
   resources :offers do
     post "decision/:status" => "offers#set_status"
     get "pdf" => "offers#get_contract"
   end
+
+  # shared resources
   resources :sessions
 
+  # TAPP routes
+  get "/export/chass/:round_id", to: "export#chass"
+  get "/export/cdf-info", to: "export#cdf"
+  get "/export/transcript-access", to: "export#transcript_access"
+  get "/export/offers", to: "export#offers"
+  post "/import/chass", to: "import#chass"
+  post "/import/enrollment", to: "import#enrollment"
+
+  # CP routes
   post "offers/send-contracts" => "offers#send_contracts"
   post "offers/print" => "offers#combine_contracts_print"
   post "offers/nag" => "offers#batch_email_nags"
