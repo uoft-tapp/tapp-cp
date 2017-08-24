@@ -10,12 +10,12 @@ module Mangler
   end
 
   def get_offer_id(mangled)
-    Offer.all.each do |offer|
-      if offer[:link]==mangled
-        return offer[:id]
-      end
+    offer = Offer.find_by(link: mangled)
+    if offer
+      return offer[:id]
+    else
+      return nil
     end
-    return nil
   end
 
   def get_route(mangled, type=nil)
