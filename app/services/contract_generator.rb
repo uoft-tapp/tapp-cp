@@ -255,6 +255,8 @@ class ContractGenerator
     set_text(get_grids(x, y+0.2, 3, 0.6), get_style(SMALL_LEFT_ALIGN, "Applicant Signature".upcase))
     if offer[:signature]
       set_text(get_grids(x, y-0.05, 3, 0.6), get_style(INITIAL, offer[:signature]))
+    else
+      set_text(get_grids(x, y-0.2, 3, 0.6), get_style(REGULAR_LEFT_ALIGN, "<i>Not Yet Electronically Signed</i>"))
     end
   end
 
