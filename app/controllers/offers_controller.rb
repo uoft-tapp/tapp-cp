@@ -112,13 +112,28 @@ class OffersController < ApplicationController
     end
   end
 
-  def get_contract_pdf
-    offer_id = get_offer_id(params[:mangled])
-    offer = Offer.find(offer_id)
-    generator = ContractGenerator.new([offer.format])
-    send_data generator.render, filename: "contract.pdf", disposition: "inline"
+  '''
+    Gets the applicant version of the contract on the admin side.
+  '''
+  def get_contract
+    get_contract_pdf(params)
   end
 
+  '''
+    Gets the applicant version of the contract through mangled route for the applicant
+    side.
+  '''
+  def get_contract_mangled
+    offer_id = get_offer_id(params[:mangled])
+    get_contract_pdf({offer_id: offer_id})
+  end
+
+  '''
+    Sets the offer status as either `Accepted` or `Rejected`. An applicant
+    can`t set the offer into any other status. This action is for the applicant
+    and it uses a mangled route so that an attacker can`t easily make the decision
+    for the offers of other applicant.
+  '''
   def set_status_mangled
     offer_id = get_offer_id(params[:mangled])
     if params[:status] == "accept" || params[:status]== "reject"
@@ -128,6 +143,10 @@ class OffersController < ApplicationController
     end
   end
 
+  '''
+    Sets the offer status as either `Accepted`, `Rejected`, or `Withdrawn`. This
+    action is for the admin.
+  '''
   def set_status
     status_setter(params)
   end
@@ -206,5 +225,16 @@ class OffersController < ApplicationController
       position_id: offer[:position_id],
     }
   end
+
+  '''
+    Gets the applicant version of the contract.
+  '''
+  def get_contract_pdf(params)
+    offer = Offer.find(params[:offer_id])
+    generator = ContractGenerator.new([offer.format])
+    send_data generator.render, filename: "contract.pdf", disposition: "inline"
+  end
+
+
 
 end
