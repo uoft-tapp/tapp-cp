@@ -102,7 +102,7 @@
         fetchHelper(url, init, action, blob);
       }
       function fetchPdfData(){
-        getHelper("/offers/"+'<%= @offer[:id] %>'+"/contract", setPdfViewPort, true);
+        getHelper("/pb/<%= @offer[:mangled] %>/pdf", setPdfViewPort, true);
       }
       function setPdfViewPort(response){
         let fileURL = URL.createObjectURL(response);
@@ -155,7 +155,7 @@
           data["signature"] = signature;
         }
         if (res) {
-          postHelper("/offers/<%= @offer[:id] %>/decision/"+status, data, updateStatus);
+          postHelper("/pb/<%= @offer[:mangled] %>/"+status, data, updateStatus);
         }
       }
       function updateStatus(response){

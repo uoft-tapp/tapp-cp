@@ -2,19 +2,19 @@ class CpMailer < ApplicationMailer
   default from: ENV['EMAIL_USER']
   layout "mailer"
 
-  def contract_email(offer)
+  def contract_email(offer, link)
     email = get_email(offer)
     @offer = offer
-    @url = "http://google.com"
+    @url = link
     mail(to: email, subject: "TA Position Offer: #{@offer[:position]}")
   end
 
-  def nag_email(contract)
+  def nag_email(contract, link)
     email = get_email(contract)
     @contract = contract
     @contract[:nag_suffix] = get_nag_suffix(@contract[:nag_count])
     @contract[:deadline] = format_time(@contract[:deadline],"%I:%M%p on %B %d, %Y")
-    @url = "http://google.com"
+    @url = link
     mail(to: email, subject: "Reminder for TA Position: #{@contract[:position]}")
   end
 

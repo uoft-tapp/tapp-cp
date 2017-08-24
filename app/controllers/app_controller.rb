@@ -1,4 +1,5 @@
 class AppController < ApplicationController
+  include Mangler
   def main
     render :main, layout: false
   end
@@ -6,11 +7,33 @@ class AppController < ApplicationController
   def test
     @offers = Offer.all.map {|o| o.format }
     @sessions = Session.all.map {|s| s.json }
-    puts @sessions
     render :test, layout: false
   end
 
+  '''
+    Shows the student facing view when the admin is using looking at it before
+    sending the contract to the applicant. This uses a route of /offers/:utorid/:position_id
+  '''
   def decision
+    show_decision_view(params)
+  end
+
+  '''
+    Shows the student facing view when the applicant is looking at the page.
+    This uses a route of /pb/:mangled, so that the applicant can`t attack
+    access the decision page of another student.
+  '''
+  def student_view
+    offer_id = get_offer_id(params[:mangled])
+    if offer_id
+      show_decision_view(decrypt(params[:mangled], offer_id))
+    else
+      render status: 404, json: {message: "There is no such page."}
+    end
+  end
+
+  private
+  def show_decision_view(params)
     applicant = Applicant.find_by_utorid(params[:utorid])
     if applicant
       position = Position.find(params[:position_id]).json
@@ -18,7 +41,7 @@ class AppController < ApplicationController
         offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
         if offer
           if offer[:send_date]
-            @offer = offer.format
+            @offer = offer.format.except(:id).merge({mangled: offer[:link]})
             render :decision, layout: false
           else
             render status: 404, json: {message: "Offer #{offer.json[:id]} hasn't been sent."}
