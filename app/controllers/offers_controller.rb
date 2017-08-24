@@ -35,6 +35,16 @@ class OffersController < ApplicationController
         if !offer[:send_date]
           if ENV['RAILS_ENV'] != 'test'
             begin
+              '''
+               We create mangled, which is a hash of the data from get_utorid_position
+               the data from get_utorid_position is a json that can be reused
+               on the /pb/:mangled routes, where :mangled = mangled.
+               This is where we mangled our routes so that an attacker can\'t
+               see how to masquerade as another applicant.
+               get_route(mangled) creates the link that we send to the applicant,
+               so that they can see the view for making decision on whether or not
+               to accept an offer.
+              '''
               mangled = crypt(get_utorid_position(offer.format), id)
               offer.update_attributes!(link: mangled)
               CpMailer.contract_email(offer.format, get_route(mangled)).deliver_now
@@ -62,6 +72,16 @@ class OffersController < ApplicationController
         if offer
           offer.increment!(:nag_count, 1)
           if ENV['RAILS_ENV'] != 'test'
+            '''
+             We create mangled, which is a hash of the data from get_utorid_position
+             the data from get_utorid_position is a json that can be reused
+             on the /pb/:mangled routes, where :mangled = mangled.
+             This is where we mangled our routes so that an attacker can\'t
+             see how to masquerade as another applicant.
+             get_route(mangled) creates the link that we send to the applicant,
+             so that they can see the view for making decision on whether or not
+             to accept an offer.
+            '''
             mangled = offer[:link]
             CpMailer.nag_email(offer.format, get_route(mangled)).deliver_now
           end

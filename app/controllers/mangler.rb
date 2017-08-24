@@ -1,9 +1,17 @@
 module Mangler
+  '''
+    crypt makes data into a salted hash that represents the :mangled part of
+    the /pb routes
+  '''
   def crypt(data, salt)
     crypt = make_key(salt)
     crypt.encrypt_and_sign(data.to_json)
   end
 
+  '''
+    decrypt the mangled data into the original data
+    salt is the same salt used to make the data into a hash
+  '''
   def decrypt(mangled, salt)
     crypt = make_key(salt)
     JSON.parse(crypt.decrypt_and_verify(mangled), symbolize_names: true)
@@ -32,6 +40,9 @@ module Mangler
     ActiveSupport::MessageEncryptor.new(key)
   end
 
+  '''
+  create a password to create/decrypt the hash
+  '''
   def make_password(salt)
     password = Rails.application.secrets.secret_key_base
     index = salt
