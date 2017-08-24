@@ -78,7 +78,7 @@ class OffersController < ApplicationController
                We create mangled, which is a hash of the data from get_utorid_position
                the data from get_utorid_position is a json that can be reused
                on the /pb/:mangled routes, where :mangled = mangled.
-               This is where we mangled our routes so that an attacker can\'t
+               This is where we mangled our routes so that an attacker can`t
                see how to masquerade as another applicant.
                get_route(mangled) creates the link that we send to the applicant,
                so that they can see the view for making decision on whether or not
@@ -112,22 +112,24 @@ class OffersController < ApplicationController
     end
   end
 
-  def get_contract_mangled
+  def get_contract_pdf
     offer_id = get_offer_id(params[:mangled])
-    get_contract_helper({offer_id: offer_id})
+    offer = Offer.find(offer_id)
+    generator = ContractGenerator.new([offer.format])
+    send_data generator.render, filename: "contract.pdf", disposition: "inline"
   end
 
   def set_status_mangled
     offer_id = get_offer_id(params[:mangled])
     if params[:status] == "accept" || params[:status]== "reject"
-      set_status_helper({offer_id: offer_id, status: params[:status]})
+      status_setter({offer_id: offer_id, status: params[:status]})
     else
       render status: 404, json: {success: false, message: "Error: no permission to set such status"}
     end
   end
 
   def set_status
-    set_status_helper(params)
+    status_setter(params)
   end
 
   private
@@ -163,7 +165,10 @@ class OffersController < ApplicationController
     end
   end
 
-  def set_status_helper(params)
+  '''
+    Sets the status of an offer to either `Accepted`, `Rejected`, or `Withdrawn`
+  '''
+  def status_setter(params)
     status = get_status(params)
     offer = Offer.find(params[:offer_id])
     if offer[:status] == "Pending"
@@ -200,12 +205,6 @@ class OffersController < ApplicationController
       utorid: offer[:applicant][:utorid],
       position_id: offer[:position_id],
     }
-  end
-
-  def get_contract_helper(params)
-    offer = Offer.find(params[:offer_id])
-    generator = ContractGenerator.new([offer.format])
-    send_data generator.render, filename: "contract.pdf", disposition: "inline"
   end
 
 end

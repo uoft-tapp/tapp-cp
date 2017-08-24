@@ -19,8 +19,11 @@ Rails.application.routes.draw do
   get "test" => "app#test"
   get "decision/:utorid/:position_id" => "app#decision"
 
-  #mangled links
+  '''
+    The following routes are mangled urls, so that attacker can`t mess with the
+    status of another student.
+  '''
   get "pb/:mangled" => "app#student_view"
-  get "pb/:mangled/pdf" => "offers#get_contract_mangled"
+  get "pb/:mangled/pdf" => "offers#get_contract_pdf"
   post "pb/:mangled/:status" => "offers#set_status_mangled"
 end
