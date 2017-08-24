@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :applicants
   resources :offers do
     post "decision/:status" => "offers#set_status"
+    get "pdf" => "offers#get_contract"
   end
   resources :sessions
 
@@ -17,7 +18,6 @@ Rails.application.routes.draw do
 
   #temp-testing views
   get "test" => "app#test"
-  get "decision/:utorid/:position_id" => "app#decision"
 
   '''
     The following routes are mangled urls, so that attacker can`t mess with the

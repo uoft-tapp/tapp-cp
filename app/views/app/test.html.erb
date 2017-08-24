@@ -32,7 +32,7 @@
         <% @offers.each do |o| %>
           <tr>
             <th><input type="checkbox" onclick="updateOfferSelected(this, <%=o[:id] %>, '<%=o[:applicant][:email]%>');"></th>
-            <th><a href="decision/<%= o[:applicant][:utorid]%>/<%= o[:position_id]%>">Link</a></th>
+            <th><a href="offers/<%=o[:id] %>/pdf">Link</a></th>
             <th><%= o[:applicant][:last_name]%></th>
             <th><%= o[:applicant][:first_name]%></th>
             <th><%= o[:applicant][:student_number]%></th>

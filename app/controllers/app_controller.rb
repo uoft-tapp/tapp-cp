@@ -11,14 +11,6 @@ class AppController < ApplicationController
   end
 
   '''
-    Shows the student facing view when the admin is using looking at it before
-    sending the contract to the applicant. This uses a route of /offers/:utorid/:position_id
-  '''
-  def decision
-    show_decision_view(params)
-  end
-
-  '''
     Shows the student facing view when the applicant is looking at the page.
     This uses a route of /pb/:mangled, so that the applicant can`t attack
     access the decision page of another student.
