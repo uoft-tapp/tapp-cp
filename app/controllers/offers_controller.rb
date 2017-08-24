@@ -66,28 +66,38 @@ class OffersController < ApplicationController
   end
 
   def batch_email_nags
+    exceptions = ["Exceptions:"]
     if params[:contracts] && params[:contracts]!=""
       params[:contracts].each do |id|
         offer = Offer.find(id)
         if offer
-          offer.increment!(:nag_count, 1)
-          if ENV['RAILS_ENV'] != 'test'
-            '''
-             We create mangled, which is a hash of the data from get_utorid_position
-             the data from get_utorid_position is a json that can be reused
-             on the /pb/:mangled routes, where :mangled = mangled.
-             This is where we mangled our routes so that an attacker can\'t
-             see how to masquerade as another applicant.
-             get_route(mangled) creates the link that we send to the applicant,
-             so that they can see the view for making decision on whether or not
-             to accept an offer.
-            '''
-            mangled = offer[:link]
-            CpMailer.nag_email(offer.format, get_route(mangled)).deliver_now
+          if offer[:status] == "Pending"
+            offer.increment!(:nag_count, 1)
+            if ENV['RAILS_ENV'] != 'test'
+              '''
+               We create mangled, which is a hash of the data from get_utorid_position
+               the data from get_utorid_position is a json that can be reused
+               on the /pb/:mangled routes, where :mangled = mangled.
+               This is where we mangled our routes so that an attacker can\'t
+               see how to masquerade as another applicant.
+               get_route(mangled) creates the link that we send to the applicant,
+               so that they can see the view for making decision on whether or not
+               to accept an offer.
+              '''
+              mangled = offer[:link]
+              CpMailer.nag_email(offer.format, get_route(mangled)).deliver_now
+            end
+          else
+            offer = offer.format
+            exceptions.push("- Applicant #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s nag for Position #{offer[:position]} was not sent because it is not in Pending status.")
           end
         end
       end
-      render json: {message: "You've sent the nag emails."}
+      if exceptions.length == 1
+        render json: {message: "You've sent the nag emails."}
+      else
+        render status: 404, json: {message: exceptions.join("\n")}
+      end
     end
   end
 
