@@ -5,7 +5,6 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore local .env file
-# Local environment shouldn't be copied
 .env
 
 # Ignore bundler config.
@@ -31,3 +30,5 @@
 
 /public/packs
 /node_modules
+
+/db/seeds/header.txt
