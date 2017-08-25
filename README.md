@@ -1,6 +1,8 @@
 # tapp
+
 [![Build Status](https://travis-ci.org/uoft-tapp/tapp.svg?branch=master)](https://travis-ci.org/uoft-tapp/tapp)
 
+- [FirstDeploymentCombinedCpTappApp](#FirstDeploymentCombinedCpTappApp)
 - [deployment](#deployment)
 - [backup & restore](#backup-restore)
 
@@ -96,6 +98,14 @@ To recreate the images the containers boot from, give `docker-compose up` the `-
 
 `docker-compose up --force-recreate` 
 
+## FirstDeploymentCombinedCpTappApp <a id="FirstDeploymentCombinedCpTappApp"></a>
+
+The  first time  we deploy  the combined  app (sept/2017,  delete this
+section once  this has  been accomplished) we  need to  import Karen's
+assignments from the tapp app running on docker.
+
+We have a few ideas on how to do this, michelle and/or gabrielle should be consulted.
+(nb aug 25 email from matz on this topic)
 
 ## Deployment <a id="deployment"></a>
 
