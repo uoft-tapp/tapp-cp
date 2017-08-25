@@ -3,9 +3,20 @@ import { appState } from './appState.js';
 
 /* General helpers */
 
-function defaultFailure(response) {
-    appState.notify('<b>Action Failed:</b> ' + response.statusText);
-    return Promise.reject(response);
+function defaultFailure(resp) {
+    appState.notify('<b>Action Failed:</b> ' + resp.statusText);
+    return Promise.reject(resp);
+}
+
+// extract and display a message which is sent in the (JSON) body of a response
+function showMessageInJsonBody(resp) {
+    if (resp.message != null) {
+        appState.notify(resp.message);
+    } else {
+        resp.json().then(res => {
+            appState.alert(res.message);
+        });
+    }
 }
 
 function fetchHelper(URL, init, success, failure = defaultFailure) {
@@ -160,8 +171,7 @@ function onFetchApplicationsSuccess(resp) {
 }
 
 function onFetchCoursesSuccess(resp) {
-    let courses = {},
-        rounds = {};
+    let courses = {};
 
     resp.forEach(course => {
         courses[course.id] = {
@@ -182,13 +192,13 @@ function onFetchCoursesSuccess(resp) {
             })(course.campus_code),
             instructors: course.instructors.map(instr => instr.id),
             estimatedPositions: course.estimated_count,
-            estimatedEnrol: course.estimated_enrolment,
+            estimatedEnrol: course.current_enrollment,
             positionHours: course.hours,
+            cap: course.cap_enrollment,
+            waitlist: course.num_waitlisted,
             qual: course.qualifications,
             resp: course.duties,
         };
-
-        rounds[course.id] = course.round_id;
     });
 
     return courses;
@@ -358,6 +368,7 @@ function updateCourse(courseId, data, attr) {
 function importChass(data) {
     return postHelper(
         '/import/chass',
+        { chass_json: data },
         data,
         () => {
             appState.setImporting(false, true);
@@ -367,15 +378,22 @@ function importChass(data) {
     ).catch(() => appState.setImporting(false));
 }
 
-// extract and display a message which is sent in the (JSON) body of a response
-function showMessageInJsonBody(resp) {
-    if (resp.message != null) {
-        appState.notify(resp.message);
-    } else {
-        resp.json().then(res => {
-            appState.alert(res.message);
-        });
-    }
+// send enrolment data
+function importEnrolment(data) {
+    appState.setFetchingCoursesList(true);
+
+    return postHelper(
+        '/import/enrollment',
+        { enrollment_data: data },
+        showMessageInJsonBody,
+        showMessageInJsonBody
+    )
+        .then(getCourses)
+        .then(courses => {
+            appState.setCoursesList(courses);
+            appState.successFetchingCoursesList();
+        })
+        .catch(() => appState.setFetchingCoursesList(false));
 }
 
 // unlock a single assignment
@@ -434,6 +452,7 @@ export {
     updateCourse,
     noteApplicant,
     importChass,
+    importEnrolment,
     unlockAssignment,
     exportOffers,
 };

@@ -1,27 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Grid } from 'react-bootstrap';
+import { Grid, Panel, ListGroup } from 'react-bootstrap';
 import { CourseList } from './courseList.js';
 import { CourseForm } from './courseForm.js';
 
 class Courses extends React.Component {
-    render() {
-        let nullCheck = this.props.isCoursesListNull() || this.props.isInstructorsListNull();
-        if (nullCheck) {
-            return <div id="loader" />;
-        }
-
-        let fetchCheck = this.props.fetchingCourses() || this.props.fetchingInstructors();
-        let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
-
-        return (
-            <Grid fluid id="courses-grid">
-                <CourseList {...this.props} />
-                <CourseForm {...this.props} />
-            </Grid>
-        );
-    }
-
     selectThisTab() {
         if (this.props.getSelectedNavTab() != this.props.navKey) {
             this.props.selectNavTab(this.props.navKey);
@@ -34,6 +17,33 @@ class Courses extends React.Component {
 
     componentWillUpdate() {
         this.selectThisTab();
+    }
+
+    render() {
+        let nullCheck = this.props.isCoursesListNull() || this.props.isInstructorsListNull();
+        if (nullCheck) {
+            return <div id="loader" />;
+        }
+
+        let fetchCheck = this.props.fetchingCourses() || this.props.fetchingInstructors();
+        let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
+
+        let courses = Object.entries(this.props.getCoursesList());
+        courses.sort(([A, valA], [B, valB]) => (valA.code < valB.code ? -1 : 1));
+
+        return (
+            <Grid fluid id="courses-grid">
+                <CourseList courses={courses} />
+
+                <Panel id="course-form">
+                    <ListGroup fill>
+                        {courses.map(([key, course]) =>
+                            <CourseForm key={key} courseId={key} course={course} {...this.props} />
+                        )}
+                    </ListGroup>
+                </Panel>
+            </Grid>
+        );
     }
 }
 

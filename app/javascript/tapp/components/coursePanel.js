@@ -226,16 +226,17 @@ const DraggableHeader = props => {
     return (
         <div
             className="panel-heading"
+            title="assignmentCount /[estimatedPositions]  [estimatedEnrolment]"
             draggable={true}
             onDragStart={e => {
                 // send this course ID to an element that this panel is dragged over
                 e.dataTransfer.setData('text', props.course);
             }}>
             {course.code}&emsp;{props.getCourseAssignmentCount(props.course)}&nbsp;/
-            {course.estimatedPositions}
+            {course.estimatedPositions}&emsp;{course.estimatedEnrol}
             <i
                 className="fa fa-close"
-                style={{ float: 'right' }}
+                style={{ float: 'right', cursor: 'pointer' }}
                 onClick={() => props.toggleSelectedCourse(props.course)}
             />
         </div>

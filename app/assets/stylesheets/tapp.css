@@ -272,16 +272,16 @@ footer div p {
     --text-input-height: 30px;
     --sep-width: 10px; /* width of margin between columns */
     --col-1-width: 220px; /* immutable course information */
-    --col-2-width: 120px; /* numerical field labels */
-    --col-3-width: 70px; /* numerical fields */
-    --col-4-width: 220px; /* instructor form */
+    --col-2-4-width: 80px; /* numerical field labels */
+    --col-3-5-width: 60px; /* numerical fields */
+    --col-6-width: 240px; /* instructor form */
     /* qualifications and responsibilities text areas */
-    --col-5-6-width: calc(
+    --col-7-8-width: calc(
         calc(
                 100vw -
                     calc(
-                        var(--course-list-panel-width) + var(--col-1-width) + var(--col-2-width) +
-                            var(--col-3-width) + var(--col-4-width) + var(--sep-width)*5 + 170px
+                        var(--course-list-panel-width) + var(--col-1-width) + var(--col-2-4-width)*2 +
+                            var(--col-3-5-width)*2 + var(--col-6-width) + var(--sep-width)*5 + 170px
                     )
             ) / 2
     );
@@ -296,10 +296,12 @@ footer div p {
 .form_table .course {
     font-weight: bold;
 }
-/* margin between text boxes in the first three columns */
-.form_table #col-1 p + p,
-.form_table #col-2 p + p,
-.form_table #col-3 form + form {
+/* margin between text boxes in the first five columns */
+.form_table .col-1 p + p,
+.form_table .col-2 p + p,
+.form_table .col-4 p + p,
+.form_table .col-3 form + form,
+.form_table .col-5 form + form {
     margin-top: 5px;
 }
 
@@ -318,48 +320,38 @@ footer div p {
 }
 
 /* immutable course information */
-.form_table #col-1 {
+.form_table .col-1 {
     width: var(--col-1-width);
 }
 
 /* numerical field labels */
-.form_table #col-2 {
-    width: var(--col-2-width);
+.form_table .col-2,
+.form_table .col-4 {
+    width: var(--col-2-4-width);
 }
-.form_table #col-2 p {
+.form_table .col-2 p,
+.form_table .col-4 p {
     height: var(--text-input-height);
     line-height: var(--text-input-height);
 }
-.form_table #col-2 p b {
+.form_table .col-2 p b,
+.form_table .col-4 p b {
     display: inline-block;
     vertical-align: middle;
     line-height: 1em;
 }
 
 /* numerical fields */
-.form_table #col-3 {
-    width: var(--col-3-width);
+.form_table .col-3,
+.form_table .col-5 {
+    width: var(--col-3-5-width);
 }
 
-/* qualifications and responsibilities text areas */
-.form_table #col-5,
-.form_table #col-6 {
-    width: var(--col-5-6-width);
-}
-
-/* last 3 columns */
-.form_table textarea {
-    width: 100%;
-    height: 80px;
-    float: left;
-    resize: none;
+.form_table .col-6 {
+    width: var(--col-6-width);
 }
 
 /* instructor form */
-.form_table #col-4 {
-    width: var(--col-4-width);
-}
-
 .instructor_form {
     border: #ccc 1px solid;
     height: 80px;
@@ -392,6 +384,20 @@ footer div p {
     border: none;
 }
 
+/* qualifications and responsibilities text areas */
+.form_table .col-7,
+.form_table .col-8 {
+    width: var(--col-7-8-width);
+}
+
+/* last 3 columns */
+.form_table textarea {
+    width: 100%;
+    height: 80px;
+    float: left;
+    resize: none;
+}
+
 /* for summary view */
 #summary-grid .panel-group {
     max-height: var(--main-div-height);
@@ -414,15 +420,19 @@ footer div p {
 }
 
 #summary-grid #utils #import {
-    flex: 0.8;
+    flex: 1;
 }
 
 #summary-grid #utils #export {
-    flex: 2;
+    flex: 1.5;
 }
 
 #summary-grid #utils #release {
     flex: 0;
+}
+
+#summary-grid #import #file {
+    margin-top: 5px;
 }
 
 /* for statistics panel in summary view */
@@ -431,8 +441,8 @@ footer div p {
 }
 
 #summary-grid #stats .panel-body {
-    /* we subtract the height of the utilities panel and stats panel header */
-    max-height: calc(var(--main-div-height) - 77px - 40px - 10px);
+    /* we subtract the height of the utilities panel, the margin below it, and the stats panel header */
+    max-height: calc(var(--main-div-height) - 91px - 10px - 40px);
     overflow: auto;
 }
 
@@ -468,11 +478,11 @@ footer div p {
     top: 76px !important;
 }
 #help .popover-content {
-    padding: 3 !important;
+    padding: 2px 12px 2px 2px !important;
     width: 300px;
     height: 400px;
 }
-#help .popover-content textarea {
+#help .popover-content pre {
     width: calc(100% - 17px);
     height: 100%;
     resize: none;

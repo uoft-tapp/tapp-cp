@@ -1,18 +1,7 @@
 import React from 'react';
-import {
-    Grid,
-    Panel,
-    PanelGroup,
-    Form,
-    FormGroup,
-    ControlLabel,
-    FormControl,
-    Button,
-    Well,
-    Table,
-    OverlayTrigger,
-    Popover,
-} from 'react-bootstrap';
+import { Grid, Panel, PanelGroup, Form, Button, Well, Table } from 'react-bootstrap';
+import { ExportForm } from './exportForm.js';
+import { ImportForm } from './importForm.js';
 
 class Summary extends React.Component {
     render() {
@@ -27,7 +16,11 @@ class Summary extends React.Component {
         return (
             <Grid fluid id="summary-grid" style={cursorStyle}>
                 <PanelGroup>
-                    <Utilities {...this.props} />
+                    <Panel header="Utilities" id="utils">
+                        <ImportForm {...this.props} />
+                        <ExportForm {...this.props} />
+                        <ReleaseForm {...this.props} />
+                    </Panel>
                     <Stats {...this.props} />
                 </PanelGroup>
             </Grid>
@@ -222,7 +215,7 @@ const ReleaseForm = props =>
                 props.alert(
                     '<b>Release assignments</b> This functionality is not currently supported.'
                 )}>
-            Release assignments
+            Release<br />assignments
         </Button>
     </Form>;
 
@@ -272,7 +265,9 @@ const Stats = props => {
                 <thead>
                     <tr>
                         <th>Course</th>
-                        <th>Est. enrolment</th>
+                        <th>Cap</th>
+                        <th>Enrolment</th>
+                        <th>Waitlist</th>
                         <th>Applicants</th>
                         <th>Assignments</th>
                         <th>Assigned hours</th>
@@ -315,7 +310,13 @@ const PerCourseStats = props => {
                 {props.courses[props.course].code}
             </td>
             <td>
+                {props.courses[props.course].cap}
+            </td>
+            <td>
                 {props.courses[props.course].estimatedEnrol}
+            </td>
+            <td>
+                {props.courses[props.course].waitlist}
             </td>
             <td>
                 {applications.length}
@@ -334,53 +335,5 @@ const PerCourseStats = props => {
         </tr>
     );
 };
-
-const chassFormat = `{
-    "courses": [
-      {
-        "instructor": [{},...],
-        "last_updated": datetime,
-        "end_nominations": string,
-        "status": integer,
-        "end_posting": datetime,
-        "start_posting": datetime,
-        "total_hours": integer,
-        "duties": string,
-        "qualifications": string,
-        "tutorials": string,
-        "dates": string,
-        "n_hours": string,
-        "n_positions": integer,
-        "enrollment": integer,
-        "round_id": ,
-        "course_name": string,
-        "course_id": string
-      },...],
-    "applicants": [
-      {
-        "app_id": string,
-        "utorid": string,
-        "first_name": string,
-        "last_name": string,
-        "email": string,
-        "phone": string,
-        "student_no": string,
-        "address": string,
-        "ta_training": (Y/N),
-        "access_acad_history": (Y/N),
-        "dept": string,
-        "program_id": string,
-        "yip": string,
-        "course_preferences": string,
-        "ta_experience": "string,
-        "academic_qualifications": string,
-        "technical_skills": string,
-        "availability": string,
-        "other_info": string,
-        "special_needs": string,
-        "last_updated": datetime,
-        "courses": [string, ...]
-      },...]
-  }`;
 
 export { Summary };
