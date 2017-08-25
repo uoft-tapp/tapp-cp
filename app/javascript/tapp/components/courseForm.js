@@ -12,14 +12,11 @@ class CourseForm extends React.Component {
                     <tbody>
                         <tr>
                             <td className="col-1">
-                                <p>
-                                    <input
-                                        type="text"
-                                        value={this.props.course.code}
-                                        className="course"
-                                        readOnly
-                                        disabled
-                                    />
+                                <p className="course">
+                                    {this.props.course.code}&nbsp;
+                                    <Badge className={'round-' + this.props.course.round}>
+                                        {this.props.course.round}
+                                    </Badge>
                                 </p>
                                 <p>
                                     <input
