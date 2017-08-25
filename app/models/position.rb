@@ -1,15 +1,8 @@
-require 'net/http'
-class Position < ActiveResource::Base
-  include Model
-  self.site = "http://#{ENV['TAPP']}:#{ENV['TAPP_PORT']}/"
+class Position < ApplicationRecord
+  has_many :assignments
+  has_many :preferences
+  has_and_belongs_to_many :instructors
+  belongs_to :session
 
-  def self.find_by_position(course_id, round_id)
-    Position.all.each do |position|
-      position = position.json
-      if position[:position]==course_id && position[:round_id]==round_id
-        return position
-      end
-    end
-    return nil
-  end
+  validates_uniqueness_of :position, scope: :round_id
 end

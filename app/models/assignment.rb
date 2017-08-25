@@ -1,5 +1,5 @@
-require 'net/http'
-class Assignment < ActiveResource::Base
-  include Model
-  self.site = "http://#{ENV['TAPP']}:#{ENV['TAPP_PORT']}/"
+class Assignment < ApplicationRecord
+  belongs_to :applicant
+  belongs_to :position
+  validates :hours, numericality: true 
 end
