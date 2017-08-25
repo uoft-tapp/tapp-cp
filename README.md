@@ -23,6 +23,7 @@ cp dev.env.default .env #for developers, different command for production
 Once that's out of the way, clone this repo, navigate into the cloned
 directory, and run
 
+
 ```
 docker-compose up
 ```
@@ -104,8 +105,19 @@ The  first time  we deploy  the combined  app (sept/2017,  delete this
 section once  this has  been accomplished) we  need to  import Karen's
 assignments from the tapp app running on docker.
 
-We have a few ideas on how to do this, michelle and/or gabrielle should be consulted.
-(nb aug 25 email from matz on this topic)
+
+### michelle's recipe for the one-time migration
+```
+[3:47 PM] 
+michellemtchai @everyone The dump of the TAPP data to TAPP-CP works! The trick was to keep the `POSTGRES_DB=tapp_production` and `POSTGRES_USER=tapp` in the `.env` file. This way `tapp-cp` takes the data from the dump as the main database. The steps to get the TAPP data to TAPP-CP is the following:
+1) `docker-compose down -v`
+2) `docker-compose up`
+3) do `Ctrl+C` to close docker
+4) `docker-compose run rails-app rake db:drop`
+5) `cat filename | docker exec -i tappcp_postgres_1 psql -U postgres`
+6) `docker-compose up`
+7) `docker-compose run rails-app rake db:migrate`
+```
 
 ## Deployment <a id="deployment"></a>
 
