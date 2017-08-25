@@ -266,33 +266,35 @@ class ChassImporter
     if dates
       dates = dates.split(" to ")
       if dates.size == 2
-        start_date = DateTime.parse(dates[0])
-        end_date =  DateTime.parse(dates[1])
-        data ={
-          start_date: start_date,
-          end_date: end_date,
-          year: start_date.strftime("%Y"),
-          semester: get_semester(start_date),
-        }
-        exists = "Session #{data[:semester]}, #{data[:year]} already exists"
-        ident = {year: data[:year], semester: data[:semester]}
-        session = insertion_helper(Session, data, ident, exists)
-        return session.id
+        return get_session(dates)
       else
         dates = dates[0].split(" - ")
-        start_date = DateTime.parse(dates[0])
-        end_date =  DateTime.parse(dates[1])
-        data ={
-          start_date: start_date,
-          end_date: end_date,
-          year: start_date.strftime("%Y"),
-          semester: get_semester(start_date),
-        }
-        exists = "Session #{data[:semester]}, #{data[:year]} already exists"
-        ident = {year: data[:year], semester: data[:semester]}
-        session = insertion_helper(Session, data, ident, exists)
-        return session.id
+        if dates.size == 2
+          return get_session(dates)
+        else
+          return nil
+        end
       end
+    else
+      return nil
+    end
+  end
+
+  def get_session(dates)
+    start_date = DateTime.parse(dates[0])
+    end_date =  DateTime.parse(dates[1])
+    semester = get_semester(start_date)
+    if semester
+      data ={
+        start_date: start_date,
+        end_date: end_date,
+        year: start_date.strftime("%Y"),
+        semester: semester,
+      }
+      exists = "Session #{data[:semester]}, #{data[:year]} already exists"
+      ident = {year: data[:year], semester: data[:semester]}
+      session = insertion_helper(Session, data, ident, exists)
+      return session.id
     else
       return nil
     end

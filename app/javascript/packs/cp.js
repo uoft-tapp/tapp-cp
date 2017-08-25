@@ -22,40 +22,40 @@ import { Admin } from '../cp/components/admin.js';
 import { Navigation } from '../cp/components/navbar.js';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    data.fetcher();
-  }
+        data.fetcher();
+    }
 
-  componentDidMount() {
-    appState.subscribe(this.forceUpdate.bind(this, null));
-  }
+    componentDidMount() {
+        appState.subscribe(this.forceUpdate.bind(this, null));
+    }
 
-  render() {
-    return <RouterInst proto={appState} />;
-  }
+    render() {
+        return <RouterInst proto={appState} />;
+    }
 }
 
 function RouterInst(props) {
-  return (
-    <Router basename="cp">
-      <div>
-        <Navigation {...props} />
-        <Switch>
-          <Route
-            path={rconfig.admin.route}
-            render={() => <Admin navKey={rconfig.admin.key} {...props} />}
-          />
-          <Route
-            path={rconfig.cp.route}
-            render={() => <Contract navKey={rconfig.cp.key} {...props} />}
-          />
-        </Switch>
-      </div>
-    </Router>
-  );
+    return (
+        <Router basename="cp">
+            <div>
+                <Navigation {...props} />
+                <Switch>
+                    <Route
+                        path={rconfig.admin.route}
+                        render={() => <Admin navKey={rconfig.admin.key} {...props} />}
+                    />
+                    <Route
+                        path={rconfig.cp.route}
+                        render={() => <Contract navKey={rconfig.cp.key} {...props} />}
+                    />
+                </Switch>
+            </div>
+        </Router>
+    );
 }
 document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(<App />, document.getElementById('root'));
+    ReactDOM.render(<App />, document.getElementById('root'));
 });

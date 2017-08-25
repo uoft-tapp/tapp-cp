@@ -1,15 +1,16 @@
 class AppController < ApplicationController
+  protect_from_forgery with: :exception
   include Mangler
 
   ''' TAPP functions '''
   def tapp
-    render :main, layout: false
+    render :tapp , layout: false
   end
 
   ''' CP functions '''
-  
+
   def cp
-    render :main, layout: false
+    render :cp, layout: false
   end
 
   def test
