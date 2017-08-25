@@ -14,6 +14,13 @@ const getSelectedOffers = () =>
         .map(box => box.id);
 
 class ControlPanel extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // most recently-clicked checkbox, stored to allow range selection
+        this.lastClicked = null;
+    }
+
     render() {
         const role = this.props.appState.getCurrentUserRole();
 
@@ -50,6 +57,28 @@ class ControlPanel extends React.Component {
                         defaultChecked={false}
                         className="offer-checkbox"
                         id={p.offerId}
+                        onClick={event => {
+			    // range selection using shift key
+			    if (this.lastClicked && event.shiftKey) {
+				let first = false, last = false;
+
+				Array.prototype.forEach.call(getCheckboxElements(), box => {
+				    if (!first && (box.id == p.offerId || box.id == this.lastClicked)) {
+					first = true;
+					box.checked = true;
+				    }
+
+				    if (first && !last) {
+					if (box.id == p.offerId || box.id == this.lastClicked) {
+					    last = true;
+					}
+					box.checked = true;
+				    }
+				});
+			    }
+
+			    this.lastClicked = p.offerId;
+                        }}
                     />,
 
                 style: { width: 0.01, textAlign: 'center' },
