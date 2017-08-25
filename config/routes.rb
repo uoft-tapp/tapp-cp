@@ -45,6 +45,6 @@ Rails.application.routes.draw do
     status of another student.
   '''
   get "pb/:mangled" => "app#student_view"
-  get "pb/:mangled/pdf" => "offers#get_contract_pdf"
+  get "pb/:mangled/pdf" => "offers#get_contract_mangled"
   post "pb/:mangled/:status" => "offers#set_status_mangled"
 end

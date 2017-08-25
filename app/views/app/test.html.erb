@@ -90,8 +90,8 @@
       <% @sessions.each do |s| %>
         <li>
           <h2><%= s[:semester] %> <%= s[:year] %></h2>
-          <p>Start Date: <%= (Date.parse s[:start_date]).strftime("%B %e, %Y") %></p>
-          <p>End Date: <%= (Date.parse s[:end_date]).strftime("%B %e, %Y") %></p>
+          <p>Start Date: <%= s[:start_date].in_time_zone('Eastern Time (US & Canada)').strftime("%B %e, %Y") %></p>
+          <p>End Date: <%= s[:end_date].in_time_zone('Eastern Time (US & Canada)').strftime("%B %e, %Y") %></p>
           <p>Pay: <input type="number" value="<%= "%.2f" % s[:pay]%>" step="0.01" min="0.00" onblur="updateSession(this, <%=s[:id]%>)"/></p>
         </li>
       <% end %>

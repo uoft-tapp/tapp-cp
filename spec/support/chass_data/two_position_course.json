@@ -1,0 +1,42 @@
+{
+    "courses": [
+        {
+            "course_id": "CSC108H1S - Head TA",
+            "course_name": "Intro to Comp Prog",
+            "round_id": "110",
+            "enrollment": null,
+            "n_positions": "2",
+            "n_hours": "54",
+            "dates": null,
+            "tutorials": null,
+            "qualifications": "Demonstrated excellent English communication skills. Demonstrated excellent organizational skills. Experience with Python, at the level of CSC148 or equivalent. At least one year of prior TA experience in first year courses is required, experience with CSC108 is preferred. Graduate applicants preferred.",
+            "duties": "Assist course coordinator with TA management and course administration. Hold marking meetings on Friday afternoons. Mentor and provide feedback to other TAs.",
+            "total_hours": null,
+            "start_posting": null,
+            "end_posting": null,
+            "status": "1",
+            "dates": "September 1, 2017 to December 31, 2017",
+            "end_nominations": null,
+            "last_updated": "2017-05-31 10:55:56"
+        },
+        {
+            "course_id": "CSC108H1S - Student-Facing TA",
+            "course_name": "Intro to Comp Prog",
+            "round_id": "110",
+            "enrollment": null,
+            "n_positions": "19",
+            "n_hours": "54",
+            "dates": null,
+            "tutorials": null,
+            "qualifications": "Experience with programming, such as by completing a 200-level CSC course, or by achieving excellent marks in multiple 100-level CSC courses, or equivalent. Experience with Python, at the level of CSC 148 or equivalent. Must be enrolled in or have completed a computer science degree, or equivalent. Must be interested in teaching beginner programmers. Willing to try different approaches when explaining simple concepts. TAs should be available during at least one of the CSC 108 lecture times (MWF10-11, W6-9).",
+            "duties": "Attend lectures to assist in classroom activities. Prepare for each week by doing online programming activities. Some TAs may hold office hours or monitor discussion forums.",
+            "total_hours": null,
+            "start_posting": null,
+            "end_posting": null,
+            "status": "1",
+            "end_nominations": null,
+            "last_updated": "2017-05-31 10:55:56"
+        }
+    ],
+    "applicants": []
+}

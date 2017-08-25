@@ -1,20 +1,21 @@
 class AppController < ApplicationController
+  protect_from_forgery with: :exception
   include Mangler
 
   ''' TAPP functions '''
   def tapp
-    render :main, layout: false
+    render :tapp , layout: false
   end
 
   ''' CP functions '''
-  
+
   def cp
-    render :main, layout: false
+    render :cp, layout: false
   end
 
   def test
     @offers = Offer.all.map {|o| o.format }
-    @sessions = Session.all.map {|s| s.json }
+    @sessions = Session.all
     render :test, layout: false
   end
 
@@ -36,7 +37,7 @@ class AppController < ApplicationController
   def show_decision_view(params)
     applicant = Applicant.find_by_utorid(params[:utorid])
     if applicant
-      position = Position.find(params[:position_id]).json
+      position = Position.find(params[:position_id])
       if position
         offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
         if offer
@@ -44,7 +45,7 @@ class AppController < ApplicationController
             @offer = offer.format.except(:id).merge({mangled: offer[:link]})
             render :decision, layout: false
           else
-            render status: 404, json: {message: "Offer #{offer.json[:id]} hasn't been sent."}
+            render status: 404, json: {message: "Offer #{offer[:id]} hasn't been sent."}
           end
         else
           render status: 404, json: {message: "TAship for #{position[:position]} was not offered to #{applicant[:first_name]} #{applicant[:last_name]}."}
