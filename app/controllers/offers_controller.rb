@@ -199,7 +199,7 @@ class OffersController < ApplicationController
 
   def update_status(offer, status)
     if status[:action]=="accept"
-      offer.update_attributes!({status: status[:name], signature: status[:signature]})
+      offer.update_attributes!({status: status[:name], signature: status[:signature], accept_datetime: DateTime.now})
     else
       offer.update_attributes!({status: status[:name]})
     end

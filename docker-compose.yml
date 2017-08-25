@@ -16,6 +16,8 @@ services:
       EMAIL_USER: ${EMAIL_USER}
       TA_COORD: ${TA_COORD}
       RECIPIENT: ${RECIPIENT}
+      HR_ADMIN_EMAIL: ${HR_ADMIN_EMAIL}
+      HR_ADMIN_NAME: ${HR_ADMIN_NAME}
     networks:
       - default
     ports:

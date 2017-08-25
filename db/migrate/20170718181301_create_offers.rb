@@ -14,7 +14,8 @@ class CreateOffers < ActiveRecord::Migration[5.1]
       t.datetime :send_date, null: true
       t.integer :nag_count, default: 0
       t.string :signature
-
+      t.datetime :accept_datetime, default: nil
+      
       t.timestamps
     end
   end
