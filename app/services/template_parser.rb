@@ -54,7 +54,7 @@ class TemplateParser
   end
 
   def format_time(time, form)
-    time = (Date.parse time).in_time_zone('Eastern Time (US & Canada)')
+    time = time.in_time_zone('Eastern Time (US & Canada)')
     case form
     when 1
       return time.strftime("%B %e, %Y")

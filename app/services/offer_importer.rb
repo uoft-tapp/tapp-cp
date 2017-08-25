@@ -13,11 +13,10 @@ class OfferImporter
 
   def import_assignments
     Assignment.all.each do |assignment|
-      assignment = assignment.json
       if assignment[:export_date]
-        position = Position.find(assignment[:position_id]).json
-        applicant = Applicant.find(assignment[:applicant_id]).json
-        session = Session.find(position[:session_id]).json
+        position = Position.find(assignment[:position_id])
+        applicant = Applicant.find(assignment[:applicant_id])
+        session = Session.find(position[:session_id])
 
         ident = {position_id: position[:id], applicant_id: assignment[:applicant_id]}
         exists = "offer with position #{position[:position]} for applicant #{applicant[:utorid]} already exists"

@@ -12,10 +12,10 @@ class Offer < ApplicationRecord
 
   def format
     offer = self.json
-    position = (Position.find(self[:position_id])).json
-    applicant = Applicant.find(self[:applicant_id]).json
-    instructors = JSON.parse(position[:instructors].to_json, symbolize_names: true)
-    session = Session.find(position[:session_id]).json
+    position = Position.find(self[:position_id])
+    applicant = Applicant.find(self[:applicant_id])
+    instructors = position.instructors
+    session = Session.find(position[:session_id])
     data = {
       position: position[:position],
       applicant: applicant,

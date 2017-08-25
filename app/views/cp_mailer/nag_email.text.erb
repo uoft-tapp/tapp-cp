@@ -1,7 +1,7 @@
 Dear <%= @contract[:applicant][:first_name] %> <%= @contract[:applicant][:last_name] %>,
 ====================================
 
-We have offered you a position as a TA for <%= @offer[:position] %>, but we have not yet received notice of whether you plan to accept or reject the offer.
+We have offered you a position as a TA for <%= @contract[:position] %>, but we have not yet received notice of whether you plan to accept or reject the offer.
 
 Until you have accepted the offer, we cannot pay you. If you have any questions, please contact the course instructor or the TA coordinator at tacoord@cs.toronto.edu. If you have not accept your offer by <%= @contract[:deadline] %>, your offer will be revoked. If you plan to reject the offer, please do so promptly. This is your <%= @contract[:nag_count] %><%= @contract[:nag_suffix] %> warning.
 
