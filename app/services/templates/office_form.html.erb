@@ -6,7 +6,7 @@
 
 <tablerow>First Name:<%= @offer[:applicant][:first_name] %>:
 
-<tablerow>ID Number: <%= @offer[:applicant][:student_number] %>:
+<tablerow>Student ID Number: <%= @offer[:applicant][:student_number] %>:
 
 <b>Returning Employee:</b>
 
@@ -16,7 +16,7 @@
 
 <tablerow>Wage Type: 01 15
 
-<tablerow>Amount: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:session][:pay]) %>
+<tablerow>Amount/Month: <%= '%.2f' % ((@offer[:hours]/4)* @offer[:session][:pay]) %>
 
 <tablerow>Number/Unit: <%= '%.2f' % (@offer[:hours]/4) %>
 
@@ -36,10 +36,14 @@
 
 <tablerow>Province: :Country: :
 
-<tablerow>Federal Tax: :Provincial Tax: :Tax Exemption: :
+<b>Banking Details (Check one of the below):</b>
 
-<tablerow>Bank Key: :Bank Account: :
+<tablerow>Void Cheque: :Direct Deposit: :
 
 <tablerow>Position: :Fund Centre: :Work Contract: :
 
 <tablerow>UofT Student number: <%= @offer[:applicant][:student_number] %>
+
+<tablerow>Citizenship: :Study Permit (Non-Canadian): :
+
+<tablerow>HRIS Position#: <%= @offer[:applicant][:program_id] %>:CC: :CFC: :Work Contract: K5
