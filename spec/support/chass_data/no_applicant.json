@@ -1,0 +1,25 @@
+{
+    "courses": [
+        {
+            "course_id": "CSC100H1S",
+            "course_name": "First Year Office Hour TA",
+            "round_id": "110",
+            "enrollment": null,
+            "n_positions": "5",
+            "n_hours": "54",
+            "dates": null,
+            "tutorials": null,
+            "qualifications": "Must be enrolled in or have completed a computer science degree, or equivalent. Must meet the qualifications to TA *ALL* of CSC 108, 148, and 165 (see CSC108H1-B, CSC148H1, CSC165H1 qualifications). Enthusiasm and patience for face-to-face teaching of beginners is required. Experience with CSC 104 or Racket preferred.",
+            "duties": "Hold office hours on a weekly basis to assist students taking 100-level CSC courses.",
+            "total_hours": "270",
+            "start_posting": null,
+            "end_posting": null,
+            "status": "1",
+            "dates": "September 1, 2017 to December 31, 2017",
+            "end_nominations": null,
+            "last_updated": "2017-05-31 10:55:56",
+            "instructor": []
+        }
+    ],
+    "applicants": []
+}

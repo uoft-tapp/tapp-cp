@@ -1,18 +1,89 @@
 require 'rails_helper'
 
 RSpec.describe OffersController, type: :controller do
+  let(:session) do
+    Session.create!(
+      semester: "Fall",
+      year: 2017,
+      start_date: "2017-09-01 00:00:00 UTC",
+      end_date: "2017-12-31 00:00:00 UTC",
+    )
+  end
+
+  let(:position) do
+    Position.create!(
+      position: "CSC104H1S",
+      round_id: 110,
+      open: true,
+      campus_code: 1,
+      course_name: "Computational Thinking",
+      current_enrollment: nil,
+      duties: "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted.",
+      qualifications: "Must be enrolled in, or have completed, an undergraduate program in computer science or education (or equivalent). Demonstrated excellent English communication skills. Patience teaching technical concepts to students with a wide variety of non-technical backgrounds. Must have completed or be in the process of completing a course involving functional programming. Must be able to write code in the Intermediate Student Language of Racket, and trace it in the same manner as the Intermediate Student Language Stepper of the DrRacket development environment.",
+      hours: 54,
+      estimated_count: 17,
+      estimated_total_hours: 918,
+      session_id: session.id,
+    )
+  end
+
+  let(:applicant_1) do
+    Applicant.create!(
+    utorid: "cookie222",
+    app_id: "11",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+
+  let(:applicant_2) do
+    Applicant.create!(
+    utorid: "cookie223",
+    app_id: "14",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+
+  let(:applicant_3) do
+    Applicant.create!(
+    utorid: "cookie221",
+    app_id: "16",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+
   let(:offer) do
     Offer.create!(
-        position_id: 6,
-        applicant_id: 1,
+        position_id: position[:id],
+        applicant_id: applicant_1[:id],
         hours: 60,
         link: "mangled-link",
     )
   end
   let(:sent_offer) do
     Offer.create!(
-        position_id: 6,
-        applicant_id: 2,
+        position_id: position[:id],
+        applicant_id: applicant_2[:id],
         hours: 60,
         status: "Pending",
         link: "mangled-link",
@@ -20,8 +91,8 @@ RSpec.describe OffersController, type: :controller do
   end
   let(:accepted_offer) do
     Offer.create!(
-        position_id: 6,
-        applicant_id: 3,
+        position_id: position[:id],
+        applicant_id: applicant_3[:id],
         hours: 60,
         status: "Accepted",
         link: "mangled-link",
@@ -78,16 +149,33 @@ RSpec.describe OffersController, type: :controller do
     end
 
     context "nag" do
-      before(:each) do
-        expect(offer[:nag_count]).to eq(0)
+      context "when offer is not Pending" do
+        before(:each) do
+          expect(offer[:nag_count]).to eq(0)
+        end
+        it "return a message of the number of time a applicant has been nagged at" do
+          post :batch_email_nags, params: {contracts: [offer[:id]]}
+          offer.reload
+          expect(response.status).to eq(404)
+          expect(offer[:nag_count]).to eq(0)
+          applicant = Applicant.find(offer[:applicant_id])
+          position = Position.find(offer[:position_id])
+          res = ({ message: "Exceptions:\n- Applicant #{applicant[:first_name]} #{applicant[:last_name]}'s nag for Position #{position[:position]} was not sent because it is not in Pending status."}).to_json
+          expect(response.body).to eq(res)
+        end
       end
-      it "return a message of the number of time a applicant has been nagged at" do
-        post :batch_email_nags, params: {contracts: [offer[:id]]}
-        offer.reload
-        expect(response.status).to eq(200)
-        expect(offer[:nag_count]).to eq(1)
-        res = ({ message: "You've sent the nag emails."}).to_json
-        expect(response.body).to eq(res)
+      context "when offer is Pending" do
+        before(:each) do
+          expect(sent_offer[:nag_count]).to eq(0)
+        end
+        it "return a message of the number of time a applicant has been nagged at" do
+          post :batch_email_nags, params: {contracts: [sent_offer[:id]]}
+          sent_offer.reload
+          expect(response.status).to eq(200)
+          res = ({ message: "You've sent the nag emails."}).to_json
+          expect(response.body).to eq(res)
+          expect(sent_offer[:nag_count]).to eq(1)
+        end
       end
     end
 

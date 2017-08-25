@@ -1,10 +1,15 @@
 require 'rails_helper'
+
 RSpec.describe SessionsController, type: :controller do
 
   let(:session) do
-    Session.all.first.json
+    Session.create!(
+      semester: "Fall",
+      year: 2017,
+      start_date: "2017-09-01 00:00:00 UTC",
+      end_date: "2017-12-31 00:00:00 UTC",
+    )
   end
-
 
   describe "GET /sessions/" do
     context "when expected" do
@@ -32,26 +37,25 @@ RSpec.describe SessionsController, type: :controller do
   end
 
   describe "PATCH /sessions/:id" do
+    before(:each) do
+      expect(session[:pay]).to eq(0.0)
+    end
+
     context "when a number" do
       it "updates the session" do
-        pay = session[:pay]
         patch :update, params: {id: session[:id], pay: 100}
-        session = Session.all.first.json
+        session.reload
         expect(response.status).to eq(204)
         expect(session[:pay]).to eq(100)
-        patch :update, params: {id: session[:id], pay: pay}
-        session = Session.all.first.json
-        expect(response.status).to eq(204)
-        expect(session[:pay]).to eq(pay)
       end
     end
 
     context "when not a number" do
       it "does not update the session" do
-        pay = session[:pay]
         patch :update, params: {id: session[:id], pay: "poop"}
+        session.reload
         expect(response.status).to eq(204)
-        expect(session[:pay]).to eq(pay)
+        expect(session[:pay]).to eq(0.0)
       end
     end
   end
