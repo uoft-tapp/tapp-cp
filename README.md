@@ -1,5 +1,12 @@
-# CP
-[![Build Status](https://travis-ci.org/uoft-tapp/cp.svg?branch=master)](https://travis-ci.org/uoft-tapp/cp)
+# tapp
+
+[![Build Status](https://travis-ci.org/uoft-tapp/tapp.svg?branch=master)](https://travis-ci.org/uoft-tapp/tapp)
+
+- [FirstDeploymentCombinedCpTappApp](#FirstDeploymentCombinedCpTappApp)
+- [deployment](#deployment)
+- [backup & restore](#backup-restore)
+
+TA assignment and matching application.
 
 ## Starting application
 You should have a reasonably recent version of Docker
@@ -16,11 +23,12 @@ cp dev.env.default .env #for developers, different command for production
 Once that's out of the way, clone this repo, navigate into the cloned
 directory, and run
 
+
 ```
 docker-compose up
 ```
 
-In a new tab, open http://localhost:5000 to see the Rails welcome page!
+In a new tab, open http://localhost:3000 to see the Rails welcome page!
 
 `docker-compose up` has launched two containers: `rails-app`
 and `webpack-dev-server`. The former runs the Rails app, while the latter
@@ -33,7 +41,7 @@ You have full control over Rails code, apply the usual methods. Check the next
 section for details on running commands like `rake …` and `rails …`.
 
 To get you started with React quicker, this app comes preloaded with a simple
-React app. Visiting http://localhost:5000/hello_react will load JavaScript code
+React app. Visiting http://localhost:3000/hello_react will load JavaScript code
 located in `app/javascript/packs/hello_react.jsx`.
 
 ## Running commands
@@ -89,13 +97,32 @@ delete existing data for this project.
 
 To recreate the images the containers boot from, give `docker-compose up` the `--force-recreate` command line option like so:
 
-`docker-compose up --force-recreate`
+`docker-compose up --force-recreate` 
 
+## FirstDeploymentCombinedCpTappApp <a id="FirstDeploymentCombinedCpTappApp"></a>
+
+The  first time  we deploy  the combined  app (sept/2017,  delete this
+section once  this has  been accomplished) we  need to  import Karen's
+assignments from the tapp app running on docker.
+
+
+### michelle's recipe for the one-time migration
+```
+[3:47 PM] 
+michellemtchai @everyone The dump of the TAPP data to TAPP-CP works! The trick was to keep the `POSTGRES_DB=tapp_production` and `POSTGRES_USER=tapp` in the `.env` file. This way `tapp-cp` takes the data from the dump as the main database. The steps to get the TAPP data to TAPP-CP is the following:
+1) `docker-compose down -v`
+2) `docker-compose up`
+3) do `Ctrl+C` to close docker
+4) `docker-compose run rails-app rake db:drop`
+5) `cat filename | docker exec -i tappcp_postgres_1 psql -U postgres`
+6) `docker-compose up`
+7) `docker-compose run rails-app rake db:migrate`
+```
 
 ## Deployment <a id="deployment"></a>
 
 * The Dockerfile contains instructions to set up the image of the container (linux, yarn, npm etc)
-* The `docker-compose` `yml` files setup the services that your container will be using (postgres, rails).
+* The `docker-compose` `yml` files setup the services that your container will be using (postgres, rails). 
 * The [prod|dev].env.default files are read by docker (at build and runtime) and define variables that parametrize the Dockerfile and the docker-compose files.
 
 ### daemon.json
@@ -108,7 +135,7 @@ On our network, `tapp.cs.toronto.edu:/etc/cocker/daemon.json` contains:
 
 ```
 {
- "bip": "ADD-IP"
+ "bip": "192.168.152.1/24"
 }
 ```
 
