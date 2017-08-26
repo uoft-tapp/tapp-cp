@@ -161,7 +161,7 @@ const TempAssignmentRow = props =>
 const Check = props =>
     <i
         className="fa fa-check-circle-o"
-        style={{ color: 'green', fontSize: '20px', verticalAlign: 'middle' }}
+        style={{ color: 'green', fontSize: '20px', verticalAlign: 'middle', cursor: 'pointer' }}
         onClick={props.click}
     />;
 
@@ -169,7 +169,7 @@ const Check = props =>
 const X = props =>
     <i
         className="fa fa-times-circle-o"
-        style={{ color: 'red', fontSize: '20px', verticalAlign: 'middle' }}
+        style={{ color: 'red', fontSize: '20px', verticalAlign: 'middle', cursor: 'pointer' }}
         onClick={props.click}
     />;
 
@@ -177,7 +177,7 @@ const X = props =>
 const Lock = props =>
     <i
         className="fa fa-lock"
-        style={{ fontSize: '20px', verticalAlign: 'middle' }}
+        style={{ fontSize: '20px', verticalAlign: 'middle', cursor: 'pointer' }}
         onClick={props.click}
     />;
 
