@@ -4,6 +4,7 @@ import { Grid, ButtonToolbar, DropdownButton, MenuItem, Button } from 'react-boo
 import { TableMenu } from './tableMenu.js';
 import { Table } from './table.js';
 import { ImportMenu } from './importMenu.js';
+import { SessionsForm } from './sessionsForm.js';
 
 const getCheckboxElements = () => document.getElementsByClassName('offer-checkbox');
 
@@ -14,15 +15,21 @@ const getSelectedOffers = () =>
 
 class ControlPanel extends React.Component {
     render() {
-        let nullCheck = this.props.appState.isOffersListNull();
+        const role = this.props.appState.getCurrentUserRole();
+
+        let nullCheck =
+            role == 'admin'
+                ? this.props.appState.anyNull()
+                : this.props.appState.isOffersListNull();
         if (nullCheck) {
             return <div id="loader" />;
         }
 
-        let fetchCheck = this.props.appState.fetchingOffers();
+        let fetchCheck =
+            role == 'admin'
+                ? this.props.appState.anyFetching()
+                : this.props.appState.fetchingOffers();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
-
-        const role = this.props.appState.getCurrentUserRole();
 
         this.config = [
             {
@@ -49,15 +56,15 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'Last Name',
-                data: p => p.offer.get('last_name'),
-                sortData: p => p.get('last_name'),
+                data: p => p.offer.get('lastName'),
+                sortData: p => p.get('lastName'),
 
                 style: { width: 0.09 },
             },
             {
                 header: 'First Name',
-                data: p => p.offer.get('first_name'),
-                sortData: p => p.get('first_name'),
+                data: p => p.offer.get('firstName'),
+                sortData: p => p.get('firstName'),
 
                 style: { width: 0.06 },
             },
@@ -70,36 +77,36 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'Student Number',
-                data: p => p.offer.get('student_number'),
-                sortData: p => p.get('student_number'),
+                data: p => p.offer.get('studentNumber'),
+                sortData: p => p.get('studentNumber'),
 
                 style: { width: 0.06 },
             },
             {
                 header: 'Position',
-                data: p => p.offer.getIn(['contract_details', 'position']),
-                sortData: p => p.getIn(['contract_details', 'position']),
+                data: p => p.offer.get('position'),
+                sortData: p => p.get('position'),
 
                 filterLabel: 'Position',
                 filterCategories: this.props.appState.getPositions(),
                 // filter out offers not to that position
                 filterFuncs: this.props.appState
                     .getPositions()
-                    .map(position => p => p.getIn(['contract_details', 'position']) == position),
+                    .map(position => p => p.get('position') == position),
 
                 style: { width: 0.08 },
             },
             {
                 header: 'Hours',
-                data: p => p.offer.getIn(['contract_details', 'hours']),
-                sortData: p => p.getIn(['contract_details', 'hours']),
+                data: p => p.offer.get('hours'),
+                sortData: p => p.get('hours'),
 
                 style: { width: 0.03 },
             },
             {
                 header: 'Status',
-                data: p => p.offer.getIn(['contract_statuses', 'status']),
-                sortData: p => p.getIn(['contract_statuses', 'status']),
+                data: p => p.offer.get('status'),
+                sortData: p => p.get('status'),
 
                 filterLabel: 'Status',
                 filterCategories: ['Unsent', 'Pending', 'Accepted', 'Rejected', 'Withdrawn'],
@@ -109,18 +116,16 @@ class ControlPanel extends React.Component {
                     'Accepted',
                     'Rejected',
                     'Withdrawn',
-                ].map(status => p => p.getIn(['contract_statuses', 'status']) == status),
+                ].map(status => p => p.get('status') == status),
 
                 style: { width: 0.05 },
             },
             {
                 header: 'Contract Send Date',
                 data: p =>
-                    p.offer.getIn(['contract_statuses', 'sent_at'])
+                    p.offer.get('sentAt')
                         ? <span>
-                              {new Date(
-                                  p.offer.getIn(['contract_statuses', 'sent_at'])
-                              ).toLocaleString()}&ensp;
+                              {new Date(p.offer.get('sentAt')).toLocaleString()}&ensp;
                               <i
                                   className="fa fa-search"
                                   style={{ fontSize: '16px', cursor: 'pointer' }}
@@ -136,37 +141,26 @@ class ControlPanel extends React.Component {
                               />
                           </span>
                         : '',
-                sortData: p => p.getIn(['contract_statuses', 'sent_at']),
+                sortData: p => p.get('sentAt'),
 
                 style: { width: 0.08 },
             },
             {
                 header: 'Nag Count',
-                data: p =>
-                    p.offer.getIn(['contract_statuses', 'nag_count'])
-                        ? p.offer.getIn(['contract_statuses', 'nag_count'])
-                        : '',
-                sortData: p => p.getIn(['contract_statuses', 'nag_count']),
+                data: p => (p.offer.get('nagCount') ? p.offer.get('nagCount') : ''),
+                sortData: p => p.get('nagCount'),
 
                 style: { width: 0.04 },
             },
             {
                 header: 'HRIS Status',
-                data: p =>
-                    p.offer.getIn(['contract_statuses', 'hr_status']) == undefined
-                        ? '-'
-                        : p.offer.getIn(['contract_statuses', 'hr_status']),
-                sortData: p =>
-                    p.getIn(['contract_statuses', 'hr_status']) == undefined
-                        ? ''
-                        : p.getIn(['contract_statuses', 'hr_status']),
+                data: p => (p.offer.get('hrStatus') == undefined ? '-' : p.offer.get('hrStatus')),
+                sortData: p => (p.get('hrStatus') == undefined ? '' : p.get('hrStatus')),
 
                 filterLabel: 'HRIS Status',
                 filterCategories: ['-', 'Processed', 'Printed'],
-                filterFuncs: [p => p.getIn(['contract_statuses', 'hr_status']) == undefined].concat(
-                    ['Processed', 'Printed'].map(status => p =>
-                        p.getIn(['contract_statuses', 'hr_status']) == status
-                    )
+                filterFuncs: [p => p.get('hrStatus') == undefined].concat(
+                    ['Processed', 'Printed'].map(status => p => p.get('hrStatus') == status)
                 ),
 
                 style: { width: 0.05 },
@@ -174,33 +168,24 @@ class ControlPanel extends React.Component {
             {
                 header: 'Printed Date',
                 data: p =>
-                    p.offer.getIn(['contract_statuses', 'printed_at'])
-                        ? new Date(
-                              p.offer.getIn(['contract_statuses', 'printed_at'])
-                          ).toLocaleString()
+                    p.offer.get('printedAt')
+                        ? new Date(p.offer.get('printedAt')).toLocaleString()
                         : '',
-                sortData: p => p.getIn(['contract_statuses', 'printed_at']),
+                sortData: p => p.get('printedAt'),
 
                 style: { width: 0.07 },
             },
             {
                 header: 'DDAH Status',
                 data: p =>
-                    p.offer.getIn(['contract_statuses', 'ddah_status']) == undefined
-                        ? '-'
-                        : p.offer.getIn(['contract_statuses', 'ddah_status']),
-                sortData: p =>
-                    p.getIn(['contract_statuses', 'ddah_status']) == undefined
-                        ? ''
-                        : p.getIn(['contract_statuses', 'ddah_status']),
+                    p.offer.get('ddahStatus') == undefined ? '-' : p.offer.get('ddahStatus'),
+                sortData: p => (p.get('ddahStatus') == undefined ? '' : p.get('ddahStatus')),
 
                 filterLabel: 'DDAH Status',
                 filterCategories: ['-', 'Accepted', 'Pending', 'Signed'],
-                filterFuncs: [
-                    p => p.getIn(['contract_statuses', 'ddah_status']) == undefined,
-                ].concat(
+                filterFuncs: [p => p.get('ddahStatus') == undefined].concat(
                     ['Accepted', 'Pending', 'Signed'].map(status => p =>
-                        p.getIn(['contract_statuses', 'ddah_status']) == status
+                        p.get('ddahStatus') == status
                     )
                 ),
 
@@ -233,6 +218,7 @@ class ControlPanel extends React.Component {
                 </ButtonToolbar>
 
                 <Table
+                    className={role == 'admin' ? 'admin-table' : ''}
                     config={this.config}
                     getOffers={() => this.props.appState.getOffersList()}
                     getSelectedSortFields={() => this.props.appState.getSorts()}
@@ -242,7 +228,7 @@ class ControlPanel extends React.Component {
         );
     }
 }
-
+//                {role == 'admin' && <SessionsForm {...this.props} />}
 const OffersMenu = props =>
     <DropdownButton bsStyle="primary" title="Update offers" id="offers-dropdown">
         <MenuItem onClick={() => props.appState.sendContracts(getSelectedOffers())}>

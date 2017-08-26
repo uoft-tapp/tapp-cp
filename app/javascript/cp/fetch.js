@@ -77,6 +77,7 @@ function putHelper(URL, body, success, failure) {
 /* Resource GETters */
 
 const getOffers = () => getHelper('/offers', resp => resp.json()).then(onFetchOffersSuccess);
+const getSessions = () => getHelper('/sessions', resp => resp.json()).then(onFetchSessionsSuccess);
 
 /* Success callbacks for resource GETters */
 
@@ -85,42 +86,50 @@ function onFetchOffersSuccess(resp) {
 
     resp.forEach(offer => {
         offers[offer.id] = {
-            applicant_id: offer.applicant_id,
-            first_name: offer.applicant.first_name,
-            last_name: offer.applicant.last_name,
-            student_number: offer.applicant.student_number,
+            applicantId: offer.applicant_id,
+            firstName: offer.applicant.first_name,
+            lastName: offer.applicant.last_name,
+            studentNumber: offer.applicant.student_number,
             email: offer.applicant.email,
-            contract_details: {
-                position: offer.position,
-                sessional_year: offer.session.year,
-                sessional_semester: offer.session.semester,
-                hours: offer.hours,
-                start_date: offer.session.start_date,
-                end_date: offer.session.end_date,
-                pay: offer.session.pay,
-                link: offer.link,
-                signature: offer.signature,
-            },
-            contract_statuses: {
-                nag_count: offer.nag_count,
-                status: offer.status,
-                hr_status: offer.hr_status,
-                ddah_status: offer.ddah_status,
-                sent_at: offer.send_date,
-                printed_at: offer.print_time,
-            },
+            position: offer.position,
+            session: offer.session.id,
+            hours: offer.hours,
+            nagCount: offer.nag_count,
+            status: offer.status,
+            hrStatus: offer.hr_status,
+            ddahStatus: offer.ddah_status,
+            sentAt: offer.send_date,
+            printedAt: offer.print_time,
         };
     });
 
     return offers;
 }
 
+function onFetchSessionsSuccess(resp) {
+    let sessions = {};
+
+    resp.forEach(session => {
+        sessions[session.id] = {
+            year: session.year,
+            startDate: session.start_date,
+            endDate: session.end_date,
+            semester: session.semester,
+            pay: session.pay,
+        };
+    });
+
+    return sessions;
+}
+
 /* Function to GET all resources */
 
 function fetchAll() {
     appState.setFetchingOffersList(true);
+    appState.setFetchingSessionsList(true);
 
     let offersPromise = getOffers();
+    let sessionsPromise = getSessions();
 
     // when offers are successfully fetched, update the offers list; set fetching flag to false either way
     offersPromise
@@ -129,6 +138,14 @@ function fetchAll() {
             appState.setFetchingOffersList(false, true);
         })
         .catch(() => appState.setFetchingOffersList(false));
+
+    // when sessions are successfully fetched, update the sessions list; set fetching flag to false either way
+    sessionsPromise
+        .then(sessions => {
+            appState.setSessionsList(fromJS(sessions));
+            appState.setFetchingSessionsList(false, true);
+        })
+        .catch(() => appState.setFetchingSessionsList(false));
 }
 
 // import locked assignments from TAPP
@@ -159,8 +176,8 @@ function importOffers(data) {
 // send contracts
 function sendContracts(offers) {
     return postHelper(
-	'/offers/send-contracts',
-	{ offers: offers },
+        '/offers/send-contracts',
+        { offers: offers },
         fetchAll,
         showMessageInJsonBody
     );
@@ -204,48 +221,51 @@ function setDdahAccepted(offers) {
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
-function showContractApplicant(offer){
+function showContractApplicant(offer) {
     window.open('/offers/' + offer + '/pdf');
 }
 
 // show the contract for this offer in a new window, as HR would see it
-function showContractHr(offer){
-    return postHelper('/offers/print',
-		      { contracts: [offer], update: false },
-		      resp => resp.blob())
-	.then(blob => {
-	    let fileURL = URL.createObjectURL(blob);
-	    let contractWindow = window.open(fileURL);
-	    contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
-	});
+function showContractHr(offer) {
+    return postHelper('/offers/print', { contracts: [offer], update: false }, resp =>
+        resp.blob()
+    ).then(blob => {
+        let fileURL = URL.createObjectURL(blob);
+        let contractWindow = window.open(fileURL);
+        contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
+    });
 }
 
 // withdraw offers
 function withdrawOffers(offers) {
     // create an array of promises for each offer being withdrawn
-    return Promise.all(offers.map(offer => postHelper(
-	'/offers/' + offer + '/decision/withdraw',
-	{},
-	resp => resp,
-	showMessageInJsonBody)))
-	.then(fetchAll);
+    return Promise.all(
+        offers.map(offer =>
+            postHelper(
+                '/offers/' + offer + '/decision/withdraw',
+                {},
+                resp => resp,
+                showMessageInJsonBody
+            )
+        )
+    ).then(fetchAll);
 }
 
 // print contracts
 function print(offers) {
     return postHelper(
-	'/offers/print',
-	{ contracts: offers, update: true },
-	resp => resp.blob(),
-        showMessageInJsonBody)
-	.then(blob => {
-	    let fileURL = URL.createObjectURL(blob);
-	    let pdfWindow = window.open(fileURL);
-	    pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
-	    pdfWindow.document.onload = pdfWindow.print();
+        '/offers/print',
+        { contracts: offers, update: true },
+        resp => resp.blob(),
+        showMessageInJsonBody
+    ).then(blob => {
+        let fileURL = URL.createObjectURL(blob);
+        let pdfWindow = window.open(fileURL);
+        pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
+        pdfWindow.document.onload = pdfWindow.print();
 
-	    return fetchAll();
-	});
+        return fetchAll();
+    });
 }
 
 /*

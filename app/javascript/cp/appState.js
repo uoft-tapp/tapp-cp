@@ -19,6 +19,7 @@ const initialState = {
 
     /** DB data **/
     offers: { fetching: 0, list: null },
+    sessions: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -221,6 +222,16 @@ class AppState {
      ** data getters and setters **
      ******************************/
 
+    // check if any data is being fetched
+    anyFetching() {
+        return [this.get('offers.fetching'), this.get('sessions.fetching')].some(val => val > 0);
+    }
+
+    // check if any data has not yet been fetched
+    anyNull() {
+        return [this.get('offers.list'), this.get('sessions.list')].some(val => val == null);
+    }
+
     email(offers) {
         let allOffers = this.getOffersList();
         fetch.email(offers.map(offer => allOffers.getIn([offer, 'email'])));
@@ -231,8 +242,17 @@ class AppState {
         return this.get('offers.fetching') > 0;
     }
 
+    // check if sessions are being fetched
+    fetchingSessions() {
+        return this.get('sessions.fetching') > 0;
+    }
+
     getOffersList() {
         return this.get('offers.list');
+    }
+
+    getSessionsList() {
+        return this.get('sessions.list');
     }
 
     // get a sorted list of the positions in the current offers list as a JS array
@@ -240,11 +260,7 @@ class AppState {
         let offers = this.getOffersList();
 
         if (offers) {
-            return offers
-                .map(offer => offer.getIn(['contract_details', 'position']))
-                .flip()
-                .keySeq()
-                .toJS();
+            return offers.map(offer => offer.get('position')).flip().keySeq().toJS();
         }
         return [];
     }
@@ -265,20 +281,24 @@ class AppState {
         return this.get('offers.list') == null;
     }
 
+    isSessionsListNull() {
+        return this.get('sessions.list') == null;
+    }
+
     nag(offers) {
         let pendingOffers = [],
             allOffers = this.getOffersList();
 
         for (var offer of offers) {
-            if (allOffers.getIn([offer, 'contract_statuses', 'status']) == 'Pending') {
+            if (allOffers.getIn([offer, 'status']) == 'Pending') {
                 pendingOffers.push(parseInt(offer));
             } else {
                 // offers that are not 'pending' cannot be nagged about
                 this.alert(
                     '<b>Error:</b> Offer to ' +
-                        allOffers.getIn([offer, 'last_name']) +
+                        allOffers.getIn([offer, 'lastName']) +
                         ', ' +
-                        allOffers.getIn([offer, 'first_name']) +
+                        allOffers.getIn([offer, 'firstName']) +
                         ' is not pending'
                 );
             }
@@ -297,7 +317,7 @@ class AppState {
             allOffers = this.getOffersList();
 
         for (var offer of offers) {
-            status = allOffers.getIn([offer, 'contract_statuses', 'status']);
+            status = allOffers.getIn([offer, 'status']);
 
             switch (status) {
                 // can only send contracts that are unsent
@@ -307,18 +327,18 @@ class AppState {
                 case 'Withdrawn':
                     this.alert(
                         '<b>Error:</b> Cannot send contract to ' +
-                            allOffers.getIn([offer, 'last_name']) +
+                            allOffers.getIn([offer, 'lastName']) +
                             ', ' +
-                            allOffers.getIn([offer, 'first_name']) +
+                            allOffers.getIn([offer, 'firstName']) +
                             '. Offer was withdrawn.'
                     );
                     break;
                 default:
                     this.alert(
                         '<b>Error:</b> Contract has already been sent to ' +
-                            allOffers.getIn([offer, 'last_name']) +
+                            allOffers.getIn([offer, 'lastName']) +
                             ', ' +
-                            allOffers.getIn([offer, 'first_name'])
+                            allOffers.getIn([offer, 'firstName'])
                     );
             }
         }
@@ -332,14 +352,14 @@ class AppState {
 
         for (var offer of offers) {
             // can only accept DDAH form for accepted offers
-            if (allOffers.getIn([offer, 'contract_statuses', 'status']) == 'Accepted') {
+            if (allOffers.getIn([offer, 'status']) == 'Accepted') {
                 acceptedOffers.push(parseInt(offer));
             } else {
                 this.alert(
                     '<b>Error:</b> Cannot accept DDAH form for ' +
-                        allOffers.getIn([offer, 'last_name']) +
+                        allOffers.getIn([offer, 'lastName']) +
                         ', ' +
-                        allOffers.getIn([offer, 'first_name']) +
+                        allOffers.getIn([offer, 'firstName']) +
                         '. Offer is not accepted.'
                 );
             }
@@ -366,20 +386,38 @@ class AppState {
         }
     }
 
+    setFetchingSessionsList(fetching, success) {
+        let init = this.get('sessions.fetching'),
+            notifications = this.get('notifications');
+        if (fetching) {
+            this.set({
+                'sessions.fetching': init + 1,
+                notifications: notifications.push('<i>Fetching sessions...</i>'),
+            });
+        } else if (success) {
+            this.set({
+                'sessions.fetching': init - 1,
+                notifications: notifications.push('Successfully fetched sessions.'),
+            });
+        } else {
+            this.set('sessions.fetching', init - 1);
+        }
+    }
+
     setHrProcessed(offers) {
         let acceptedOffers = [],
             allOffers = this.getOffersList();
 
         for (var offer of offers) {
             // can only process contract for accepted offers
-            if (allOffers.getIn([offer, 'contract_statuses', 'status']) == 'Accepted') {
+            if (allOffers.getIn([offer, 'status']) == 'Accepted') {
                 acceptedOffers.push(parseInt(offer));
             } else {
                 this.alert(
                     '<b>Error:</b> Cannot process contract for ' +
-                        allOffers.getIn([offer, 'last_name']) +
+                        allOffers.getIn([offer, 'lastName']) +
                         ', ' +
-                        allOffers.getIn([offer, 'first_name']) +
+                        allOffers.getIn([offer, 'firstName']) +
                         '. Offer is not accepted.'
                 );
             }
@@ -410,6 +448,10 @@ class AppState {
         this.set('offers.list', list);
     }
 
+    setSessionsList(list) {
+        this.set('sessions.list', list);
+    }
+
     showContractApplicant(offer) {
         fetch.showContractApplicant(offer);
     }
@@ -425,12 +467,12 @@ class AppState {
 
         for (var offer of offers) {
             // cannot withdraw unsent offers
-            if (allOffers.getIn([offer, 'contract_statuses', 'status']) == 'Unsent') {
+            if (allOffers.getIn([offer, 'status']) == 'Unsent') {
                 this.alert(
                     '<b>Error:</b> Offer to ' +
-                        allOffers.getIn([offer, 'last_name']) +
+                        allOffers.getIn([offer, 'lastName']) +
                         ', ' +
-                        allOffers.getIn([offer, 'first_name']) +
+                        allOffers.getIn([offer, 'firstName']) +
                         ' has not been sent'
                 );
             } else {
