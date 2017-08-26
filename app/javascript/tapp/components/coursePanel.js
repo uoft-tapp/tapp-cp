@@ -19,6 +19,7 @@ class CoursePanel extends React.Component {
                             return (
                                 <i
                                     className="fa fa-lock"
+                                    style={{ cursor: 'pointer' }}
                                     onClick={() => {
                                         if (
                                             confirm(
@@ -70,14 +71,14 @@ class CoursePanel extends React.Component {
                     </span>,
                 sortData: p => p.applicant.lastName,
 
-                style: { width: 0.15 },
+                style: { width: 0.10 },
             },
             {
                 header: 'First Name',
                 data: p => p.applicant.firstName,
                 sortData: p => p.applicant.firstName,
 
-                style: { width: 0.15 },
+                style: { width: 0.10 },
             },
             {
                 header: 'Dept.',
@@ -91,7 +92,7 @@ class CoursePanel extends React.Component {
                     p => p.applicant.dept != 'Computer Science',
                 ],
 
-                style: { width: 0.25 },
+                style: { width: 0.08 },
             },
             {
                 header: 'Prog.',
@@ -108,14 +109,14 @@ class CoursePanel extends React.Component {
                     p => p.applicant.program == 'UG',
                 ],
 
-                style: { width: 0.10 },
+                style: { width: 0.05 },
             },
             {
                 header: 'Year',
                 data: p => p.applicant.year,
                 sortData: p => p.applicant.year,
 
-                style: { width: 0.05 },
+                style: { width: 0.03 },
             },
             {
                 header: 'Pref.',
@@ -127,7 +128,7 @@ class CoursePanel extends React.Component {
 
                 sortData: p => props.getApplicationPreference(p.applicantId, p.course),
 
-                style: { width: 0.05 },
+                style: { width: 0.03 },
             },
             {
                 header: 'Other',

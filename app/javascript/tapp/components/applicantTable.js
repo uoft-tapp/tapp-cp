@@ -163,7 +163,7 @@ ApplicantTable.propTypes = {
 
             // style applied to cells in table column
             style: PropTypes.shape({
-                // column width - this should be a number between 0 and 1
+                // column width - this should be a percentage of the total table width (between 0 and 1)
                 width: PropTypes.number,
             }),
         })
