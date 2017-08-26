@@ -195,6 +195,8 @@ class ControlPanel extends React.Component {
 
         return (
             <Grid fluid id="offers-grid">
+                {role == 'admin' && <SessionsForm {...this.props} />}
+            
                 <ButtonToolbar id="dropdown-menu">
                     {role == 'admin' && <ImportMenu {...this.props} />}
                     {role == 'admin' && <OffersMenu {...this.props} />}
@@ -224,8 +226,6 @@ class ControlPanel extends React.Component {
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
                 />
-
-                {role == 'admin' && <SessionsForm {...this.props} />}
             </Grid>
         );
     }

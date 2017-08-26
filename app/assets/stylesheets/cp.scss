@@ -4,7 +4,7 @@
     --navbar-height: 71px; /* includes margins */
     --table-menu-height: calc(34px + 1vh);
     --main-div-height: calc(100vh - var(--navbar-height) - var(--footer-height));
-    --sessions-height: calc(100px + 1vh);
+    --sessions-height: calc(100px + 1.5vh);
 }
 
 html {
@@ -126,7 +126,7 @@ footer div p {
 }
 
 #offers-grid .sessions {
-    margin: 1vh 0 0 0;
+    margin: 0 0 1.5vh 0;
     border: 1px solid #ddd;
 }
 
