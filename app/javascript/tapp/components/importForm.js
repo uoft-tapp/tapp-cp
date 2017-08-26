@@ -66,11 +66,16 @@ class ImportForm extends React.Component {
         return (
             <Form inline id="import">
                 <FormControl.Static style={{ verticalAlign: 'middle' }}>
-                    <i
-                        className="fa fa-upload"
-                        style={{ fontSize: '20px', color: 'blue', cursor: 'pointer' }}
-                        onClick={() => this.uploadFile()}
-                    />&emsp;
+                    {this.props.importing()
+                        ? <i
+                              className="fa fa-spinner fa-spin"
+                              style={{ fontSize: '20px', color: 'blue' }}
+                          />
+                        : <i
+                              className="fa fa-upload"
+                              style={{ fontSize: '20px', color: 'blue', cursor: 'pointer' }}
+                              onClick={() => this.uploadFile()}
+                          />}&emsp;
                 </FormControl.Static>
                 <FormGroup>
                     <ControlLabel>Import&ensp;</ControlLabel>

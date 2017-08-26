@@ -366,10 +366,11 @@ function updateCourse(courseId, data, attr) {
 
 // send CHASS data
 function importChass(data) {
+    appState.setImporting(true);
+
     return postHelper(
         '/import/chass',
         { chass_json: data },
-        data,
         () => {
             appState.setImporting(false, true);
             fetchAll();
@@ -380,18 +381,25 @@ function importChass(data) {
 
 // send enrolment data
 function importEnrolment(data) {
+    appState.setImporting(true);
     appState.setFetchingCoursesList(true);
 
     return postHelper(
         '/import/enrollment',
         { enrollment_data: data },
-        showMessageInJsonBody,
-        showMessageInJsonBody
+        resp => {
+            showMessageInJsonBody(resp);
+            appState.setImporting(false, true);
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+            appState.setImporting(false);
+        }
     )
         .then(getCourses)
         .then(courses => {
             appState.setCoursesList(courses);
-            appState.successFetchingCoursesList();
+            appState.setFetchingCoursesList(false, true);
         })
         .catch(() => appState.setFetchingCoursesList(false));
 }
