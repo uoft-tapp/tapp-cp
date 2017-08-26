@@ -224,11 +224,13 @@ class ControlPanel extends React.Component {
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
                 />
+
+                {role == 'admin' && <SessionsForm {...this.props} />}
             </Grid>
         );
     }
 }
-//                {role == 'admin' && <SessionsForm {...this.props} />}
+
 const OffersMenu = props =>
     <DropdownButton bsStyle="primary" title="Update offers" id="offers-dropdown">
         <MenuItem onClick={() => props.appState.sendContracts(getSelectedOffers())}>
