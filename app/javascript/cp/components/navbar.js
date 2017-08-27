@@ -2,13 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Navbar,
-	 Nav,
-	 NavItem,
-	 NavDropdown,
-	 MenuItem,
-	 FormGroup,
-	 ControlLabel,
-	 FormControl }
+         Nav,
+         NavItem,
+         NavDropdown,
+         MenuItem,
+         FormGroup,
+         ControlLabel,
+         FormControl }
 from 'react-bootstrap';
 
 /*** Navbar components ***/
@@ -44,18 +44,20 @@ const Session = props => {
     }
     
     return (
-	<Navbar.Form>
-	    <FormGroup>
+        <Navbar.Form>
+            <FormGroup>
                 <ControlLabel>Session</ControlLabel>&ensp;
-                <FormControl componentClass="select">
-                <option value={null} key="session-all">-</option>
-	        {props.appState.getSessionsList().map((session, sessionId) =>
-			      <option value={sessionId} key={'session-' + sessionId}>
-                                  {session.get('semester')}&nbsp;{session.get('year')}
-			      </option>)}
-	        </FormControl>
-	    </FormGroup>
-	</Navbar.Form>
+                <FormControl
+                    componentClass="select"
+                    onChange={event => props.appState.selectSession(event.target.value)}>
+                    <option value={null} key="session-all">-</option>
+                    {props.appState.getSessionsList().map((session, sessionId) =>
+                        <option value={sessionId} key={'session-' + sessionId}>
+                            {session.get('semester')}&nbsp;{session.get('year')}
+                        </option>)}
+                </FormControl>
+            </FormGroup>
+        </Navbar.Form>
     );
 };
 

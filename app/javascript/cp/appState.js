@@ -17,6 +17,8 @@ const initialState = {
     selectedSortFields: [],
     selectedFilters: {},
 
+    selectedSession: null,
+
     /** DB data **/
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
@@ -143,6 +145,10 @@ class AppState {
         return this.get('selectedFilters');
     }
 
+    getSelectedSession() {
+        return this.get('selectedSession');
+    }
+
     getSorts() {
         return this.get('selectedSortFields');
     }
@@ -177,12 +183,16 @@ class AppState {
         this.set('selectedSortFields', sorts.delete(i));
     }
 
+    selectSession(session) {
+        this.set('selectedSession', session);
+    }
+
     setCurrentUserName(user) {
-        return this.set('user', user);
+        this.set('user', user);
     }
 
     setCurrentUserRole(role) {
-        return this.set('role', role);
+        this.set('role', role);
     }
 
     // toggle a filter on the offers table
