@@ -3,9 +3,9 @@ import { appState } from './appState.js';
 
 /* General helpers */
 
-function defaultFailure(resp) {
-    appState.notify('<b>Action Failed:</b> ' + resp.statusText);
-    return Promise.reject(resp);
+function defaultFailure(text) {
+    appState.alert('<b>Action Failed:</b> ' + text);
+    return Promise.reject();
 }
 
 // extract and display a message which is sent in the (JSON) body of a response
@@ -19,77 +19,80 @@ function showMessageInJsonBody(resp) {
     }
 }
 
-function fetchHelper(URL, init, success, failure = defaultFailure) {
+function fetchHelper(URL, init) {
     return fetch(URL, init)
-        .then(function(response) {
+        .then(function(resp) {
             if (response.ok) {
-                // parse the body of the response as JSON
-                if (['GET', 'POST'].includes(init.method)) {
-                    return response.json().then(resp => success(resp));
-                }
-
-                return success(response);
+                return Promise.resolve(resp);
             }
-
-            return failure(response);
+            return Promise.reject(resp);
         })
         .catch(function(error) {
-            appState.notify('<b>Error:</b> ' + URL + ' ' + error.message);
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
             return Promise.reject(error);
         });
 }
 
-function getHelper(URL, success, failure) {
-    let init = {
+function getHelper(URL) {
+    return fetchHelper(URL, {
         headers: {
             Accept: 'application/json',
         },
         method: 'GET',
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    });
 }
 
-function postHelper(URL, body, success, failure) {
-    let init = {
+function postHelper(URL, body) {
+    return fetchHelper(URL, {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
         },
         method: 'POST',
         body: JSON.stringify(body),
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    });
 }
 
-function deleteHelper(URL, success, failure) {
-    return fetchHelper(URL, { method: 'DELETE' }, success, failure);
+function deleteHelper(URL) {
+    return fetchHelper(URL, { method: 'DELETE' });
 }
 
-function putHelper(URL, body, success, failure) {
-    let init = {
+function putHelper(URL, body) {
+    return fetchHelper(URL, {
         headers: {
             'Content-Type': 'application/json; charset=utf-8',
         },
         method: 'PUT',
         body: JSON.stringify(body),
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    });
 }
 
 /* Resource GETters */
 
-const getApplicants = () => getHelper('/applicants', onFetchApplicantsSuccess);
+const getApplicants = () => getHelper('/applicants')
+      .then(resp => resp.json())
+      .then(onFetchApplicantsSuccess)
+      .catch(defaultFailure);
 
-const getApplications = () => getHelper('/applications', onFetchApplicationsSuccess);
+const getApplications = () => getHelper('/applications')
+      .then(resp => resp.json())
+      .then(onFetchApplicationsSuccess)
+      .catch(defaultFailure);
 
-const getCourses = () => getHelper('/positions', onFetchCoursesSuccess);
+const getCourses = () => getHelper('/positions')
+      .then(resp => resp.json())
+      .then(onFetchPositionsSuccess)
+      .catch(defaultFailure);
 
-const getAssignments = () => getHelper('/assignments', onFetchAssignmentsSuccess);
+const getAssignments = () => getHelper('/assignments')
+      .then(resp => resp.json())
+      .then(onFetchAssignmentsSuccess)
+      .catch(defaultFailure);
 
-const getInstructors = () => getHelper('/instructors', onFetchInstructorsSuccess);
+const getInstructors = () => getHelper('/instructors')
+      .then(resp => resp.json())
+      .then(onFetchInstructorsSuccess)
+      .catch(defaultFailure);
 
 /* Success callbacks for resource GETters */
 
@@ -298,158 +301,161 @@ function fetchAll() {
 
 // create a new assignment
 function postAssignment(applicant, course, hours) {
-    appState.setFetchingAssignmentsList(true);
-
-    return postHelper(
-        '/applicants/' + applicant + '/assignments',
-        { position_id: course, hours: hours },
-        getAssignments
-    )
-        .then(assignments => {
-            appState.setAssignmentsList(assignments);
-            appState.setFetchingAssignmentsList(false, true);
-        })
-        .catch(() => appState.setFetchingAssignmentsList(false));
+    postHelper('/applicants/' + applicant + '/assignments',
+               { position_id: course, hours: hours })
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // remove an assignment
 function deleteAssignment(applicant, assignment) {
-    appState.setFetchingAssignmentsList(true);
-
-    return deleteHelper('/applicants/' + applicant + '/assignments/' + assignment, getAssignments)
-        .then(assignments => {
-            appState.setAssignmentsList(assignments);
-            appState.setFetchingAssignmentsList(false, true);
-        })
-        .catch(() => appState.setFetchingAssignmentsList(false));
+    deleteHelper('/applicants/' + applicant + '/assignments/' + assignment)
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // add/update the notes for an applicant
 function noteApplicant(applicant, notes) {
-    appState.setFetchingApplicantsList(true);
-
-    return putHelper('/applicants/' + applicant, { commentary: notes }, getApplicants)
-        .then(applicants => {
-            appState.setApplicantsList(applicants);
-            appState.setFetchingApplicantsList(false, true);
-        })
-        .catch(() => appState.setFetchingApplicantsList(false));
+    putHelper('/applicants/' + applicant, { commentary: notes })
+        .then(() => {
+            appState.setFetchingApplicantsList(true);
+            getApplicants()
+                .then(applicants => {
+                    appState.setApplicantsList(applicants);
+                    appState.setFetchingApplicantsList(false, true);
+                })
+                .catch(() => appState.setFetchingApplicantsList(false));
+        });
 }
 
 // update the number of hours for an assignment
 function updateAssignmentHours(applicant, assignment, hours) {
-    appState.setFetchingAssignmentsList(true);
-
-    return putHelper(
-        '/applicants/' + applicant + '/assignments/' + assignment,
-        { hours: hours },
-        getAssignments
-    )
-        .then(assignments => {
-            appState.setAssignmentsList(assignments);
-            appState.setFetchingAssignmentsList(false, true);
-        })
-        .catch(() => appState.setFetchingAssignmentsList(false));
+    putHelper('/applicants/' + applicant + '/assignments/' + assignment, { hours: hours })
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // update attribute(s) of a course
-function updateCourse(courseId, data, attr) {
-    appState.setFetchingCoursesList(true);
-
-    return putHelper('/positions/' + courseId, data, getCourses)
-        .then(courses => {
-            appState.setCoursesList(courses);
-            appState.setFetchingCoursesList(false, true);
-        })
-        .catch(() => appState.setFetchingCoursesList(false));
+function updateCourse(courseId, data) {
+    putHelper('/positions/' + courseId, data)
+        .then(() => {
+            appState.setFetchingCoursesList(true);
+            getCourses()
+                .then(courses => {
+                    appState.setCoursesList(courses);
+                    appState.setFetchingCoursesList(false, true);
+                })
+                .catch(() => appState.setFetchingCoursesList(false));
+        });
 }
 
 // send CHASS data
 function importChass(data) {
     appState.setImporting(true);
 
-    return postHelper(
-        '/import/chass',
-        { chass_json: data },
-        () => {
+    postHelper('/import/chass', { chass_json: data })
+        .then(() => {
             appState.setImporting(false, true);
             fetchAll();
         },
-        showMessageInJsonBody
-    ).catch(() => appState.setImporting(false));
+        resp => {
+            appState.setImporting(false);
+            showMessageInJsonBody(resp);
+        });
 }
 
 // send enrolment data
 function importEnrolment(data) {
     appState.setImporting(true);
-    appState.setFetchingCoursesList(true);
 
-    return postHelper(
-        '/import/enrollment',
-        { enrollment_data: data },
-        resp => {
-            showMessageInJsonBody(resp);
+    postHelper('/import/enrollment', { enrollment_data: data })
+        .then(() => {
             appState.setImporting(false, true);
+
+            appState.setFetchingCoursesList(true);
+            getCourses()
+                .then(courses => {
+                    appState.setCoursesList(courses);
+                    appState.setFetchingCoursesList(false, true);
+                })
+                .catch(() => appState.setFetchingCoursesList(false));
         },
         resp => {
-            showMessageInJsonBody(resp);
             appState.setImporting(false);
-        }
-    )
-        .then(getCourses)
-        .then(courses => {
-            appState.setCoursesList(courses);
-            appState.setFetchingCoursesList(false, true);
-        })
-        .catch(() => appState.setFetchingCoursesList(false));
+            showMessageInJsonBody(resp);
+        });
 }
 
 // unlock a single assignment
 function unlockAssignment(applicant, assignment) {
-    appState.setFetchingAssignmentsList(true);
-
-    return putHelper(
-        '/applicants/' + applicant + '/assignments/' + assignment,
-        { export_date: null },
-        getAssignments
-    )
-        .then(assignments => {
-            appState.setAssignmentsList(assignments);
-            appState.setFetchingAssignmentsList(false, true);
-        })
-        .catch(() => appState.setFetchingAssignmentsList(false));
+    putHelper('/applicants/' + applicant + '/assignments/' + assignment, { export_date: null })
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // export offers from CHASS (locking the corresponding assignments)
 function exportOffers(round) {
-    appState.setFetchingAssignmentsList(true);
+    let exportPromise = fetchHelper('/export/chass/' + round, {})
+        .catch(defaultFailure);
 
     let filename;
-    return (
-        fetchHelper('/export/chass/' + round, {}, response => {
+    exportPromise
+        .then(resp => {
             // extract the filename from the response headers
-            filename = response.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
+            filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
             // parse the response body as a blob
-            return response.blob();
+            return resp.blob();
         })
-            // create a URL for the object body of the response
-            .then(blob => URL.createObjectURL(blob))
-            .then(url => {
-                // associate the download with an anchor tag
-                var a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                // trigger a click -> download
-                a.click();
-                URL.revokeObjectURL(url);
-            })
-            .then(getAssignments)
-            .then(assignments => {
-                appState.setAssignmentsList(assignments);
-                appState.setFetchingAssignmentsList(false, true);
-            })
-            .catch(() => appState.setFetchingAssignmentsList(false))
-    );
+        // create a URL for the object body of the response
+        .then(blob => URL.createObjectURL(blob))
+        .then(url => {
+            // associate the download with an anchor tag
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            // trigger a click -> download
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+    exportPromise
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 export {

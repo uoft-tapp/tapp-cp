@@ -569,7 +569,7 @@ class AppState {
     addInstructor(courseId, instructorId) {
         let val = this.getCoursesList().get(courseId.toString()).get('instructors').toJS();
         val.push(parseInt(instructorId));
-        fetch.updateCourse(courseId, { instructors: val }, 'instructors');
+        fetch.updateCourse(courseId, { instructors: val });
     }
 
     // check if any data is being fetched
@@ -886,7 +886,7 @@ class AppState {
     importEnrolment(data) {
         fetch.importEnrolment(data);
     }
-	
+        
     importing() {
         return this.get('importing') > 0;
     }
@@ -934,7 +934,7 @@ class AppState {
         // thinks they are strings
         let val = this.getCoursesList().get(courseId.toString()).get('instructors').toJS();
         val.splice(index, 1);
-        fetch.updateCourse(courseId, { instructors: val }, 'instructors');
+        fetch.updateCourse(courseId, { instructors: val });
     }
 
     setApplicantsList(list) {
@@ -1073,9 +1073,9 @@ class AppState {
         fetch.unlockAssignment(applicant, assignment);
     }
 
-    updateCourse(courseId, val, props) {
+    updateCourse(courseId, val, attr) {
         let data = {};
-        switch (props) {
+        switch (attr) {
             case 'estimatedPositions':
                 data['estimated_count'] = val;
                 break;
@@ -1098,7 +1098,7 @@ class AppState {
                 data['num_waitlisted'] = val;
                 break;
         }
-        fetch.updateCourse(courseId, data, props);
+        fetch.updateCourse(courseId, data);
     }
 }
 
