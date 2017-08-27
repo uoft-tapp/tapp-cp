@@ -1,7 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Navbar,
+	 Nav,
+	 NavItem,
+	 NavDropdown,
+	 MenuItem,
+	 FormGroup,
+	 ControlLabel,
+	 FormControl }
+from 'react-bootstrap';
 
 /*** Navbar components ***/
 
@@ -27,6 +35,27 @@ const Notifications = props => {
                 <MenuItem key={'notification-' + i} dangerouslySetInnerHTML={{ __html: text }} />
             )}
         </NavDropdown>
+    );
+};
+
+const Session = props => {
+    if (props.isSessionsListNull()) {
+        return null;
+    }
+    
+    return (
+	<Navbar.Form>
+	    <FormGroup>
+                <ControlLabel>Session</ControlLabel>&ensp;
+                <FormControl componentClass="select">
+                <option value={null} key="session-all">-</option>
+	        {props.appState.getSessionsList().map((session, sessionId) =>
+			      <option value={sessionId} key={'session-' + sessionId}>
+                                  {session.get('semester')}&nbsp;{session.get('year')}
+			      </option>)}
+	        </FormControl>
+	    </FormGroup>
+	</Navbar.Form>
     );
 };
 
@@ -58,6 +87,11 @@ const NavbarInst = props =>
         <Navbar.Header>
             <Navbar.Brand>TAPP:CP</Navbar.Brand>
         </Navbar.Header>
+
+        {props.appState.getCurrentUserRole() == 'admin' &&
+            <Nav pullLeft>
+                <Sessions {...props} />
+            </Nav>}
 
         <Nav pullRight>
             <Notifications {...props} />
