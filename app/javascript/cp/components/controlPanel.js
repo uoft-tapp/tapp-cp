@@ -251,7 +251,14 @@ class ControlPanel extends React.Component {
                 <Table
                     className={role == 'admin' ? 'admin-table' : ''}
                     config={this.config}
-                    getOffers={() => this.props.appState.getOffersList()}
+                    getOffers={() => {
+			let session = this.props.appState.getSelectedSession();
+			if (session != null) {
+			    return this.props.appState.getOffersList()
+				.filter(offer => offer.get('session') == session);
+			}
+			return this.props.appState.getOffersList();
+	            }}
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
                 />
