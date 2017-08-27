@@ -77,7 +77,7 @@ const getOffers = () => getHelper('/offers')
 
 const getSessions = () => getHelper('/sessions')
       .then(resp => resp.json())
-      .then(onFetchOffersSuccess)
+      .then(onFetchSessionsSuccess)
       .catch(defaultFailure);
 
 /* Success callbacks for resource GETters */
