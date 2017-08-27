@@ -7,9 +7,17 @@ class SessionsForm extends React.Component {
             <div className="sessions">
                 <Tabs>
                     <Tab title={<b>Sessions</b>} disabled />
-                    {this.props.appState.getSessionsList().map(session =>
+                    {this.props.appState.getSessionsList().map((session, sessionId) =>
                         <Tab title={session.get('semester') + ' ' + session.get('year')}>
-                            <Form inline>
+		        <Form
+			    inline
+			    onSubmit={event => {
+				if (event.target.elements[0].value != session.get('pay')) {
+				    this.props.appState.updateSessionPay(
+					sessionId, event.target.elements[0].value);
+				}
+                                event.preventDefault();
+                            }}>
 				<b>Start date:</b>&ensp;
 				{new Date(session.get('startDate')).toDateString()}&emsp;&emsp;
 				<b>End date:</b>&ensp;
@@ -19,10 +27,18 @@ class SessionsForm extends React.Component {
                                     <InputGroup>
                                         <InputGroup.Addon>$</InputGroup.Addon>
                                         <FormControl
-                                            type="text"
+					    type="number"
+					    min="0.00"
+				            step="0.01"
                                             defaultValue={session.get('pay')}
-                                            ref={input => (this.pay = input)}
-                                        />
+				            onBlur={event => {
+						if (event.target.value != session.get('pay')) {
+						    this.props.appState.updateSessionPay(
+							sessionId,
+							event.target.value);
+						}
+					    }}
+				        />
                                     </InputGroup>
                                 </FormGroup>
                             </Form>
