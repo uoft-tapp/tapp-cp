@@ -4,9 +4,9 @@ import { appState } from './appState.js';
 
 /* General helpers */
 
-function defaultFailure(resp) {
-    appState.notify('<b>Action Failed:</b> ' + resp.statusText);
-    return Promise.reject(resp);
+function defaultFailure(text) {
+    appState.alert('<b>Action Failed:</b> ' + text);
+    return Promise.reject();
 }
 
 // extract and display a message which is sent in the (JSON) body of a response
@@ -20,64 +20,65 @@ function showMessageInJsonBody(resp) {
     }
 }
 
-function fetchHelper(URL, init, success, failure = defaultFailure) {
+function fetchHelper(URL, init) {
     return fetch(URL, init)
-        .then(function(response) {
+        .then(function(resp) {
             if (response.ok) {
-                return success(response);
+                return Promise.resolve(resp);
             }
-            return failure(response);
+            return Promise.reject(resp);
         })
         .catch(function(error) {
-            appState.notify('<b>Error:</b> ' + URL + ' ' + error.message);
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
             return Promise.reject(error);
         });
 }
 
-function getHelper(URL, success, failure) {
-    let init = {
+function getHelper(URL) {
+    return fetchHelper(URL, {
         headers: {
             Accept: 'application/json',
         },
         method: 'GET',
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    });
 }
 
-function postHelper(URL, body, success, failure) {
-    let init = {
+function postHelper(URL, body) {
+    return fetchHelper(URL, {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
         },
         method: 'POST',
         body: JSON.stringify(body),
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    });
 }
 
-function deleteHelper(URL, success, failure) {
-    return fetchHelper(URL, { method: 'DELETE' }, success, failure);
+function deleteHelper(URL) {
+    return fetchHelper(URL, { method: 'DELETE' });
 }
 
-function putHelper(URL, body, success, failure) {
-    let init = {
+function putHelper(URL, body) {
+    return fetchHelper(URL, {
         headers: {
             'Content-Type': 'application/json; charset=utf-8',
         },
         method: 'PUT',
         body: JSON.stringify(body),
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    });
 }
 
 /* Resource GETters */
 
-const getOffers = () => getHelper('/offers', resp => resp.json()).then(onFetchOffersSuccess);
-const getSessions = () => getHelper('/sessions', resp => resp.json()).then(onFetchSessionsSuccess);
+const getOffers = () => getHelper('/offers')
+      .then(resp => resp.json())
+      .then(onFetchOffersSuccess)
+      .catch(defaultFailure);
+
+const getSessions = () => getHelper('/sessions')
+      .then(resp => resp.json())
+      .then(onFetchOffersSuccess)
+      .catch(defaultFailure);
 
 /* Success callbacks for resource GETters */
 
@@ -152,35 +153,61 @@ function fetchAll() {
 function importAssignments() {
     appState.setImporting(true);
 
-    return postHelper(
-        '/import/locked-assignments',
-        {},
-        () => {
+    postHelper('/import/locked-assignments', {})
+        .then(() => {
             appState.setImporting(false, true);
-            fetchAll();
+
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
         },
-        showMessageInJsonBody
-    ).catch(() => appState.setImporting(false));
+        resp => {
+            appState.setImporting(false);
+            showMessageInJsonBody(resp);
+        });
 }
 
 // send CHASS offers data
 function importOffers(data) {
     appState.setImporting(true);
 
-    return postHelper('/import/offers', { chass_offers: data }, () => {
-        appState.setImporting(false, true);
-        fetchAll();
-    }).catch(() => appState.setImporting(false));
+    postHelper('/import/offers', { chass_offers: data })
+        .then(() => {
+            appState.setImporting(false, true);
+
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            appState.setImporting(false);
+            showMessageInJsonBody(resp);
+        });
 }
 
 // send contracts
 function sendContracts(offers) {
-    return postHelper(
-        '/offers/send-contracts',
-        { offers: offers },
-        fetchAll,
-        showMessageInJsonBody
-    );
+    postHelper('/offers/send-contracts', { offers: offers })
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        });
 }
 
 // email applicants
@@ -197,27 +224,53 @@ function email(emails) {
 
 // nag applicants
 function nag(offers) {
-    return postHelper('/offers/nag', { contracts: offers }, fetchAll, showMessageInJsonBody);
+    postHelper('/offers/nag', { contracts: offers })
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        });
 }
 
 // mark contracts as hr_processed
 function setHrProcessed(offers) {
-    return putHelper(
-        '/offers/batch-update',
-        { offers: offers, hr_status: 'Processed' },
-        fetchAll,
-        showMessageInJsonBody
-    );
+    putHelper('/offers/batch-update', { offers: offers, hr_status: 'Processed' })
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        });
 }
 
 // mark contracts as ddah_accepted
 function setDdahAccepted(offers) {
-    return putHelper(
-        '/offers/batch-update',
-        { offers: offers, ddah_status: 'Accepted' },
-        fetchAll,
-        showMessageInJsonBody
-    );
+    putHelper('/offers/batch-update', { offers: offers, ddah_status: 'Accepted' })
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        });
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
@@ -227,59 +280,80 @@ function showContractApplicant(offer) {
 
 // show the contract for this offer in a new window, as HR would see it
 function showContractHr(offer) {
-    return postHelper('/offers/print', { contracts: [offer], update: false }, resp =>
-        resp.blob()
-    ).then(blob => {
-        let fileURL = URL.createObjectURL(blob);
-        let contractWindow = window.open(fileURL);
-        contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
-    });
+    postHelper('/offers/print', { contracts: [offer], update: false })
+        .then(resp => resp.blob())
+        .then(blob => {
+            let fileURL = URL.createObjectURL(blob);
+            let contractWindow = window.open(fileURL);
+            contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
+        })
+        .catch(defaultFailure);
 }
 
 // withdraw offers
 function withdrawOffers(offers) {
     // create an array of promises for each offer being withdrawn
-    return Promise.all(
-        offers.map(offer =>
-            postHelper(
-                '/offers/' + offer + '/decision/withdraw',
-                {},
-                resp => resp,
-                showMessageInJsonBody
-            )
-        )
-    ).then(fetchAll);
+    Promise.all(
+        offers.map(offer => postHelper('/offers/' + offer + '/decision/withdraw', {}))
+    ).then(() => {
+        appState.setFetchingOffersList(true);
+        getOffers()
+            .then(offers => {
+                appState.setOffersList(fromJS(offers));
+                appState.setFetchingOffersList(false, true);
+            })
+            .catch(() => appState.setFetchingOffersList(false));
+    },
+    resp => {
+        showMessageInJsonBody(resp);
+    });
 }
 
 // print contracts
 function print(offers) {
-    return postHelper(
-        '/offers/print',
-        { contracts: offers, update: true },
-        resp => resp.blob(),
-        showMessageInJsonBody
-    ).then(blob => {
-        let fileURL = URL.createObjectURL(blob);
-        let pdfWindow = window.open(fileURL);
-        pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
-        pdfWindow.document.onload = pdfWindow.print();
+    let postPromise = postHelper('/offers/print', { contracts: offers, update: true })
+        .then(resp => resp.blob())
+        .catch(defaultFailure);
 
-        return fetchAll();
-    });
+    postPromise
+        .then(blob => {
+            let fileURL = URL.createObjectURL(blob);
+            let pdfWindow = window.open(fileURL);
+            pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
+            pdfWindow.document.onload = pdfWindow.print();
+        });
+
+    postPromise
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        });
 }
 
-/*
-      function updateSession(input, id){
-        let data = {pay: input.value};
-        let init = {
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-            method: 'PUT',
-            body: JSON.stringify(data)
-        };
-        fetchHelper("/sessions/"+id, init, "Pay updated");
-        }*/
+// change session pay
+function updateSessionPay(session, pay){
+    putHelper('/sessions/' + session, { pay: pay })
+        .then(() => {
+            appState.setFetchingSessionsList(true);
+            getSessions()
+                .then(sessions => {
+                    appState.setSessionsList(fromJS(sessions));
+                    appState.setFetchingSessionsList(false, true);
+                })
+                .catch(() => appState.setFetchingSessionsList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        });
+}
 
 export {
     fetchAll,
@@ -294,4 +368,5 @@ export {
     showContractHr,
     withdrawOffers,
     print,
+    updateSessionPay,
 };
