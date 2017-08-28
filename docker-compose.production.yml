@@ -4,4 +4,4 @@ services:
     environment:
       # config/environments/production -> in order to serve static files
       RAILS_SERVE_STATIC_FILES: 1
-    
+      RAILS_LOG_TO_STDOUT: 1
