@@ -15,7 +15,6 @@ services:
       EMAIL_TYPE: ${EMAIL_TYPE}
       EMAIL_USER: ${EMAIL_USER}
       TA_COORD: ${TA_COORD}
-      CUPE_SITE: ${CUPE_SITE}
       RECIPIENT: ${RECIPIENT}
     networks:
       - default
@@ -23,7 +22,7 @@ services:
       - "3000:3000"
     links:
       - postgres
-      
+
   postgres:
     image: postgres:9.6-alpine
     environment:
