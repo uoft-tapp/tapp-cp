@@ -24,7 +24,7 @@ class CpMailer < ApplicationMailer
     email = get_email(ENV["HR_ADMIN_EMAIL"])
     mail(to: email, subject: "CP Alert: New Offers Accepted")
   end
-  
+
   private
   def get_nag_suffix(nag_count)
     case nag_count
