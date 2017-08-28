@@ -17,6 +17,9 @@ Rails.application.routes.draw do
   resources :offers do
     post "decision/:status" => "offers#set_status"
     get "pdf" => "offers#get_contract"
+    post "can-send-contract" => "offers#can_send_contract"
+    post "can-print" => "offers#can_print"
+    post "can_nag" => "offers#can_nag"
   end
 
   # shared resources
