@@ -30,14 +30,8 @@ class OffersController < ApplicationController
 
   def can_send_contract
     offer = Offer.find(params[:offer_id])
-    if offer
-      if !offer[:send_date]
-        render status: 200
-      else
-        render status: 404, json: {message: "Error: This offer has already been sent."}
-      end
-    else
-      render status: 404, json: {message: "Error: No such offer."}
+    if offer[:send_date]
+      render status: 404, json: {message: "Error: This offer has already been sent."}
     end
   end
 
@@ -66,14 +60,8 @@ class OffersController < ApplicationController
 
   def can_nag
     offer = Offer.find(params[:offer_id])
-    if offer
-      if offer[:status] == "Pending"
-        render status: 200
-      else
-        render status: 404, json: {message: "Error: This offer is not in Pending."}
-      end
-    else
-      render status: 404, json: {message: "Error: No such offer."}
+    if offer[:status] != "Pending"
+      render status: 404, json: {message: "Error: This offer is not in Pending."}
     end
   end
 
@@ -101,14 +89,8 @@ class OffersController < ApplicationController
 
   def can_print
     offer = Offer.find(params[:offer_id])
-    if offer
-      if offer[:status] != "Unsent" && offer[:status] != "Withdrawn"
-        render status: 200
-      else
-        render status: 404, json: {message: "Error: This offer is not in Pending."}
-      end
-    else
-      render status: 404, json: {message: "Error: No such offer."}
+    if offer[:status] != "Accepted"
+      render status: 404, json: {message: "Error: This offer has not been accepted."}
     end
   end
 

@@ -86,6 +86,7 @@ RSpec.describe OffersController, type: :controller do
         applicant_id: applicant_2[:id],
         hours: 60,
         status: "Pending",
+        send_date: DateTime.now,
         link: "mangled-link",
     )
   end
@@ -95,6 +96,7 @@ RSpec.describe OffersController, type: :controller do
         applicant_id: applicant_3[:id],
         hours: 60,
         status: "Accepted",
+        send_date: DateTime.now,
         link: "mangled-link",
     )
   end
@@ -126,6 +128,33 @@ RSpec.describe OffersController, type: :controller do
   end
 
   describe "POST /offers/" do
+    context ":offer_id/can-send-contract" do
+      context "when offer_id is valid" do
+        context "when offer has not been sent" do
+          it "returns a status 200" do
+            post :can_send_contract, params: {offer_id: offer[:id]}
+            expect(response.status).to eq(204)
+          end
+        end
+
+        context "when offer has been sent" do
+          it "returns a status 400 and a json message" do
+            post :can_send_contract, params: {offer_id: sent_offer[:id]}
+            expect(response.status).to eq(404)
+            message = {message: "Error: This offer has already been sent."}.to_json
+            expect(response.body).to eq(message)
+          end
+        end
+      end
+      context "when offer_id is invalid" do
+        it "returns a status 400 and a json message" do
+          post :can_send_contract, params: {offer_id: 6000}
+          expect(response.status).to eq(404)
+          expect(response.body).to eq({status: 404}.to_json)
+        end
+      end
+    end
+
     context "send-contracts" do
       before(:each) do
         expect(offer[:status]).to eq("Unsent")
@@ -138,32 +167,38 @@ RSpec.describe OffersController, type: :controller do
           message: "You've successfully sent out all the contracts."
         }.to_json)
         expect(offer[:status]).to eq("Pending")
-        post :send_contracts, params: {offers: [offer[:id]]}
-        offer.reload
-        expect(response.status).to eq(404)
-        expect(offer[:status]).to eq("Pending")
-        expect(response.body).to eq({
-          message: "Exceptions:\nYou've already sent out a contract to #{offer.format[:applicant][:email]}."
-        }.to_json)
       end
     end
 
-    context "nag" do
-      context "when offer is not Pending" do
-        before(:each) do
-          expect(offer[:nag_count]).to eq(0)
+    context ":offer_id/can-nag" do
+      context "when offer_id is valid" do
+        context "when offer is Pending" do
+          it "returns a status 200" do
+            post :can_nag, params: {offer_id: sent_offer[:id]}
+            expect(response.status).to eq(204)
+          end
         end
-        it "return a message of the number of time a applicant has been nagged at" do
-          post :batch_email_nags, params: {contracts: [offer[:id]]}
-          offer.reload
-          expect(response.status).to eq(404)
-          expect(offer[:nag_count]).to eq(0)
-          applicant = Applicant.find(offer[:applicant_id])
-          position = Position.find(offer[:position_id])
-          res = ({ message: "Exceptions:\n- Applicant #{applicant[:first_name]} #{applicant[:last_name]}'s nag for Position #{position[:position]} was not sent because it is not in Pending status."}).to_json
-          expect(response.body).to eq(res)
+
+        context "when offer is not Pending" do
+          it "returns a status 400 and a json message" do
+            post :can_nag, params: {offer_id: offer[:id]}
+            expect(response.status).to eq(404)
+            message = {message: "Error: This offer is not in Pending."}.to_json
+            expect(response.body).to eq(message)
+          end
         end
       end
+      context "when offer_id is invalid" do
+        it "returns a status 400 and a json message" do
+          post :can_send_contract, params: {offer_id: 6000}
+          expect(response.status).to eq(404)
+          expect(response.body).to eq({status: 404}.to_json)
+        end
+      end
+    end
+
+
+    context "nag" do
       context "when offer is Pending" do
         before(:each) do
           expect(sent_offer[:nag_count]).to eq(0)
@@ -275,6 +310,32 @@ RSpec.describe OffersController, type: :controller do
         end
       end
 
+    end
+    context ":offer_id/can-print" do
+      context "when offer_id is valid" do
+        context "when offer is Accepted" do
+          it "returns a status 200" do
+            post :can_print, params: {offer_id: accepted_offer[:id]}
+            expect(response.status).to eq(204)
+          end
+        end
+
+        context "when offer is not Accepted" do
+          it "returns a status 400 and a json message" do
+            post :can_print, params: {offer_id: offer[:id]}
+            expect(response.status).to eq(404)
+            message = {message: "Error: This offer has not been accepted."}.to_json
+            expect(response.body).to eq(message)
+          end
+        end
+      end
+      context "when offer_id is invalid" do
+        it "returns a status 400 and a json message" do
+          post :can_send_contract, params: {offer_id: 6000}
+          expect(response.status).to eq(404)
+          expect(response.body).to eq({status: 404}.to_json)
+        end
+      end
     end
 
     context "print with update" do
