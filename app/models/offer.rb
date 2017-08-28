@@ -16,6 +16,7 @@ class Offer < ApplicationRecord
     applicant = Applicant.find(self[:applicant_id])
     instructors = position.instructors
     session = Session.find(position[:session_id])
+    offer[:link]= "/pb/#{offer[:link]}"
     data = {
       position: position[:position],
       applicant: applicant,
@@ -29,6 +30,6 @@ class Offer < ApplicationRecord
     instructors.each do |instructor|
       data[:instructors].push(instructor)
     end
-    return offer.merge(data).except(:link)
+    return offer.merge(data)
   end
 end
