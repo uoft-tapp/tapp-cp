@@ -23,7 +23,7 @@ function showMessageInJsonBody(resp) {
 function fetchHelper(URL, init) {
     return fetch(URL, init)
         .then(function(resp) {
-            if (response.ok) {
+            if (resp.ok) {
                 return Promise.resolve(resp);
             }
             return Promise.reject(resp);
@@ -70,15 +70,14 @@ function putHelper(URL, body) {
 
 /* Resource GETters */
 
-const getOffers = () => getHelper('/offers')
-      .then(resp => resp.json())
-      .then(onFetchOffersSuccess)
-      .catch(defaultFailure);
+const getOffers = () =>
+    getHelper('/offers').then(resp => resp.json()).then(onFetchOffersSuccess).catch(defaultFailure);
 
-const getSessions = () => getHelper('/sessions')
-      .then(resp => resp.json())
-      .then(onFetchSessionsSuccess)
-      .catch(defaultFailure);
+const getSessions = () =>
+    getHelper('/sessions')
+        .then(resp => resp.json())
+        .then(onFetchSessionsSuccess)
+        .catch(defaultFailure);
 
 /* Success callbacks for resource GETters */
 
@@ -153,8 +152,8 @@ function fetchAll() {
 function importAssignments() {
     appState.setImporting(true);
 
-    postHelper('/import/locked-assignments', {})
-        .then(() => {
+    postHelper('/import/locked-assignments', {}).then(
+        () => {
             appState.setImporting(false, true);
 
             appState.setFetchingOffersList(true);
@@ -168,15 +167,16 @@ function importAssignments() {
         resp => {
             appState.setImporting(false);
             showMessageInJsonBody(resp);
-        });
+        }
+    );
 }
 
 // send CHASS offers data
 function importOffers(data) {
     appState.setImporting(true);
 
-    postHelper('/import/offers', { chass_offers: data })
-        .then(() => {
+    postHelper('/import/offers', { chass_offers: data }).then(
+        () => {
             appState.setImporting(false, true);
 
             appState.setFetchingOffersList(true);
@@ -190,13 +190,14 @@ function importOffers(data) {
         resp => {
             appState.setImporting(false);
             showMessageInJsonBody(resp);
-        });
+        }
+    );
 }
 
 // send contracts
 function sendContracts(offers) {
-    postHelper('/offers/send-contracts', { offers: offers })
-        .then(() => {
+    postHelper('/offers/send-contracts', { offers: offers }).then(
+        () => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -207,7 +208,8 @@ function sendContracts(offers) {
         },
         resp => {
             showMessageInJsonBody(resp);
-        });
+        }
+    );
 }
 
 // email applicants
@@ -224,8 +226,8 @@ function email(emails) {
 
 // nag applicants
 function nag(offers) {
-    postHelper('/offers/nag', { contracts: offers })
-        .then(() => {
+    postHelper('/offers/nag', { contracts: offers }).then(
+        () => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -236,13 +238,14 @@ function nag(offers) {
         },
         resp => {
             showMessageInJsonBody(resp);
-        });
+        }
+    );
 }
 
 // mark contracts as hr_processed
 function setHrProcessed(offers) {
-    putHelper('/offers/batch-update', { offers: offers, hr_status: 'Processed' })
-        .then(() => {
+    putHelper('/offers/batch-update', { offers: offers, hr_status: 'Processed' }).then(
+        () => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -253,13 +256,14 @@ function setHrProcessed(offers) {
         },
         resp => {
             showMessageInJsonBody(resp);
-        });
+        }
+    );
 }
 
 // mark contracts as ddah_accepted
 function setDdahAccepted(offers) {
-    putHelper('/offers/batch-update', { offers: offers, ddah_status: 'Accepted' })
-        .then(() => {
+    putHelper('/offers/batch-update', { offers: offers, ddah_status: 'Accepted' }).then(
+        () => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -270,7 +274,8 @@ function setDdahAccepted(offers) {
         },
         resp => {
             showMessageInJsonBody(resp);
-        });
+        }
+    );
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
@@ -295,36 +300,8 @@ function withdrawOffers(offers) {
     // create an array of promises for each offer being withdrawn
     Promise.all(
         offers.map(offer => postHelper('/offers/' + offer + '/decision/withdraw', {}))
-    ).then(() => {
-        appState.setFetchingOffersList(true);
-        getOffers()
-            .then(offers => {
-                appState.setOffersList(fromJS(offers));
-                appState.setFetchingOffersList(false, true);
-            })
-            .catch(() => appState.setFetchingOffersList(false));
-    },
-    resp => {
-        showMessageInJsonBody(resp);
-    });
-}
-
-// print contracts
-function print(offers) {
-    let postPromise = postHelper('/offers/print', { contracts: offers, update: true })
-        .then(resp => resp.blob())
-        .catch(defaultFailure);
-
-    postPromise
-        .then(blob => {
-            let fileURL = URL.createObjectURL(blob);
-            let pdfWindow = window.open(fileURL);
-            pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
-            pdfWindow.document.onload = pdfWindow.print();
-        });
-
-    postPromise
-        .then(() => {
+    ).then(
+        () => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -335,13 +312,43 @@ function print(offers) {
         },
         resp => {
             showMessageInJsonBody(resp);
-        });
+        }
+    );
+}
+
+// print contracts
+function print(offers) {
+    let postPromise = postHelper('/offers/print', { contracts: offers, update: true })
+        .then(resp => resp.blob())
+        .catch(defaultFailure);
+
+    postPromise.then(blob => {
+        let fileURL = URL.createObjectURL(blob);
+        let pdfWindow = window.open(fileURL);
+        pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
+        pdfWindow.document.onload = pdfWindow.print();
+    });
+
+    postPromise.then(
+        () => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        }
+    );
 }
 
 // change session pay
-function updateSessionPay(session, pay){
-    putHelper('/sessions/' + session, { pay: pay })
-        .then(() => {
+function updateSessionPay(session, pay) {
+    putHelper('/sessions/' + session, { pay: pay }).then(
+        () => {
             appState.setFetchingSessionsList(true);
             getSessions()
                 .then(sessions => {
@@ -352,7 +359,8 @@ function updateSessionPay(session, pay){
         },
         resp => {
             showMessageInJsonBody(resp);
-        });
+        }
+    );
 }
 
 export {
