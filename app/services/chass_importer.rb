@@ -280,8 +280,6 @@ class ChassImporter
     semester = get_semester(start_date)
     if semester
       data ={
-        start_date: start_date,
-        end_date: end_date,
         year: start_date.strftime("%Y"),
         semester: semester,
       }

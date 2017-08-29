@@ -5,8 +5,6 @@ RSpec.describe OffersController, type: :controller do
     Session.create!(
       semester: "Fall",
       year: 2017,
-      start_date: "2017-09-01 00:00:00 UTC",
-      end_date: "2017-12-31 00:00:00 UTC",
     )
   end
 
@@ -24,6 +22,8 @@ RSpec.describe OffersController, type: :controller do
       estimated_count: 17,
       estimated_total_hours: 918,
       session_id: session.id,
+      start_date: "2017-09-01 00:00:00 UTC",
+      end_date: "2017-12-31 00:00:00 UTC",
     )
   end
 

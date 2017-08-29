@@ -23,6 +23,8 @@ class Offer < ApplicationRecord
     end
     data = {
       position: position[:position],
+      start_date: position[:start_date],
+      end_date: position[:end_date],
       applicant: applicant,
       session: session,
       instructors: [],
