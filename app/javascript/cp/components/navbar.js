@@ -1,15 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Navbar,
-         Nav,
-         NavItem,
-         NavDropdown,
-         MenuItem,
-         FormGroup,
-         ControlLabel,
-         FormControl }
-from 'react-bootstrap';
+import {
+    Navbar,
+    Nav,
+    NavItem,
+    NavDropdown,
+    MenuItem,
+    FormGroup,
+    ControlLabel,
+    FormControl,
+} from 'react-bootstrap';
 
 /*** Navbar components ***/
 
@@ -42,7 +43,22 @@ const Session = props => {
     if (props.appState.isSessionsListNull()) {
         return null;
     }
-    
+
+    let semesterOrder = ['Winter', 'Spring', 'Fall', 'Year'];
+    // sort sesions in order of most recent to least recent
+    let sessions = props.appState.getSessionsList().sort((sessionA, sessionB) => {
+        if (sessionA.get('year') > sessionB.get('year')) {
+            return -1;
+        }
+        if (sessionA.get('year') < sessionB.get('year')) {
+            return 1;
+        }
+        return (
+            semesterOrder.indexOf(sessionA.get('semester')) -
+            semesterOrder.indexOf(sessionB.get('semester'))
+        );
+    });
+
     return (
         <Navbar.Form>
             <FormGroup>
@@ -50,11 +66,14 @@ const Session = props => {
                 <FormControl
                     componentClass="select"
                     onChange={event => props.appState.selectSession(event.target.value)}>
-                    <option value={null} key="session-all">-</option>
-                    {props.appState.getSessionsList().map((session, sessionId) =>
+                    <option value="" key="session-all">
+                        all
+                    </option>
+                    {sessions.map((session, sessionId) =>
                         <option value={sessionId} key={'session-' + sessionId}>
                             {session.get('semester')}&nbsp;{session.get('year')}
-                        </option>)}
+                        </option>
+                    )}
                 </FormControl>
             </FormGroup>
         </Navbar.Form>
@@ -65,7 +84,9 @@ const Auth = props =>
     <NavDropdown
         title={props.appState.getCurrentUserRole() + ':' + props.appState.getCurrentUserName()}
         id="nav-auth-dropdown">
-        <MenuItem eventKey="switch-admin" onClick={() => props.appState.setCurrentUserRole('admin')}>
+        <MenuItem
+            eventKey="switch-admin"
+            onClick={() => props.appState.setCurrentUserRole('admin')}>
             Switch to admin role
         </MenuItem>
 
@@ -77,9 +98,7 @@ const Auth = props =>
             Switch to inst role
         </MenuItem>
 
-        <MenuItem eventKey="logout">
-            Logout
-        </MenuItem>
+        <MenuItem eventKey="logout">Logout</MenuItem>
     </NavDropdown>;
 
 /*** Navbar ***/

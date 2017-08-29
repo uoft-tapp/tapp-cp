@@ -5,7 +5,7 @@ class SessionsForm extends React.Component {
     render() {
         return (
             <div className="sessions">
-                <Tabs>
+                <Tabs id="sessions-tabs">
                     <Tab title={<b>Sessions</b>} disabled />
                     {this.props.appState.getSessionsList().map((session, sessionId) =>
                         <Tab title={session.get('semester') + ' ' + session.get('year')}>

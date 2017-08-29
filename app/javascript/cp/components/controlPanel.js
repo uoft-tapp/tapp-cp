@@ -253,7 +253,7 @@ class ControlPanel extends React.Component {
                     config={this.config}
                     getOffers={() => {
 			let session = this.props.appState.getSelectedSession();
-			if (session != null) {
+			if (session != '') {
 			    return this.props.appState.getOffersList()
 				.filter(offer => offer.get('session') == session);
 			}

@@ -17,7 +17,7 @@ const initialState = {
     selectedSortFields: [],
     selectedFilters: {},
 
-    selectedSession: null,
+    selectedSession: '',
 
     /** DB data **/
     offers: { fetching: 0, list: null },
