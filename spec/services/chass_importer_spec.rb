@@ -19,20 +19,6 @@ describe ChassImporter do
   end
 
   context "when parsing courses" do
-    context "with no dates" do
-      let(:mock_json) { File.read("./spec/support/chass_data/no_dates.json") }
-      before(:each) do
-        # Sanity checking -- shouldn't ever fail
-        expect(Position.all.count).to eq(0)
-      end
-
-      before(:each) { subject } # Evaluate subject
-
-      it "does not insert the position" do
-        expect(Position.where(position: "CSC100H1S").count).to eq(0)
-      end
-    end
-
     context "with a plain course" do
       let(:mock_json) { File.read("./spec/support/chass_data/plain_course.json") }
 
