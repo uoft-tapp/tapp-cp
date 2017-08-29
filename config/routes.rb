@@ -17,9 +17,6 @@ Rails.application.routes.draw do
   resources :offers do
     post "decision/:status" => "offers#set_status"
     get "pdf" => "offers#get_contract"
-    post "can-send-contract" => "offers#can_send_contract"
-    post "can-print" => "offers#can_print"
-    post "can_nag" => "offers#can_nag"
   end
 
   # shared resources
@@ -34,6 +31,9 @@ Rails.application.routes.draw do
   post "/import/enrollment", to: "import#enrollment"
 
   # CP routes
+  post "offers/can-send-contract" => "offers#can_send_contract"
+  post "offers/can-print" => "offers#can_print"
+  post "offers/can_nag" => "offers#can_nag"
   post "offers/send-contracts" => "offers#send_contracts"
   post "offers/print" => "offers#combine_contracts_print"
   post "offers/nag" => "offers#batch_email_nags"
