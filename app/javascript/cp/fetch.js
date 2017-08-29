@@ -34,6 +34,28 @@ function fetchHelper(URL, init) {
         });
 }
 
+// fetching for 'can-*' batch methods
+function fetchCheckHelper(URL, body) {
+    return fetch(URL, {
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
+        },
+        method: 'POST',
+        body: JSON.stringify(body),
+    })
+        .then(function(resp) {
+            if (resp.ok || resp.status == 404) {
+                return Promise.resolve(resp);
+            }
+            return Promise.reject(resp);
+        })
+        .catch(function(error) {
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
+            return Promise.reject(error);
+        });
+}
+
 function getHelper(URL) {
     return fetchHelper(URL, {
         headers: {
@@ -197,8 +219,32 @@ function importOffers(data) {
 
 // send contracts
 function sendContracts(offers) {
-    postHelper('/offers/send-contracts', { offers: offers }).then(
-        () => {
+    let validOffers = offers;
+
+    // check which contracts can be sent
+    fetchCheckHelper('/offers/can-send-contract', { contracts: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some contracts cannot be sent
+                return resp
+                    .json()
+                    .then(res => {
+                        let invalidOffers = res.invalid_offers;
+                        invalidOffers.forEach(offer => {
+                            appState.alert(
+                                '<b>Error</b>: Cannot nag send contract for offer ' + offer
+                            );
+                            // remove invalid offer(s) from offer list
+                            validOffers.splice(validOffers.indexOf(offer));
+                        });
+                    })
+                    .catch(defaultFailure);
+            }
+        })
+        // send offers to valid offers
+        .then(() => postHelper('/offers/send-contracts', { offers: offers }))
+        .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -206,17 +252,37 @@ function sendContracts(offers) {
                     appState.setFetchingOffersList(false, true);
                 })
                 .catch(() => appState.setFetchingOffersList(false));
-        },
-        resp => {
-            showMessageInJsonBody(resp);
-        }
-    );
+        });
 }
 
 // nag applicants
 function nag(offers) {
-    postHelper('/offers/nag', { contracts: offers }).then(
-        () => {
+    let validOffers = offers;
+
+    // check which applicants can be nagged
+    fetchCheckHelper('/offers/can-nag', { contracts: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some contracts cannot be sent
+                return resp
+                    .json()
+                    .then(res => {
+                        let invalidOffers = res.invalid_offers;
+                        invalidOffers.forEach(offer => {
+                            appState.alert(
+                                '<b>Error</b>: Cannot nag applicant about offer ' + offer
+                            );
+                            // remove invalid offer(s) from offer list
+                            validOffers.splice(validOffers.indexOf(offer));
+                        });
+                    })
+                    .catch(defaultFailure);
+            }
+        })
+        // nag valid offers
+        .then(() => postHelper('/offers/nag', { contracts: validOffers }))
+        .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -224,17 +290,37 @@ function nag(offers) {
                     appState.setFetchingOffersList(false, true);
                 })
                 .catch(() => appState.setFetchingOffersList(false));
-        },
-        resp => {
-            showMessageInJsonBody(resp);
-        }
-    );
+        });
 }
 
 // mark contracts as hr_processed
 function setHrProcessed(offers) {
-    putHelper('/offers/batch-update', { offers: offers, hr_status: 'Processed' }).then(
-        () => {
+    let validOffers = offers;
+
+    // check which offers can be marked as hr_processed
+    fetchCheckHelper('/offers/can-hr-update', { offers: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some offers cannot be updated
+                return resp
+                    .json()
+                    .then(res => {
+                        let invalidOffers = res.invalid_offers;
+                        invalidOffers.forEach(offer => {
+                            appState.alert(
+                                '<b>Error</b>: Cannot mark offer ' + offer + ' as HR processed'
+                            );
+                            // remove invalid offer(s) from offer list
+                            validOffers.splice(validOffers.indexOf(offer));
+                        });
+                    })
+                    .catch(defaultFailure);
+            }
+        })
+        // update valid offers
+        .then(() => putHelper('/offers/batch-update', { offers: offers, hr_status: 'Processed' }))
+        .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -242,17 +328,37 @@ function setHrProcessed(offers) {
                     appState.setFetchingOffersList(false, true);
                 })
                 .catch(() => appState.setFetchingOffersList(false));
-        },
-        resp => {
-            showMessageInJsonBody(resp);
-        }
-    );
+        });
 }
 
 // mark contracts as ddah_accepted
 function setDdahAccepted(offers) {
-    putHelper('/offers/batch-update', { offers: offers, ddah_status: 'Accepted' }).then(
-        () => {
+    let validOffers = offers;
+
+    // check which offers can be marked as ddah_accepted
+    fetchCheckHelper('/offers/can-ddah-update', { offers: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some offers cannot be updated
+                return resp
+                    .json()
+                    .then(res => {
+                        let invalidOffers = res.invalid_offers;
+                        invalidOffers.forEach(offer => {
+                            appState.alert(
+                                '<b>Error</b>: Cannot mark offer ' + offer + ' as DDAH accepted'
+                            );
+                            // remove invalid offer(s) from offer list
+                            validOffers.splice(validOffers.indexOf(offer));
+                        });
+                    })
+                    .catch(defaultFailure);
+            }
+        })
+        // update valid offers
+        .then(() => putHelper('/offers/batch-update', { offers: offers, ddah_status: 'Accepted' }))
+        .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
@@ -260,11 +366,7 @@ function setDdahAccepted(offers) {
                     appState.setFetchingOffersList(false, true);
                 })
                 .catch(() => appState.setFetchingOffersList(false));
-        },
-        resp => {
-            showMessageInJsonBody(resp);
-        }
-    );
+        });
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
@@ -287,9 +389,14 @@ function showContractHr(offer) {
 // withdraw offers
 function withdrawOffers(offers) {
     // create an array of promises for each offer being withdrawn
-    Promise.all(
-        offers.map(offer => postHelper('/offers/' + offer + '/decision/withdraw', {}))
-    ).then(
+    let promises = offers.map(offer =>
+        postHelper('/offers/' + offer + '/decision/withdraw', {}).then(
+            resp => Promise.resolve(resp.status),
+            resp => Promise.resolve(resp.status)
+        )
+    );
+
+    Promise.all(promises).then(
         () => {
             appState.setFetchingOffersList(true);
             getOffers()
@@ -307,9 +414,32 @@ function withdrawOffers(offers) {
 
 // print contracts
 function print(offers) {
-    let postPromise = postHelper('/offers/print', { contracts: offers, update: true })
-        .then(resp => resp.blob())
-        .catch(defaultFailure);
+    let validOffers = offers;
+
+    // check which contracts can be printed
+    let printPromise = fetchCheckHelper('/offers/can-print', { contracts: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some contracts cannot be printed
+                return resp
+                    .json()
+                    .then(res => {
+                        let invalidOffers = res.invalid_offers;
+                        invalidOffers.forEach(offer => {
+                            appState.alert(
+                                '<b>Error</b>: Cannot mark offer ' + offer + ' as HR processed'
+                            );
+                            // remove invalid offer(s) from offer list
+                            validOffers.splice(validOffers.indexOf(offer));
+                        });
+                    })
+                    .catch(defaultFailure);
+            }
+        })
+        // print valid offers
+        .then(() => postHelper('/offers/print', { contracts: validOffers, update: true }))
+        .then(resp => resp.blob().catch(defaultFailure));
 
     postPromise.then(blob => {
         let fileURL = URL.createObjectURL(blob);
@@ -318,20 +448,15 @@ function print(offers) {
         pdfWindow.document.onload = pdfWindow.print();
     });
 
-    postPromise.then(
-        () => {
-            appState.setFetchingOffersList(true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
-                })
-                .catch(() => appState.setFetchingOffersList(false));
-        },
-        resp => {
-            showMessageInJsonBody(resp);
-        }
-    );
+    postPromise.then(() => {
+        appState.setFetchingOffersList(true);
+        getOffers()
+            .then(offers => {
+                appState.setOffersList(fromJS(offers));
+                appState.setFetchingOffersList(false, true);
+            })
+            .catch(() => appState.setFetchingOffersList(false));
+    });
 }
 
 // change session pay
