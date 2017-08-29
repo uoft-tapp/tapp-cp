@@ -12,6 +12,14 @@ class OffersController < ApplicationController
     render json: offer.format
   end
 
+  def can_hr_update
+    offers_accepted(params[:offers])
+  end
+
+  def can_ddah_update
+    offers_accepted(params[:offers])
+  end
+
   def update
     if params[:id] == "batch-update"
       if params[:offers]
@@ -100,16 +108,7 @@ class OffersController < ApplicationController
   end
 
   def can_print
-    invalid = []
-    params[:contracts].each do |offer_id|
-      offer = Offer.find(offer_id)
-      if offer[:status] != "Accepted"
-        invalid.push(offer[:id])
-      end
-    end
-    if invalid.length > 0
-      render status: 404, json: {invalid_offers: invalid}
-    end
+    offers_accepted(params[:contracts])
   end
 
   def combine_contracts_print
@@ -196,7 +195,7 @@ class OffersController < ApplicationController
     elsif offer[:status] == "Unsent"
       render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
     else
-      render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
+      render status: 404, json: {success: false, message: "You cannot #{status[:action]} this offer. This offer has already been #{offer[:status].downcase}."}
     end
   end
 
@@ -238,5 +237,18 @@ class OffersController < ApplicationController
   def set_domain
     ENV["domain"] = request.base_url
   end
-  
+
+  def offers_accepted(offers)
+    invalid = []
+    offers.each do |offer_id|
+      offer = Offer.find(offer_id)
+      if offer[:status] != "Accepted"
+        invalid.push(offer[:id])
+      end
+    end
+    if invalid.length > 0
+      render status: 404, json: {invalid_offers: invalid}
+    end
+  end
+
 end

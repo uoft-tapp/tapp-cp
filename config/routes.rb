@@ -33,7 +33,9 @@ Rails.application.routes.draw do
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"
   post "offers/can-print" => "offers#can_print"
-  post "offers/can_nag" => "offers#can_nag"
+  post "offers/can-nag" => "offers#can_nag"
+  post "offers/can-hr-update" => "offers#can_hr_update"
+  post "offers/can-ddah-update" => "offers#can_ddah_update"
   post "offers/send-contracts" => "offers#send_contracts"
   post "offers/print" => "offers#combine_contracts_print"
   post "offers/nag" => "offers#batch_email_nags"
