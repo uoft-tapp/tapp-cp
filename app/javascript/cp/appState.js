@@ -259,8 +259,21 @@ class AppState {
     emailContract(offers) {
         if (offers.length != 1) {
             this.alert('<b>Error:</b> Can only email a contract link to a single applicant.');
+            return;
         }
+
         let offer = this.getOffersList().get(offers[0]);
+        if (!offer.get('link')) {
+            // offers does not have a contract link
+            this.alert(
+                '<b>Error:</b> Offer to ' +
+                    offer.get('lastName') +
+                    ', ' +
+                    offer.get('firstName') +
+                    ' does not have an associated contract'
+            );
+            return;
+        }
 
         var a = document.createElement('a');
         a.href =
@@ -317,6 +330,11 @@ class AppState {
     }
 
     nag(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
         let pendingOffers = [],
             allOffers = this.getOffersList();
 
@@ -339,10 +357,20 @@ class AppState {
     }
 
     print(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
         fetch.print(offers);
     }
 
     sendContracts(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
         let status,
             unsentOffers = [],
             allOffers = this.getOffersList();
@@ -378,6 +406,11 @@ class AppState {
     }
 
     setDdahAccepted(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
         let acceptedOffers = [],
             allOffers = this.getOffersList();
 
@@ -436,6 +469,11 @@ class AppState {
     }
 
     setHrProcessed(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
         let acceptedOffers = [],
             allOffers = this.getOffersList();
 
@@ -496,6 +534,11 @@ class AppState {
     }
 
     withdrawOffers(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
         let status,
             pendingOffers = [],
             allOffers = this.getOffersList();
