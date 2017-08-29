@@ -251,7 +251,7 @@ end
     context "file with no round_id" do
       let(:mock_json) { File.read("./spec/support/chass_data/no_round.json") }
       it "returns error json" do
-        error = {success: false, message: "Import Failure: no round_id found in the file"}
+        error = {success: false, imported: false, message: ["Import Failure: no round_id found in the file"]}
         expect(subject.get_status).to eq(error)
       end
     end
@@ -259,15 +259,23 @@ end
     context "file with more than one round_id" do
       let(:mock_json) { File.read("./spec/support/chass_data/too_many_rounds.json") }
       it "returns error json" do
-        error = {success: false, message: "Import Failure: too many round_ids found in the file"}
+        error = {success: false, imported: false, message: ["Import Failure: too many round_ids found in the file"]}
         expect(subject.get_status).to eq(error)
       end
     end
 
     context "expected file" do
       let(:mock_json) { File.read("./spec/support/chass_data/applicant.json") }
-      it "returns sucess json" do
-        success = {success: true, message: "CHASS import completed."}
+      it "returns success json with imported true" do
+        success = {success: true, imported: true, message: ["CHASS import completed."]}
+        expect(subject.get_status).to eq(success)
+      end
+    end
+
+    context "expected file with bad dates" do
+      let(:mock_json) { File.read("./spec/support/chass_data/applicant_bad_dates.json") }
+      it "returns errors json with imported true" do
+        success = {success: true, imported: true, message: ["Error: The dates for Position CSC100H1S is malformed."]}
         expect(subject.get_status).to eq(success)
       end
     end
