@@ -65,6 +65,7 @@ class ChassImporter
   end
 
   def create_session(semester, year)
+    semester = semester.slice(0,1).upcase + semester.slice(1..-1).downcase
     data ={
         year: year,
         semester: semester,
