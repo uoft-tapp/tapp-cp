@@ -335,25 +335,7 @@ class AppState {
             return;
         }
 
-        let pendingOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            if (allOffers.getIn([offer, 'status']) == 'Pending') {
-                pendingOffers.push(parseInt(offer));
-            } else {
-                // offers that are not 'pending' cannot be nagged about
-                this.alert(
-                    '<b>Error:</b> Offer to ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        ' is not pending'
-                );
-            }
-        }
-
-        fetch.nag(pendingOffers);
+        fetch.nag(offers);
     }
 
     print(offers) {
@@ -371,38 +353,7 @@ class AppState {
             return;
         }
 
-        let status,
-            unsentOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            status = allOffers.getIn([offer, 'status']);
-
-            switch (status) {
-                // can only send contracts that are unsent
-                case 'Unsent':
-                    unsentOffers.push(parseInt(offer));
-                    break;
-                case 'Withdrawn':
-                    this.alert(
-                        '<b>Error:</b> Cannot send contract to ' +
-                            allOffers.getIn([offer, 'lastName']) +
-                            ', ' +
-                            allOffers.getIn([offer, 'firstName']) +
-                            '. Offer was withdrawn.'
-                    );
-                    break;
-                default:
-                    this.alert(
-                        '<b>Error:</b> Contract has already been sent to ' +
-                            allOffers.getIn([offer, 'lastName']) +
-                            ', ' +
-                            allOffers.getIn([offer, 'firstName'])
-                    );
-            }
-        }
-
-        fetch.sendContracts(unsentOffers);
+        fetch.sendContracts(offers);
     }
 
     setDdahAccepted(offers) {
@@ -411,25 +362,7 @@ class AppState {
             return;
         }
 
-        let acceptedOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            // can only accept DDAH form for accepted offers
-            if (allOffers.getIn([offer, 'status']) == 'Accepted') {
-                acceptedOffers.push(parseInt(offer));
-            } else {
-                this.alert(
-                    '<b>Error:</b> Cannot accept DDAH form for ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        '. Offer is not accepted.'
-                );
-            }
-        }
-
-        fetch.setDdahAccepted(acceptedOffers);
+        fetch.setDdahAccepted(offers);
     }
 
     setFetchingOffersList(fetching, success) {
@@ -474,25 +407,7 @@ class AppState {
             return;
         }
 
-        let acceptedOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            // can only process contract for accepted offers
-            if (allOffers.getIn([offer, 'status']) == 'Accepted') {
-                acceptedOffers.push(parseInt(offer));
-            } else {
-                this.alert(
-                    '<b>Error:</b> Cannot process contract for ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        '. Offer is not accepted.'
-                );
-            }
-        }
-
-        fetch.setHrProcessed(acceptedOffers);
+        fetch.setHrProcessed(offers);
     }
 
     setImporting(importing, success) {
@@ -539,26 +454,7 @@ class AppState {
             return;
         }
 
-        let status,
-            pendingOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            // cannot withdraw unsent offers
-            if (allOffers.getIn([offer, 'status']) == 'Unsent') {
-                this.alert(
-                    '<b>Error:</b> Offer to ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        ' has not been sent'
-                );
-            } else {
-                pendingOffers.push(parseInt(offer));
-            }
-        }
-
-        fetch.withdrawOffers(pendingOffers);
+        fetch.withdrawOffers(offers);
     }
 }
 
