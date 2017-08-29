@@ -137,6 +137,8 @@ footer div p {
 
 #offers-grid .sessions .nav-tabs {
     background-color: #f5f5f5;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 #offers-grid .sessions .tab-content {
