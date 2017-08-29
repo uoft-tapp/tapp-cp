@@ -33,7 +33,7 @@ class OffersController < ApplicationController
     params[:contracts].each do |offer_id|
       offer = Offer.find(offer_id)
       if offer[:send_date]
-        invalid.push(offer_id)
+        invalid.push(offer[:id])
       end
     end
     if invalid.length > 0
@@ -69,7 +69,7 @@ class OffersController < ApplicationController
     params[:contracts].each do |offer_id|
       offer = Offer.find(offer_id)
       if offer[:status] != "Pending"
-        invalid.push(offer_id)
+        invalid.push(offer[:id])
       end
     end
     if invalid.length > 0
@@ -104,7 +104,7 @@ class OffersController < ApplicationController
     params[:contracts].each do |offer_id|
       offer = Offer.find(offer_id)
       if offer[:status] != "Accepted"
-        invalid.push(offer_id)
+        invalid.push(offer[:id])
       end
     end
     if invalid.length > 0

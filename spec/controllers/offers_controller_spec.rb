@@ -129,28 +129,18 @@ RSpec.describe OffersController, type: :controller do
 
   describe "POST /offers/" do
     context ":offer_id/can-send-contract" do
-      context "when offer_id is valid" do
-        context "when offer has not been sent" do
-          it "returns a status 200" do
-            post :can_send_contract, params: {offer_id: offer[:id]}
-            expect(response.status).to eq(204)
-          end
-        end
-
-        context "when offer has been sent" do
-          it "returns a status 400 and a json message" do
-            post :can_send_contract, params: {offer_id: sent_offer[:id]}
-            expect(response.status).to eq(404)
-            message = {message: "Error: This offer has already been sent."}.to_json
-            expect(response.body).to eq(message)
-          end
+      context "when all offers are valid" do
+        it "returns a status 204" do
+          post :can_send_contract, params: {contracts: [offer[:id]]}
+          expect(response.status).to eq(204)
         end
       end
-      context "when offer_id is invalid" do
-        it "returns a status 400 and a json message" do
-          post :can_send_contract, params: {offer_id: 6000}
+      context "when not all offers are valid" do
+        it "returns a status 400 and a json containing invalid offer_id's" do
+          post :can_send_contract, params: {contracts: [offer[:id], sent_offer[:id]]}
           expect(response.status).to eq(404)
-          expect(response.body).to eq({status: 404}.to_json)
+          json = {invalid_offers: [sent_offer[:id]]}.to_json
+          expect(response.body).to eq(json)
         end
       end
     end
@@ -171,28 +161,18 @@ RSpec.describe OffersController, type: :controller do
     end
 
     context ":offer_id/can-nag" do
-      context "when offer_id is valid" do
-        context "when offer is Pending" do
-          it "returns a status 200" do
-            post :can_nag, params: {offer_id: sent_offer[:id]}
-            expect(response.status).to eq(204)
-          end
-        end
-
-        context "when offer is not Pending" do
-          it "returns a status 400 and a json message" do
-            post :can_nag, params: {offer_id: offer[:id]}
-            expect(response.status).to eq(404)
-            message = {message: "Error: This offer is not in Pending."}.to_json
-            expect(response.body).to eq(message)
-          end
+      context "when all offers are valid" do
+        it "returns a status 204" do
+          post :can_nag, params: {contracts: [sent_offer[:id]]}
+          expect(response.status).to eq(204)
         end
       end
-      context "when offer_id is invalid" do
-        it "returns a status 400 and a json message" do
-          post :can_send_contract, params: {offer_id: 6000}
+      context "when not all offers are valid" do
+        it "returns a status 400 and a json containing invalid offer_id's" do
+          post :can_nag, params: {contracts: [offer[:id], sent_offer[:id]]}
           expect(response.status).to eq(404)
-          expect(response.body).to eq({status: 404}.to_json)
+          json = {invalid_offers: [offer[:id]]}.to_json
+          expect(response.body).to eq(json)
         end
       end
     end
@@ -312,28 +292,18 @@ RSpec.describe OffersController, type: :controller do
 
     end
     context ":offer_id/can-print" do
-      context "when offer_id is valid" do
-        context "when offer is Accepted" do
-          it "returns a status 200" do
-            post :can_print, params: {offer_id: accepted_offer[:id]}
-            expect(response.status).to eq(204)
-          end
-        end
-
-        context "when offer is not Accepted" do
-          it "returns a status 400 and a json message" do
-            post :can_print, params: {offer_id: offer[:id]}
-            expect(response.status).to eq(404)
-            message = {message: "Error: This offer has not been accepted."}.to_json
-            expect(response.body).to eq(message)
-          end
+      context "when all offers are valid" do
+        it "returns a status 204" do
+          post :can_print, params: {contracts: [accepted_offer[:id]]}
+          expect(response.status).to eq(204)
         end
       end
-      context "when offer_id is invalid" do
-        it "returns a status 400 and a json message" do
-          post :can_send_contract, params: {offer_id: 6000}
+      context "when not all offers are valid" do
+        it "returns a status 400 and a json containing invalid offer_id's" do
+          post :can_print, params: {contracts: [offer[:id], accepted_offer[:id]]}
           expect(response.status).to eq(404)
-          expect(response.body).to eq({status: 404}.to_json)
+          json = {invalid_offers: [offer[:id]]}.to_json
+          expect(response.body).to eq(json)
         end
       end
     end
