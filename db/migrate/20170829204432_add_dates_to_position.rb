@@ -1,7 +1,7 @@
 class AddDatesToPosition < ActiveRecord::Migration[5.1]
   def change
-    add_column :positions, :start_date, :datetime
-    add_column :positions, :end_date, :datetime
+    add_column :positions, :start_date, :datetime, null: true
+    add_column :positions, :end_date, :datetime, null: true
 
     reversible do |dir|
       dir.up do
@@ -16,7 +16,7 @@ class AddDatesToPosition < ActiveRecord::Migration[5.1]
       dir.down do
         execute <<-SQL
           UPDATE positions
-          SET start_date=sessions.start_date, end_date=sessions.end_date 
+          SET start_date=sessions.start_date, end_date=sessions.end_date
           FROM sessions
           WHERE positions.session_id=sessions.id;
         SQL

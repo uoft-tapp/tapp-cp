@@ -1,20 +1,26 @@
 class ChassImporter
   attr_reader :course_data, :applicant_data, :round_id
 
-  def initialize(data)
+  def initialize(data, semester, year)
     @course_data = data["courses"]
     @applicant_data = data["applicants"]
     @round_id = get_round_id
+    @exceptions = []
     if @round_id[:found]
       @round_id = @round_id[:round_id]
+      create_session(semester, year)
       insert_data
     else
-      @import_status = {success: false, message: @round_id[:message]}
+      @import_status = {success: false, imported: false, message: [@round_id[:message]]}
     end
   end
 
   def get_status
-    @import_status
+    if @exceptions.length > 0
+      {success: false, imported: true, message: @exceptions}
+    else
+      @import_status
+    end
   end
 
   private
@@ -22,7 +28,7 @@ class ChassImporter
     insert_positions
     insert_applicant
     insert_application
-    @import_status = {success: true, message: "CHASS import completed."}
+    @import_status = {success: true, imported: true, message: ["CHASS import completed."]}
   end
 
   def get_round_id
@@ -56,6 +62,16 @@ class ChassImporter
       db_model.save!
       return db_model
     end
+  end
+
+  def create_session(semester, year)
+    data ={
+        year: year,
+        semester: semester,
+    }
+    exists = "Session #{semester}, #{:year} already exists"
+    ident = {year: data[:year], semester: data[:semester]}
+    @session = insertion_helper(Session, data, ident, exists)
   end
 
   def insert_applicant
@@ -216,7 +232,11 @@ class ChassImporter
       posting_id  = course_entry["course_id"]
       course_id = posting_id.split("-")[0].strip
       round_id = course_entry["round_id"]
-      session_id = get_session_id(course_entry["dates"])
+      dates = get_dates(course_entry["dates"])
+      if !dates
+        dates = [nil, nil]
+        @exceptions.push("Error: The dates for Position #{course_entry["course_id"]} is malformed.")
+      end
       exists = "Position #{posting_id} already exists"
       ident = {position: posting_id, round_id: round_id}
       data = {
@@ -231,7 +251,9 @@ class ChassImporter
         hours: course_entry["n_hours"],
         estimated_count: course_entry["n_positions"],
         estimated_total_hours: course_entry["total_hours"],
-        session_id: session_id,
+        session_id: @session[:id],
+        start_date: dates[0],
+        end_date: dates[1],
       }
       position = insertion_helper(Position, data, ident, exists)
 
@@ -260,46 +282,19 @@ class ChassImporter
     end
   end
 
-  def get_session_id(dates)
+  def get_dates(dates)
     if dates
       dates = dates.split(" to ")
       if dates.size == 2
-        return get_session(dates)
+        return dates
       else
         dates = dates[0].split(" - ")
         if dates.size == 2
-          return get_session(dates)
+          return dates
         end
       end
     end
   end
 
-  def get_session(dates)
-    start_date = DateTime.parse(dates[0])
-    end_date =  DateTime.parse(dates[1])
-    semester = get_semester(start_date)
-    if semester
-      data ={
-        year: start_date.strftime("%Y"),
-        semester: semester,
-      }
-      exists = "Session #{data[:semester]}, #{data[:year]} already exists"
-      ident = {year: data[:year], semester: data[:semester]}
-      session = insertion_helper(Session, data, ident, exists)
-      return session.id
-    end
-  end
-
-  def get_semester(start_date)
-    start = start_date.strftime("%-m")
-    case start.to_i
-    when 9
-      return "Fall"
-    when 1
-      return "Winter"
-    when 5
-      return "Summer"
-    end
-  end
 
 end

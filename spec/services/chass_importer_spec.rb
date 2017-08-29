@@ -4,7 +4,7 @@ describe ChassImporter do
   let(:test_filename) { 'test/stub' }
   subject {
     data = JSON.parse(File.read("#{Rails.root}/db/#{test_filename}.json"))
-    ChassImporter.new(data)
+    ChassImporter.new(data, "Fall", 2017)
   }
 
   before :each do
