@@ -269,12 +269,8 @@ class ChassImporter
         dates = dates[0].split(" - ")
         if dates.size == 2
           return get_session(dates)
-        else
-          return nil
         end
       end
-    else
-      return nil
     end
   end
 
@@ -293,8 +289,6 @@ class ChassImporter
       ident = {year: data[:year], semester: data[:semester]}
       session = insertion_helper(Session, data, ident, exists)
       return session.id
-    else
-      return nil
     end
   end
 
