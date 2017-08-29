@@ -44,21 +44,6 @@ const Session = props => {
         return null;
     }
 
-    let semesterOrder = ['Winter', 'Spring', 'Fall', 'Year'];
-    // sort sesions in order of most recent to least recent
-    let sessions = props.appState.getSessionsList().sort((sessionA, sessionB) => {
-        if (sessionA.get('year') > sessionB.get('year')) {
-            return -1;
-        }
-        if (sessionA.get('year') < sessionB.get('year')) {
-            return 1;
-        }
-        return (
-            semesterOrder.indexOf(sessionA.get('semester')) -
-            semesterOrder.indexOf(sessionB.get('semester'))
-        );
-    });
-
     return (
         <Navbar.Form>
             <FormGroup>
@@ -69,7 +54,7 @@ const Session = props => {
                     <option value="" key="session-all">
                         all
                     </option>
-                    {sessions.map((session, sessionId) =>
+                    {props.appState.getSessionsList().map((session, sessionId) =>
                         <option value={sessionId} key={'session-' + sessionId}>
                             {session.get('semester')}&nbsp;{session.get('year')}
                         </option>

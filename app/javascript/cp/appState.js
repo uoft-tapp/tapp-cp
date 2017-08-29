@@ -433,6 +433,18 @@ class AppState {
     }
 
     setSessionsList(list) {
+        let semesterOrder = ['Winter', 'Spring', 'Fall', 'Year'];
+        // sort sesions in order of most recent to least recent
+        list.sort((sessionA, sessionB) => {
+            if (sessionA.get('year') > sessionB.get('year')) {
+                return -1;
+            }
+            if (sessionA.get('year') < sessionB.get('year')) {
+                return 1;
+            }
+            return semesterOrder.indexOf(sessionA.get('semester')) - semesterOrder.indexOf(sessionB.get('semester'));
+        });
+        
         this.set('sessions.list', list);
     }
 
