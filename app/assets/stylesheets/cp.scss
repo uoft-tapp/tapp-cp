@@ -4,7 +4,8 @@
     --navbar-height: 71px; /* includes margins */
     --table-menu-height: calc(34px + 1vh);
     --main-div-height: calc(100vh - var(--navbar-height) - var(--footer-height));
-    --sessions-height: calc(100px + 1.5vh);
+    --min-row-height: 52px; /* assumes that header is two rows high */
+    --sessions-height: calc(87px + 1.5vh);
 }
 
 html {
@@ -100,9 +101,16 @@ footer div p {
     margin-left: 3vw;
 }
 
-/* for Table in admin view */
 #offers-grid table {
     margin: 0;
+}
+
+/* for Table in admin view */
+#offers-grid .sessions ~ .table-container .table-body {
+    /* note that this assumes that the header is at most one row high */
+    max-height: calc(
+        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - var(--sessions-height)
+    );
 }
 
 #offers-grid .table-body {
@@ -113,11 +121,8 @@ footer div p {
     overflow: auto;
 }
 
-#offers-grid .admin-table .table-body {
-    /* note that this assumes that the header is at most one row high */
-    max-height: calc(
-        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - var(--sessions-height)
-    );
+#offers-grid .table-container th {
+    text-overflow: ellipsis;
 }
 
 #offers-grid .table-container td,
@@ -130,11 +135,11 @@ footer div p {
     border: 1px solid #ddd;
 }
 
-#offers-grid .nav-tabs {
+#offers-grid .sessions .nav-tabs {
     background-color: #f5f5f5;
 }
 
-#offers-grid .tab-content {
+#offers-grid .sessions .tab-content {
     height: calc(35px + 5px + 5px);
     padding: 5px 15px;
 }

@@ -470,6 +470,10 @@ class AppState {
         fetch.showContractHr(offer);
     }
 
+    updateSessionPay(session, pay) {
+        fetch.updateSessionPay(session, pay);
+    }
+
     withdrawOffers(offers) {
         let status,
             pendingOffers = [],

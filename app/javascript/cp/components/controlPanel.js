@@ -88,28 +88,28 @@ class ControlPanel extends React.Component {
                 data: p => p.offer.get('lastName'),
                 sortData: p => p.get('lastName'),
 
-                style: { width: 0.09 },
+                style: { width: 0.08 },
             },
             {
                 header: 'First Name',
                 data: p => p.offer.get('firstName'),
                 sortData: p => p.get('firstName'),
 
-                style: { width: 0.06 },
+                style: { width: 0.08 },
             },
             {
                 header: 'Email',
                 data: p => p.offer.get('email'),
                 sortData: p => p.get('email'),
 
-                style: { width: 0.13 },
+                style: { width: 0.16 },
             },
             {
                 header: 'Student Number',
                 data: p => p.offer.get('studentNumber'),
                 sortData: p => p.get('studentNumber'),
 
-                style: { width: 0.06 },
+                style: { width: 0.07 },
             },
             {
                 header: 'Position',
@@ -123,7 +123,7 @@ class ControlPanel extends React.Component {
                     .getPositions()
                     .map(position => p => p.get('position') == position),
 
-                style: { width: 0.08 },
+                style: { width: 0.10 },
             },
             {
                 header: 'Hours',
@@ -147,7 +147,7 @@ class ControlPanel extends React.Component {
                     'Withdrawn',
                 ].map(status => p => p.get('status') == status),
 
-                style: { width: 0.05 },
+                style: { width: 0.07 },
             },
             {
                 header: 'Contract Send Date',
@@ -172,14 +172,14 @@ class ControlPanel extends React.Component {
                         : '',
                 sortData: p => p.get('sentAt'),
 
-                style: { width: 0.08 },
+                style: { width: 0.10 },
             },
             {
                 header: 'Nag Count',
                 data: p => (p.offer.get('nagCount') ? p.offer.get('nagCount') : ''),
                 sortData: p => p.get('nagCount'),
 
-                style: { width: 0.04 },
+                style: { width: 0.05 },
             },
             {
                 header: 'HRIS Status',
@@ -192,7 +192,7 @@ class ControlPanel extends React.Component {
                     ['Processed', 'Printed'].map(status => p => p.get('hrStatus') == status)
                 ),
 
-                style: { width: 0.05 },
+                style: { width: 0.07 },
             },
             {
                 header: 'Printed Date',
@@ -217,8 +217,6 @@ class ControlPanel extends React.Component {
                         p.get('ddahStatus') == status
                     )
                 ),
-
-                style: { width: 0.06 },
             },
         ];
 
@@ -249,7 +247,6 @@ class ControlPanel extends React.Component {
                 </ButtonToolbar>
 
                 <Table
-                    className={role == 'admin' ? 'admin-table' : ''}
                     config={this.config}
                     getOffers={() => {
 			let session = this.props.appState.getSelectedSession();

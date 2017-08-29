@@ -12,11 +12,11 @@ class SessionsForm extends React.Component {
 		        <Form
 			    inline
 			    onSubmit={event => {
-				if (event.target.elements[0].value != session.get('pay')) {
+                                event.preventDefault();
+                                if (event.target.elements[0].value != session.get('pay')) {
 				    this.props.appState.updateSessionPay(
 					sessionId, event.target.elements[0].value);
 				}
-                                event.preventDefault();
                             }}>
 				<b>Start date:</b>&ensp;
 				{new Date(session.get('startDate')).toDateString()}&emsp;&emsp;
