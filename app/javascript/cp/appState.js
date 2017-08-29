@@ -242,9 +242,30 @@ class AppState {
         return [this.get('offers.list'), this.get('sessions.list')].some(val => val == null);
     }
 
+    // email applicants
     email(offers) {
         let allOffers = this.getOffersList();
-        fetch.email(offers.map(offer => allOffers.getIn([offer, 'email'])));
+        let emails = offers.map(offer => allOffers.getIn([offer, 'email']));
+
+        var a = document.createElement('a');
+        a.href =
+            emails.length == 1
+                ? 'mailto:' + emails[0] // if there is only a single recipient, send normally
+                : 'mailto:?bcc=' + emails.join(';'); // if there are multiple recipients, bcc all
+        a.click();
+    }
+
+    // email mangled contract link to a single applicant
+    emailContract(offers) {
+        if (offers.length != 1) {
+            this.alert('<b>Error:</b> Can only email a contract link to a single applicant.');
+        }
+        let offer = this.getOffersList().get(offers[0]);
+
+        var a = document.createElement('a');
+        a.href =
+            'mailto:' + offer.get('email') + '?body=Link%20to%20contract:%20' + offer.get('link');
+        a.click();
     }
 
     // check if offers are being fetched

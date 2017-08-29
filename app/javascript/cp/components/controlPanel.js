@@ -288,7 +288,10 @@ const OffersMenu = props =>
 
 const CommMenu = props =>
     <DropdownButton bsStyle="primary" title="Communicate" id="comm-dropdown">
-        <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>Email</MenuItem>
+        <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>Email [blank]</MenuItem>
+        <MenuItem onClick={() => props.appState.emailContract(getSelectedOffers())}>
+            Email [contract]
+        </MenuItem>
         <MenuItem onClick={() => props.appState.nag(getSelectedOffers())}>Nag</MenuItem>
     </DropdownButton>;
 

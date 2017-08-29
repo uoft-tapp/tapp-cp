@@ -100,6 +100,7 @@ function onFetchOffersSuccess(resp) {
             ddahStatus: offer.ddah_status,
             sentAt: offer.send_date,
             printedAt: offer.print_time,
+            link: offer.link,
         };
     });
 
@@ -210,18 +211,6 @@ function sendContracts(offers) {
             showMessageInJsonBody(resp);
         }
     );
-}
-
-// email applicants
-function email(emails) {
-    let ref =
-        emails.length == 1
-            ? 'mailto:' + emails[0] // if there is only a single recipient, send normally
-            : 'mailto:?bcc=' + emails.join(';'); // if there are multiple recipients, bcc all
-
-    var a = document.createElement('a');
-    a.href = ref;
-    a.click();
 }
 
 // nag applicants
@@ -368,7 +357,6 @@ export {
     importOffers,
     importAssignments,
     sendContracts,
-    email,
     nag,
     setHrProcessed,
     setDdahAccepted,
