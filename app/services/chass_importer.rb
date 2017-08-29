@@ -17,7 +17,7 @@ class ChassImporter
 
   def get_status
     if @exceptions.length > 0
-      {success: false, imported: true, message: @exceptions}
+      {success: true, imported: true, message: @exceptions}
     else
       @import_status
     end
