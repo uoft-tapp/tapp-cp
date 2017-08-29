@@ -39,7 +39,7 @@ const Notifications = props => {
 };
 
 const Session = props => {
-    if (props.isSessionsListNull()) {
+    if (props.appState.isSessionsListNull()) {
         return null;
     }
     
@@ -92,7 +92,7 @@ const NavbarInst = props =>
 
         {props.appState.getCurrentUserRole() == 'admin' &&
             <Nav pullLeft>
-                <Sessions {...props} />
+                <Session {...props} />
             </Nav>}
 
         <Nav pullRight>
