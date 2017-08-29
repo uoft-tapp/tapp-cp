@@ -12,6 +12,14 @@ class OffersController < ApplicationController
     render json: offer.format
   end
 
+  def can_hr_update
+    offers_accepted(params[:offers])
+  end
+
+  def can_ddah_update
+    offers_accepted(params[:offers])
+  end
+
   def update
     if params[:id] == "batch-update"
       if params[:offers]
@@ -28,89 +36,92 @@ class OffersController < ApplicationController
     end
   end
 
-  def send_contracts
-    errors = ["Exceptions:"]
-    if params[:offers]
-      params[:offers].each do |id|
-        offer = Offer.find(id)
-        if !offer[:send_date]
-          if ENV['RAILS_ENV'] != 'test'
-            begin
-              '''
-               We create mangled, which is a hash of the data from get_utorid_position
-               the data from get_utorid_position is a json that can be reused
-               on the /pb/:mangled routes, where :mangled = mangled.
-               This is where we mangled our routes so that an attacker can\'t
-               see how to masquerade as another applicant.
-               get_route(mangled) creates the link that we send to the applicant,
-               so that they can see the view for making decision on whether or not
-               to accept an offer.
-              '''
-              mangled = crypt(get_utorid_position(offer.format), id)
-              offer.update_attributes!(link: mangled)
-              CpMailer.contract_email(offer.format, get_route(mangled)).deliver_now
-            rescue StandardError => e
-              errors.push("Could not send a contract to #{offer[:applicant][:email]}.")
-            end
-          end
-          offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
-        else
-          errors.push("You've already sent out a contract to #{offer.format[:applicant][:email]}.")
-        end
+  def can_send_contract
+    invalid = []
+    params[:contracts].each do |offer_id|
+      offer = Offer.find(offer_id)
+      if offer[:send_date]
+        invalid.push(offer[:id])
       end
     end
-    if errors.length == 1
-      render status: 200, json: {message: "You've successfully sent out all the contracts."}
-    else
-      render status: 404, json: {message: errors.join("\n")}
+    if invalid.length > 0
+      render status: 404, json: {invalid_offers: invalid}
+    end
+  end
+
+  def send_contracts
+    params[:offers].each do |id|
+      offer = Offer.find(id)
+        if ENV['RAILS_ENV'] != 'test'
+          '''
+            We create mangled, which is a hash of the data from get_utorid_position
+            the data from get_utorid_position is a json that can be reused
+            on the /pb/:mangled routes, where :mangled = mangled.
+            This is where we mangled our routes so that an attacker can\'t
+            see how to masquerade as another applicant.
+            get_route(mangled) creates the link that we send to the applicant,
+            so that they can see the view for making decision on whether or not
+            to accept an offer.
+          '''
+          mangled = crypt(get_utorid_position(offer.format), id)
+          offer.update_attributes!(link: mangled)
+          CpMailer.contract_email(offer.format, get_route(mangled)).deliver_now
+        end
+        offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
+    end
+    render status: 200, json: {message: "You've successfully sent out all the contracts."}
+  end
+
+  def can_nag
+    invalid = []
+    params[:contracts].each do |offer_id|
+      offer = Offer.find(offer_id)
+      if offer[:status] != "Pending"
+        invalid.push(offer[:id])
+      end
+    end
+    if invalid.length > 0
+      render status: 404, json: {invalid_offers: invalid}
     end
   end
 
   def batch_email_nags
-    exceptions = ["Exceptions:"]
-    if params[:contracts] && params[:contracts]!=""
-      params[:contracts].each do |id|
-        offer = Offer.find(id)
-        if offer
-          if offer[:status] == "Pending"
-            offer.increment!(:nag_count, 1)
-            if ENV['RAILS_ENV'] != 'test'
-              '''
-               We create mangled, which is a hash of the data from get_utorid_position
-               the data from get_utorid_position is a json that can be reused
-               on the /pb/:mangled routes, where :mangled = mangled.
-               This is where we mangled our routes so that an attacker can`t
-               see how to masquerade as another applicant.
-               get_route(mangled) creates the link that we send to the applicant,
-               so that they can see the view for making decision on whether or not
-               to accept an offer.
-              '''
-              mangled = offer[:link]
-              CpMailer.nag_email(offer.format, get_route(mangled)).deliver_now
-            end
-          else
-            offer = offer.format
-            exceptions.push("- Applicant #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s nag for Position #{offer[:position]} was not sent because it is not in Pending status.")
-          end
-        end
-      end
-      if exceptions.length == 1
-        render json: {message: "You've sent the nag emails."}
-      else
-        render status: 404, json: {message: exceptions.join("\n")}
+    params[:contracts].each do |id|
+      offer = Offer.find(id)
+      offer.increment!(:nag_count, 1)
+      if ENV['RAILS_ENV'] != 'test'
+        '''
+         We create mangled, which is a hash of the data from get_utorid_position
+         the data from get_utorid_position is a json that can be reused
+         on the /pb/:mangled routes, where :mangled = mangled.
+         This is where we mangled our routes so that an attacker can`t
+         see how to masquerade as another applicant.
+         get_route(mangled) creates the link that we send to the applicant,
+         so that they can see the view for making decision on whether or not
+         to accept an offer.
+        '''
+        mangled = offer[:link]
+        CpMailer.nag_email(offer.format, get_route(mangled)).deliver_now
       end
     end
+    render json: {message: "You've sent the nag emails."}
+  end
+
+  def can_print
+    offers_accepted(params[:contracts])
   end
 
   def combine_contracts_print
-    if params[:contracts] && params[:contracts]!=""
-      offers = get_printable_data(params[:contracts])
+    offers = []
+    params[:contracts].each do |offer_id|
       if params[:update]
-        update_print_status(offers)
+        update_print_status(offer_id)
       end
-      generator = ContractGenerator.new(offers, true)
-      send_data generator.render, filename: "contracts.pdf", disposition: "inline"
+      offer = Offer.find(offer_id)
+      offers.push(offer.format)
     end
+    generator = ContractGenerator.new(offers, true)
+    send_data generator.render, filename: "contracts.pdf", disposition: "inline"
   end
 
   '''
@@ -163,25 +174,12 @@ class OffersController < ApplicationController
     end
   end
 
-  def get_printable_data(contracts)
-    offers = []
-    contracts.each do |id|
-      offer = Offer.find(id)
-      if offer
-        offers.push(offer.format)
-      end
-    end
-    return offers
-  end
-
-  def update_print_status(offers)
-    offers.each do |offer|
-      offer = Offer.find(offer[:id])
-      if offer[:hr_status] == "Processed"
-        offer.update_attributes!({print_time: DateTime.now})
-      else
-        offer.update_attributes!({hr_status: "Printed", print_time: DateTime.now})
-      end
+  def update_print_status(offer_id)
+    offer = Offer.find(offer_id)
+    if offer[:hr_status] == "Processed"
+      offer.update_attributes!({print_time: DateTime.now})
+    else
+      offer.update_attributes!({hr_status: "Printed", print_time: DateTime.now})
     end
   end
 
@@ -197,7 +195,7 @@ class OffersController < ApplicationController
     elsif offer[:status] == "Unsent"
       render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
     else
-      render status: 404, json: {success: false, message: "You cannot reject this offer. This offer has already been #{offer[:status].downcase}."}
+      render status: 404, json: {success: false, message: "You cannot #{status[:action]} this offer. This offer has already been #{offer[:status].downcase}."}
     end
   end
 
@@ -239,5 +237,18 @@ class OffersController < ApplicationController
   def set_domain
     ENV["domain"] = request.base_url
   end
-  
+
+  def offers_accepted(offers)
+    invalid = []
+    offers.each do |offer_id|
+      offer = Offer.find(offer_id)
+      if offer[:status] != "Accepted"
+        invalid.push(offer[:id])
+      end
+    end
+    if invalid.length > 0
+      render status: 404, json: {invalid_offers: invalid}
+    end
+  end
+
 end
