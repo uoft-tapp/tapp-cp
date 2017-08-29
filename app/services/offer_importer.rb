@@ -2,8 +2,8 @@ class OfferImporter
 
   def import_json(data)
     data[:offers].each do |offer|
-      position = Position.find_by_position(offer["course_id"], offer["round_id"])
-      applicant = Applicant.find_by_utorid(offer["utorid"])
+      position = Position.find_by(position: offer["course_id"], round_id: offer["round_id"])
+      applicant = Applicant.find_by(utorid: offer["utorid"])
       ident = {position_id: position[:id], applicant_id: applicant[:id]}
       exists = "offer with position #{offer[:position]} for applicant #{offer[:utorid]} already exists"
       data = get_data(position, applicant, offer["hours"],offer["session"], offer["year"])

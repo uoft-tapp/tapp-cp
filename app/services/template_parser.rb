@@ -42,6 +42,22 @@ class TemplateParser
     return num_lines
   end
 
+  def get_hr_position_num(status)
+    ug = 14935
+    sgs_I = 14936
+    sgs_II = 14937
+    case status
+    when "1PHD"
+      return sgs_II
+    when "2Msc"
+      return sgs_I
+    when "8UG"
+      return ug
+    else
+      return ""
+    end
+  end
+
   private
   def set_template_data(name)
     file_data = File.read("#{Rails.root}/app/services/templates/#{name}.html.erb")
