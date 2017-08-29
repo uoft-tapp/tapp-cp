@@ -58,26 +58,31 @@ class ControlPanel extends React.Component {
                         className="offer-checkbox"
                         id={p.offerId}
                         onClick={event => {
-			    // range selection using shift key
-			    if (this.lastClicked && event.shiftKey) {
-				let first = false, last = false;
+                            // range selection using shift key (range is from current box (offerId) to last-clicked box
+                            if (this.lastClicked && event.shiftKey) {
+                                let first = false,
+                                    last = false;
 
-				Array.prototype.forEach.call(getCheckboxElements(), box => {
-				    if (!first && (box.id == p.offerId || box.id == this.lastClicked)) {
-					first = true;
-					box.checked = true;
-				    }
+                                Array.prototype.forEach.call(getCheckboxElements(), box => {
+                                    if (
+                                        !first &&
+                                        (box.id == p.offerId || box.id == this.lastClicked)
+                                    ) {
+                                        // starting box
+                                        first = true;
+                                        box.checked = true;
+                                    } else if (first && !last) {
+                                        // box is in range
+                                        if (box.id == p.offerId || box.id == this.lastClicked) {
+                                            // ending box
+                                            last = true;
+                                        }
+                                        box.checked = true;
+                                    }
+                                });
+                            }
 
-				    if (first && !last) {
-					if (box.id == p.offerId || box.id == this.lastClicked) {
-					    last = true;
-					}
-					box.checked = true;
-				    }
-				});
-			    }
-
-			    this.lastClicked = p.offerId;
+                            this.lastClicked = p.offerId;
                         }}
                     />,
 
@@ -123,7 +128,7 @@ class ControlPanel extends React.Component {
                     .getPositions()
                     .map(position => p => p.get('position') == position),
 
-                style: { width: 0.10 },
+                style: { width: 0.1 },
             },
             {
                 header: 'Hours',
@@ -172,7 +177,7 @@ class ControlPanel extends React.Component {
                         : '',
                 sortData: p => p.get('sentAt'),
 
-                style: { width: 0.10 },
+                style: { width: 0.1 },
             },
             {
                 header: 'Nag Count',
@@ -223,7 +228,7 @@ class ControlPanel extends React.Component {
         return (
             <Grid fluid id="offers-grid">
                 {role == 'admin' && <SessionsForm {...this.props} />}
-            
+
                 <ButtonToolbar id="dropdown-menu">
                     {role == 'admin' && <ImportMenu {...this.props} />}
                     {role == 'admin' && <OffersMenu {...this.props} />}
@@ -249,13 +254,14 @@ class ControlPanel extends React.Component {
                 <Table
                     config={this.config}
                     getOffers={() => {
-			let session = this.props.appState.getSelectedSession();
-			if (session != '') {
-			    return this.props.appState.getOffersList()
-				.filter(offer => offer.get('session') == session);
-			}
-			return this.props.appState.getOffersList();
-	            }}
+                        let session = this.props.appState.getSelectedSession();
+                        if (session != '') {
+                            return this.props.appState
+                                .getOffersList()
+                                .filter(offer => offer.get('session') == session);
+                        }
+                        return this.props.appState.getOffersList();
+                    }}
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
                 />
