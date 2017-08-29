@@ -40,4 +40,4 @@ fi
 EXPOSE 3000
 
 #TODO apparently cannot use variable in CMD instruction, but i hate the 5000 here!
-#CMD ["rails", "server", "-b", "0.0.0.0", "-p", ${CP_PORT}]
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "3000"]
