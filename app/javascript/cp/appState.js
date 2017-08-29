@@ -335,7 +335,7 @@ class AppState {
             return;
         }
 
-        fetch.nag(offers);
+        fetch.nag(offers.map(offer => parseInt(offer)));
     }
 
     print(offers) {
@@ -344,7 +344,7 @@ class AppState {
             return;
         }
 
-        fetch.print(offers);
+        fetch.print(offers.map(offer => parseInt(offer)));
     }
 
     sendContracts(offers) {
@@ -353,7 +353,7 @@ class AppState {
             return;
         }
 
-        fetch.sendContracts(offers);
+        fetch.sendContracts(offers.map(offer => parseInt(offer)));
     }
 
     setDdahAccepted(offers) {
@@ -362,7 +362,7 @@ class AppState {
             return;
         }
 
-        fetch.setDdahAccepted(offers);
+        fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
     }
 
     setFetchingOffersList(fetching, success) {
@@ -407,7 +407,7 @@ class AppState {
             return;
         }
 
-        fetch.setHrProcessed(offers);
+        fetch.setHrProcessed(offers.map(offer => parseInt(offer)));
     }
 
     setImporting(importing, success) {
