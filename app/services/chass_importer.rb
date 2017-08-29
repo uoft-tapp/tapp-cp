@@ -11,13 +11,13 @@ class ChassImporter
       create_session(semester, year)
       insert_data
     else
-      @import_status = {success: false, imported: false, message: [@round_id[:message]]}
+      @import_status = {success: false, errors: true, message: [@round_id[:message]]}
     end
   end
 
   def get_status
     if @exceptions.length > 0
-      {success: true, imported: true, message: @exceptions}
+      {success: true, errors: true, message: @exceptions}
     else
       @import_status
     end
@@ -28,7 +28,7 @@ class ChassImporter
     insert_positions
     insert_applicant
     insert_application
-    @import_status = {success: true, imported: true, message: ["CHASS import completed."]}
+    @import_status = {success: true, errors: false, message: ["CHASS import completed."]}
   end
 
   def get_round_id
