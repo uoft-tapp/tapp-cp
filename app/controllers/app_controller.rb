@@ -1,15 +1,31 @@
 class AppController < ApplicationController
+  include Authorizer
+  around_action :is_admin
   protect_from_forgery with: :exception
   include Mangler
 
   ''' TAPP functions '''
   def tapp
+    requests = {}
+    request.headers.each do |key, value|
+      requests[key.to_sym] = value
+    end
+    File.open("#{Rails.root}/db/seeds/header.txt", 'w') do |f|
+      f.puts JSON.pretty_generate(requests)
+    end
     render :tapp , layout: false
   end
 
   ''' CP functions '''
 
   def cp
+    requests = {}
+    request.headers.each do |key, value|
+      requests[key.to_sym] = value
+    end
+    File.open("#{Rails.root}/db/seeds/header.txt", 'w') do |f|
+      f.puts JSON.pretty_generate(requests)
+    end
     render :cp, layout: false
   end
 

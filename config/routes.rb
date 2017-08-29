@@ -37,8 +37,13 @@ Rails.application.routes.draw do
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
 
+  # shared routes
+  post "/login", to: "roles#login"
+  post "/logout", to: "roles#logout"
+
   #temp-testing views
   get "test" => "app#test"
+  get "/test", to: "roles#test"
 
   '''
     The following routes are mangled urls, so that attacker can`t mess with the

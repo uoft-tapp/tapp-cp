@@ -1,4 +1,6 @@
 class ApplicationsController < ApplicationController
+  include Authorizer
+  around_action :is_admin
 
 '''
   index #GET
