@@ -217,46 +217,44 @@ class ChassImporter
       course_id = posting_id.split("-")[0].strip
       round_id = course_entry["round_id"]
       session_id = get_session_id(course_entry["dates"])
-      if session_id
-        exists = "Position #{posting_id} already exists"
-        ident = {position: posting_id, round_id: round_id}
-        data = {
-          position: posting_id,
-          round_id: round_id,
-          open: true,
-          campus_code: course_id[course_id[/[A-Za-z0-9]{3}\d{3,4}/].size+1].to_i,
-          course_name: course_entry["course_name"].strip,
-          current_enrollment: course_entry["enrollment"],
-          duties: course_entry["duties"],
-          qualifications: course_entry["qualifications"],
-          hours: course_entry["n_hours"],
-          estimated_count: course_entry["n_positions"],
-          estimated_total_hours: course_entry["total_hours"],
-          session_id: session_id,
-        }
-        position = insertion_helper(Position, data, ident, exists)
+      exists = "Position #{posting_id} already exists"
+      ident = {position: posting_id, round_id: round_id}
+      data = {
+        position: posting_id,
+        round_id: round_id,
+        open: true,
+        campus_code: course_id[course_id[/[A-Za-z0-9]{3}\d{3,4}/].size+1].to_i,
+        course_name: course_entry["course_name"].strip,
+        current_enrollment: course_entry["enrollment"],
+        duties: course_entry["duties"],
+        qualifications: course_entry["qualifications"],
+        hours: course_entry["n_hours"],
+        estimated_count: course_entry["n_positions"],
+        estimated_total_hours: course_entry["total_hours"],
+        session_id: session_id,
+      }
+      position = insertion_helper(Position, data, ident, exists)
 
-        teaching_instructors = []
-        course_entry["instructor"].each do |instructor|
-          name = instructor["first_name"].strip+" "+instructor["last_name"].strip
-          ident = {name: name}
-          exists = "Instructor #{name} alread exists"
-          data = {
-              name: name,
-              email: instructor["email"],
-              utorid: instructor["utorid"],
-          }
-          instructor = insertion_helper(Instructor, data, ident, exists)
-          teaching_instructors.push(instructor[:id])
-          unless position.instructors.where(id: instructor[:id]).exists?
-            position.instructors << [instructor]
-          end
+      teaching_instructors = []
+      course_entry["instructor"].each do |instructor|
+        name = instructor["first_name"].strip+" "+instructor["last_name"].strip
+        ident = {name: name}
+        exists = "Instructor #{name} alread exists"
+        data = {
+            name: name,
+            email: instructor["email"],
+            utorid: instructor["utorid"],
+        }
+        instructor = insertion_helper(Instructor, data, ident, exists)
+        teaching_instructors.push(instructor[:id])
+        unless position.instructors.where(id: instructor[:id]).exists?
+          position.instructors << [instructor]
         end
-        position.instructors.each do |instructor|
-          if !teaching_instructors.include?(instructor[:id])
-            position.instructors.delete(instructor)
-            Rails.logger.debug "all instructors for Position #{position[:id]}: #{JSON.pretty_generate(position.instructors.as_json)}"
-          end
+      end
+      position.instructors.each do |instructor|
+        if !teaching_instructors.include?(instructor[:id])
+          position.instructors.delete(instructor)
+          Rails.logger.debug "all instructors for Position #{position[:id]}: #{JSON.pretty_generate(position.instructors.as_json)}"
         end
       end
     end

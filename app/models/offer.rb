@@ -1,8 +1,9 @@
 class Offer < ApplicationRecord
+  validates_uniqueness_of :position_id, scope: [:applicant_id]
+  belongs_to :applicant
+  belongs_to :position
   include Model
   include Mangler
-  validates_uniqueness_of :position_id, scope: [:applicant_id]
-  has_one :contract
 
   def get_deadline
     offer = self.json

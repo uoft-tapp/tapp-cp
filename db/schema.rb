@@ -94,7 +94,6 @@ ActiveRecord::Schema.define(version: 20170828170241) do
     t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "accept_date"
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"
     t.index ["position_id"], name: "index_offers_on_position_id"
   end
