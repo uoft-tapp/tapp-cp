@@ -28,9 +28,9 @@ module Mangler
 
   def get_route(mangled, type=nil)
     if !type
-      "#{request.base_url}/pb/#{mangled}"
+      "#{ENV["domain"]}/pb/#{mangled}"
     else
-      "#{request.base_url}/pb/#{mangled}/#{type}"
+      "#{ENV["domain"]}/pb/#{mangled}/#{type}"
     end
   end
 

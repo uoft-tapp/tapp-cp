@@ -1,5 +1,6 @@
 class Offer < ApplicationRecord
   include Model
+  include Mangler
   validates_uniqueness_of :position_id, scope: [:applicant_id]
   has_one :contract
 
@@ -16,6 +17,9 @@ class Offer < ApplicationRecord
     applicant = Applicant.find(self[:applicant_id])
     instructors = position.instructors
     session = Session.find(position[:session_id])
+    if offer[:link]
+      offer[:link]= get_route(offer[:link])
+    end
     data = {
       position: position[:position],
       applicant: applicant,
@@ -29,6 +33,6 @@ class Offer < ApplicationRecord
     instructors.each do |instructor|
       data[:instructors].push(instructor)
     end
-    return offer.merge(data).except(:link)
+    return offer.merge(data)
   end
 end

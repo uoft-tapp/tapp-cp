@@ -1,5 +1,6 @@
 class OffersController < ApplicationController
   protect_from_forgery with: :null_session
+  before_action :set_domain
   include Mangler
 
   def index
@@ -235,6 +236,8 @@ class OffersController < ApplicationController
     send_data generator.render, filename: "contract.pdf", disposition: "inline"
   end
 
-
-
+  def set_domain
+    ENV["domain"] = request.base_url
+  end
+  
 end
