@@ -3,7 +3,12 @@ class ImportController < ApplicationController
 
   def import_offers
     importer = OfferImporter.new
-    importer.import_json(params[:chass_offers])
+    status = importer.import_json(params[:chass_offers])
+    if status[:imported]
+      render json: {message: status[:message], errors: status[:errors]}
+    else
+      render status: 404, json: {message: status[:message], errors: status[:errors]}
+    end
   end
 
   def import_locked_assignments

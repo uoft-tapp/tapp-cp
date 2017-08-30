@@ -1,13 +1,25 @@
 class OfferImporter
 
   def import_json(data)
+    exceptions = []
     data[:offers].each do |offer|
       position = Position.find_by(position: offer["course_id"], round_id: offer["round_id"])
       applicant = Applicant.find_by(utorid: offer["utorid"])
-      ident = {position_id: position[:id], applicant_id: applicant[:id]}
-      exists = "offer with position #{offer[:position]} for applicant #{offer[:utorid]} already exists"
-      data = get_data(position, applicant, offer["hours"],offer["session"], offer["year"])
-      insertion_helper(Offer, data, ident, exists)
+      if position && applicant
+        ident = {position_id: position[:id], applicant_id: applicant[:id]}
+        exists = "offer with position #{offer[:position]} for applicant #{offer[:utorid]} already exists"
+        data = get_data(position, applicant, offer["hours"],offer["session"], offer["year"])
+        insertion_helper(Offer, data, ident, exists)
+      else
+        exceptions.push("Error: either Position #{offer["course_id"]} or Applicant #{offer["utorid"]} is invalid.")
+      end
+    end
+    if exceptions.length == data[:offers].length
+      return {imported: false, errors: true, message: exceptions}
+    elsif exceptions.length > 0
+      return {imported: true, errors: true, message: exceptions}
+    else
+      return {imported: true, errors: false, message: ["Offers import success."]}
     end
   end
 
