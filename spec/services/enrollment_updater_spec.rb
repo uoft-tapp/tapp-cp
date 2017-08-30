@@ -11,8 +11,6 @@ describe EnrollmentUpdater do
     Session.create!(
       semester: "Fall",
       year: 2017,
-      start_date: "2017-09-01 00:00:00 UTC",
-      end_date: "2017-12-31 00:00:00 UTC",
     )
   end
   let(:position) do
@@ -31,6 +29,8 @@ describe EnrollmentUpdater do
     session_id: session.id,
     cap_enrollment: nil,
     num_waitlisted: nil,
+    start_date: "2017-09-01 00:00:00 UTC",
+    end_date: "2017-12-31 00:00:00 UTC",
     )
   end
   failure = {updated: false, message: "Error: This file is not formatted correctly."}

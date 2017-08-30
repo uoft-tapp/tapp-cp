@@ -12,7 +12,7 @@
 
 <tablerow>Personnel Number: :Name:<%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>
 
-<tablerow>Start Date: <%= format_time(@offer[:session][:start_date],2) %>:End Date: <%= format_time(@offer[:session][:end_date],2) %>
+<tablerow>Start Date: <%= format_time(@offer[:start_date],2) %>:End Date: <%= format_time(@offer[:end_date],2) %>
 
 <tablerow>Wage Type: 01 15
 
@@ -24,7 +24,7 @@
 
 <b>New Employee:</b>
 
-<tablerow>Personnel Number: :Start Date: <%= format_time(@offer[:session][:start_date],2) %>
+<tablerow>Personnel Number: :Start Date: <%= format_time(@offer[:start_date],2) %>
 
 <tablerow>Form-of-add: :Last Name: <%= @offer[:applicant][:last_name] %>:First Name: <%= @offer[:applicant][:first_name] %>
 

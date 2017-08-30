@@ -4,7 +4,7 @@ describe ChassImporter do
   let(:test_filename) { 'test/stub' }
   subject {
     data = JSON.parse(File.read("#{Rails.root}/db/#{test_filename}.json"))
-    ChassImporter.new(data)
+    ChassImporter.new(data, "fall", 2017)
   }
 
   before :each do
@@ -19,20 +19,6 @@ describe ChassImporter do
   end
 
   context "when parsing courses" do
-    context "with no dates" do
-      let(:mock_json) { File.read("./spec/support/chass_data/no_dates.json") }
-      before(:each) do
-        # Sanity checking -- shouldn't ever fail
-        expect(Position.all.count).to eq(0)
-      end
-
-      before(:each) { subject } # Evaluate subject
-
-      it "does not insert the position" do
-        expect(Position.where(position: "CSC100H1S").count).to eq(0)
-      end
-    end
-
     context "with a plain course" do
       let(:mock_json) { File.read("./spec/support/chass_data/plain_course.json") }
 
@@ -265,7 +251,7 @@ end
     context "file with no round_id" do
       let(:mock_json) { File.read("./spec/support/chass_data/no_round.json") }
       it "returns error json" do
-        error = {success: false, message: "Import Failure: no round_id found in the file"}
+        error = {success: false, errors: true, message: ["Import Failure: no round_id found in the file"]}
         expect(subject.get_status).to eq(error)
       end
     end
@@ -273,15 +259,23 @@ end
     context "file with more than one round_id" do
       let(:mock_json) { File.read("./spec/support/chass_data/too_many_rounds.json") }
       it "returns error json" do
-        error = {success: false, message: "Import Failure: too many round_ids found in the file"}
+        error = {success: false, errors: true, message: ["Import Failure: too many round_ids found in the file"]}
         expect(subject.get_status).to eq(error)
       end
     end
 
     context "expected file" do
       let(:mock_json) { File.read("./spec/support/chass_data/applicant.json") }
-      it "returns sucess json" do
-        success = {success: true, message: "CHASS import completed."}
+      it "returns success json with imported true" do
+        success = {success: true, errors: false, message: ["CHASS import completed."]}
+        expect(subject.get_status).to eq(success)
+      end
+    end
+
+    context "expected file with bad dates" do
+      let(:mock_json) { File.read("./spec/support/chass_data/applicant_bad_dates.json") }
+      it "returns errors json with imported true" do
+        success = {success: true, errors: true, message: ["Error: The dates for Position CSC100H1S is malformed."]}
         expect(subject.get_status).to eq(success)
       end
     end

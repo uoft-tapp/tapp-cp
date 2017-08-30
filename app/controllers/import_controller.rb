@@ -12,12 +12,12 @@ class ImportController < ApplicationController
   end
 
   def chass
-    import = ChassImporter.new(params[:chass_json])
+    import = ChassImporter.new(params[:chass_json], params[:semester], params[:year])
     status = import.get_status
     if status[:success]
-      render json: {message: status[:message]}
+      render json: {message: status[:message], errors: status[:errors]}
     else
-      render status: 404, json: {message: status[:message]}
+      render status: 404, json: {message: status[:message], errors: status[:errors]}
     end
   end
 

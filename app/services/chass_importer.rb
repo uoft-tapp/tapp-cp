@@ -1,20 +1,26 @@
 class ChassImporter
   attr_reader :course_data, :applicant_data, :round_id
 
-  def initialize(data)
+  def initialize(data, semester, year)
     @course_data = data["courses"]
     @applicant_data = data["applicants"]
     @round_id = get_round_id
+    @exceptions = []
     if @round_id[:found]
       @round_id = @round_id[:round_id]
+      create_session(semester, year)
       insert_data
     else
-      @import_status = {success: false, message: @round_id[:message]}
+      @import_status = {success: false, errors: true, message: [@round_id[:message]]}
     end
   end
 
   def get_status
-    @import_status
+    if @exceptions.length > 0
+      {success: true, errors: true, message: @exceptions}
+    else
+      @import_status
+    end
   end
 
   private
@@ -22,7 +28,7 @@ class ChassImporter
     insert_positions
     insert_applicant
     insert_application
-    @import_status = {success: true, message: "CHASS import completed."}
+    @import_status = {success: true, errors: false, message: ["CHASS import completed."]}
   end
 
   def get_round_id
@@ -56,6 +62,17 @@ class ChassImporter
       db_model.save!
       return db_model
     end
+  end
+
+  def create_session(semester, year)
+    semester = semester.slice(0,1).upcase + semester.slice(1..-1).downcase
+    data ={
+        year: year,
+        semester: semester,
+    }
+    exists = "Session #{semester}, #{:year} already exists"
+    ident = {year: data[:year], semester: data[:semester]}
+    @session = insertion_helper(Session, data, ident, exists)
   end
 
   def insert_applicant
@@ -216,100 +233,69 @@ class ChassImporter
       posting_id  = course_entry["course_id"]
       course_id = posting_id.split("-")[0].strip
       round_id = course_entry["round_id"]
-      session_id = get_session_id(course_entry["dates"])
-      if session_id
-        exists = "Position #{posting_id} already exists"
-        ident = {position: posting_id, round_id: round_id}
-        data = {
-          position: posting_id,
-          round_id: round_id,
-          open: true,
-          campus_code: course_id[course_id[/[A-Za-z0-9]{3}\d{3,4}/].size+1].to_i,
-          course_name: course_entry["course_name"].strip,
-          current_enrollment: course_entry["enrollment"],
-          duties: course_entry["duties"],
-          qualifications: course_entry["qualifications"],
-          hours: course_entry["n_hours"],
-          estimated_count: course_entry["n_positions"],
-          estimated_total_hours: course_entry["total_hours"],
-          session_id: session_id,
-        }
-        position = insertion_helper(Position, data, ident, exists)
+      dates = get_dates(course_entry["dates"])
+      if !dates
+        dates = [nil, nil]
+        @exceptions.push("Error: The dates for Position #{course_entry["course_id"]} is malformed.")
+      end
+      exists = "Position #{posting_id} already exists"
+      ident = {position: posting_id, round_id: round_id}
+      data = {
+        position: posting_id,
+        round_id: round_id,
+        open: true,
+        campus_code: course_id[course_id[/[A-Za-z0-9]{3}\d{3,4}/].size+1].to_i,
+        course_name: course_entry["course_name"].strip,
+        current_enrollment: course_entry["enrollment"],
+        duties: course_entry["duties"],
+        qualifications: course_entry["qualifications"],
+        hours: course_entry["n_hours"],
+        estimated_count: course_entry["n_positions"],
+        estimated_total_hours: course_entry["total_hours"],
+        session_id: @session[:id],
+        start_date: dates[0],
+        end_date: dates[1],
+      }
+      position = insertion_helper(Position, data, ident, exists)
 
-        teaching_instructors = []
-        course_entry["instructor"].each do |instructor|
-          name = instructor["first_name"].strip+" "+instructor["last_name"].strip
-          ident = {name: name}
-          exists = "Instructor #{name} alread exists"
-          data = {
-              name: name,
-              email: instructor["email"],
-              utorid: instructor["utorid"],
-          }
-          instructor = insertion_helper(Instructor, data, ident, exists)
-          teaching_instructors.push(instructor[:id])
-          unless position.instructors.where(id: instructor[:id]).exists?
-            position.instructors << [instructor]
-          end
+      teaching_instructors = []
+      course_entry["instructor"].each do |instructor|
+        name = instructor["first_name"].strip+" "+instructor["last_name"].strip
+        ident = {name: name}
+        exists = "Instructor #{name} alread exists"
+        data = {
+            name: name,
+            email: instructor["email"],
+            utorid: instructor["utorid"],
+        }
+        instructor = insertion_helper(Instructor, data, ident, exists)
+        teaching_instructors.push(instructor[:id])
+        unless position.instructors.where(id: instructor[:id]).exists?
+          position.instructors << [instructor]
         end
-        position.instructors.each do |instructor|
-          if !teaching_instructors.include?(instructor[:id])
-            position.instructors.delete(instructor)
-            Rails.logger.debug "all instructors for Position #{position[:id]}: #{JSON.pretty_generate(position.instructors.as_json)}"
-          end
+      end
+      position.instructors.each do |instructor|
+        if !teaching_instructors.include?(instructor[:id])
+          position.instructors.delete(instructor)
+          Rails.logger.debug "all instructors for Position #{position[:id]}: #{JSON.pretty_generate(position.instructors.as_json)}"
         end
       end
     end
   end
 
-  def get_session_id(dates)
+  def get_dates(dates)
     if dates
       dates = dates.split(" to ")
       if dates.size == 2
-        return get_session(dates)
+        return dates
       else
         dates = dates[0].split(" - ")
         if dates.size == 2
-          return get_session(dates)
-        else
-          return nil
+          return dates
         end
       end
-    else
-      return nil
     end
   end
 
-  def get_session(dates)
-    start_date = DateTime.parse(dates[0])
-    end_date =  DateTime.parse(dates[1])
-    semester = get_semester(start_date)
-    if semester
-      data ={
-        start_date: start_date,
-        end_date: end_date,
-        year: start_date.strftime("%Y"),
-        semester: semester,
-      }
-      exists = "Session #{data[:semester]}, #{data[:year]} already exists"
-      ident = {year: data[:year], semester: data[:semester]}
-      session = insertion_helper(Session, data, ident, exists)
-      return session.id
-    else
-      return nil
-    end
-  end
-
-  def get_semester(start_date)
-    start = start_date.strftime("%-m")
-    case start.to_i
-    when 9
-      return "Fall"
-    when 1
-      return "Winter"
-    when 5
-      return "Summer"
-    end
-  end
 
 end

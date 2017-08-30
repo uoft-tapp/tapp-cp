@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170828170241) do
+ActiveRecord::Schema.define(version: 20170829204432) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -94,7 +94,6 @@ ActiveRecord::Schema.define(version: 20170828170241) do
     t.string "signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "accept_date"
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"
     t.index ["position_id"], name: "index_offers_on_position_id"
   end
@@ -116,6 +115,8 @@ ActiveRecord::Schema.define(version: 20170828170241) do
     t.bigint "session_id"
     t.integer "cap_enrollment"
     t.integer "num_waitlisted"
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.index ["campus_code"], name: "index_positions_on_campus_code"
     t.index ["open"], name: "index_positions_on_open"
     t.index ["position", "round_id"], name: "index_positions_on_position_and_round_id", unique: true
@@ -134,8 +135,6 @@ ActiveRecord::Schema.define(version: 20170828170241) do
 
   create_table "sessions", force: :cascade do |t|
     t.integer "year"
-    t.datetime "start_date"
-    t.datetime "end_date"
     t.string "semester"
     t.float "pay", default: 0.0
     t.datetime "created_at", null: false
