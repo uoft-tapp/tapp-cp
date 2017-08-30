@@ -44,6 +44,7 @@ function fetchCheckHelper(URL, body) {
         },
         method: 'POST',
         body: JSON.stringify(body),
+        credentials: 'include',
     })
         .then(function(resp) {
             if (resp.ok || resp.status == 404) {
@@ -63,6 +64,7 @@ function getHelper(URL) {
             Accept: 'application/json',
         },
         method: 'GET',
+        credentials: 'include',
     });
 }
 
@@ -74,11 +76,15 @@ function postHelper(URL, body) {
         },
         method: 'POST',
         body: JSON.stringify(body),
+        credentials: 'include',
     });
 }
 
 function deleteHelper(URL) {
-    return fetchHelper(URL, { method: 'DELETE' });
+    return fetchHelper(URL, { 
+	method: 'DELETE',
+        credentials: 'include', 
+	});
 }
 
 function putHelper(URL, body) {
@@ -88,6 +94,7 @@ function putHelper(URL, body) {
         },
         method: 'PUT',
         body: JSON.stringify(body),
+        credentials: 'include',
     });
 }
 
