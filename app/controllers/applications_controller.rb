@@ -1,4 +1,6 @@
 class ApplicationsController < ApplicationController
+  include Authorizer
+  before_action :tapp_admin
 
 '''
   index #GET
