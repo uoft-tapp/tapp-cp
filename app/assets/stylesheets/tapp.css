@@ -274,17 +274,8 @@ footer div p {
     --col-1-width: 220px; /* immutable course information */
     --col-2-4-width: 80px; /* numerical field labels */
     --col-3-5-width: 60px; /* numerical fields */
-    --col-6-width: 240px; /* instructor form */
-    /* qualifications and responsibilities text areas */
-    --col-7-8-width: calc(
-        calc(
-                100vw -
-                    calc(
-                        var(--course-list-panel-width) + var(--col-1-width) + var(--col-2-4-width)*2 +
-                            var(--col-3-5-width)*2 + var(--col-6-width) + var(--sep-width)*5 + 170px
-                    )
-            ) / 2
-    );
+    --col-6-width: 140px; /* date fields */
+    --col-7-width: 240px; /* instructor form */
 }
 
 .form_table {
@@ -347,8 +338,14 @@ footer div p {
     width: var(--col-3-5-width);
 }
 
-.form_table .col-6 {
+/* date fields */
+.form_table .col-6,
+.form_table .col-6 input {
     width: var(--col-6-width);
+}
+
+.form_table .col-7 {
+    width: var(--col-7-width);
 }
 
 /* instructor form */
@@ -384,12 +381,6 @@ footer div p {
     border: none;
 }
 
-/* qualifications and responsibilities text areas */
-.form_table .col-7,
-.form_table .col-8 {
-    width: var(--col-7-8-width);
-}
-
 /* last 3 columns */
 .form_table textarea {
     width: 100%;
@@ -420,7 +411,7 @@ footer div p {
 }
 
 #summary-grid #utils #import {
-    flex: 1;
+    flex: 1.5;
 }
 
 #summary-grid #utils #export {
@@ -433,6 +424,10 @@ footer div p {
 
 #summary-grid #import #file {
     margin-top: 5px;
+}
+
+#summary-grid #import #year {
+    width: 80px;
 }
 
 /* for statistics panel in summary view */
