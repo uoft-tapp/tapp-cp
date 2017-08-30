@@ -27,3 +27,11 @@ namespace :email do
     end
   end
 end
+
+namespace :env do
+  task print: :environment do
+    ENV.each do |key, val|
+      puts "#{key}=#{val}"
+    end
+  end
+end
