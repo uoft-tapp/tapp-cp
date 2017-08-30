@@ -1,7 +1,9 @@
 class OffersController < ApplicationController
-  protect_from_forgery with: :null_session
   before_action :set_domain
   include Mangler
+  include Authorizer
+  before_action :cp_admin, except: [:get_contract_mangled, :set_status_mangled]
+  before_action :correct_applicant, only: [:get_contract_mangled, :set_status_mangled]
 
   def index
     render json: get_all_offers
