@@ -9,7 +9,7 @@ module Authorizer
 
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
-      if !request.env['HTTP_X_FORWARD_USER'] == get_applicant(params)
+      if request.env['HTTP_X_FORWARD_USER']!= get_applicant(params)
         render status: 403, json: {message: "You are not authorized to access this page."}
       end
     end
