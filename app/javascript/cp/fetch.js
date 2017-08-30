@@ -4,9 +4,9 @@ import { appState } from './appState.js';
 
 /* General helpers */
 
-function defaultFailure(resp) {
-    appState.notify('<b>Action Failed:</b> ' + resp.statusText);
-    return Promise.reject(resp);
+function defaultFailure(text) {
+    appState.alert('<b>Action Failed:</b> ' + text);
+    return Promise.reject();
 }
 
 // extract and display a message which is sent in the (JSON) body of a response
@@ -20,64 +20,87 @@ function showMessageInJsonBody(resp) {
     }
 }
 
-function fetchHelper(URL, init, success, failure = defaultFailure) {
-    return fetch(URL, init)
-        .then(function(response) {
-            if (response.ok) {
-                return success(response);
+function fetchHelper(URL, init) {
+    return fetch(URL, init).then(
+        function(resp) {
+            if (resp.ok) {
+                return Promise.resolve(resp);
             }
-            return failure(response);
-        })
-        .catch(function(error) {
-            appState.notify('<b>Error:</b> ' + URL + ' ' + error.message);
-            return Promise.reject(error);
-        });
-}
-
-function getHelper(URL, success, failure) {
-    let init = {
-        headers: {
-            Accept: 'application/json',
+            return Promise.reject(resp);
         },
-        method: 'GET',
-    };
-
-    return fetchHelper(URL, init, success, failure);
+        function(error) {
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
+            return Promise.reject(error);
+        }
+    );
 }
 
-function postHelper(URL, body, success, failure) {
-    let init = {
+// fetching for 'can-*' batch methods
+function fetchCheckHelper(URL, body) {
+    return fetch(URL, {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
         },
         method: 'POST',
         body: JSON.stringify(body),
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    })
+        .then(function(resp) {
+            if (resp.ok || resp.status == 404) {
+                return Promise.resolve(resp);
+            }
+            return Promise.reject(resp);
+        })
+        .catch(function(error) {
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
+            return Promise.reject(error);
+        });
 }
 
-function deleteHelper(URL, success, failure) {
-    return fetchHelper(URL, { method: 'DELETE' }, success, failure);
+function getHelper(URL) {
+    return fetchHelper(URL, {
+        headers: {
+            Accept: 'application/json',
+        },
+        method: 'GET',
+    });
 }
 
-function putHelper(URL, body, success, failure) {
-    let init = {
+function postHelper(URL, body) {
+    return fetchHelper(URL, {
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
+        },
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
+
+function deleteHelper(URL) {
+    return fetchHelper(URL, { method: 'DELETE' });
+}
+
+function putHelper(URL, body) {
+    return fetchHelper(URL, {
         headers: {
             'Content-Type': 'application/json; charset=utf-8',
         },
         method: 'PUT',
         body: JSON.stringify(body),
-    };
-
-    return fetchHelper(URL, init, success, failure);
+    });
 }
 
 /* Resource GETters */
 
-const getOffers = () => getHelper('/offers', resp => resp.json()).then(onFetchOffersSuccess);
-const getSessions = () => getHelper('/sessions', resp => resp.json()).then(onFetchSessionsSuccess);
+const getOffers = () =>
+    getHelper('/offers').then(resp => resp.json()).then(onFetchOffersSuccess).catch(defaultFailure);
+
+const getSessions = () =>
+    getHelper('/sessions')
+        .then(resp => resp.json())
+        .then(onFetchSessionsSuccess)
+        .catch(defaultFailure);
 
 /* Success callbacks for resource GETters */
 
@@ -100,6 +123,7 @@ function onFetchOffersSuccess(resp) {
             ddahStatus: offer.ddah_status,
             sentAt: offer.send_date,
             printedAt: offer.print_time,
+            link: offer.link,
         };
     });
 
@@ -152,72 +176,197 @@ function fetchAll() {
 function importAssignments() {
     appState.setImporting(true);
 
-    return postHelper(
-        '/import/locked-assignments',
-        {},
+    postHelper('/import/locked-assignments', {}).then(
         () => {
             appState.setImporting(false, true);
-            fetchAll();
+
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
         },
-        showMessageInJsonBody
-    ).catch(() => appState.setImporting(false));
+        resp => {
+            appState.setImporting(false);
+            showMessageInJsonBody(resp);
+        }
+    );
 }
 
 // send CHASS offers data
 function importOffers(data) {
     appState.setImporting(true);
 
-    return postHelper('/import/offers', { chass_offers: data }, () => {
-        appState.setImporting(false, true);
-        fetchAll();
-    }).catch(() => appState.setImporting(false));
+    postHelper('/import/offers', { chass_offers: data }).then(
+        () => {
+            appState.setImporting(false, true);
+
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        },
+        resp => {
+            appState.setImporting(false);
+            showMessageInJsonBody(resp);
+        }
+    );
 }
 
 // send contracts
 function sendContracts(offers) {
-    return postHelper(
-        '/offers/send-contracts',
-        { offers: offers },
-        fetchAll,
-        showMessageInJsonBody
-    );
-}
+    let validOffers = offers;
 
-// email applicants
-function email(emails) {
-    let ref =
-        emails.length == 1
-            ? 'mailto:' + emails[0] // if there is only a single recipient, send normally
-            : 'mailto:?bcc=' + emails.join(';'); // if there are multiple recipients, bcc all
+    // check which contracts can be sent
+    fetchCheckHelper('/offers/can-send-contract', { contracts: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some contracts cannot be sent
+                return resp.json().then(res => {
+                    let invalidOffers = res.invalid_offers;
+                    invalidOffers.forEach(offer => {
+                        appState.alert('<b>Error</b>: Cannot nag send contract for offer ' + offer);
+                        // remove invalid offer(s) from offer list
+                        validOffers.splice(validOffers.indexOf(offer), 1);
+                    });
 
-    var a = document.createElement('a');
-    a.href = ref;
-    a.click();
+                    if (validOffers.length == 0) {
+                        return Promise.reject();
+                    }
+                }, defaultFailure);
+            }
+        })
+        // send offers to valid offers
+        .then(() => postHelper('/offers/send-contracts', { offers: offers }))
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
 }
 
 // nag applicants
 function nag(offers) {
-    return postHelper('/offers/nag', { contracts: offers }, fetchAll, showMessageInJsonBody);
+    let validOffers = offers;
+
+    // check which applicants can be nagged
+    fetchCheckHelper('/offers/can-nag', { contracts: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some contracts cannot be sent
+                return resp.json().then(res => {
+                    let invalidOffers = res.invalid_offers;
+                    invalidOffers.forEach(offer => {
+                        appState.alert('<b>Error</b>: Cannot nag applicant about offer ' + offer);
+                        // remove invalid offer(s) from offer list
+                        validOffers.splice(validOffers.indexOf(offer), 1);
+                    });
+
+                    if (validOffers.length == 0) {
+                        return Promise.reject();
+                    }
+                }, defaultFailure);
+            }
+        })
+        // nag valid offers
+        .then(() => postHelper('/offers/nag', { contracts: validOffers }))
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
 }
 
 // mark contracts as hr_processed
 function setHrProcessed(offers) {
-    return putHelper(
-        '/offers/batch-update',
-        { offers: offers, hr_status: 'Processed' },
-        fetchAll,
-        showMessageInJsonBody
-    );
+    let validOffers = offers;
+
+    // check which offers can be marked as hr_processed
+    fetchCheckHelper('/offers/can-hr-update', { offers: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some offers cannot be updated
+                return resp.json().then(res => {
+                    let invalidOffers = res.invalid_offers;
+                    invalidOffers.forEach(offer => {
+                        appState.alert(
+                            '<b>Error</b>: Cannot mark offer ' + offer + ' as HR processed'
+                        );
+                        // remove invalid offer(s) from offer list
+                        validOffers.splice(validOffers.indexOf(offer), 1);
+                    });
+
+                    if (validOffers.length == 0) {
+                        return Promise.reject();
+                    }
+                }, defaultFailure);
+            }
+        })
+        // update valid offers
+        .then(() => putHelper('/offers/batch-update', { offers: offers, hr_status: 'Processed' }))
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
 }
 
 // mark contracts as ddah_accepted
 function setDdahAccepted(offers) {
-    return putHelper(
-        '/offers/batch-update',
-        { offers: offers, ddah_status: 'Accepted' },
-        fetchAll,
-        showMessageInJsonBody
-    );
+    let validOffers = offers;
+
+    // check which offers can be marked as ddah_accepted
+    fetchCheckHelper('/offers/can-ddah-update', { offers: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some offers cannot be updated
+                return resp.json().then(res => {
+                    let invalidOffers = res.invalid_offers;
+                    invalidOffers.forEach(offer => {
+                        appState.alert(
+                            '<b>Error</b>: Cannot mark offer ' + offer + ' as DDAH accepted'
+                        );
+                        // remove invalid offer(s) from offer list
+                        validOffers.splice(validOffers.indexOf(offer), 1);
+                    });
+                    if (validOffers.length == 0) {
+                        return Promise.reject();
+                    }
+                }, defaultFailure);
+            }
+        })
+        // update valid offers
+        .then(() => putHelper('/offers/batch-update', { offers: offers, ddah_status: 'Accepted' }))
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
@@ -227,66 +376,113 @@ function showContractApplicant(offer) {
 
 // show the contract for this offer in a new window, as HR would see it
 function showContractHr(offer) {
-    return postHelper('/offers/print', { contracts: [offer], update: false }, resp =>
-        resp.blob()
-    ).then(blob => {
-        let fileURL = URL.createObjectURL(blob);
-        let contractWindow = window.open(fileURL);
-        contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
-    });
+    postHelper('/offers/print', { contracts: [offer], update: false })
+        .then(resp => resp.blob())
+        .then(blob => {
+            let fileURL = URL.createObjectURL(blob);
+            let contractWindow = window.open(fileURL);
+            contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
+        })
+        .catch(defaultFailure);
 }
 
 // withdraw offers
 function withdrawOffers(offers) {
     // create an array of promises for each offer being withdrawn
-    return Promise.all(
-        offers.map(offer =>
-            postHelper(
-                '/offers/' + offer + '/decision/withdraw',
-                {},
-                resp => resp,
-                showMessageInJsonBody
-            )
+    // force each promise to resolve so that we can see which failed
+    let promises = offers.map(offer =>
+        postHelper('/offers/' + offer + '/decision/withdraw', {}).then(
+            resp => Promise.resolve(resp),
+            resp => Promise.resolve(resp)
         )
-    ).then(fetchAll);
+    );
+
+    Promise.all(promises).then(responses =>
+        responses.forEach(resp => {
+            if (resp.ok) {
+                appState.setFetchingOffersList(true);
+                getOffers()
+                    .then(offers => {
+                        appState.setOffersList(fromJS(offers));
+                        appState.setFetchingOffersList(false, true);
+                    })
+                    .catch(() => appState.setFetchingOffersList(false));
+            } else {
+                showMessageInJsonBody(resp);
+            }
+        })
+    );
 }
 
 // print contracts
 function print(offers) {
-    return postHelper(
-        '/offers/print',
-        { contracts: offers, update: true },
-        resp => resp.blob(),
-        showMessageInJsonBody
-    ).then(blob => {
+    let validOffers = offers;
+
+    // check which contracts can be printed
+    let printPromise = fetchCheckHelper('/offers/can-print', { contracts: offers })
+        .catch(defaultFailure)
+        .then(resp => {
+            if (resp.status == 404) {
+                // some contracts cannot be printed
+                return resp.json().then(res => {
+                    let invalidOffers = res.invalid_offers;
+                    invalidOffers.forEach(offer => {
+                        appState.alert('<b>Error</b>: Cannot print contract for offer ' + offer);
+                        // remove invalid offer(s) from offer list
+                        validOffers.splice(validOffers.indexOf(offer), 1);
+                    });
+
+                    if (validOffers.length == 0) {
+                        return Promise.reject();
+                    }
+                }, defaultFailure);
+            }
+        })
+        // print valid offers
+        .then(() => postHelper('/offers/print', { contracts: validOffers, update: true }))
+        .then(resp => resp.blob().catch(defaultFailure));
+
+    printPromise.then(blob => {
         let fileURL = URL.createObjectURL(blob);
         let pdfWindow = window.open(fileURL);
         pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
         pdfWindow.document.onload = pdfWindow.print();
+    });
 
-        return fetchAll();
+    printPromise.then(() => {
+        appState.setFetchingOffersList(true);
+        getOffers()
+            .then(offers => {
+                appState.setOffersList(fromJS(offers));
+                appState.setFetchingOffersList(false, true);
+            })
+            .catch(() => appState.setFetchingOffersList(false));
     });
 }
 
-/*
-      function updateSession(input, id){
-        let data = {pay: input.value};
-        let init = {
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-            method: 'PUT',
-            body: JSON.stringify(data)
-        };
-        fetchHelper("/sessions/"+id, init, "Pay updated");
-        }*/
+// change session pay
+function updateSessionPay(session, pay) {
+    putHelper('/sessions/' + session, { pay: pay }).then(
+        () => {
+            appState.setFetchingSessionsList(true);
+            getSessions()
+                .then(sessions => {
+                    appState.setSessionsList(fromJS(sessions));
+                    appState.setFetchingSessionsList(false, true);
+                })
+                .catch(() => appState.setFetchingSessionsList(false));
+        },
+        resp => {
+            showMessageInJsonBody(resp);
+        }
+    );
+}
 
 export {
     fetchAll,
     importOffers,
     importAssignments,
     sendContracts,
-    email,
     nag,
     setHrProcessed,
     setDdahAccepted,
@@ -294,4 +490,5 @@ export {
     showContractHr,
     withdrawOffers,
     print,
+    updateSessionPay,
 };

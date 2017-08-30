@@ -58,26 +58,31 @@ class ControlPanel extends React.Component {
                         className="offer-checkbox"
                         id={p.offerId}
                         onClick={event => {
-			    // range selection using shift key
-			    if (this.lastClicked && event.shiftKey) {
-				let first = false, last = false;
+                            // range selection using shift key (range is from current box (offerId) to last-clicked box
+                            if (this.lastClicked && event.shiftKey) {
+                                let first = false,
+                                    last = false;
 
-				Array.prototype.forEach.call(getCheckboxElements(), box => {
-				    if (!first && (box.id == p.offerId || box.id == this.lastClicked)) {
-					first = true;
-					box.checked = true;
-				    }
+                                Array.prototype.forEach.call(getCheckboxElements(), box => {
+                                    if (
+                                        !first &&
+                                        (box.id == p.offerId || box.id == this.lastClicked)
+                                    ) {
+                                        // starting box
+                                        first = true;
+                                        box.checked = true;
+                                    } else if (first && !last) {
+                                        // box is in range
+                                        if (box.id == p.offerId || box.id == this.lastClicked) {
+                                            // ending box
+                                            last = true;
+                                        }
+                                        box.checked = true;
+                                    }
+                                });
+                            }
 
-				    if (first && !last) {
-					if (box.id == p.offerId || box.id == this.lastClicked) {
-					    last = true;
-					}
-					box.checked = true;
-				    }
-				});
-			    }
-
-			    this.lastClicked = p.offerId;
+                            this.lastClicked = p.offerId;
                         }}
                     />,
 
@@ -88,28 +93,28 @@ class ControlPanel extends React.Component {
                 data: p => p.offer.get('lastName'),
                 sortData: p => p.get('lastName'),
 
-                style: { width: 0.09 },
+                style: { width: 0.08 },
             },
             {
                 header: 'First Name',
                 data: p => p.offer.get('firstName'),
                 sortData: p => p.get('firstName'),
 
-                style: { width: 0.06 },
+                style: { width: 0.08 },
             },
             {
                 header: 'Email',
                 data: p => p.offer.get('email'),
                 sortData: p => p.get('email'),
 
-                style: { width: 0.13 },
+                style: { width: 0.16 },
             },
             {
                 header: 'Student Number',
                 data: p => p.offer.get('studentNumber'),
                 sortData: p => p.get('studentNumber'),
 
-                style: { width: 0.06 },
+                style: { width: 0.07 },
             },
             {
                 header: 'Position',
@@ -123,7 +128,7 @@ class ControlPanel extends React.Component {
                     .getPositions()
                     .map(position => p => p.get('position') == position),
 
-                style: { width: 0.08 },
+                style: { width: 0.1 },
             },
             {
                 header: 'Hours',
@@ -147,7 +152,7 @@ class ControlPanel extends React.Component {
                     'Withdrawn',
                 ].map(status => p => p.get('status') == status),
 
-                style: { width: 0.05 },
+                style: { width: 0.07 },
             },
             {
                 header: 'Contract Send Date',
@@ -172,14 +177,14 @@ class ControlPanel extends React.Component {
                         : '',
                 sortData: p => p.get('sentAt'),
 
-                style: { width: 0.08 },
+                style: { width: 0.1 },
             },
             {
                 header: 'Nag Count',
                 data: p => (p.offer.get('nagCount') ? p.offer.get('nagCount') : ''),
                 sortData: p => p.get('nagCount'),
 
-                style: { width: 0.04 },
+                style: { width: 0.05 },
             },
             {
                 header: 'HRIS Status',
@@ -192,7 +197,7 @@ class ControlPanel extends React.Component {
                     ['Processed', 'Printed'].map(status => p => p.get('hrStatus') == status)
                 ),
 
-                style: { width: 0.05 },
+                style: { width: 0.07 },
             },
             {
                 header: 'Printed Date',
@@ -217,15 +222,13 @@ class ControlPanel extends React.Component {
                         p.get('ddahStatus') == status
                     )
                 ),
-
-                style: { width: 0.06 },
             },
         ];
 
         return (
             <Grid fluid id="offers-grid">
                 {role == 'admin' && <SessionsForm {...this.props} />}
-            
+
                 <ButtonToolbar id="dropdown-menu">
                     {role == 'admin' && <ImportMenu {...this.props} />}
                     {role == 'admin' && <OffersMenu {...this.props} />}
@@ -249,9 +252,16 @@ class ControlPanel extends React.Component {
                 </ButtonToolbar>
 
                 <Table
-                    className={role == 'admin' ? 'admin-table' : ''}
                     config={this.config}
-                    getOffers={() => this.props.appState.getOffersList()}
+                    getOffers={() => {
+                        let session = this.props.appState.getSelectedSession();
+                        if (session != '') {
+                            return this.props.appState
+                                .getOffersList()
+                                .filter(offer => offer.get('session') == session);
+                        }
+                        return this.props.appState.getOffersList();
+                    }}
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
                 />
@@ -278,7 +288,10 @@ const OffersMenu = props =>
 
 const CommMenu = props =>
     <DropdownButton bsStyle="primary" title="Communicate" id="comm-dropdown">
-        <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>Email</MenuItem>
+        <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>Email [blank]</MenuItem>
+        <MenuItem onClick={() => props.appState.emailContract(getSelectedOffers())}>
+            Email [contract]
+        </MenuItem>
         <MenuItem onClick={() => props.appState.nag(getSelectedOffers())}>Nag</MenuItem>
     </DropdownButton>;
 

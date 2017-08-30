@@ -1,7 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import {
+    Navbar,
+    Nav,
+    NavItem,
+    NavDropdown,
+    MenuItem,
+    FormGroup,
+    ControlLabel,
+    FormControl,
+} from 'react-bootstrap';
 
 /*** Navbar components ***/
 
@@ -34,7 +43,9 @@ const Auth = props =>
     <NavDropdown
         title={props.appState.getCurrentUserRole() + ':' + props.appState.getCurrentUserName()}
         id="nav-auth-dropdown">
-        <MenuItem eventKey="switch-admin" onClick={() => props.appState.setCurrentUserRole('admin')}>
+        <MenuItem
+            eventKey="switch-admin"
+            onClick={() => props.appState.setCurrentUserRole('admin')}>
             Switch to admin role
         </MenuItem>
 
@@ -46,9 +57,7 @@ const Auth = props =>
             Switch to inst role
         </MenuItem>
 
-        <MenuItem eventKey="logout">
-            Logout
-        </MenuItem>
+        <MenuItem eventKey="logout">Logout</MenuItem>
     </NavDropdown>;
 
 /*** Navbar ***/

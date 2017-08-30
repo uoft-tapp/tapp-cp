@@ -17,6 +17,8 @@ const initialState = {
     selectedSortFields: [],
     selectedFilters: {},
 
+    selectedSession: '',
+
     /** DB data **/
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
@@ -143,6 +145,10 @@ class AppState {
         return this.get('selectedFilters');
     }
 
+    getSelectedSession() {
+        return this.get('selectedSession');
+    }
+
     getSorts() {
         return this.get('selectedSortFields');
     }
@@ -177,12 +183,16 @@ class AppState {
         this.set('selectedSortFields', sorts.delete(i));
     }
 
+    selectSession(session) {
+        this.set('selectedSession', session);
+    }
+
     setCurrentUserName(user) {
-        return this.set('user', user);
+        this.set('user', user);
     }
 
     setCurrentUserRole(role) {
-        return this.set('role', role);
+        this.set('role', role);
     }
 
     // toggle a filter on the offers table
@@ -232,9 +242,43 @@ class AppState {
         return [this.get('offers.list'), this.get('sessions.list')].some(val => val == null);
     }
 
+    // email applicants
     email(offers) {
         let allOffers = this.getOffersList();
-        fetch.email(offers.map(offer => allOffers.getIn([offer, 'email'])));
+        let emails = offers.map(offer => allOffers.getIn([offer, 'email']));
+
+        var a = document.createElement('a');
+        a.href =
+            emails.length == 1
+                ? 'mailto:' + emails[0] // if there is only a single recipient, send normally
+                : 'mailto:?bcc=' + emails.join(';'); // if there are multiple recipients, bcc all
+        a.click();
+    }
+
+    // email mangled contract link to a single applicant
+    emailContract(offers) {
+        if (offers.length != 1) {
+            this.alert('<b>Error:</b> Can only email a contract link to a single applicant.');
+            return;
+        }
+
+        let offer = this.getOffersList().get(offers[0]);
+        if (!offer.get('link')) {
+            // offers does not have a contract link
+            this.alert(
+                '<b>Error:</b> Offer to ' +
+                    offer.get('lastName') +
+                    ', ' +
+                    offer.get('firstName') +
+                    ' does not have an associated contract'
+            );
+            return;
+        }
+
+        var a = document.createElement('a');
+        a.href =
+            'mailto:' + offer.get('email') + '?body=Link%20to%20contract:%20' + offer.get('link');
+        a.click();
     }
 
     // check if offers are being fetched
@@ -286,86 +330,39 @@ class AppState {
     }
 
     nag(offers) {
-        let pendingOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            if (allOffers.getIn([offer, 'status']) == 'Pending') {
-                pendingOffers.push(parseInt(offer));
-            } else {
-                // offers that are not 'pending' cannot be nagged about
-                this.alert(
-                    '<b>Error:</b> Offer to ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        ' is not pending'
-                );
-            }
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
         }
 
-        fetch.nag(pendingOffers);
+        fetch.nag(offers.map(offer => parseInt(offer)));
     }
 
     print(offers) {
-        fetch.print(offers);
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
+        fetch.print(offers.map(offer => parseInt(offer)));
     }
 
     sendContracts(offers) {
-        let status,
-            unsentOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            status = allOffers.getIn([offer, 'status']);
-
-            switch (status) {
-                // can only send contracts that are unsent
-                case 'Unsent':
-                    unsentOffers.push(parseInt(offer));
-                    break;
-                case 'Withdrawn':
-                    this.alert(
-                        '<b>Error:</b> Cannot send contract to ' +
-                            allOffers.getIn([offer, 'lastName']) +
-                            ', ' +
-                            allOffers.getIn([offer, 'firstName']) +
-                            '. Offer was withdrawn.'
-                    );
-                    break;
-                default:
-                    this.alert(
-                        '<b>Error:</b> Contract has already been sent to ' +
-                            allOffers.getIn([offer, 'lastName']) +
-                            ', ' +
-                            allOffers.getIn([offer, 'firstName'])
-                    );
-            }
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
         }
 
-        fetch.sendContracts(unsentOffers);
+        fetch.sendContracts(offers.map(offer => parseInt(offer)));
     }
 
     setDdahAccepted(offers) {
-        let acceptedOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            // can only accept DDAH form for accepted offers
-            if (allOffers.getIn([offer, 'status']) == 'Accepted') {
-                acceptedOffers.push(parseInt(offer));
-            } else {
-                this.alert(
-                    '<b>Error:</b> Cannot accept DDAH form for ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        '. Offer is not accepted.'
-                );
-            }
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
         }
 
-        fetch.setDdahAccepted(acceptedOffers);
+        fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
     }
 
     setFetchingOffersList(fetching, success) {
@@ -405,25 +402,12 @@ class AppState {
     }
 
     setHrProcessed(offers) {
-        let acceptedOffers = [],
-            allOffers = this.getOffersList();
-
-        for (var offer of offers) {
-            // can only process contract for accepted offers
-            if (allOffers.getIn([offer, 'status']) == 'Accepted') {
-                acceptedOffers.push(parseInt(offer));
-            } else {
-                this.alert(
-                    '<b>Error:</b> Cannot process contract for ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        '. Offer is not accepted.'
-                );
-            }
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
         }
 
-        fetch.setHrProcessed(acceptedOffers);
+        fetch.setHrProcessed(offers.map(offer => parseInt(offer)));
     }
 
     setImporting(importing, success) {
@@ -449,6 +433,18 @@ class AppState {
     }
 
     setSessionsList(list) {
+        let semesterOrder = ['Winter', 'Spring', 'Fall', 'Year'];
+        // sort sesions in order of most recent to least recent
+        list.sort((sessionA, sessionB) => {
+            if (sessionA.get('year') > sessionB.get('year')) {
+                return -1;
+            }
+            if (sessionA.get('year') < sessionB.get('year')) {
+                return 1;
+            }
+            return semesterOrder.indexOf(sessionA.get('semester')) - semesterOrder.indexOf(sessionB.get('semester'));
+        });
+        
         this.set('sessions.list', list);
     }
 
@@ -460,27 +456,17 @@ class AppState {
         fetch.showContractHr(offer);
     }
 
-    withdrawOffers(offers) {
-        let status,
-            pendingOffers = [],
-            allOffers = this.getOffersList();
+    updateSessionPay(session, pay) {
+        fetch.updateSessionPay(session, pay);
+    }
 
-        for (var offer of offers) {
-            // cannot withdraw unsent offers
-            if (allOffers.getIn([offer, 'status']) == 'Unsent') {
-                this.alert(
-                    '<b>Error:</b> Offer to ' +
-                        allOffers.getIn([offer, 'lastName']) +
-                        ', ' +
-                        allOffers.getIn([offer, 'firstName']) +
-                        ' has not been sent'
-                );
-            } else {
-                pendingOffers.push(parseInt(offer));
-            }
+    withdrawOffers(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
         }
 
-        fetch.withdrawOffers(pendingOffers);
+        fetch.withdrawOffers(offers);
     }
 }
 
