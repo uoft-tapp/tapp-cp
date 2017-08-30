@@ -13,12 +13,6 @@ class AppController < ApplicationController
     render :cp, layout: false
   end
 
-  def test
-    @offers = Offer.all.map {|o| o.format }
-    @sessions = Session.all
-    render :test, layout: false
-  end
-
   '''
     Shows the student facing view when the applicant is looking at the page.
     This uses a route of /pb/:mangled, so that the applicant can`t attack
