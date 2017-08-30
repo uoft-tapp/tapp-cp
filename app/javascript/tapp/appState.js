@@ -886,7 +886,7 @@ class AppState {
     importEnrolment(data) {
         fetch.importEnrolment(data);
     }
-        
+
     importing() {
         return this.get('importing') > 0;
     }
@@ -1096,6 +1096,12 @@ class AppState {
                 break;
             case 'waitlist':
                 data['num_waitlisted'] = val;
+                break;
+            case 'startDate':
+                data['start_date'] = val;
+                break;
+            case 'endDate':
+                data['end_date'] = val;
                 break;
         }
         fetch.updateCourse(courseId, data);

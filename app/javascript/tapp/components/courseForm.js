@@ -50,7 +50,8 @@ class CourseForm extends React.Component {
                                 </p>
                             </td>
                             <td className="col-3">
-                                <NumForm
+                                <Form
+                                    type="number"
                                     defaultVal={this.props.course.estimatedEnrol}
                                     update={val => {
                                         if (val != this.props.course.estimatedEnrol) {
@@ -62,7 +63,8 @@ class CourseForm extends React.Component {
                                         }
                                     }}
                                 />
-                                <NumForm
+                                <Form
+                                    type="number"
                                     defaultVal={this.props.course.cap}
                                     update={val => {
                                         if (val != this.props.course.cap) {
@@ -74,7 +76,8 @@ class CourseForm extends React.Component {
                                         }
                                     }}
                                 />
-                                <NumForm
+                                <Form
+                                    type="number"
                                     defaultVal={this.props.course.waitlist}
                                     update={val => {
                                         if (val != this.props.course.waitlist) {
@@ -96,7 +99,8 @@ class CourseForm extends React.Component {
                                 </p>
                             </td>
                             <td className="col-5">
-                                <NumForm
+                                <Form
+                                    type="number"
                                     defaultVal={this.props.course.estimatedPositions}
                                     update={val => {
                                         if (val != this.props.course.estimatedPositions) {
@@ -108,7 +112,8 @@ class CourseForm extends React.Component {
                                         }
                                     }}
                                 />
-                                <NumForm
+                                <Form
+                                    type="number"
                                     defaultVal={this.props.course.positionHours}
                                     update={val => {
                                         if (val != this.props.course.positionHours) {
@@ -123,6 +128,32 @@ class CourseForm extends React.Component {
                             </td>
                             <td className="col-6">
                                 <p>
+                                    <b>Start Date: </b>
+                                </p>
+                                <Form
+                                    type="date"
+                                    defaultVal={this.props.course.startDate.split('T')[0]}
+                                    update={val => {
+                                        if (val != this.props.course.startDate) {
+                                            this.props.updateCourse(
+                                                this.props.courseId,
+                                                val,
+                                                'startDate'
+                                            );
+                                        }
+                                    }}
+                                />
+                                <p>
+                                    <b>End Date: </b>
+                                </p>
+                                <Form
+                                    type="date"
+                                    defaultVal={this.props.course.endDate.split('T')[0]}
+                                />
+                            </td>
+
+                            <td className="col-7">
+                                <p>
                                     <b>Instructors: </b>
                                 </p>
                                 <InstructorForm
@@ -132,7 +163,7 @@ class CourseForm extends React.Component {
                                     {...this.props}
                                 />
                             </td>
-                            <td className="col-7">
+                            <td className="col-8">
                                 <p>
                                     <b>Qualifications: </b>
                                 </p>
@@ -149,7 +180,7 @@ class CourseForm extends React.Component {
                                     defaultValue={this.props.course.qual}
                                 />
                             </td>
-                            <td className="col-8">
+                            <td className="col-9">
                                 <p>
                                     <b>Responsibilities: </b>
                                 </p>
@@ -174,17 +205,16 @@ class CourseForm extends React.Component {
     }
 }
 
-// numerical input that allows submission by pressing enter
-const NumForm = props =>
+// input that allows form submission
+const Form = props =>
     <form
         onSubmit={event => {
             props.update(event.target.elements[0].value);
             event.preventDefault();
         }}>
         <input
-            type="number"
+            type={props.type}
             defaultValue={props.defaultVal != undefined ? props.defaultVal : ''}
-            min="0"
             onBlur={event => props.update(event.target.value)}
         />
     </form>;

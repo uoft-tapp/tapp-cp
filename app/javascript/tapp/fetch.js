@@ -206,6 +206,8 @@ function onFetchCoursesSuccess(resp) {
             waitlist: course.num_waitlisted,
             qual: course.qualifications,
             resp: course.duties,
+            startDate: course.start_date,
+            endDate: course.end_date,
         };
     });
 
