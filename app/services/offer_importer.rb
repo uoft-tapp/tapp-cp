@@ -19,7 +19,7 @@ class OfferImporter
     elsif exceptions.length > 0
       return {imported: true, errors: true, message: exceptions}
     else
-      return {imported: true, errors: false, message: ["Offers import success."]}
+      return {imported: true, errors: false, message: ["Offers import was successful."]}
     end
   end
 
