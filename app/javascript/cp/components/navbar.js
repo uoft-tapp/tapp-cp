@@ -39,32 +39,6 @@ const Notifications = props => {
     );
 };
 
-const Session = props => {
-    if (props.appState.isSessionsListNull()) {
-        return null;
-    }
-
-    return (
-        <Navbar.Form>
-            <FormGroup>
-                <ControlLabel>Session</ControlLabel>&ensp;
-                <FormControl
-                    componentClass="select"
-                    onChange={event => props.appState.selectSession(event.target.value)}>
-                    <option value="" key="session-all">
-                        all
-                    </option>
-                    {props.appState.getSessionsList().map((session, sessionId) =>
-                        <option value={sessionId} key={'session-' + sessionId}>
-                            {session.get('semester')}&nbsp;{session.get('year')}
-                        </option>
-                    )}
-                </FormControl>
-            </FormGroup>
-        </Navbar.Form>
-    );
-};
-
 const Auth = props =>
     <NavDropdown
         title={props.appState.getCurrentUserRole() + ':' + props.appState.getCurrentUserName()}
@@ -93,11 +67,6 @@ const NavbarInst = props =>
         <Navbar.Header>
             <Navbar.Brand>TAPP:CP</Navbar.Brand>
         </Navbar.Header>
-
-        {props.appState.getCurrentUserRole() == 'admin' &&
-            <Nav pullLeft>
-                <Session {...props} />
-            </Nav>}
 
         <Nav pullRight>
             <Notifications {...props} />
