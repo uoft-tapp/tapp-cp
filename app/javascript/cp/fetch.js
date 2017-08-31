@@ -136,8 +136,6 @@ function onFetchSessionsSuccess(resp) {
     resp.forEach(session => {
         sessions[session.id] = {
             year: session.year,
-            startDate: session.start_date,
-            endDate: session.end_date,
             semester: session.semester,
             pay: session.pay,
         };
