@@ -1,5 +1,4 @@
 class AppController < ApplicationController
-  protect_from_forgery with: :exception
   include Mangler
   include Authorizer
   before_action :tapp_admin, only: [:tapp]
