@@ -97,7 +97,11 @@ delete existing data for this project.
 
 To recreate the images the containers boot from, give `docker-compose up` the `--force-recreate` command line option like so:
 
-`docker-compose up --force-recreate` 
+`docker-compose up --force-recreate`
+
+To absolutely nuke all the docker images and networks:
+
+`docker system prune --all --force`
 
 ## FirstDeploymentCombinedCpTappApp <a id="FirstDeploymentCombinedCpTappApp"></a>
 
