@@ -1,4 +1,5 @@
 class AppController < ApplicationController
+  skip_before_action :verify_authenticity_token
   include Mangler
   include Authorizer
   before_action :tapp_admin, only: [:tapp]
@@ -29,6 +30,14 @@ class AppController < ApplicationController
       render status: 404, json: {message: "There is no such page."}
     end
   end
+
+  def logout
+     session[:keys].each do |key|
+       cookies.delete(key.to_sym)
+     end
+     reset_session
+     render json: cookies.as_json
+   end
 
   private
   def show_decision_view(params)
