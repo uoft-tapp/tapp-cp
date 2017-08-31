@@ -26,8 +26,7 @@ function fetchHelper(URL, init) {
                 return Promise.resolve(resp);
             }
             return Promise.reject(resp);
-        })
-        .catch(function(error) {
+        }, function(error) {
             appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
             return Promise.reject(error);
         });
@@ -206,6 +205,8 @@ function onFetchCoursesSuccess(resp) {
             waitlist: course.num_waitlisted,
             qual: course.qualifications,
             resp: course.duties,
+            startDate: course.start_date,
+            endDate: course.end_date,
         };
     });
 
@@ -375,10 +376,10 @@ function updateCourse(courseId, data) {
 }
 
 // send CHASS data
-function importChass(data) {
+function importChass(data, year, semester) {
     appState.setImporting(true);
 
-    postHelper('/import/chass', { chass_json: data }).then(
+    postHelper('/import/chass', { chass_json: data, year: year, semester: semester }).then(
         () => {
             appState.setImporting(false, true);
             fetchAll();

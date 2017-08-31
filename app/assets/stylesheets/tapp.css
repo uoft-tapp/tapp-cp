@@ -274,17 +274,8 @@ footer div p {
     --col-1-width: 220px; /* immutable course information */
     --col-2-4-width: 80px; /* numerical field labels */
     --col-3-5-width: 60px; /* numerical fields */
-    --col-6-width: 240px; /* instructor form */
-    /* qualifications and responsibilities text areas */
-    --col-7-8-width: calc(
-        calc(
-                100vw -
-                    calc(
-                        var(--course-list-panel-width) + var(--col-1-width) + var(--col-2-4-width)*2 +
-                            var(--col-3-5-width)*2 + var(--col-6-width) + var(--sep-width)*5 + 170px
-                    )
-            ) / 2
-    );
+    --col-6-width: 140px; /* date fields */
+    --col-7-width: 240px; /* instructor form */
 }
 
 .form_table {
@@ -347,8 +338,14 @@ footer div p {
     width: var(--col-3-5-width);
 }
 
-.form_table .col-6 {
+/* date fields */
+.form_table .col-6,
+.form_table .col-6 input {
     width: var(--col-6-width);
+}
+
+.form_table .col-7 {
+    width: var(--col-7-width);
 }
 
 /* instructor form */
@@ -384,12 +381,6 @@ footer div p {
     border: none;
 }
 
-/* qualifications and responsibilities text areas */
-.form_table .col-7,
-.form_table .col-8 {
-    width: var(--col-7-8-width);
-}
-
 /* last 3 columns */
 .form_table textarea {
     width: 100%;
@@ -401,6 +392,7 @@ footer div p {
 /* for summary view */
 #summary-grid .panel-group {
     max-height: var(--main-div-height);
+    margin-bottom: 0;
 }
 
 #summary-grid .panel {
@@ -414,25 +406,46 @@ footer div p {
 }
 
 #summary-grid #utils .panel-body {
-    display: flex;
     width: 100%;
-    justify-content: space-between;
+    padding: 0;
 }
 
-#summary-grid #utils #import {
-    flex: 1;
+#summary-grid #utils .btn {
+    height: 60px;
+    width: 60px;
+    padding: 0;
+    border: 0;
 }
 
-#summary-grid #utils #export {
-    flex: 1.5;
+#summary-grid #utils .divider {
+    width: 0;
+    height: 0;
+    border-top: 30px solid transparent;
+    border-bottom: 30px solid transparent;
+    border-left: 30px solid #e3e3e3;
+    float: left;
+    margin-right: 2vw;
 }
 
-#summary-grid #utils #release {
-    flex: 0;
+#summary-grid #utils form {
+    padding: 12px 0;
 }
 
-#summary-grid #import #file {
-    margin-top: 5px;
+#summary-grid #utils input {
+    display: inline;
+}
+
+#summary-grid #utils #import-form-container,
+#summary-grid #utils #export-form-container {
+    height: 60px;
+    width: calc(100% - 60px * 3 - 1vw);
+    float: right;
+
+    display: none;
+}
+
+#summary-grid #utils #year {
+    width: 80px;
 }
 
 /* for statistics panel in summary view */
@@ -442,7 +455,7 @@ footer div p {
 
 #summary-grid #stats .panel-body {
     /* we subtract the height of the utilities panel, the margin below it, and the stats panel header */
-    max-height: calc(var(--main-div-height) - 91px - 10px - 40px);
+    max-height: calc(var(--main-div-height) - 60px - 10px - 40px);
     overflow: auto;
 }
 
