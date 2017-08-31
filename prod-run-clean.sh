@@ -15,6 +15,8 @@ echo
 echo 'if there are any tapp containers listed above you should consider '
 echo 'docker-compose down, perhaps even down -v (to remove the postgres volume)'
 echo
+echo '*** to really nuke the images consider `docker system prune --all --force` ***'
+echo
 
 read -p 'hit enter to continue: [interrupt to quit]: '
 
