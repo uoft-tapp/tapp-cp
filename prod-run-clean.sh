@@ -38,14 +38,14 @@ read -p 'enter to `docker-compose build --force-rm`  ' JUNK
 docker-compose build --force-rm || die docker-compose up --force-recreate failed
 )
 
-read -p 'enter to `docker-compose up tapp containers: (will want -d in production) ' JUNK
+read -p 'enter to `docker-compose up -d --force-recreate` tapp containers: ' JUNK
 
 (set -x
 docker-compose up -d --force-recreate || die docker-compose up --force-recreate failed
 )
 
 #there is probably a race condition here. migrate can't work until container is really up.
-read -p 'enter to `migrate postgres db: ' JUNK
+read -p 'enter to `migrate db: ' JUNK
 
 (set -x
 docker-compose run rails-app rake db:migrate  || die "rake db:migrate failed"
