@@ -9,17 +9,21 @@ module Authorizer
 
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
-      if request.env['HTTP_X_FORWARD_USER']!= get_applicant(params)
+      if get_utorid != get_applicant(params)
         render status: 403, json: {message: "You are not authorized to access this page."}
       end
     end
+  end
+
+  def logout
+    reset_session
   end
 
   private
   def is_admin(admins)
     admins = admins.split(',')
     if ENV['RAILS_ENV'] == 'production'
-      if !admins.include?(request.env['HTTP_X_FORWARD_USER'])
+      if !admins.include?(get_utorid)
         render status: 403, json: {message: "You are not authorized to access this page."}
       end
     end
@@ -32,6 +36,15 @@ module Authorizer
       return offer[:applicant][:utorid]
     else
       render status: 404, json: {message: "Page not found."}
+    end
+  end
+
+  def get_utorid
+    if request.env['HTTP_X_FORWARD_USER']
+      session[:utorid] = request.env['HTTP_X_FORWARD_USER']
+      return session[:utorid]
+    else
+      return session[:utorid]
     end
   end
 end
