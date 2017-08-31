@@ -28,9 +28,7 @@ function fetchHelper(URL, init) {
             return Promise.reject(resp);
         },
         function(error) {
-            appState.alert(
-                '<b>' + init.method + ' error</b> ' + URL + ': ' + error.message
-            );
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
             return Promise.reject(error);
         }
     );
@@ -255,14 +253,8 @@ function fetchAll() {
     appState.setFetchingAssignmentsList(true);
     appState.setFetchingInstructorsList(true);
 
-    let applicantsPromise = getApplicants();
-    let applicationsPromise = getApplications();
-    let coursesPromise = getCourses();
-    let assignmentsPromise = getAssignments();
-    let instructorsPromise = getInstructors();
-
     // when applicants are successfully fetched, update the applicants list; set fetching flag to false either way
-    applicantsPromise
+    getApplicants()
         .then(applicants => {
             appState.setApplicantsList(applicants);
             appState.setFetchingApplicantsList(false, true);
@@ -270,7 +262,7 @@ function fetchAll() {
         .catch(() => appState.setFetchingApplicantsList(false));
 
     // when applications are successfully fetched, update the applications list; set fetching flag to false either way
-    applicationsPromise
+    getApplications()
         .then(applications => {
             appState.setApplicationsList(applications);
             appState.setFetchingApplicationsList(false, true);
@@ -278,7 +270,7 @@ function fetchAll() {
         .catch(() => appState.setFetchingApplicationsList(false));
 
     // when assignments are successfully fetched, update the assignments list; set fetching flag to false either way
-    assignmentsPromise
+    getAssignments()
         .then(assignments => {
             appState.setAssignmentsList(assignments);
             appState.setFetchingAssignmentsList(false, true);
@@ -286,7 +278,7 @@ function fetchAll() {
         .catch(() => appState.setFetchingAssignmentsList(false));
 
     // when courses are successfully fetched, update the courses list; set fetching flag to false either way
-    coursesPromise
+    getCourses()
         .then(courses => {
             appState.setCoursesList(courses);
             appState.setFetchingCoursesList(false, true);
@@ -294,7 +286,7 @@ function fetchAll() {
         .catch(() => appState.setFetchingCoursesList(false));
 
     // when instructors are successfully fetched, update the instructors list; set fetching flag to false either way
-    instructorsPromise
+    getInstructors()
         .then(instructors => {
             appState.setInstructorsList(instructors);
             appState.setFetchingInstructorsList(false, true);
@@ -322,9 +314,7 @@ function postAssignment(applicant, course, hours) {
 
 // remove an assignment
 function deleteAssignment(applicant, assignment) {
-    deleteHelper(
-        '/applicants/' + applicant + '/assignments/' + assignment
-    ).then(() => {
+    deleteHelper('/applicants/' + applicant + '/assignments/' + assignment).then(() => {
         appState.setFetchingAssignmentsList(true);
         getAssignments()
             .then(assignments => {
@@ -436,17 +426,13 @@ function unlockAssignment(applicant, assignment) {
 
 // export offers from CHASS (locking the corresponding assignments)
 function exportOffers(round) {
-    let exportPromise = fetchHelper('/export/chass/' + round, {}).catch(
-        defaultFailure
-    );
-
     let filename;
+    let exportPromise = fetchHelper('/export/chass/' + round, {}).catch(defaultFailure);
+
     exportPromise
         .then(resp => {
             // extract the filename from the response headers
-            filename = resp.headers
-                .get('Content-Disposition')
-                .match(/filename="(.*)"/)[1];
+            filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
             // parse the response body as a blob
             return resp.blob();
         })
