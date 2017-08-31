@@ -97,7 +97,11 @@ delete existing data for this project.
 
 To recreate the images the containers boot from, give `docker-compose up` the `--force-recreate` command line option like so:
 
-`docker-compose up --force-recreate` 
+`docker-compose up --force-recreate`
+
+To absolutely nuke all the docker images and networks:
+
+`docker system prune --all --force`
 
 ## FirstDeploymentCombinedCpTappApp <a id="FirstDeploymentCombinedCpTappApp"></a>
 
@@ -142,6 +146,8 @@ On our network, `tapp.cs.toronto.edu:/etc/cocker/daemon.json` contains:
 This tells docker to use a particular IP range for its bridge network. We had to do this because docker guessed private IP addresses for its bridge that correspond to real workstations on the departmental (private) network. It is essential that the range is reserved by CSLAB admins for docker and not used for any other purpose. (Apparently it's okay for all docker instances to set up their bridge lans this way)
 
 See https://github.com/uoft-tapp/tapp/blob/master/etc/daemon.json
+
+NB. subnet for docker networks that are created at docker-compose up time are configured in prod.env file
 
 ### Initial deployment
 
