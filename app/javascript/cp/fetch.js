@@ -336,7 +336,7 @@ function setHrProcessed(offers) {
         // update valid offers
         .then(() =>
             putHelper('/offers/batch-update', {
-                offers: offers,
+                offers: validOffers,
                 hr_status: 'Processed',
             })
         )
