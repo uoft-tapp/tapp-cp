@@ -879,8 +879,8 @@ class AppState {
         return applicants.entrySeq();
     }
 
-    importChass(data) {
-        fetch.importChass(data);
+    importChass(data, year, semester) {
+        fetch.importChass(data, year, semester);
     }
 
     importEnrolment(data) {

@@ -392,6 +392,7 @@ footer div p {
 /* for summary view */
 #summary-grid .panel-group {
     max-height: var(--main-div-height);
+    margin-bottom: 0;
 }
 
 #summary-grid .panel {
@@ -405,28 +406,45 @@ footer div p {
 }
 
 #summary-grid #utils .panel-body {
-    display: flex;
     width: 100%;
-    justify-content: space-between;
+    padding: 0;
 }
 
-#summary-grid #utils #import {
-    flex: 1.5;
+#summary-grid #utils .btn {
+    height: 60px;
+    width: 60px;
+    padding: 0;
+    border: 0;
 }
 
-#summary-grid #utils #export {
-    flex: 1.5;
+#summary-grid #utils .divider {
+    width: 0;
+    height: 0;
+    border-top: 30px solid transparent;
+    border-bottom: 30px solid transparent;
+    border-left: 30px solid #e3e3e3;
+    float: left;
+    margin-right: 2vw;
 }
 
-#summary-grid #utils #release {
-    flex: 0;
+#summary-grid #utils form {
+    padding: 12px 0;
 }
 
-#summary-grid #import #file {
-    margin-top: 5px;
+#summary-grid #utils input {
+    display: inline;
 }
 
-#summary-grid #import #year {
+#summary-grid #utils #import-form-container,
+#summary-grid #utils #export-form-container {
+    height: 60px;
+    width: calc(100% - 60px * 3 - 1vw);
+    float: right;
+
+    display: none;
+}
+
+#summary-grid #utils #year {
     width: 80px;
 }
 
@@ -437,7 +455,7 @@ footer div p {
 
 #summary-grid #stats .panel-body {
     /* we subtract the height of the utilities panel, the margin below it, and the stats panel header */
-    max-height: calc(var(--main-div-height) - 91px - 10px - 40px);
+    max-height: calc(var(--main-div-height) - 60px - 10px - 40px);
     overflow: auto;
 }
 

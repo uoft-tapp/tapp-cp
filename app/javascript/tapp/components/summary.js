@@ -1,7 +1,7 @@
 import React from 'react';
-import { Grid, Panel, PanelGroup, Form, Button, Well, Table } from 'react-bootstrap';
-import { ExportForm } from './exportForm.js';
+import { Grid, Panel, PanelGroup, ButtonGroup, Form, Button, Well, Table } from 'react-bootstrap';
 import { ImportForm } from './importForm.js';
+import { ExportForm } from './exportForm.js';
 
 class Summary extends React.Component {
     render() {
@@ -16,11 +16,7 @@ class Summary extends React.Component {
         return (
             <Grid fluid id="summary-grid" style={cursorStyle}>
                 <PanelGroup>
-                    <Panel header="Utilities" id="utils">
-                        <ImportForm {...this.props} />
-                        <ExportForm {...this.props} />
-                        <ReleaseForm {...this.props} />
-                    </Panel>
+                    <Utilities {...this.props} />
                     <Stats {...this.props} />
                 </PanelGroup>
             </Grid>
@@ -45,25 +41,58 @@ class Summary extends React.Component {
 const Utilities = props => {
     return (
         <Panel header="Utilities" id="utils">
-            <ImportForm {...props} />
-            <ExportForm {...props} />
-            <ReleaseForm {...props} />
+            <ButtonGroup>
+                <Button
+                    id="import-btn"
+                    onClick={() => {
+                        let importForm = document.getElementById('import-form-container');
+                        if (!importForm.style.display || importForm.style.display == 'none') {
+                            importForm.style.display = 'block';
+                            document.getElementById('export-form-container').style.display = 'none';
+                        } else {
+                            importForm.style.display = 'none';
+                        }
+                    }}>
+                    <i className="fa fa-upload" style={{ fontSize: '20px' }} />
+                    <br />
+                    <small>Import</small>
+                </Button>
+                <Button
+                    id="export-btn"
+                    onClick={() => {
+                        let exportForm = document.getElementById('export-form-container');
+                        if (!exportForm.style.display || exportForm.style.display == 'none') {
+                            exportForm.style.display = 'block';
+                            document.getElementById('import-form-container').style.display = 'none';
+                        } else {
+                            exportForm.style.display = 'none';
+                        }
+                    }}>
+                    <i className="fa fa-download" style={{ fontSize: '20px' }} />
+                    <br />
+                    <small>Export</small>
+                </Button>
+                <Button
+                    onClick={() =>
+                        props.alert(
+                            '<b>Release assignments</b> This functionality is not currently supported.'
+                        )}>
+                    <i className="fa fa-share-square-o" style={{ fontSize: '20px' }} />
+                    <br />
+                    <small>Release</small>
+                </Button>
+            </ButtonGroup>
+            <div id="import-form-container">
+                <div className="divider" />
+                <ImportForm {...props} />
+            </div>
+            <div id="export-form-container">
+                <div className="divider" />
+                <ExportForm {...props} />
+            </div>
         </Panel>
     );
 };
-
-// form for releasing tentative assignments to instructors
-const ReleaseForm = props =>
-    <Form id="release">
-        <Button
-            bsStyle="success"
-            onClick={() =>
-                props.alert(
-                    '<b>Release assignments</b> This functionality is not currently supported.'
-                )}>
-            Release<br />assignments
-        </Button>
-    </Form>;
 
 const Stats = props => {
     let applicants = Object.entries(props.getApplicantsList());
