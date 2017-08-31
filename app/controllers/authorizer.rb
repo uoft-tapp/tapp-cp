@@ -15,10 +15,6 @@ module Authorizer
     end
   end
 
-  def logout
-    reset_session
-  end
-
   private
   def is_admin(admins)
     admins = admins.split(',')
@@ -42,9 +38,19 @@ module Authorizer
   def get_utorid
     if request.env['HTTP_X_FORWARDED_USER']
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
+      set_cookie_keys
       return session[:utorid]
     else
       return session[:utorid]
     end
+  end
+
+  def set_cookie_keys
+     session[:keys]=[]
+     cookies = request.env['HTTP_COOKIE'].split(";")
+     cookies.each do |cookie|
+       key = cookie.strip.split("=")
+       session[:keys].push(key[0])
+     end
   end
 end
