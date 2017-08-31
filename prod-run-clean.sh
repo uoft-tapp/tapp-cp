@@ -21,7 +21,7 @@ read -p 'hit enter to continue: [interrupt to quit]: '
 read -p 'enter to cp prod.env.devfault .env :' JUNK
 
 (set -x
-cp prod.env.default .env
+cp prod.env.default .env || die failed to copy prod.env.default
 )
 
 read -p 'enter to `docker rm -f` your containers: ' JUNK
