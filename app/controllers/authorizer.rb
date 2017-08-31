@@ -40,8 +40,8 @@ module Authorizer
   end
 
   def get_utorid
-    if request.env['HTTP_X_FORWARD_USER']
-      session[:utorid] = request.env['HTTP_X_FORWARD_USER']
+    if request.env['HTTP_X_FORWARDED_USER']
+      session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
       return session[:utorid]
     else
       return session[:utorid]
