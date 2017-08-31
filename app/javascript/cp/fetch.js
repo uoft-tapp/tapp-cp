@@ -29,7 +29,9 @@ function fetchHelper(URL, init) {
             return Promise.reject(resp);
         },
         function(error) {
-            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
+            appState.alert(
+                '<b>' + init.method + ' error</b> ' + URL + ': ' + error.message
+            );
             return Promise.reject(error);
         }
     );
@@ -52,7 +54,9 @@ function fetchCheckHelper(URL, body) {
             return Promise.reject(resp);
         })
         .catch(function(error) {
-            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
+            appState.alert(
+                '<b>' + init.method + ' error</b> ' + URL + ': ' + error.message
+            );
             return Promise.reject(error);
         });
 }
@@ -94,7 +98,10 @@ function putHelper(URL, body) {
 /* Resource GETters */
 
 const getOffers = () =>
-    getHelper('/offers').then(resp => resp.json()).then(onFetchOffersSuccess).catch(defaultFailure);
+    getHelper('/offers')
+        .then(resp => resp.json())
+        .then(onFetchOffersSuccess)
+        .catch(defaultFailure);
 
 const getSessions = () =>
     getHelper('/sessions')
@@ -229,7 +236,10 @@ function sendContracts(offers) {
                 return resp.json().then(res => {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
-                        appState.alert('<b>Error</b>: Cannot nag send contract for offer ' + offer);
+                        appState.alert(
+                            '<b>Error</b>: Cannot nag send contract for offer ' +
+                                offer
+                        );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
@@ -241,7 +251,9 @@ function sendContracts(offers) {
             }
         })
         // send offers to valid offers
-        .then(() => postHelper('/offers/send-contracts', { offers: offers }))
+        .then(() =>
+            postHelper('/offers/send-contracts', { offers: validOffers })
+        )
         .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
@@ -266,7 +278,10 @@ function nag(offers) {
                 return resp.json().then(res => {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
-                        appState.alert('<b>Error</b>: Cannot nag applicant about offer ' + offer);
+                        appState.alert(
+                            '<b>Error</b>: Cannot nag applicant about offer ' +
+                                offer
+                        );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
@@ -304,7 +319,9 @@ function setHrProcessed(offers) {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
                         appState.alert(
-                            '<b>Error</b>: Cannot mark offer ' + offer + ' as HR processed'
+                            '<b>Error</b>: Cannot mark offer ' +
+                                offer +
+                                ' as HR processed'
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -317,7 +334,12 @@ function setHrProcessed(offers) {
             }
         })
         // update valid offers
-        .then(() => putHelper('/offers/batch-update', { offers: offers, hr_status: 'Processed' }))
+        .then(() =>
+            putHelper('/offers/batch-update', {
+                offers: offers,
+                hr_status: 'Processed',
+            })
+        )
         .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
@@ -343,7 +365,9 @@ function setDdahAccepted(offers) {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
                         appState.alert(
-                            '<b>Error</b>: Cannot mark offer ' + offer + ' as DDAH accepted'
+                            '<b>Error</b>: Cannot mark offer ' +
+                                offer +
+                                ' as DDAH accepted'
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -355,7 +379,12 @@ function setDdahAccepted(offers) {
             }
         })
         // update valid offers
-        .then(() => putHelper('/offers/batch-update', { offers: offers, ddah_status: 'Accepted' }))
+        .then(() =>
+            putHelper('/offers/batch-update', {
+                offers: validOffers,
+                ddah_status: 'Accepted',
+            })
+        )
         .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
@@ -387,7 +416,10 @@ function showContractHr(offer) {
 // withdraw offers
 function withdrawOffers(offers) {
     // create an array of promises for each offer being withdrawn
-    // force each promise to resolve so that we can see which failed
+    // force each promise to resolve so that we can see which failed.
+    // foible of all is that it will reject as soon as any promise fails.
+    // hence, by resolving each promise we frustrate this laziness.
+    // (and also necessitates the loop looking at the responses below)
     let promises = offers.map(offer =>
         postHelper('/offers/' + offer + '/decision/withdraw', {}).then(
             resp => Promise.resolve(resp),
@@ -395,6 +427,7 @@ function withdrawOffers(offers) {
         )
     );
 
+    //re-examine the responses we squirrelled away above.
     Promise.all(promises).then(responses =>
         responses.forEach(resp => {
             if (resp.ok) {
@@ -417,7 +450,9 @@ function print(offers) {
     let validOffers = offers;
 
     // check which contracts can be printed
-    let printPromise = fetchCheckHelper('/offers/can-print', { contracts: offers })
+    let printPromise = fetchCheckHelper('/offers/can-print', {
+        contracts: offers,
+    })
         .catch(defaultFailure)
         .then(resp => {
             if (resp.status == 404) {
@@ -425,7 +460,10 @@ function print(offers) {
                 return resp.json().then(res => {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
-                        appState.alert('<b>Error</b>: Cannot print contract for offer ' + offer);
+                        appState.alert(
+                            '<b>Error</b>: Cannot print contract for offer ' +
+                                offer
+                        );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
@@ -437,7 +475,12 @@ function print(offers) {
             }
         })
         // print valid offers
-        .then(() => postHelper('/offers/print', { contracts: validOffers, update: true }))
+        .then(() =>
+            postHelper('/offers/print', {
+                contracts: validOffers,
+                update: true,
+            })
+        )
         .then(resp => resp.blob().catch(defaultFailure));
 
     printPromise.then(blob => {
