@@ -29,9 +29,7 @@ function fetchHelper(URL, init) {
             return Promise.reject(resp);
         },
         function(error) {
-            appState.alert(
-                '<b>' + init.method + ' error</b> ' + URL + ': ' + error.message
-            );
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
             return Promise.reject(error);
         }
     );
@@ -46,19 +44,18 @@ function fetchCheckHelper(URL, body) {
         },
         method: 'POST',
         body: JSON.stringify(body),
-    })
-        .then(function(resp) {
+    }).then(
+        function(resp) {
             if (resp.ok || resp.status == 404) {
                 return Promise.resolve(resp);
             }
             return Promise.reject(resp);
-        })
-        .catch(function(error) {
-            appState.alert(
-                '<b>' + init.method + ' error</b> ' + URL + ': ' + error.message
-            );
+        },
+        function(error) {
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
             return Promise.reject(error);
-        });
+        }
+    );
 }
 
 function getHelper(URL) {
@@ -98,10 +95,7 @@ function putHelper(URL, body) {
 /* Resource GETters */
 
 const getOffers = () =>
-    getHelper('/offers')
-        .then(resp => resp.json())
-        .then(onFetchOffersSuccess)
-        .catch(defaultFailure);
+    getHelper('/offers').then(resp => resp.json()).then(onFetchOffersSuccess).catch(defaultFailure);
 
 const getSessions = () =>
     getHelper('/sessions')
@@ -157,11 +151,8 @@ function fetchAll() {
     appState.setFetchingOffersList(true);
     appState.setFetchingSessionsList(true);
 
-    let offersPromise = getOffers();
-    let sessionsPromise = getSessions();
-
     // when offers are successfully fetched, update the offers list; set fetching flag to false either way
-    offersPromise
+    getOffers()
         .then(offers => {
             appState.setOffersList(fromJS(offers));
             appState.setFetchingOffersList(false, true);
@@ -169,7 +160,7 @@ function fetchAll() {
         .catch(() => appState.setFetchingOffersList(false));
 
     // when sessions are successfully fetched, update the sessions list; set fetching flag to false either way
-    sessionsPromise
+    getSessions()
         .then(sessions => {
             appState.setSessionsList(fromJS(sessions));
             appState.setFetchingSessionsList(false, true);
@@ -236,10 +227,7 @@ function sendContracts(offers) {
                 return resp.json().then(res => {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot nag send contract for offer ' +
-                                offer
-                        );
+                        appState.alert('<b>Error</b>: Cannot nag send contract for offer ' + offer);
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
@@ -251,9 +239,7 @@ function sendContracts(offers) {
             }
         })
         // send offers to valid offers
-        .then(() =>
-            postHelper('/offers/send-contracts', { offers: validOffers })
-        )
+        .then(() => postHelper('/offers/send-contracts', { offers: validOffers }))
         .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
@@ -278,10 +264,7 @@ function nag(offers) {
                 return resp.json().then(res => {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot nag applicant about offer ' +
-                                offer
-                        );
+                        appState.alert('<b>Error</b>: Cannot nag applicant about offer ' + offer);
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
@@ -319,9 +302,7 @@ function setHrProcessed(offers) {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
                         appState.alert(
-                            '<b>Error</b>: Cannot mark offer ' +
-                                offer +
-                                ' as HR processed'
+                            '<b>Error</b>: Cannot mark offer ' + offer + ' as HR processed'
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -365,9 +346,7 @@ function setDdahAccepted(offers) {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
                         appState.alert(
-                            '<b>Error</b>: Cannot mark offer ' +
-                                offer +
-                                ' as DDAH accepted'
+                            '<b>Error</b>: Cannot mark offer ' + offer + ' as DDAH accepted'
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -460,10 +439,7 @@ function print(offers) {
                 return resp.json().then(res => {
                     let invalidOffers = res.invalid_offers;
                     invalidOffers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot print contract for offer ' +
-                                offer
-                        );
+                        appState.alert('<b>Error</b>: Cannot print contract for offer ' + offer);
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
