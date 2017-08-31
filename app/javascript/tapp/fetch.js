@@ -20,16 +20,20 @@ function showMessageInJsonBody(resp) {
 }
 
 function fetchHelper(URL, init) {
-    return fetch(URL, init)
-        .then(function(resp) {
+    return fetch(URL, init).then(
+        function(resp) {
             if (resp.ok) {
                 return Promise.resolve(resp);
             }
             return Promise.reject(resp);
-        }, function(error) {
-            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
+        },
+        function(error) {
+            appState.alert(
+                '<b>' + init.method + ' error</b> ' + URL + ': ' + error.message
+            );
             return Promise.reject(error);
-        });
+        }
+    );
 }
 
 function getHelper(URL) {
@@ -70,33 +74,28 @@ function putHelper(URL, body) {
 
 const getApplicants = () =>
     getHelper('/applicants')
-        .then(resp => resp.json())
-        .then(onFetchApplicantsSuccess)
-        .catch(defaultFailure);
+        .then(resp => resp.json().catch(defaultFailure))
+        .then(onFetchApplicantsSuccess);
 
 const getApplications = () =>
     getHelper('/applications')
-        .then(resp => resp.json())
-        .then(onFetchApplicationsSuccess)
-        .catch(defaultFailure);
+        .then(resp => resp.json().catch(defaultFailure))
+        .then(onFetchApplicationsSuccess);
 
 const getCourses = () =>
     getHelper('/positions')
-        .then(resp => resp.json())
-        .then(onFetchCoursesSuccess)
-        .catch(defaultFailure);
+        .then(resp => resp.json().catch(defaultFailure))
+        .then(onFetchCoursesSuccess);
 
 const getAssignments = () =>
     getHelper('/assignments')
-        .then(resp => resp.json())
-        .then(onFetchAssignmentsSuccess)
-        .catch(defaultFailure);
+        .then(resp => resp.json().catch(defaultFailure))
+        .then(onFetchAssignmentsSuccess);
 
 const getInstructors = () =>
     getHelper('/instructors')
-        .then(resp => resp.json())
-        .then(onFetchInstructorsSuccess)
-        .catch(defaultFailure);
+        .then(resp => resp.json().catch(defaultFailure))
+        .then(onFetchInstructorsSuccess);
 
 /* Success callbacks for resource GETters */
 
@@ -323,7 +322,9 @@ function postAssignment(applicant, course, hours) {
 
 // remove an assignment
 function deleteAssignment(applicant, assignment) {
-    deleteHelper('/applicants/' + applicant + '/assignments/' + assignment).then(() => {
+    deleteHelper(
+        '/applicants/' + applicant + '/assignments/' + assignment
+    ).then(() => {
         appState.setFetchingAssignmentsList(true);
         getAssignments()
             .then(assignments => {
@@ -379,7 +380,11 @@ function updateCourse(courseId, data) {
 function importChass(data, year, semester) {
     appState.setImporting(true);
 
-    postHelper('/import/chass', { chass_json: data, year: year, semester: semester }).then(
+    postHelper('/import/chass', {
+        chass_json: data,
+        year: year,
+        semester: semester,
+    }).then(
         () => {
             appState.setImporting(false, true);
             fetchAll();
@@ -431,13 +436,17 @@ function unlockAssignment(applicant, assignment) {
 
 // export offers from CHASS (locking the corresponding assignments)
 function exportOffers(round) {
-    let exportPromise = fetchHelper('/export/chass/' + round, {}).catch(defaultFailure);
+    let exportPromise = fetchHelper('/export/chass/' + round, {}).catch(
+        defaultFailure
+    );
 
     let filename;
     exportPromise
         .then(resp => {
             // extract the filename from the response headers
-            filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
+            filename = resp.headers
+                .get('Content-Disposition')
+                .match(/filename="(.*)"/)[1];
             // parse the response body as a blob
             return resp.blob();
         })
