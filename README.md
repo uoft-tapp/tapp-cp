@@ -143,6 +143,8 @@ This tells docker to use a particular IP range for its bridge network. We had to
 
 See https://github.com/uoft-tapp/tapp/blob/master/etc/daemon.json
 
+NB. subnet for docker networks that are created at docker-compose up time are configured in prod.env file
+
 ### Initial deployment
 
 On the production machine:
