@@ -25,6 +25,14 @@ class ExportForm extends React.Component {
                 this.props.exportOffers();
             }
         } else {
+            if (data == 'cdf-info') {
+                if (Object.keys(this.props.getAssignmentsList()).length == 0) {
+                    // no assignments have been made
+                    this.props.alert('Cannot export CDF info: no assignments have been made');
+                    return;
+                }
+            }
+            
             // export other data in CS
             if (format == 'csv') {
                 window.open('/export/' + data);
