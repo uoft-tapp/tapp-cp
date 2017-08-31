@@ -377,10 +377,10 @@ function updateCourse(courseId, data) {
 }
 
 // send CHASS data
-function importChass(data) {
+function importChass(data, year, semester) {
     appState.setImporting(true);
 
-    postHelper('/import/chass', { chass_json: data }).then(
+    postHelper('/import/chass', { chass_json: data, year: year, semester: semester }).then(
         () => {
             appState.setImporting(false, true);
             fetchAll();

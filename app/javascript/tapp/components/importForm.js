@@ -27,7 +27,7 @@ class ImportForm extends React.Component {
                         data = JSON.parse(data);
 
                         if (data['courses'] !== undefined && data['applicants'] !== undefined) {
-                            this.props.importChass(data);
+                            this.props.importChass(data, this.year.value, this.semester.value);
                         } else {
                             this.props.alert('<b>Error:</b> This is not a CHASS JSON.');
                         }
@@ -51,8 +51,6 @@ class ImportForm extends React.Component {
                     'Are you sure you want to import "' + files[0].name + '" into the database?'
                 )
             ) {
-                this.props.notify('<i>Import in progress...</i>');
-
                 let reader = new FileReader();
                 reader.onload = event => importFunc(event.target.result);
                 reader.readAsText(files[0]);
@@ -65,18 +63,6 @@ class ImportForm extends React.Component {
     render() {
         return (
             <Form inline id="import">
-                <FormControl.Static style={{ verticalAlign: 'middle' }}>
-                    {this.props.importing()
-                        ? <i
-                              className="fa fa-spinner fa-spin"
-                              style={{ fontSize: '20px', color: 'blue' }}
-                          />
-                        : <i
-                              className="fa fa-upload"
-                              style={{ fontSize: '20px', color: 'blue', cursor: 'pointer' }}
-                              onClick={() => this.uploadFile()}
-                          />}&emsp;
-                </FormControl.Static>
                 <FormGroup>
                     <ControlLabel>Import&ensp;</ControlLabel>
                     <FormControl
@@ -84,12 +70,11 @@ class ImportForm extends React.Component {
                         inputRef={ref => {
                             this.data = ref;
                         }}>
-                        <option value="enrol">Enrolment&nbsp;</option>
+                        <option value="enrol">Enrolment</option>
                         <option value="chass">Courses/Applicants</option>
                     </FormControl>
                     <ControlLabel>
-                        &ensp;from file:&nbsp;
-                        <i
+                        &ensp;<i
                             className="fa fa-info-circle"
                             style={{ color: 'blue' }}
                             onClick={() =>
@@ -98,7 +83,38 @@ class ImportForm extends React.Component {
                         <ChassDialog />
                         <EnrolDialog />
                     </ControlLabel>
-                    <br />
+                    <ControlLabel>&ensp;for&ensp;</ControlLabel>
+                    <FormControl
+                        componentClass="select"
+                        inputRef={ref => {
+                            this.semester = ref;
+                        }}>
+                        <option>Winter</option>
+                        <option>Spring</option>
+                        <option>Fall</option>
+                    </FormControl>&nbsp;
+                    <FormControl
+                        id="year"
+                        type="number"
+                        min="2000"
+                        step="1"
+                        defaultValue={new Date().getFullYear()}
+                        inputRef={ref => {
+                            this.year = ref;
+                        }}
+                    />
+                    <FormControl.Static style={{ verticalAlign: 'middle' }}>
+                        &emsp;&emsp;{this.props.importing()
+                            ? <i
+                                  className="fa fa-spinner fa-spin"
+                                  style={{ fontSize: '20px', color: 'blue' }}
+                              />
+                            : <i
+                                  className="fa fa-upload"
+                                  style={{ fontSize: '20px', color: 'blue', cursor: 'pointer' }}
+                                  onClick={() => this.uploadFile()}
+                              />}&ensp;
+                    </FormControl.Static>
                     <FormControl
                         id="file"
                         type="file"

@@ -32,7 +32,7 @@ class SessionsForm extends React.Component {
                                 let pay = this.props.appState
                                     .getSessionsList()
                                     .getIn([event.target.value, 'pay']);
-                                this.pay.value = pay ? pay : null;
+                                this.pay.value = pay != undefined ? pay : '';
                             }}>
                             <option value="" key="session-all">
                                 all
