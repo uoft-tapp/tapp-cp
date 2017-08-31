@@ -26,8 +26,7 @@ function fetchHelper(URL, init) {
                 return Promise.resolve(resp);
             }
             return Promise.reject(resp);
-        })
-        .catch(function(error) {
+        }, function(error) {
             appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
             return Promise.reject(error);
         });

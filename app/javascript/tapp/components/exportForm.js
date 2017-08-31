@@ -5,6 +5,12 @@ import { Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 class ExportForm extends React.Component {
     exportData(data, format) {
         if (data == 'offers') {
+            if (Object.keys(this.props.getAssignmentsList()).length == 0) {
+                // no assignments have been made
+                this.props.alert('Cannot export offers: no assignments have been made');
+                return;
+            }
+
             // export offers
             let route;
             if (format == 'csv') {
