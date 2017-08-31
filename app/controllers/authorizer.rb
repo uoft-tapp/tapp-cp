@@ -10,7 +10,7 @@ module Authorizer
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
       if get_utorid != get_applicant(params)
-        render status: 403, json: {message: "You are not authorized to access this page."}
+        render status: 403, file: 'public/403.html'
       end
     end
   end
@@ -20,7 +20,7 @@ module Authorizer
     admins = admins.split(',')
     if ENV['RAILS_ENV'] == 'production'
       if !admins.include?(get_utorid)
-        render status: 403, json: {message: "You are not authorized to access this page."}
+        render status: 403, file: 'public/403.html'
       end
     end
   end
@@ -31,7 +31,7 @@ module Authorizer
       offer = offer.format
       return offer[:applicant][:utorid]
     else
-      render status: 404, json: {message: "Page not found."}
+      render status: 404, file: 'public/404.html'
     end
   end
 
