@@ -43,21 +43,7 @@ const Auth = props =>
     <NavDropdown
         title={props.appState.getCurrentUserRole() + ':' + props.appState.getCurrentUserName()}
         id="nav-auth-dropdown">
-        <MenuItem
-            eventKey="switch-admin"
-            onClick={() => props.appState.setCurrentUserRole('admin')}>
-            Switch to admin role
-        </MenuItem>
-
-        <MenuItem eventKey="switch-hris" onClick={() => props.appState.setCurrentUserRole('hris')}>
-            Switch to hris role
-        </MenuItem>
-
-        <MenuItem eventKey="switch-inst" onClick={() => props.appState.setCurrentUserRole('inst')}>
-            Switch to inst role
-        </MenuItem>
-
-        <MenuItem eventKey="logout">Logout</MenuItem>
+        <MenuItem onClick={() => props.appState.logout()}>Logout</MenuItem>
     </NavDropdown>;
 
 /*** Navbar ***/
