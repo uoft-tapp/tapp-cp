@@ -17,7 +17,15 @@ function respFailure(resp) {
 
 // extract and display a message which is sent in the (JSON) body of a response
 function showMessageInJsonBody(resp) {
-    resp.json().then(res => appState.alert(res.message));
+    resp.json().then(res => {
+        if (res.message instanceof Array) {
+            // array of messages
+            res.message.forEach(message => appState.alert(message));
+        } else {
+            // single message
+            appState.alert(res.message);
+        }
+    });
 }
 
 function fetchHelper(URL, init) {
@@ -384,7 +392,20 @@ function importChass(data, year, semester) {
         year: year,
         semester: semester,
     })
-        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            resp =>
+                resp.ok
+                    ? // import succeeded
+                      resp.json().then(resp => {
+                          // import succeeded with errors
+                          if (resp.errors) {
+                              return showMessageInJsonBody(resp).catch(Promise.resolve());
+                          }
+                          return Promise.resolve();
+                      })
+                    : // import failed
+                      showMessageInJsonBody(resp)
+        )
         .then(
             () => {
                 appState.setImporting(false, true);
