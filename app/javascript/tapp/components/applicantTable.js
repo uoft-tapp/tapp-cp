@@ -11,7 +11,7 @@ const THeader = props =>
                     style={
                         field.style
                             ? Object.assign({}, field.style, {
-                                  width: 'calc(' + field.style.width + '*100vw)',
+                                  width: 'calc(' + field.style.width + '*' + props.width + ')',
                               })
                             : {}
                     }>
@@ -29,7 +29,7 @@ const ApplicantRow = props =>
                 style={
                     field.style
                         ? Object.assign({}, field.style, {
-                              width: 'calc(' + field.style.width + '*100vw)',
+                              width: 'calc(' + field.style.width + '*' + props.width + ')',
                           })
                         : {}
                 }>
@@ -107,6 +107,7 @@ class ApplicantTable extends React.Component {
     }
 
     render() {
+        console.log(this.props.layout);
         return (
             <div
                 className={
@@ -114,7 +115,7 @@ class ApplicantTable extends React.Component {
                     (this.props.assigned ? 'assigned-table' : 'unassigned-table')
                 }>
                 <Table striped bordered condensed hover>
-                    <THeader config={this.props.config} />
+                    <THeader config={this.props.config} width={this.props.width} />
                 </Table>
 
                 <div
@@ -183,6 +184,9 @@ ApplicantTable.propTypes = {
 
     // function that returns a unique id for each applicant row
     rowId: PropTypes.func,
+
+    // total table width (can use any units)
+    width: PropTypes.string,
 };
 
 export { ApplicantTable };

@@ -71,14 +71,14 @@ class CoursePanel extends React.Component {
                     </span>,
                 sortData: p => p.applicant.lastName,
 
-                style: { width: 0.10 },
+                style: { width: 0.12 },
             },
             {
                 header: 'First Name',
                 data: p => p.applicant.firstName,
                 sortData: p => p.applicant.firstName,
 
-                style: { width: 0.10 },
+                style: { width: 0.1 },
             },
             {
                 header: 'Dept.',
@@ -92,7 +92,7 @@ class CoursePanel extends React.Component {
                     p => p.applicant.dept != 'Computer Science',
                 ],
 
-                style: { width: 0.08 },
+                style: { width: 0.1 },
             },
             {
                 header: 'Prog.',
@@ -109,14 +109,14 @@ class CoursePanel extends React.Component {
                     p => p.applicant.program == 'UG',
                 ],
 
-                style: { width: 0.05 },
+                style: { width: 0.06 },
             },
             {
                 header: 'Year',
                 data: p => p.applicant.year,
                 sortData: p => p.applicant.year,
 
-                style: { width: 0.03 },
+                style: { width: 0.04 },
             },
             {
                 header: 'Pref.',
@@ -128,7 +128,7 @@ class CoursePanel extends React.Component {
 
                 sortData: p => props.getApplicationPreference(p.applicantId, p.course),
 
-                style: { width: 0.03 },
+                style: { width: 0.04 },
             },
             {
                 header: 'Other',
@@ -251,6 +251,11 @@ const AssignedApplicantTable = props =>
         course={props.course}
         getApplicants={() => props.getApplicantsAssignedToCourse(props.course)}
         rowId={p => p.course + '-' + p.applicantId + '-1'}
+        width={
+            [2, 3.1, 3.2, 3.3, 3.4, 4].includes(props.getCoursePanelLayout())
+                ? '70vw'
+                : props.getCoursePanelLayout() == 3 ? '45vw' : '100vw'
+        }
     />;
 
 const UnassignedApplicantTable = props =>
@@ -262,6 +267,11 @@ const UnassignedApplicantTable = props =>
         getSelectedSortFields={() => props.getCoursePanelSortsByCourse(props.course)}
         getSelectedFilters={() => props.getCoursePanelFiltersByCourse(props.course)}
         rowId={p => p.course + '-' + p.applicantId + '-0'}
+        width={
+            [2, 3.1, 3.2, 3.3, 3.4, 4].includes(props.getCoursePanelLayout())
+                ? '70vw'
+                : props.getCoursePanelLayout() == 3 ? '45vw' : '100vw'
+        }
     />;
 
 export { CoursePanel };
