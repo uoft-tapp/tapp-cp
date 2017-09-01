@@ -200,11 +200,82 @@ by default the logs are in json and are buried deep in `/var/lib/docker/containe
 We should automatically backup postgres every few minutes.
 The restore procedure is manual for emergencies when we need to step back to a backup
 
+### temporary workaround
+
+in production we are unable to run db:drop because
+
+```
+ActiveRecord::ProtectedEnvironmentError: You are attempting to run a destructive action against your 'production' database.
+If you are sure you want to continue, run the same command with the environment variable:
+DISABLE_DATABASE_ENVIRONMENT_CHECK=1
+```
+
+So we drop by hand.
+
+First, start postgres service
+
+```
+docker-compose run postgres
+```
+
+Second, find out the name of the postgres container.
+
+```
+docker ps
+```
+
+in the following, we saw tappcp_postgres_1 in the NAME column
+
+
+```
+docker exec -it tappcp_postgres_1 psql -U postgres
+```
+
+now talk to psql (just like the 1970's!
+
+```
+postres-# \c postgres
+You are now connected to database "postgres" as user "postgres".
+
+postgres=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+(3 rows)
+
+postgres-# drop database tapp_production;
+```
+
+don't forget that SEMICOLON !!
+
+
+now restore the database dump from backup:
+
+```
+cat filename | docker exec -i tappcp_postgres_1 psql -U postgres
+```
+
+and migrate:
+
+`docker-compose run rails-app rake db:migrate`
+
+Finally start up the services:
+
+```
+docker-compose up -d
+```
+
+
 ### Backup & Restore <a id="backup-restore"></a>
 While the application is running,
 1. Back up the database and its content:
     ```
-    docker exec -t tapp_postgres_1 pg_dumpall -U postgres > filename
+    docker exec -t tappcp_postgres_1 pg_dumpall -U postgres > filename
     ```
 2. Stop & remove all running containers and erase their volumes:
     ```
