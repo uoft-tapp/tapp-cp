@@ -33,3 +33,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - /var/lib/postgresql/data
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: ${DOCKER_DEFAULT_SUBNET}

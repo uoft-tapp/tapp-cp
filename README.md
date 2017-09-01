@@ -5,6 +5,7 @@
 - [FirstDeploymentCombinedCpTappApp](#FirstDeploymentCombinedCpTappApp)
 - [deployment](#deployment)
 - [backup & restore](#backup-restore)
+- [Task Commands](#task-commands)
 
 TA assignment and matching application.
 
@@ -97,7 +98,11 @@ delete existing data for this project.
 
 To recreate the images the containers boot from, give `docker-compose up` the `--force-recreate` command line option like so:
 
-`docker-compose up --force-recreate` 
+`docker-compose up --force-recreate`
+
+To absolutely nuke all the docker images and networks:
+
+`docker system prune --all --force`
 
 ## FirstDeploymentCombinedCpTappApp <a id="FirstDeploymentCombinedCpTappApp"></a>
 
@@ -108,7 +113,7 @@ assignments from the tapp app running on docker.
 
 ### michelle's recipe for the one-time migration
 ```
-[3:47 PM] 
+[3:47 PM]
 michellemtchai @everyone The dump of the TAPP data to TAPP-CP works! The trick was to keep the `POSTGRES_DB=tapp_production` and `POSTGRES_USER=tapp` in the `.env` file. This way `tapp-cp` takes the data from the dump as the main database. The steps to get the TAPP data to TAPP-CP is the following:
 1) `docker-compose down -v`
 2) `docker-compose up`
@@ -122,7 +127,7 @@ michellemtchai @everyone The dump of the TAPP data to TAPP-CP works! The trick w
 ## Deployment <a id="deployment"></a>
 
 * The Dockerfile contains instructions to set up the image of the container (linux, yarn, npm etc)
-* The `docker-compose` `yml` files setup the services that your container will be using (postgres, rails). 
+* The `docker-compose` `yml` files setup the services that your container will be using (postgres, rails).
 * The [prod|dev].env.default files are read by docker (at build and runtime) and define variables that parametrize the Dockerfile and the docker-compose files.
 
 ### daemon.json
@@ -142,6 +147,8 @@ On our network, `tapp.cs.toronto.edu:/etc/cocker/daemon.json` contains:
 This tells docker to use a particular IP range for its bridge network. We had to do this because docker guessed private IP addresses for its bridge that correspond to real workstations on the departmental (private) network. It is essential that the range is reserved by CSLAB admins for docker and not used for any other purpose. (Apparently it's okay for all docker instances to set up their bridge lans this way)
 
 See https://github.com/uoft-tapp/tapp/blob/master/etc/daemon.json
+
+NB. subnet for docker networks that are created at docker-compose up time are configured in prod.env file
 
 ### Initial deployment
 
@@ -228,6 +235,10 @@ Hourly postgress sql dumps are stored in a safe place off the production machine
 So, if suspicious, you can check to make sure assignments, etc, are making it into the database by reading the sql.
 You can always grep and/or diff the dumps to find if and when assignments were made, etc.
 
+## Task commands
+The following command looks at the current date and checks the database for the number of offers accepted in the last 24 hours (for Tuesday - Friday) and 3 days (for Monday) and decide whether to send an email alert to the HR admin or not. The following command is intended to be run from cron daily. Whether the email is sent is decided by the task.
+
+`docker-compose run rails-app rake email:status`
 
 ## TODO
 - [] JavaScript testing

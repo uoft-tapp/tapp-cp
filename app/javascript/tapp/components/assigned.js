@@ -140,6 +140,7 @@ class Assigned extends React.Component {
                     rowId={p => 'assigned-' + p.applicantId}
                     getSelectedSortFields={() => this.props.getSorts()}
                     getSelectedFilters={() => this.props.getFilters()}
+                    width="100vw"
                 />
             </Grid>
         );

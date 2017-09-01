@@ -139,6 +139,7 @@ class Unassigned extends React.Component {
                     rowId={p => 'unassigned-' + p.applicantId}
                     getSelectedSortFields={() => this.props.getSorts()}
                     getSelectedFilters={() => this.props.getFilters()}
+                    width="100vw"
                 />
             </Grid>
         );
