@@ -411,11 +411,11 @@ class AppState {
     }
 
     setCurrentUserName(user) {
-        this.set('user', user);
+        this.set('nav.user', user);
     }
 
     setCurrentUserRoles(roles) {
-        this.set('roles', roles);
+        this.set('nav.roles', roles);
     }
 
     // change the number of hours of a temporary assignment

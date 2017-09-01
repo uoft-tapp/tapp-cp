@@ -486,7 +486,7 @@ function fetchAuth() {
     getHelper('/roles')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(resp => {
-            if (resp.dev) {
+            if (resp.development) {
                 appState.setCurrentUserName('_DEV_');
                 appState.setCurrentUserRoles(['tapp_admin', 'instructor']);
                 // default to tapp_admin as selected user role

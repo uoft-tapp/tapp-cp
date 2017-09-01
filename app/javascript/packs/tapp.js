@@ -44,8 +44,8 @@ class App extends React.Component {
     }
 
     render() {
-        let role = this.props.appState.getSelectedUserRole(),
-            user = this.props.appState.getCurrentUserName();
+        let role = appState.getSelectedUserRole(),
+            user = appState.getCurrentUserName();
 
         // this should only happen before we have fetched the current auth information
         if (user == null) {
@@ -56,9 +56,7 @@ class App extends React.Component {
             return <AdminRouter {...appState} />;
         }
 
-        if (role == 'instructor') {
-            return <InstRouter {...appState} />;
-        }
+        return null;
     }
 }
 
