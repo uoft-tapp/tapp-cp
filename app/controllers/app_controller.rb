@@ -44,8 +44,10 @@ class AppController < ApplicationController
     Work in progress.
   '''
   def logout
-     session[:keys].each do |key|
-       cookies.delete(key.to_sym)
+     if ENV['RAILS_ENV'] == 'production'
+       session[:keys].each do |key|
+         cookies.delete(key.to_sym)
+       end
      end
      reset_session
      render json: cookies.as_json
@@ -60,7 +62,7 @@ class AppController < ApplicationController
         offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
         if offer
           if offer[:send_date]
-            @offer = offer.format.except(:id).merge({mangled: offer[:link]})
+            @offer = offer.format.except(:id)
             render :decision, layout: false
           else
             render status: 404, json: {message: "Offer #{offer[:id]} hasn't been sent."}
