@@ -4,58 +4,26 @@ import { appState } from './appState.js';
 
 /* General helpers */
 
-function defaultFailure(text) {
+function msgFailure(text) {
     appState.alert('<b>Action Failed:</b> ' + text);
+    return Promise.reject();
+}
+
+function respFailure(resp) {
+    appState.alert('<b>Action Failed</b> ' + resp.url + ': ' + resp.statusText);
     return Promise.reject();
 }
 
 // extract and display a message which is sent in the (JSON) body of a response
 function showMessageInJsonBody(resp) {
-    if (resp.message != null) {
-        appState.notify(resp.message);
-    } else {
-        resp.json().then(res => {
-            appState.alert(res.message);
-        });
-    }
+    resp.json().then(res => appState.alert(res.message));
 }
 
 function fetchHelper(URL, init) {
-    return fetch(URL, init).then(
-        function(resp) {
-            if (resp.ok) {
-                return Promise.resolve(resp);
-            }
-            return Promise.reject(resp);
-        },
-        function(error) {
-            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
-            return Promise.reject(error);
-        }
-    );
-}
-
-// fetching for 'can-*' batch methods
-function fetchCheckHelper(URL, body) {
-    return fetch(URL, {
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'POST',
-        body: JSON.stringify(body),
-    }).then(
-        function(resp) {
-            if (resp.ok || resp.status == 404) {
-                return Promise.resolve(resp);
-            }
-            return Promise.reject(resp);
-        },
-        function(error) {
-            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
-            return Promise.reject(error);
-        }
-    );
+    return fetch(URL, init).catch(function(error) {
+        appState.alert('<b>' + init.method + ' ' + URL + ' error</b> ' + ': ' + error);
+        return Promise.reject(error);
+    });
 }
 
 function getHelper(URL) {
@@ -95,13 +63,14 @@ function putHelper(URL, body) {
 /* Resource GETters */
 
 const getOffers = () =>
-    getHelper('/offers').then(resp => resp.json()).then(onFetchOffersSuccess).catch(defaultFailure);
+    getHelper('/offers')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchOffersSuccess);
 
 const getSessions = () =>
     getHelper('/sessions')
-        .then(resp => resp.json())
-        .then(onFetchSessionsSuccess)
-        .catch(defaultFailure);
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchSessionsSuccess);
 
 /* Success callbacks for resource GETters */
 
@@ -172,46 +141,50 @@ function fetchAll() {
 function importAssignments() {
     appState.setImporting(true);
 
-    postHelper('/import/locked-assignments', {}).then(
-        () => {
-            appState.setImporting(false, true);
+    postHelper('/import/locked-assignments', {})
+        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            () => {
+                appState.setImporting(false, true);
 
-            appState.setFetchingOffersList(true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
-                })
-                .catch(() => appState.setFetchingOffersList(false));
-        },
-        resp => {
-            appState.setImporting(false);
-            showMessageInJsonBody(resp);
-        }
-    );
+                appState.setFetchingOffersList(true);
+                getOffers()
+                    .then(offers => {
+                        appState.setOffersList(fromJS(offers));
+                        appState.setFetchingOffersList(false, true);
+                    })
+                    .catch(() => appState.setFetchingOffersList(false));
+            },
+            resp => {
+                appState.setImporting(false);
+                showMessageInJsonBody(resp);
+            }
+        );
 }
 
 // send CHASS offers data
 function importOffers(data) {
     appState.setImporting(true);
 
-    postHelper('/import/offers', { chass_offers: data }).then(
-        () => {
-            appState.setImporting(false, true);
+    postHelper('/import/offers', { chass_offers: data })
+        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            () => {
+                appState.setImporting(false, true);
 
-            appState.setFetchingOffersList(true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
-                })
-                .catch(() => appState.setFetchingOffersList(false));
-        },
-        resp => {
-            appState.setImporting(false);
-            showMessageInJsonBody(resp);
-        }
-    );
+                appState.setFetchingOffersList(true);
+                getOffers()
+                    .then(offers => {
+                        appState.setOffersList(fromJS(offers));
+                        appState.setFetchingOffersList(false, true);
+                    })
+                    .catch(() => appState.setFetchingOffersList(false));
+            },
+            resp => {
+                appState.setImporting(false);
+                showMessageInJsonBody(resp);
+            }
+        );
 }
 
 // send contracts
@@ -219,8 +192,7 @@ function sendContracts(offers) {
     let validOffers = offers;
 
     // check which contracts can be sent
-    fetchCheckHelper('/offers/can-send-contract', { contracts: offers })
-        .catch(defaultFailure)
+    postHelper('/offers/can-send-contract', { contracts: offers })
         .then(resp => {
             if (resp.status == 404) {
                 // some contracts cannot be sent
@@ -235,10 +207,13 @@ function sendContracts(offers) {
                     if (validOffers.length == 0) {
                         return Promise.reject();
                     }
-                }, defaultFailure);
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
             }
         })
-        // send offers to valid offers
+        // send contracts for valid offers
         .then(() => postHelper('/offers/send-contracts', { offers: validOffers }))
         .then(() => {
             appState.setFetchingOffersList(true);
@@ -256,8 +231,7 @@ function nag(offers) {
     let validOffers = offers;
 
     // check which applicants can be nagged
-    fetchCheckHelper('/offers/can-nag', { contracts: offers })
-        .catch(defaultFailure)
+    postHelper('/offers/can-nag', { contracts: offers })
         .then(resp => {
             if (resp.status == 404) {
                 // some contracts cannot be sent
@@ -272,7 +246,10 @@ function nag(offers) {
                     if (validOffers.length == 0) {
                         return Promise.reject();
                     }
-                }, defaultFailure);
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
             }
         })
         // nag valid offers
@@ -293,8 +270,7 @@ function setHrProcessed(offers) {
     let validOffers = offers;
 
     // check which offers can be marked as hr_processed
-    fetchCheckHelper('/offers/can-hr-update', { offers: offers })
-        .catch(defaultFailure)
+    postHelper('/offers/can-hr-update', { offers: offers })
         .then(resp => {
             if (resp.status == 404) {
                 // some offers cannot be updated
@@ -311,7 +287,10 @@ function setHrProcessed(offers) {
                     if (validOffers.length == 0) {
                         return Promise.reject();
                     }
-                }, defaultFailure);
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
             }
         })
         // update valid offers
@@ -337,8 +316,7 @@ function setDdahAccepted(offers) {
     let validOffers = offers;
 
     // check which offers can be marked as ddah_accepted
-    fetchCheckHelper('/offers/can-ddah-update', { offers: offers })
-        .catch(defaultFailure)
+    postHelper('/offers/can-ddah-update', { offers: offers })
         .then(resp => {
             if (resp.status == 404) {
                 // some offers cannot be updated
@@ -354,7 +332,10 @@ function setDdahAccepted(offers) {
                     if (validOffers.length == 0) {
                         return Promise.reject();
                     }
-                }, defaultFailure);
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
             }
         })
         // update valid offers
@@ -383,13 +364,12 @@ function showContractApplicant(offer) {
 // show the contract for this offer in a new window, as HR would see it
 function showContractHr(offer) {
     postHelper('/offers/print', { contracts: [offer], update: false })
-        .then(resp => resp.blob())
+        .then(resp => (resp.ok ? resp.blob().catch(msgFailure) : respFailure))
         .then(blob => {
             let fileURL = URL.createObjectURL(blob);
             let contractWindow = window.open(fileURL);
             contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
-        })
-        .catch(defaultFailure);
+        });
 }
 
 // withdraw offers
@@ -409,16 +389,20 @@ function withdrawOffers(offers) {
     //re-examine the responses we squirrelled away above.
     Promise.all(promises).then(responses =>
         responses.forEach(resp => {
-            if (resp.ok) {
-                appState.setFetchingOffersList(true);
-                getOffers()
-                    .then(offers => {
-                        appState.setOffersList(fromJS(offers));
-                        appState.setFetchingOffersList(false, true);
-                    })
-                    .catch(() => appState.setFetchingOffersList(false));
-            } else {
-                showMessageInJsonBody(resp);
+            if (resp.type != 'error') {
+                // network error did not occur
+                if (resp.ok) {
+                    appState.setFetchingOffersList(true);
+                    getOffers()
+                        .then(offers => {
+                            appState.setOffersList(fromJS(offers));
+                            appState.setFetchingOffersList(false, true);
+                        })
+                        .catch(() => appState.setFetchingOffersList(false));
+                } else {
+                    // request failed
+                    showMessageInJsonBody(resp);
+                }
             }
         })
     );
@@ -429,10 +413,7 @@ function print(offers) {
     let validOffers = offers;
 
     // check which contracts can be printed
-    let printPromise = fetchCheckHelper('/offers/can-print', {
-        contracts: offers,
-    })
-        .catch(defaultFailure)
+    let printPromise = putHelper('/offers/can-print', { contracts: offers })
         .then(resp => {
             if (resp.status == 404) {
                 // some contracts cannot be printed
@@ -447,7 +428,10 @@ function print(offers) {
                     if (validOffers.length == 0) {
                         return Promise.reject();
                     }
-                }, defaultFailure);
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
             }
         })
         // print valid offers
@@ -457,7 +441,7 @@ function print(offers) {
                 update: true,
             })
         )
-        .then(resp => resp.blob().catch(defaultFailure));
+        .then(resp => (resp.ok ? resp.blob().catch(msgFailure) : respFailure));
 
     printPromise.then(blob => {
         let fileURL = URL.createObjectURL(blob);
@@ -479,20 +463,22 @@ function print(offers) {
 
 // change session pay
 function updateSessionPay(session, pay) {
-    putHelper('/sessions/' + session, { pay: pay }).then(
-        () => {
-            appState.setFetchingSessionsList(true);
-            getSessions()
-                .then(sessions => {
-                    appState.setSessionsList(fromJS(sessions));
-                    appState.setFetchingSessionsList(false, true);
-                })
-                .catch(() => appState.setFetchingSessionsList(false));
-        },
-        resp => {
-            showMessageInJsonBody(resp);
-        }
-    );
+    putHelper('/sessions/' + session, { pay: pay })
+        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            () => {
+                appState.setFetchingSessionsList(true);
+                getSessions()
+                    .then(sessions => {
+                        appState.setSessionsList(fromJS(sessions));
+                        appState.setFetchingSessionsList(false, true);
+                    })
+                    .catch(() => appState.setFetchingSessionsList(false));
+            },
+            resp => {
+                showMessageInJsonBody(resp);
+            }
+        );
 }
 
 export {
