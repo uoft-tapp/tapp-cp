@@ -148,7 +148,7 @@
         fetchHelper(url, init, action, blob);
       }
       function fetchPdfData(){
-        getHelper("<%= @offer[:link] %>/pdf", setPdfViewPort, true);
+        getHelper("<%= @offer[:mangled] %>/pdf", setPdfViewPort, true);
       }
       function logout_cleanup(response){
         // TO-DO
@@ -210,7 +210,7 @@
           data["signature"] = signature;
         }
         if (res) {
-          postHelper("<%= @offer[:link] %>/"+status, data, updateStatus);
+          postHelper("<%= @offer[:mangled] %>/"+status, data, updateStatus);
         }
       }
       function updateStatus(response){
