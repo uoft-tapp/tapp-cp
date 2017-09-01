@@ -32,10 +32,10 @@ module Authorizer
   end
 
   private
-  def listed_as(admins)
-    admins = admins.split(',')
+  def listed_as(users)
+    users = users.split(',')
     if ENV['RAILS_ENV'] == 'production'
-      return admins.include?(get_utorid)
+      return users.include?(get_utorid)
     end
   end
 
