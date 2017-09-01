@@ -7,7 +7,7 @@ import { routeConfig } from './routeConfig.js';
 const initialState = {
     // navbar component
     nav: {
-        role: null, // one of { 'tapp_admin', 'inst' }
+        role: null, // one of { 'tapp_admin', 'instructor' }
         user: null,
 
         selectedTab: null,

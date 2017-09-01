@@ -25,11 +25,7 @@ const routeConfig = {
         label: 'Summary',
         route: '/summary',
         id: 'summary',
-    },
-    logout: {
-        route: '/bye',
-        id: 'logout',
-    },
+    }
 };
 
 export { routeConfig };

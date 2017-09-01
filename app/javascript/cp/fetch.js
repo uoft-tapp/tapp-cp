@@ -491,6 +491,21 @@ function logout() {
     postHelper('/logout', {});
 }
 
+// get current user role and username
+// if we are in development, set the current user name to a special value
+function fetchAuth() {
+    getHelper('/roles')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(resp => {
+            if (resp.dev) {
+                appState.setCurrentUserName('_DEV_');
+            } else {
+                appState.setCurrentUserName(resp.utorid);
+                appState.setCurrentUserRole(resp.role);
+            }
+        });
+}
+
 export {
     fetchAll,
     importOffers,
@@ -505,4 +520,5 @@ export {
     print,
     updateSessionPay,
     logout,
+    fetchAuth,
 };

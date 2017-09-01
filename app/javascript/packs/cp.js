@@ -13,7 +13,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { appState } from '../cp/appState.js';
-import { fetchAll } from '../cp/fetch.js';
+import { fetchAll, fetchAuth } from '../cp/fetch.js';
 
 import { Navbar } from '../cp/components/navbar.js';
 import { ControlPanel } from '../cp/components/controlPanel.js';
@@ -24,6 +24,9 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
+        // get current user role and username
+        fetchAuth();
+
         // start fetching data
         fetchAll();
     }
@@ -33,7 +36,13 @@ class App extends React.Component {
     }
 
     render() {
-        let role = this.props.appState.getCurrentUserRole();
+        let role = this.props.appState.getCurrentUserRole(),
+            user = this.props.appState.getCurrentUserName();
+
+        // this should only happen before we have fetched the current auth information
+        if (user == null) {
+            return <div id="loader" />;
+        }
 
         return (
             <div>
@@ -41,7 +50,7 @@ class App extends React.Component {
 
                 {role == 'cp_admin' && <ControlPanel {...this.props} />}
                 {role == 'hr_assistant' && <ControlPanel {...this.props} />}
-                {role == 'inst' && null}
+                {role == 'instructor' && null}
 
                 <div className="container-fluid" id="alert-container">
                     {this.props.appState

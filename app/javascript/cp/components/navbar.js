@@ -39,12 +39,31 @@ const Notifications = props => {
     );
 };
 
-const Auth = props =>
-    <NavDropdown
-        title={props.appState.getCurrentUserRole() + ':' + props.appState.getCurrentUserName()}
-        id="nav-auth-dropdown">
-        <MenuItem onClick={() => props.appState.logout()}>Logout</MenuItem>
-    </NavDropdown>;
+const Auth = props => {
+    let role = props.appState.getCurrentUserRole(),
+        name = props.appState.getCurrentUserName();
+
+    return (
+        <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
+            {name == '_DEV_' &&
+                <MenuItem onClick={() => props.appState.setCurrentUserRole('cp_admin')}>
+                    Switch to admin role
+                </MenuItem>}
+
+            {name == '_DEV_' &&
+                <MenuItem onClick={() => props.appState.setCurrentUserRole('hr_assistant')}>
+                    Switch to hr assistant role
+                </MenuItem>}
+
+            {name == '_DEV_' &&
+                <MenuItem onClick={() => props.appState.setCurrentUserRole('instructor')}>
+                    Switch to instructor role
+                </MenuItem>}
+
+            <MenuItem onClick={() => props.appState.logout()}>Logout</MenuItem>
+        </NavDropdown>
+    );
+};
 
 /*** Navbar ***/
 

@@ -15,7 +15,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { appState } from '../tapp/appState.js';
-import { fetchAll } from '../tapp/fetch.js';
+import { fetchAll, fetchAuth } from '../tapp/fetch.js';
 import { routeConfig } from '../tapp/routeConfig.js';
 
 import { Navbar } from '../tapp/components/navbar.js';
@@ -32,6 +32,9 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
+        // get current user role and username
+        fetchAuth();
+
         // start fetching data
         fetchAll();
     }
@@ -41,16 +44,19 @@ class App extends React.Component {
     }
 
     render() {
+        let role = this.props.appState.getCurrentUserRole(),
+            user = this.props.appState.getCurrentUserName();
+
+        // this should only happen before we have fetched the current auth information
+        if (user == null) {
+            return <div id="loader" />;
+        }
+
         return <RouterInst {...appState} />;
     }
 }
 
 /*** Router ***/
-// temporary logout "view"
-const Bye = props =>
-    <div className="container-fluid" style={{ paddingTop: '70px' }}>
-        <h1>Bye!</h1>
-    </div>;
 
 const RouterInst = props => {
     let selectedApplicant = props.getSelectedApplicant();
@@ -81,8 +87,6 @@ const RouterInst = props => {
                         path={routeConfig.summary.route}
                         render={() => <Summary navKey={routeConfig.summary.id} {...props} />}
                     />
-
-                    <Route path={routeConfig.logout.route} render={() => <Bye />} />
                 </Switch>
 
                 {selectedApplicant && <ApplicantModal applicantId={selectedApplicant} {...props} />}
