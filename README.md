@@ -230,7 +230,7 @@ So, if suspicious, you can check to make sure assignments, etc, are making it in
 You can always grep and/or diff the dumps to find if and when assignments were made, etc.
 
 ## Task commands
-The following command looks at the current date and checks the database for the number of offers accepted in the last 24 hours (for Tuesday - Friday) and 3 days (for Monday) and decide whether to send an email alert to the HR admin or not.
+The following command looks at the current date and checks the database for the number of offers accepted in the last 24 hours (for Tuesday - Friday) and 3 days (for Monday) and decide whether to send an email alert to the HR admin or not. The following command is intended to be run from cron daily. Whether the email is sent is decided by the task.
 
 `docker-compose run rails-app rake email:status`
 
