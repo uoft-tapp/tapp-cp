@@ -16,7 +16,15 @@ function respFailure(resp) {
 
 // extract and display a message which is sent in the (JSON) body of a response
 function showMessageInJsonBody(resp) {
-    resp.json().then(res => appState.alert(res.message));
+    resp.json().then(res => {
+        if (res.message instanceof Array) {
+            // array of messages
+            res.message.forEach(message => appState.alert(message));
+        } else {
+            // single message
+            appState.alert(res.message);
+        }
+    });
 }
 
 function fetchHelper(URL, init) {
@@ -50,9 +58,9 @@ function postHelper(URL, body) {
 
 function deleteHelper(URL) {
     return fetchHelper(URL, {
-	method: 'DELETE',
+        method: 'DELETE',
         credentials: 'include',
-	});
+    });
 }
 
 function putHelper(URL, body) {
@@ -148,7 +156,20 @@ function importAssignments() {
     appState.setImporting(true);
 
     postHelper('/import/locked-assignments', {})
-        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            resp =>
+                resp.ok
+                    ? // import succeeded
+                      resp.json().then(resp => {
+                          // import succeeded with errors
+                          if (resp.errors) {
+                              return showMessageInJsonBody(resp).catch(Promise.resolve());
+                          }
+                          return Promise.resolve();
+                      })
+                    : // import failed
+                      showMessageInJsonBody(resp)
+        )
         .then(
             () => {
                 appState.setImporting(false, true);
@@ -161,10 +182,7 @@ function importAssignments() {
                     })
                     .catch(() => appState.setFetchingOffersList(false));
             },
-            resp => {
-                appState.setImporting(false);
-                showMessageInJsonBody(resp);
-            }
+            () => appState.setImporting(false)
         );
 }
 
@@ -173,7 +191,20 @@ function importOffers(data) {
     appState.setImporting(true);
 
     postHelper('/import/offers', { chass_offers: data })
-        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            resp =>
+                resp.ok
+                    ? // import succeeded
+                      resp.json().then(resp => {
+                          // import succeeded with errors
+                          if (resp.errors) {
+                              return showMessageInJsonBody(resp).catch(Promise.resolve());
+                          }
+                          return Promise.resolve();
+                      })
+                    : // import failed
+                      showMessageInJsonBody(resp)
+        )
         .then(
             () => {
                 appState.setImporting(false, true);
@@ -186,10 +217,7 @@ function importOffers(data) {
                     })
                     .catch(() => appState.setFetchingOffersList(false));
             },
-            resp => {
-                appState.setImporting(false);
-                showMessageInJsonBody(resp);
-            }
+            () => appState.setImporting(false)
         );
 }
 
@@ -504,7 +532,9 @@ function fetchAuth() {
                 appState.setCurrentUserName('DEV');
             } else {
                 // filter out roles not relevant to this application
-                let roles = resp.roles.filter(role => ['cp_admin', 'hr_assistant', 'instructor'].includes(role));
+                let roles = resp.roles.filter(role =>
+                    ['cp_admin', 'hr_assistant', 'instructor'].includes(role)
+                );
                 appState.setCurrentUserRoles(roles);
                 appState.selectUserRole(roles[0]);
                 appState.setCurrentUserName(resp.utorid);
