@@ -448,7 +448,7 @@ function print(offers) {
     let validOffers = offers;
 
     // check which contracts can be printed
-    let printPromise = putHelper('/offers/can-print', { contracts: offers })
+    let printPromise = postHelper('/offers/can-print', { contracts: offers })
         .then(resp => {
             if (resp.status == 404) {
                 // some contracts cannot be printed
