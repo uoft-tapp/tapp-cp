@@ -157,18 +157,23 @@ function importAssignments() {
 
     postHelper('/import/locked-assignments', {})
         .then(
-            resp =>
-                resp.ok
-                    ? // import succeeded
-                      resp.json().then(resp => {
+            resp => {
+                // import succeeded
+                if (resp.ok) {
+                    return resp.json().then(resp => {
                           // import succeeded with errors
                           if (resp.errors) {
                               return showMessageInJsonBody(resp).catch(Promise.resolve());
                           }
                           return Promise.resolve();
-                      })
-                    : // import failed
-                      showMessageInJsonBody(resp)
+                    });
+                }
+                // import failed with errors
+                if (resp.status == 404) {
+                    return showMessageInJsonBody(resp);
+                }
+                return respFailure(resp);
+            }
         )
         .then(
             () => {
@@ -192,18 +197,23 @@ function importOffers(data) {
 
     postHelper('/import/offers', { chass_offers: data })
         .then(
-            resp =>
-                resp.ok
-                    ? // import succeeded
-                      resp.json().then(resp => {
+            resp => {
+                // import succeeded
+                if (resp.ok) {
+                    return resp.json().then(resp => {
                           // import succeeded with errors
                           if (resp.errors) {
                               return showMessageInJsonBody(resp).catch(Promise.resolve());
                           }
                           return Promise.resolve();
-                      })
-                    : // import failed
-                      showMessageInJsonBody(resp)
+                    });
+                }
+                // import failed with errors
+                if (resp.status == 404) {
+                    return showMessageInJsonBody(resp);
+                }
+                return respFailure(resp);
+            }
         )
         .then(
             () => {
