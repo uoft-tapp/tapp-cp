@@ -476,6 +476,10 @@ function exportOffers(round) {
     });
 }
 
+function logout() {
+    postHelper('/logout', {});
+}
+
 export {
     fetchAll,
     postAssignment,
@@ -487,4 +491,5 @@ export {
     importEnrolment,
     unlockAssignment,
     exportOffers,
+    logout,
 };

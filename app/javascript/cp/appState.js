@@ -4,8 +4,8 @@ import { fromJS } from 'immutable';
 import * as fetch from './fetch.js';
 
 const initialState = {
-    role: 'admin', // one of { 'admin', 'hris', 'inst' }
-    user: 'user',
+    role: null, // one of { 'cp_admin', 'hr_assistant', 'inst' }
+    user: null,
 
     // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
     notifications: [],
@@ -162,6 +162,10 @@ class AppState {
         let filters = this.get('selectedFilters');
 
         return filters.has(field) && filters.get(field).includes(category);
+    }
+
+    logout() {
+        fetch.logout();
     }
 
     // add a notification to the list of unread notifications

@@ -487,6 +487,10 @@ function updateSessionPay(session, pay) {
         );
 }
 
+function logout() {
+    postHelper('/logout', {});
+}
+
 export {
     fetchAll,
     importOffers,
@@ -500,4 +504,5 @@ export {
     withdrawOffers,
     print,
     updateSessionPay,
+    logout,
 };

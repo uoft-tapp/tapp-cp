@@ -7,8 +7,8 @@ import { routeConfig } from './routeConfig.js';
 const initialState = {
     // navbar component
     nav: {
-        role: 'role',
-        user: 'user',
+        role: null, // one of { 'tapp_admin', 'inst' }
+        user: null,
 
         selectedTab: null,
 
@@ -335,6 +335,10 @@ class AppState {
     // check whether a panel is expanded in the applicant view
     isPanelExpanded(index) {
         return this.get('assignmentForm.panels[' + index + '].expanded');
+    }
+
+    logout() {
+        fetch.logout();
     }
 
     // add a notification to the list of unread notifications

@@ -39,10 +39,9 @@ class App extends React.Component {
             <div>
                 <Navbar {...this.props} />
 
-                {role == 'admin' && <ControlPanel {...this.props} />}
-                {role == 'hris' && <ControlPanel {...this.props} />}
+                {role == 'cp_admin' && <ControlPanel {...this.props} />}
+                {role == 'hr_assistant' && <ControlPanel {...this.props} />}
                 {role == 'inst' && null}
-                {role == 'student' && null}
 
                 <div className="container-fluid" id="alert-container">
                     {this.props.appState
