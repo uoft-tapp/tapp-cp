@@ -17,6 +17,14 @@ class AppController < ApplicationController
     render :cp, layout: false
   end
 
+  def roles
+    if ENV['RAILS_ENV'] == 'production'
+      render json: {development: false, utorid: session[:utorid], role: session[:roles]}
+    else
+      render json: {development: true, utorid: nil, role: nil}
+    end
+  end
+
   '''
     Shows the student facing view when the applicant is looking at the page.
     This uses a route of /pb/:mangled, so that the applicant can`t attack

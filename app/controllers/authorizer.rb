@@ -63,9 +63,37 @@ module Authorizer
     if request.env['HTTP_X_FORWARDED_USER']
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
       set_cookie_keys
+      set_roles
       return session[:utorid]
     else
       return session[:utorid]
+    end
+  end
+
+  def set_roles
+    session[:roles] = []
+    roles = [
+      {
+        access: listed_as(ENV['TAPP_ADMINS']),
+        role: "tapp_admin",
+      },
+      {
+        access: listed_as(ENV['CP_ADMINS']),
+        role: "cp_admin",
+      },
+      {
+        access: listed_as(ENV['HR_ASSISTANTS']),
+        role: "hr_assistant",
+      },
+      {
+        access: is_instructor,
+        role: "instructor",
+      }
+    ]
+    roles.each do |role|
+      if role[:access]
+        session[:roles].push(role[:role])
+      end
     end
   end
 

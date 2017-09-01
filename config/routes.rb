@@ -2,6 +2,7 @@ include Authorizer
 Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
   get '/cp/(*z)', to: "app#cp"
+  get '/roles', to: "app#roles"
 
   post '/logout', to: "app#logout"
 
