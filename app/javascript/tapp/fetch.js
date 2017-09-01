@@ -33,7 +33,7 @@ function getHelper(URL) {
             Accept: 'application/json',
         },
         method: 'GET',
-        credentials: 'include'
+        credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
     });
 }
 
@@ -50,7 +50,7 @@ function postHelper(URL, body) {
 }
 
 function deleteHelper(URL) {
-    return fetchHelper(URL, { 
+    return fetchHelper(URL, {
 	method: 'DELETE' ,
         credentials: 'include'
 	});

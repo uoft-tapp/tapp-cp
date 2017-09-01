@@ -1,15 +1,27 @@
 module Authorizer
+  ```
+    ENV['TAPP_ADMINS'] is environmental variable from .env
+    The data format is CSV.
+  ```
   def tapp_admin
     is_admin(ENV['TAPP_ADMINS'])
   end
 
+  ```
+    ENV['CP_ADMINS'] is environmental variable from .env
+    The data format is CSV.
+  ```
   def cp_admin
     is_admin(ENV['CP_ADMINS'])
   end
 
+  ```
+    Checks if the applicant authenticated by Shibboleth matches
+    the utorid of the applicant the offer was made to.
+  ```
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
-      if get_utorid != get_applicant(params)
+      if get_utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
         render status: 403, file: 'public/403.html'
       end
     end
@@ -25,7 +37,7 @@ module Authorizer
     end
   end
 
-  def get_applicant(params)
+  def utorid_of_applicant_corresponding_to_student_facing_route(params)
     offer = Offer.find_by(link: params[:mangled])
     if offer
       offer = offer.format
@@ -35,6 +47,10 @@ module Authorizer
     end
   end
 
+  ```
+    This function depends on the Shibboleth enable reverse proxy
+    stuffing in request headers when it forwards.
+  ```
   def get_utorid
     if request.env['HTTP_X_FORWARDED_USER']
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
@@ -45,6 +61,10 @@ module Authorizer
     end
   end
 
+  ```
+    Sets the keys of the cookies from Shibboleth as part of the array in
+    session[:keys], so that the cookie can be deleted.
+  ```
   def set_cookie_keys
      session[:keys]=[]
      cookies = request.env['HTTP_COOKIE'].split(";")

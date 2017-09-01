@@ -32,7 +32,7 @@ function getHelper(URL) {
             Accept: 'application/json',
         },
         method: 'GET',
-        credentials: 'include',
+        credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
     });
 }
 

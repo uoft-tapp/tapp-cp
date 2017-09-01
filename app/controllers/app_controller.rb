@@ -31,6 +31,9 @@ class AppController < ApplicationController
     end
   end
 
+  ```
+    Work in progress.
+  ```
   def logout
      session[:keys].each do |key|
        cookies.delete(key.to_sym)
