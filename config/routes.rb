@@ -1,6 +1,10 @@
+include Authorizer
 Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
   get '/cp/(*z)', to: "app#cp"
+  get '/roles', to: "app#roles"
+
+  post '/logout', to: "app#logout"
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   # TAPP resources

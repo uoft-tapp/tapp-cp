@@ -1,6 +1,10 @@
 class AppController < ApplicationController
-  protect_from_forgery with: :exception
+  skip_before_action :verify_authenticity_token
   include Mangler
+  include Authorizer
+  before_action :tapp_admin, only: [:tapp]
+  before_action :cp_access, only: [:cp]
+  before_action :correct_applicant, only: [:student_view]
 
   ''' TAPP functions '''
   def tapp
@@ -11,6 +15,14 @@ class AppController < ApplicationController
 
   def cp
     render :cp, layout: false
+  end
+
+  def roles
+    if ENV['RAILS_ENV'] == 'production'
+      render json: {development: false, utorid: session[:utorid], roles: session[:roles]}
+    else
+      render json: {development: true, utorid: "development", roles: session[:roles]}
+    end
   end
 
   '''
@@ -26,6 +38,17 @@ class AppController < ApplicationController
       render status: 404, json: {message: "There is no such page."}
     end
   end
+
+  '''
+    Work in progress.
+  '''
+  def logout
+     session[:keys].each do |key|
+       cookies.delete(key.to_sym)
+     end
+     reset_session
+     render json: cookies.as_json
+   end
 
   private
   def show_decision_view(params)

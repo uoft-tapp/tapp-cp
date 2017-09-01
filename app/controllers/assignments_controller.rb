@@ -1,5 +1,7 @@
 class AssignmentsController < ApplicationController
   protect_from_forgery with: :null_session
+  include Authorizer
+  before_action :tapp_admin
 
  '''
     index #GET

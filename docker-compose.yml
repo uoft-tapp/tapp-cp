@@ -18,6 +18,9 @@ services:
       RECIPIENT: ${RECIPIENT}
       HR_ADMIN_EMAIL: ${HR_ADMIN_EMAIL}
       HR_ADMIN_NAME: ${HR_ADMIN_NAME}
+      TAPP_ADMINS: ${TAPP_ADMINS}
+      CP_ADMINS: ${CP_ADMINS}
+      HR_ASSISTANTS: ${HR_ASSISTANTS}
     networks:
       - default
     ports:
