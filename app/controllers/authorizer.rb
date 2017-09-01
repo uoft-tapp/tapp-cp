@@ -11,6 +11,12 @@ module Authorizer
     access(expected_roles)
   end
 
+  def app_access
+    set_roles
+    expected_roles = ["tapp_admin","cp_admin", "hr_assistant", "instructor"]
+    access(expected_roles)
+  end
+
   '''
     Checks if the applicant authenticated by Shibboleth matches
     the utorid of the applicant the offer was made to.
