@@ -494,7 +494,7 @@ function fetchAuth() {
             } else {
                 appState.setCurrentUserName(resp.utorid);
                 // filter out roles not relevant to this application
-                let roles = resp.role.filter(role => ['tapp_admin', 'instructor'].includes(role));
+                let roles = resp.roles.filter(role => ['tapp_admin', 'instructor'].includes(role));
                 appState.setCurrentUserRoles(roles);
                 appState.selectUserRole(roles[0]);
             }
