@@ -15,11 +15,6 @@ function respFailure(resp) {
     return Promise.reject();
 }
 
-// extract and display a message which is sent in the (JSON) body of a response
-function showMessageInJsonBody(resp) {
-    resp.json().then(res => appState.alert(res.message));
-}
-
 function fetchHelper(URL, init) {
     return fetch(URL, init).catch(function(error) {
         appState.alert('<b>' + init.method + ' ' + URL + ' error</b> ' + ': ' + error);
@@ -384,16 +379,33 @@ function importChass(data, year, semester) {
         year: year,
         semester: semester,
     })
-        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            resp => {
+                // import succeeded
+                if (resp.ok) {
+                    return resp.json().then(resp => {
+                          // import succeeded with errors
+                          if (resp.errors) {
+                              return resp.message.forEach(message => appState.alert(message));
+                          }
+                          return Promise.resolve();
+                    });
+                }
+                // import failed with errors
+                if (resp.status == 404) {
+                    return resp.json()
+                        .then(resp => resp.message.forEach(message => appState.alert(message)))
+                        .then(Promise.reject);
+                }
+                return respFailure(resp);
+            }
+        )
         .then(
             () => {
                 appState.setImporting(false, true);
                 fetchAll();
             },
-            resp => {
-                appState.setImporting(false);
-                showMessageInJsonBody(resp);
-            }
+            () => appState.setImporting(false)
         );
 }
 
@@ -417,7 +429,7 @@ function importEnrolment(data) {
             },
             resp => {
                 appState.setImporting(false);
-                showMessageInJsonBody(resp);
+                resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
             }
         );
 }
