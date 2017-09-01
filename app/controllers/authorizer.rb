@@ -26,14 +26,14 @@ module Authorizer
   private
   def access(expected_roles)
     if ENV['RAILS_ENV'] == 'production'
-      if !has_role(session[:roles], expected_roles)
+      if !has_role(expected_roles)
         render status: 403, file: 'public/403.html'
       end
     end
   end
 
-  def has_role(roles, expected_roles)
-    roles.each do |role|
+  def has_role(expected_roles)
+    session[:roles].each do |role|
       expected_roles.each do |expected|
         if expected == role
           return true
