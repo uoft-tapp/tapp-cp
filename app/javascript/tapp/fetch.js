@@ -3,8 +3,13 @@ import { appState } from './appState.js';
 
 /* General helpers */
 
-function defaultFailure(text) {
+function msgFailure(text) {
     appState.alert('<b>Action Failed:</b> ' + text);
+    return Promise.reject();
+}
+
+function respFailure(resp) {
+    appState.alert('<b>Action Failed</b> ' + resp.url + ': ' + resp.statusText);
     return Promise.reject();
 }
 
@@ -20,15 +25,9 @@ function showMessageInJsonBody(resp) {
 }
 
 function fetchHelper(URL, init) {
-    return fetch(URL, init).then(
-        function(resp) {
-            if (resp.ok) {
-                return Promise.resolve(resp);
-            }
-            return Promise.reject(resp);
-        },
-        function(error) {
-            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error.message);
+    return fetch(URL, init)
+        .catch(function(error) {
+            appState.alert('<b>' + init.method + ' error</b> ' + URL + ': ' + error);
             return Promise.reject(error);
         }
     );
@@ -72,27 +71,27 @@ function putHelper(URL, body) {
 
 const getApplicants = () =>
     getHelper('/applicants')
-        .then(resp => resp.json().catch(defaultFailure))
+        .then(resp => resp.ok ? resp.json().catch(msgFailure) : respFailure)
         .then(onFetchApplicantsSuccess);
 
 const getApplications = () =>
     getHelper('/applications')
-        .then(resp => resp.json().catch(defaultFailure))
+        .then(resp => resp.ok ? resp.json().catch(msgFailure) : respFailure)
         .then(onFetchApplicationsSuccess);
 
 const getCourses = () =>
     getHelper('/positions')
-        .then(resp => resp.json().catch(defaultFailure))
+        .then(resp => resp.ok ? resp.json().catch(msgFailure) : respFailure)
         .then(onFetchCoursesSuccess);
 
 const getAssignments = () =>
     getHelper('/assignments')
-        .then(resp => resp.json().catch(defaultFailure))
+        .then(resp => resp.ok ? resp.json().catch(msgFailure) : respFailure)
         .then(onFetchAssignmentsSuccess);
 
 const getInstructors = () =>
     getHelper('/instructors')
-        .then(resp => resp.json().catch(defaultFailure))
+        .then(resp => resp.ok ? resp.json().catch(msgFailure) : respFailure)
         .then(onFetchInstructorsSuccess);
 
 /* Success callbacks for resource GETters */
@@ -301,69 +300,79 @@ function postAssignment(applicant, course, hours) {
     postHelper('/applicants/' + applicant + '/assignments', {
         position_id: course,
         hours: hours,
-    }).then(() => {
-        appState.setFetchingAssignmentsList(true);
-        getAssignments()
-            .then(assignments => {
-                appState.setAssignmentsList(assignments);
-                appState.setFetchingAssignmentsList(false, true);
-            })
-            .catch(() => appState.setFetchingAssignmentsList(false));
-    });
+    })
+        .then(resp => resp.ok ? resp : respFailure)
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // remove an assignment
 function deleteAssignment(applicant, assignment) {
-    deleteHelper('/applicants/' + applicant + '/assignments/' + assignment).then(() => {
-        appState.setFetchingAssignmentsList(true);
-        getAssignments()
-            .then(assignments => {
-                appState.setAssignmentsList(assignments);
-                appState.setFetchingAssignmentsList(false, true);
-            })
-            .catch(() => appState.setFetchingAssignmentsList(false));
-    });
+    deleteHelper('/applicants/' + applicant + '/assignments/' + assignment)
+        .then(resp => resp.ok ? resp : respFailure)
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // add/update the notes for an applicant
 function noteApplicant(applicant, notes) {
-    putHelper('/applicants/' + applicant, { commentary: notes }).then(() => {
-        appState.setFetchingApplicantsList(true);
-        getApplicants()
-            .then(applicants => {
-                appState.setApplicantsList(applicants);
-                appState.setFetchingApplicantsList(false, true);
-            })
-            .catch(() => appState.setFetchingApplicantsList(false));
-    });
+    putHelper('/applicants/' + applicant, { commentary: notes })
+        .then(resp => resp.ok ? resp : respFailure)
+        .then(() => {
+            appState.setFetchingApplicantsList(true);
+            getApplicants()
+                .then(applicants => {
+                    appState.setApplicantsList(applicants);
+                    appState.setFetchingApplicantsList(false, true);
+                })
+                .catch(() => appState.setFetchingApplicantsList(false));
+        });
 }
 
 // update the number of hours for an assignment
 function updateAssignmentHours(applicant, assignment, hours) {
     putHelper('/applicants/' + applicant + '/assignments/' + assignment, {
         hours: hours,
-    }).then(() => {
-        appState.setFetchingAssignmentsList(true);
-        getAssignments()
-            .then(assignments => {
-                appState.setAssignmentsList(assignments);
-                appState.setFetchingAssignmentsList(false, true);
-            })
-            .catch(() => appState.setFetchingAssignmentsList(false));
-    });
+    })
+        .then(resp => resp.ok ? resp : respFailure)
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // update attribute(s) of a course
 function updateCourse(courseId, data) {
-    putHelper('/positions/' + courseId, data).then(() => {
-        appState.setFetchingCoursesList(true);
-        getCourses()
-            .then(courses => {
-                appState.setCoursesList(courses);
-                appState.setFetchingCoursesList(false, true);
-            })
-            .catch(() => appState.setFetchingCoursesList(false));
-    });
+    putHelper('/positions/' + courseId, data)
+        .then(resp => resp.ok ? resp : respFailure)
+        .then(() => {
+            appState.setFetchingCoursesList(true);
+            getCourses()
+                .then(courses => {
+                    appState.setCoursesList(courses);
+                    appState.setFetchingCoursesList(false, true);
+                })
+                .catch(() => appState.setFetchingCoursesList(false));
+        });
 }
 
 // send CHASS data
@@ -374,24 +383,25 @@ function importChass(data, year, semester) {
         chass_json: data,
         year: year,
         semester: semester,
-    }).then(
-        () => {
-            appState.setImporting(false, true);
-            fetchAll();
-        },
-        resp => {
-            appState.setImporting(false);
-            showMessageInJsonBody(resp);
-        }
-    );
+    })
+        .then(resp => resp.ok ? resp : Promise.reject(resp))
+        .then(() => {
+                appState.setImporting(false, true);
+                fetchAll();
+            },
+            resp => {
+                appState.setImporting(false);
+                showMessageInJsonBody(resp);
+            });
 }
 
 // send enrolment data
 function importEnrolment(data) {
     appState.setImporting(true);
 
-    postHelper('/import/enrollment', { enrollment_data: data }).then(
-        () => {
+    postHelper('/import/enrollment', { enrollment_data: data })
+        .then(resp => resp.ok ? resp : Promise.reject(resp))
+        .then(() => {
             appState.setImporting(false, true);
 
             appState.setFetchingCoursesList(true);
@@ -401,33 +411,35 @@ function importEnrolment(data) {
                     appState.setFetchingCoursesList(false, true);
                 })
                 .catch(() => appState.setFetchingCoursesList(false));
-        },
-        resp => {
-            appState.setImporting(false);
-            showMessageInJsonBody(resp);
-        }
-    );
+            },
+            resp => {
+                appState.setImporting(false);
+                showMessageInJsonBody(resp);
+            });
 }
 
 // unlock a single assignment
 function unlockAssignment(applicant, assignment) {
     putHelper('/applicants/' + applicant + '/assignments/' + assignment, {
         export_date: null,
-    }).then(() => {
-        appState.setFetchingAssignmentsList(true);
-        getAssignments()
-            .then(assignments => {
-                appState.setAssignmentsList(assignments);
-                appState.setFetchingAssignmentsList(false, true);
-            })
-            .catch(() => appState.setFetchingAssignmentsList(false));
-    });
+    })
+        .then(resp => resp.ok ? resp : respFailure)
+        .then(() => {
+            appState.setFetchingAssignmentsList(true);
+            getAssignments()
+                .then(assignments => {
+                    appState.setAssignmentsList(assignments);
+                    appState.setFetchingAssignmentsList(false, true);
+                })
+                .catch(() => appState.setFetchingAssignmentsList(false));
+        });
 }
 
 // export offers from CHASS (locking the corresponding assignments)
 function exportOffers(round) {
     let filename;
-    let exportPromise = fetchHelper('/export/chass/' + round, {}).catch(defaultFailure);
+    let exportPromise = getHelper('/export/chass/' + round)
+        .then(resp => resp.ok ? resp : respFailure);
 
     exportPromise
         .then(resp => {
