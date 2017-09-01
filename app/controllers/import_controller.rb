@@ -17,7 +17,7 @@ class ImportController < ApplicationController
   def import_locked_assignments
     importer = OfferImporter.new
     importer.import_assignments()
-    render json: {errors: false, message: ["Importing locked assignments as offers was successful."]}}
+    render json: {errors: false, message: ["Importing locked assignments as offers was successful."]}
   end
 
   def chass
