@@ -149,6 +149,15 @@ class CourseForm extends React.Component {
                                 <Form
                                     type="date"
                                     defaultVal={this.props.course.endDate.split('T')[0]}
+                                    update={val => {
+                                        if (val != this.props.course.endDate) {
+                                            this.props.updateCourse(
+                                                this.props.courseId,
+                                                val,
+                                                'endDate'
+                                            );
+                                        }
+                                    }}
                                 />
                             </td>
 
