@@ -177,20 +177,19 @@ const Notifications = props => {
 };
 
 const Auth = props => {
-    let role = props.appState.getCurrentUserRole(),
+    let roles = props.appState.getCurrentUserRoles(),
+        role = props.appState.getSelectedUserRole(),
         name = props.appState.getCurrentUserName();
 
     return (
         <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
-            {name == '_DEV_' &&
-                <MenuItem onClick={() => props.appState.setCurrentUserRole('tapp_admin')}>
-                    Switch to admin role
-                </MenuItem>}
-
-            {name == '_DEV_' &&
-                <MenuItem onClick={() => props.appState.setCurrentUserRole('instructor')}>
-                    Switch to instructor role
-                </MenuItem>}
+            {roles.map(
+                r =>
+                    role != r &&
+                    <MenuItem onClick={() => props.appState.selectUserRole(r)}>
+                        Switch to {r} role
+                    </MenuItem>
+            )}
 
             <MenuItem onClick={() => props.appState.logout()}>Logout</MenuItem>
         </NavDropdown>

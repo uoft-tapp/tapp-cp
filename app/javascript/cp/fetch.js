@@ -491,7 +491,7 @@ function logout() {
     postHelper('/logout', {});
 }
 
-// get current user role and username
+// get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
     getHelper('/roles')
@@ -499,9 +499,16 @@ function fetchAuth() {
         .then(resp => {
             if (resp.dev) {
                 appState.setCurrentUserName('_DEV_');
+                appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
+                // default to cp_admin as selected user role
+                appState.selectUserRole('cp_admin');
             } else {
                 appState.setCurrentUserName(resp.utorid);
-                appState.setCurrentUserRole(resp.role);
+                // filter out roles not relevant to this application
+                let roles = resp.role.filter(role => ['cp_admin', 'hr_assistant', 'instructor'].includes(role));
+                appState.setCurrentUserRoles(roles);
+                appState.selectUserRole(roles[0]);
+
             }
         });
 }

@@ -4,7 +4,8 @@ import { fromJS } from 'immutable';
 import * as fetch from './fetch.js';
 
 const initialState = {
-    role: null, // one of { 'cp_admin', 'hr_assistant', 'instructor' }
+    roles: null, // array of { 'cp_admin', 'hr_assistant', 'instructor' }
+    selectedRole: null,
     user: null,
 
     // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
@@ -137,8 +138,8 @@ class AppState {
         return this.get('user');
     }
 
-    getCurrentUserRole() {
-        return this.get('role');
+    getCurrentUserRoles() {
+        return this.get('roles');
     }
 
     getFilters() {
@@ -147,6 +148,10 @@ class AppState {
 
     getSelectedSession() {
         return this.get('selectedSession');
+    }
+
+    getSelectedUserRole() {
+        return this.get('selectedRole');
     }
 
     getSorts() {
@@ -191,12 +196,16 @@ class AppState {
         this.set('selectedSession', session);
     }
 
+    selectUserRole(role) {
+        this.set('selectedRole', role);
+    }
+
     setCurrentUserName(user) {
         this.set('user', user);
     }
 
-    setCurrentUserRole(role) {
-        this.set('role', role);
+    setCurrentUserRoles(roles) {
+        this.set('roles', roles);
     }
 
     // toggle a filter on the offers table

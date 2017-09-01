@@ -36,7 +36,7 @@ class App extends React.Component {
     }
 
     render() {
-        let role = this.props.appState.getCurrentUserRole(),
+        let role = this.props.appState.getSelectedUserRole(),
             user = this.props.appState.getCurrentUserName();
 
         // this should only happen before we have fetched the current auth information
