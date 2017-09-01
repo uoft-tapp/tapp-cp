@@ -3,7 +3,7 @@ class AppController < ApplicationController
   include Mangler
   include Authorizer
   before_action :tapp_admin, only: [:tapp]
-  before_action :cp_admin, only: [:cp]
+  before_action :cp_access, only: [:cp]
   before_action :correct_applicant, only: [:student_view]
 
   ''' TAPP functions '''

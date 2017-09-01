@@ -2,7 +2,7 @@ class OffersController < ApplicationController
   before_action :set_domain
   include Mangler
   include Authorizer
-  before_action :cp_admin, except: [:get_contract_mangled, :set_status_mangled]
+  before_action :cp_access, except: [:get_contract_mangled, :set_status_mangled]
   before_action :correct_applicant, only: [:get_contract_mangled, :set_status_mangled]
 
   def index

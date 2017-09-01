@@ -4,15 +4,19 @@ module Authorizer
     The data format is CSV.
   ```
   def tapp_admin
-    is_admin(ENV['TAPP_ADMINS'])
+    if !listed_as(ENV['TAPP_ADMINS'])
+      render status: 403, file: 'public/403.html'
+    else
   end
 
   ```
-    ENV['CP_ADMINS'] is environmental variable from .env
+    ENV['CP_ADMINS'] and ENV['HR_ASSISTANTS'] are environmental variable from .env
     The data format is CSV.
   ```
-  def cp_admin
-    is_admin(ENV['CP_ADMINS'])
+  def cp_access
+    if !listed_as(ENV['CP_ADMINS'])||!listed_as(ENV['HR_ASSISTANTS'])||!is_instructor
+      render status: 403, file: 'public/403.html'
+    end
   end
 
   ```
@@ -28,12 +32,16 @@ module Authorizer
   end
 
   private
-  def is_admin(admins)
+  def listed_as(admins)
     admins = admins.split(',')
     if ENV['RAILS_ENV'] == 'production'
-      if !admins.include?(get_utorid)
-        render status: 403, file: 'public/403.html'
-      end
+      return admins.include?(get_utorid)
+    end
+  end
+
+  def is_instructor
+    if ENV['RAILS_ENV'] == 'production'
+      return Instructor.find_by(utorid: get_utorid)
     end
   end
 
