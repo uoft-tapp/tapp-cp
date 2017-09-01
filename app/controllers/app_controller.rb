@@ -19,9 +19,9 @@ class AppController < ApplicationController
 
   def roles
     if ENV['RAILS_ENV'] == 'production'
-      render json: {development: false, utorid: session[:utorid], role: session[:roles]}
+      render json: {development: false, utorid: session[:utorid], roles: session[:roles]}
     else
-      render json: {development: true, utorid: nil, role: nil}
+      render json: {development: true, utorid: "development", roles: session[:roles]}
     end
   end
 
@@ -39,9 +39,9 @@ class AppController < ApplicationController
     end
   end
 
-  ```
+  '''
     Work in progress.
-  ```
+  '''
   def logout
      session[:keys].each do |key|
        cookies.delete(key.to_sym)
