@@ -67,7 +67,9 @@
 
   <body>
     <header>
-      <p>User: <b><%=@offer[:applicant][:utorid]%></b><button>Logout</button></p>
+      <p>User: <b><%=@offer[:applicant][:utorid]%></b>
+        <button onclick="logout()">Logout</button>
+      </p>
       <div>
         <h1>Offer for Teaching Assistantship of <%=@offer[:position]%></h1>
       </div>
@@ -147,6 +149,15 @@
       }
       function fetchPdfData(){
         getHelper("<%= @offer[:link] %>/pdf", setPdfViewPort, true);
+      }
+      function logout_cleanup(response){
+        // TO-DO
+      }
+      function deleteCookie(cookiename){
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      }
+      function logout(){
+        postHelper('/logout', {}, logout_cleanup);
       }
       function setPdfViewPort(response){
         let fileURL = URL.createObjectURL(response);
