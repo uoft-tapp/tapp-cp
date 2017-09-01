@@ -3,14 +3,14 @@ class CpMailer < ApplicationMailer
   layout "mailer"
 
   def contract_email(offer, link)
-    email = get_email(offer)
+    email = get_email(offer[:applicant][:email])
     @offer = offer
     @url = link
     mail(to: email, subject: "TA Position Offer: #{@offer[:position]}")
   end
 
   def nag_email(contract, link)
-    email = get_email(contract)
+    email = get_email(contract[:applicant][:email])
     @contract = contract
     @contract[:nag_suffix] = get_nag_suffix(@contract[:nag_count])
     @contract[:deadline] = format_time(@contract[:deadline],"%I:%M%p on %B %d, %Y")
@@ -43,7 +43,7 @@ class CpMailer < ApplicationMailer
     if ENV['RAILS_ENV'] == 'development'
       return ENV['RECIPIENT']
     elsif ENV['RAILS_ENV'] == 'production'
-      return email[:applicant][:email]
+      return email
     end
   end
 
