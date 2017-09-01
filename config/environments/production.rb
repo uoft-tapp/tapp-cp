@@ -64,7 +64,7 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: ENV['EMAIL_TYPE'],
-    port: 587
+    port: 25
   }
 
   # Ignore bad email addresses and do not raise email delivery errors.
