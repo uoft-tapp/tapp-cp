@@ -4,7 +4,7 @@ import { fromJS } from 'immutable';
 import * as fetch from './fetch.js';
 
 const initialState = {
-    roles: null, // array of { 'cp_admin', 'hr_assistant', 'instructor' }
+    roles: [], // array of { 'cp_admin', 'hr_assistant', 'instructor' }
     selectedRole: null,
     user: null,
 

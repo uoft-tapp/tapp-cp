@@ -7,7 +7,7 @@ import { routeConfig } from './routeConfig.js';
 const initialState = {
     // navbar component
     nav: {
-        roles: null, // array of { 'tapp_admin', 'instructor' }
+        roles: [], // array of { 'tapp_admin', 'instructor' }
         selectedRole: null,
         user: null,
 

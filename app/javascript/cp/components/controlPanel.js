@@ -22,7 +22,7 @@ class ControlPanel extends React.Component {
     }
 
     render() {
-        const role = this.props.appState.getCurrentUserRole();
+        const role = this.props.appState.getSelectedUserRole();
 
         let nullCheck =
             role == 'cp_admin'

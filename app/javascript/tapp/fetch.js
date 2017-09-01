@@ -487,16 +487,16 @@ function fetchAuth() {
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(resp => {
             if (resp.development) {
-                appState.setCurrentUserName('_DEV_');
                 appState.setCurrentUserRoles(['tapp_admin', 'instructor']);
                 // default to tapp_admin as selected user role
                 appState.selectUserRole('tapp_admin');
+                appState.setCurrentUserName('DEV');
             } else {
-                appState.setCurrentUserName(resp.utorid);
                 // filter out roles not relevant to this application
                 let roles = resp.roles.filter(role => ['tapp_admin', 'instructor'].includes(role));
                 appState.setCurrentUserRoles(roles);
                 appState.selectUserRole(roles[0]);
+                appState.setCurrentUserName(resp.utorid);
             }
         });
 }

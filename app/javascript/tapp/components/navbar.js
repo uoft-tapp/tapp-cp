@@ -186,7 +186,7 @@ const Auth = props => {
             {roles.map(
                 r =>
                     role != r &&
-                    <MenuItem onClick={() => props.selectUserRole(r)}>
+                    <MenuItem key={'switch-' + r} onClick={() => props.selectUserRole(r)}>
                         Switch to {r} role
                     </MenuItem>
             )}

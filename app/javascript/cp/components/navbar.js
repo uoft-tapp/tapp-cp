@@ -49,11 +49,10 @@ const Auth = props => {
             {roles.map(
                 r =>
                     role != r &&
-                    <MenuItem onClick={() => props.appState.selectUserRole(r)}>
+                    <MenuItem key={'switch-' + r} onClick={() => props.appState.selectUserRole(r)}>
                         Switch to {r} role
                     </MenuItem>
             )}
-
             <MenuItem onClick={() => props.appState.logout()}>Logout</MenuItem>
         </NavDropdown>
     );

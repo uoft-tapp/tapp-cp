@@ -32,7 +32,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        appState.subscribe(this.forceUpdate.bind(this, null));
+        this.props.appState.subscribe(this.forceUpdate.bind(this, null));
     }
 
     render() {
