@@ -15,7 +15,7 @@ echo
 echo 'if there are any tapp containers listed above you should consider '
 echo 'docker-compose down, perhaps even down -v (to remove the postgres volume)'
 echo
-echo '*** to really nuke the containers consider `docker system prune --all --force` ***'
+echo '*** to really nuke the images consider `docker system prune --all --force` ***'
 echo
 
 read -p 'hit enter to continue: [interrupt to quit]: '
@@ -23,7 +23,7 @@ read -p 'hit enter to continue: [interrupt to quit]: '
 read -p 'enter to cp prod.env.devfault .env :' JUNK
 
 (set -x
-cp prod.env.default .env
+cp prod.env.default .env || die failed to copy prod.env.default
 )
 
 read -p 'enter to `docker rm -f` your containers: ' JUNK
@@ -38,7 +38,7 @@ read -p 'enter to `docker-compose build --force-rm`  ' JUNK
 docker-compose build --force-rm || die docker-compose up --force-recreate failed
 )
 
-read -p 'enter to `docker-compose up tapp containers: (will want -d in production) ' JUNK
+read -p 'enter to `docker-compose up -d --force-recreate` tapp containers: ' JUNK
 
 (set -x
 docker-compose up -d --force-recreate || die docker-compose up --force-recreate failed
