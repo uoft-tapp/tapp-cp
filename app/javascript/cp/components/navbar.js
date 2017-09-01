@@ -39,26 +39,24 @@ const Notifications = props => {
     );
 };
 
-const Auth = props =>
-    <NavDropdown
-        title={props.appState.getCurrentUserRole() + ':' + props.appState.getCurrentUserName()}
-        id="nav-auth-dropdown">
-        <MenuItem
-            eventKey="switch-admin"
-            onClick={() => props.appState.setCurrentUserRole('admin')}>
-            Switch to admin role
-        </MenuItem>
+const Auth = props => {
+    let roles = props.appState.getCurrentUserRoles(),
+        role = props.appState.getSelectedUserRole(),
+        name = props.appState.getCurrentUserName();
 
-        <MenuItem eventKey="switch-hris" onClick={() => props.appState.setCurrentUserRole('hris')}>
-            Switch to hris role
-        </MenuItem>
-
-        <MenuItem eventKey="switch-inst" onClick={() => props.appState.setCurrentUserRole('inst')}>
-            Switch to inst role
-        </MenuItem>
-
-        <MenuItem eventKey="logout">Logout</MenuItem>
-    </NavDropdown>;
+    return (
+        <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
+            {roles.map(
+                r =>
+                    role != r &&
+                    <MenuItem key={'switch-' + r} onClick={() => props.appState.selectUserRole(r)}>
+                        Switch to {r} role
+                    </MenuItem>
+            )}
+            <MenuItem onClick={() => props.appState.logout()}>Logout</MenuItem>
+        </NavDropdown>
+    );
+};
 
 /*** Navbar ***/
 

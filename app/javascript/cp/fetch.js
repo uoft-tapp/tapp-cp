@@ -487,6 +487,31 @@ function updateSessionPay(session, pay) {
         );
 }
 
+function logout() {
+    postHelper('/logout', {});
+}
+
+// get current user role(s) and username
+// if we are in development, set the current user name to a special value
+function fetchAuth() {
+    getHelper('/roles')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(resp => {
+            if (resp.development) {
+                appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
+                // default to cp_admin as selected user role
+                appState.selectUserRole('cp_admin');
+                appState.setCurrentUserName('DEV');
+            } else {
+                // filter out roles not relevant to this application
+                let roles = resp.roles.filter(role => ['cp_admin', 'hr_assistant', 'instructor'].includes(role));
+                appState.setCurrentUserRoles(roles);
+                appState.selectUserRole(roles[0]);
+                appState.setCurrentUserName(resp.utorid);
+            }
+        });
+}
+
 export {
     fetchAll,
     importOffers,
@@ -500,4 +525,6 @@ export {
     withdrawOffers,
     print,
     updateSessionPay,
+    logout,
+    fetchAuth,
 };

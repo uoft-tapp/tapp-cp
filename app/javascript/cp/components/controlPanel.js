@@ -22,10 +22,10 @@ class ControlPanel extends React.Component {
     }
 
     render() {
-        const role = this.props.appState.getCurrentUserRole();
+        const role = this.props.appState.getSelectedUserRole();
 
         let nullCheck =
-            role == 'admin'
+            role == 'cp_admin'
                 ? this.props.appState.anyNull()
                 : this.props.appState.isOffersListNull();
         if (nullCheck) {
@@ -33,7 +33,7 @@ class ControlPanel extends React.Component {
         }
 
         let fetchCheck =
-            role == 'admin'
+            role == 'cp_admin'
                 ? this.props.appState.anyFetching()
                 : this.props.appState.fetchingOffers();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
@@ -227,12 +227,12 @@ class ControlPanel extends React.Component {
 
         return (
             <Grid fluid id="offers-grid">
-                {role == 'admin' && <SessionsForm {...this.props} />}
+                {role == 'cp_admin' && <SessionsForm {...this.props} />}
 
                 <ButtonToolbar id="dropdown-menu">
-                    {role == 'admin' && <ImportMenu {...this.props} />}
-                    {role == 'admin' && <OffersMenu {...this.props} />}
-                    {role == 'admin' && <CommMenu {...this.props} />}
+                    {role == 'cp_admin' && <ImportMenu {...this.props} />}
+                    {role == 'cp_admin' && <OffersMenu {...this.props} />}
+                    {role == 'cp_admin' && <CommMenu {...this.props} />}
 
                     <PrintButton {...this.props} />
 

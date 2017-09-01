@@ -7,8 +7,9 @@ import { routeConfig } from './routeConfig.js';
 const initialState = {
     // navbar component
     nav: {
-        role: 'role',
-        user: 'user',
+        roles: [], // array of { 'tapp_admin', 'instructor' }
+        selectedRole: null,
+        user: null,
 
         selectedTab: null,
 
@@ -260,8 +261,8 @@ class AppState {
         return this.get('nav.user');
     }
 
-    getCurrentUserRole() {
-        return this.get('nav.role');
+    getCurrentUserRoles() {
+        return this.get('nav.roles');
     }
 
     getFilters() {
@@ -283,6 +284,10 @@ class AppState {
 
     getSelectedRound() {
         return this.get('selectedRound');
+    }
+
+    getSelectedUserRole() {
+        return this.get('nav.selectedRole');
     }
 
     // return the name of the appState component that corresponds to the currently selected view
@@ -335,6 +340,10 @@ class AppState {
     // check whether a panel is expanded in the applicant view
     isPanelExpanded(index) {
         return this.get('assignmentForm.panels[' + index + '].expanded');
+    }
+
+    logout() {
+        fetch.logout();
     }
 
     // add a notification to the list of unread notifications
@@ -392,9 +401,21 @@ class AppState {
         this.set('abcView.selectedCourses', fromJS([course.toString()]));
     }
 
+    selectUserRole(role) {
+        this.set('nav.selectedRole', role);
+    }
+
     // set the course panel layout in the ABC view
     setCoursePanelLayout(layout) {
         this.set('abcView.panelLayout', layout);
+    }
+
+    setCurrentUserName(user) {
+        this.set('nav.user', user);
+    }
+
+    setCurrentUserRoles(roles) {
+        this.set('nav.roles', roles);
     }
 
     // change the number of hours of a temporary assignment

@@ -4,8 +4,9 @@ import { fromJS } from 'immutable';
 import * as fetch from './fetch.js';
 
 const initialState = {
-    role: 'admin', // one of { 'admin', 'hris', 'inst' }
-    user: 'user',
+    roles: [], // array of { 'cp_admin', 'hr_assistant', 'instructor' }
+    selectedRole: null,
+    user: null,
 
     // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
     notifications: [],
@@ -137,8 +138,8 @@ class AppState {
         return this.get('user');
     }
 
-    getCurrentUserRole() {
-        return this.get('role');
+    getCurrentUserRoles() {
+        return this.get('roles');
     }
 
     getFilters() {
@@ -147,6 +148,10 @@ class AppState {
 
     getSelectedSession() {
         return this.get('selectedSession');
+    }
+
+    getSelectedUserRole() {
+        return this.get('selectedRole');
     }
 
     getSorts() {
@@ -162,6 +167,10 @@ class AppState {
         let filters = this.get('selectedFilters');
 
         return filters.has(field) && filters.get(field).includes(category);
+    }
+
+    logout() {
+        fetch.logout();
     }
 
     // add a notification to the list of unread notifications
@@ -187,12 +196,16 @@ class AppState {
         this.set('selectedSession', session);
     }
 
+    selectUserRole(role) {
+        this.set('selectedRole', role);
+    }
+
     setCurrentUserName(user) {
         this.set('user', user);
     }
 
-    setCurrentUserRole(role) {
-        this.set('role', role);
+    setCurrentUserRoles(roles) {
+        this.set('roles', roles);
     }
 
     // toggle a filter on the offers table

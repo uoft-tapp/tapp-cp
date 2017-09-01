@@ -111,9 +111,12 @@ const Round = props => {
 
     // colour associated with 'all rounds'
     style.sheet.insertRule('.round-all {background-color: ' + roundColourConfig['all'] + '}', 0);
-    
+
     for (var i = 0; i < rounds.length; i++) {
-        style.sheet.insertRule('.round-' + rounds[i] + ' {background-color: ' + roundColourConfig[i] + '}', 0);
+        style.sheet.insertRule(
+            '.round-' + rounds[i] + ' {background-color: ' + roundColourConfig[i] + '}',
+            0
+        );
     }
 
     return (
@@ -173,15 +176,25 @@ const Notifications = props => {
     );
 };
 
-const Auth = props =>
-    <NavDropdown
-        eventKey={routeConfig.logout.id}
-        title={props.getCurrentUserRole() + ':' + props.getCurrentUserName()}
-        id="nav-auth-dropdown">
-        <MenuItem eventKey={routeConfig.logout.id + '.1'} href={routeConfig.logout.route}>
-            Logout
-        </MenuItem>
-    </NavDropdown>;
+const Auth = props => {
+    let roles = props.getCurrentUserRoles(),
+        role = props.getSelectedUserRole(),
+        name = props.getCurrentUserName();
+
+    return (
+        <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
+            {roles.map(
+                r =>
+                    role != r &&
+                    <MenuItem key={'switch-' + r} onClick={() => props.selectUserRole(r)}>
+                        Switch to {r} role
+                    </MenuItem>
+            )}
+
+            <MenuItem onClick={() => props.logout()}>Logout</MenuItem>
+        </NavDropdown>
+    );
+};
 
 /*** Navbar ***/
 
