@@ -52,13 +52,19 @@ class App extends React.Component {
             return <div id="loader" />;
         }
 
-        return <RouterInst {...appState} />;
+        if (role == 'tapp_admin') {
+            return <AdminRouter {...appState} />;
+        }
+
+        if (role == 'instructor') {
+            return <InstRouter {...appState} />;
+        }
     }
 }
 
-/*** Router ***/
+/*** Routers ***/
 
-const RouterInst = props => {
+const AdminRouter = props => {
     let selectedApplicant = props.getSelectedApplicant();
 
     return (
@@ -104,6 +110,16 @@ const RouterInst = props => {
                             />
                         )}
                 </div>
+            </div>
+        </Router>
+    );
+};
+
+const InstRouter = props => {
+    return (
+        <Router basename="tapp">
+            <div>
+                <Navbar {...props} />
             </div>
         </Router>
     );
