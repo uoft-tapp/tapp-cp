@@ -1,7 +1,7 @@
 class CreateTemplates < ActiveRecord::Migration[5.1]
   def change
     create_table :templates do |t|
-      t.string :name
+      t.string :name, null: false
       t.boolean :optional
       t.references :position, foreign_key: true
       t.references :instructor, foreign_key: true
@@ -10,5 +10,6 @@ class CreateTemplates < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
+    add_index(:templates, [:name, :instructor, :id], unique: true)
   end
 end

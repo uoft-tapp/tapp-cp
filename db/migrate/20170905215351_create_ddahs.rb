@@ -11,5 +11,6 @@ class CreateDdahs < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
+    add_index(:ddahs, [:applicant, :position, :id], unique: true)
   end
 end
