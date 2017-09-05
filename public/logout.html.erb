@@ -68,6 +68,7 @@
     <p>Please click <a onClick='reenter_session("<%= @url %>")'>here</a> to log in again.</p>
   </div>
   <script>
+  window.location.replace('<%= @url %>');
   function reenter_session(url){
     fetch("/reenter-session", {
         headers: {
