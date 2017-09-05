@@ -25,9 +25,10 @@ module Authorizer
     if ENV['RAILS_ENV'] == 'production'
       if !session[:logged_in]
         render file: 'public/logout.html'
-      end
-      if get_utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
-        render status: 403, file: 'public/403.html'
+      else
+        if get_utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
+          render status: 403, file: 'public/403.html'
+        end
       end
     end
   end
@@ -37,9 +38,10 @@ module Authorizer
     if ENV['RAILS_ENV'] == 'production'
       if !session[:logged_in]
         render file: 'public/logout.html'
-      end
-      if !has_role(expected_roles)
-        render status: 403, file: 'public/403.html'
+      else
+        if !has_role(expected_roles)
+          render status: 403, file: 'public/403.html'
+        end
       end
     end
   end
