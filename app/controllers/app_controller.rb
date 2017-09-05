@@ -44,9 +44,9 @@ class AppController < ApplicationController
     if ENV['RAILS_ENV'] == 'production'
       session[:keys].each do |key|
         cookies.delete(key.to_sym)
-        @response.delete_cookie(key)
       end
     end
+    headers["Set-Cookie"]=nil
     @_request.reset_session
     reset_session
     @url = params[:current_page]
