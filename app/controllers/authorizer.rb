@@ -89,7 +89,6 @@ module Authorizer
       if !session[:utorid]
         session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
         session[:logged_in]= true
-        set_cookie_keys
       end
       return session[:utorid]
     else
@@ -133,16 +132,4 @@ module Authorizer
     end
   end
 
-  '''
-    Sets the keys of the cookies from Shibboleth as part of the array in
-    session[:keys], so that the cookie can be deleted.
-  '''
-  def set_cookie_keys
-     session[:keys]=[]
-     cookies = request.env['HTTP_COOKIE'].split(";")
-     cookies.each do |cookie|
-       key = cookie.strip.split("=")
-       session[:keys].push(key[0])
-     end
-  end
 end
