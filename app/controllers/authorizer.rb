@@ -23,11 +23,11 @@ module Authorizer
   '''
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
-      if get_utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
-        render status: 403, file: 'public/403.html'
-      end
       if !session[:logged_in]
         render file: 'public/logout.html'
+      end
+      if get_utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
+        render status: 403, file: 'public/403.html'
       end
     end
   end
@@ -35,11 +35,11 @@ module Authorizer
   private
   def access(expected_roles)
     if ENV['RAILS_ENV'] == 'production'
-      if !has_role(expected_roles)
-        render status: 403, file: 'public/403.html'
-      end
       if !session[:logged_in]
         render file: 'public/logout.html'
+      end
+      if !has_role(expected_roles)
+        render status: 403, file: 'public/403.html'
       end
     end
   end
