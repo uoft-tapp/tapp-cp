@@ -113,9 +113,7 @@
     </div>
 
     <script>
-      function refresh(){
-        setTimeout(window.location.reload, 1);
-      }
+      header("Cache-Control: private, must-revalidate, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
       function setupPage(offer_status, fetch=false){
         if (fetch)
           fetchPdfData();
