@@ -40,18 +40,16 @@ class AppController < ApplicationController
     end
   end
 
-  '''
-    Work in progress.
-  '''
   def logout
-     if ENV['RAILS_ENV'] == 'production'
-       session[:keys].each do |key|
-         cookies.delete(key.to_sym)
-       end
-     end
-     reset_session
-     render json: cookies.as_json
-   end
+    if ENV['RAILS_ENV'] == 'production'
+      session[:keys].each do |key|
+        cookies.delete(key.to_sym)
+      end
+    end
+    @_request.reset_session
+    reset_session
+    render json: cookies.as_json
+  end
 
   private
   def show_decision_view(params)
