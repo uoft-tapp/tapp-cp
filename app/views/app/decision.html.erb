@@ -82,7 +82,7 @@
 
   <body>
     <header>
-      <form id="logout" action="/profile/Logout" method="get">
+      <form id="logout" action="/logout" method="post">
         <p>User: <b><%=@offer[:applicant][:utorid]%></b></p>
         <input type="hidden" value="pb/<%= @offer[:mangled] %>" name="current_page"/>
         <input value="Logout" type="submit" />

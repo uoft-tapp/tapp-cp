@@ -41,11 +41,11 @@ class AppController < ApplicationController
   end
 
   def logout
-    if ENV['RAILS_ENV'] == 'production'
-      session[:keys].each do |key|
-        cookies.delete(key.to_sym)
-      end
-    end
+    #if ENV['RAILS_ENV'] == 'production'
+    #  session[:keys].each do |key|
+    #    cookies.delete(key.to_sym)
+    #  end
+    #end
     response.headers.delete("Set-Cookie")
     @_request.reset_session
     reset_session
