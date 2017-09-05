@@ -46,7 +46,7 @@ class AppController < ApplicationController
         cookies.delete(key.to_sym)
       end
     end
-    headers["Set-Cookie"]=nil
+    response.headers.delete("Set-Cookie")
     @_request.reset_session
     reset_session
     @url = params[:current_page]
