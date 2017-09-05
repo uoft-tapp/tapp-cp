@@ -11,6 +11,7 @@ import '../cp-styles';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Alert } from 'react-bootstrap';
 
 import { appState } from '../cp/appState.js';
 import { fetchAll, fetchAuth } from '../cp/fetch.js';
@@ -53,18 +54,14 @@ class App extends React.Component {
                 {role == 'instructor' && null}
 
                 <div className="container-fluid" id="alert-container">
-                    {this.props.appState
-                        .getAlerts()
-                        .map(alert =>
-                            <div
-                                key={'alert-' + alert.get('id')}
-                                className="alert alert-danger"
-                                onClick={() => this.props.appState.dismissAlert(alert.get('id'))}
-                                onAnimationEnd={() =>
-                                    this.props.appState.dismissAlert(alert.get('id'))}
-                                dangerouslySetInnerHTML={{ __html: alert.get('text') }}
-                            />
-                        )}
+                    {this.props.appState.getAlerts().map(alert =>
+                        <Alert
+                            key={'alert-' + alert.get('id')}
+                            className="alert alert-danger"
+                            onDismiss={() => this.props.appState.dismissAlert(alert.get('id'))}>
+                            <span dangerouslySetInnerHTML={{ __html: alert.get('text') }} />
+                        </Alert>
+                    )}
                 </div>
             </div>
         );
