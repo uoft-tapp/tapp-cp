@@ -53,23 +53,40 @@
       font-size: 22px;
       text-align: center;
     }
-    header p{
+    #logout p{
       font-size: 14px;
-      float: right;
+      float: left;
       padding: 3px;
     }
-    header p button, #decision p button{
-      margin: 2px 5px 0 5px;
+    #logout input[type=submit], #decision p button{
+      margin: 2px 5px 2px 5px;
       padding: 0 5px;
       font-size: 14px;
+      outline: 0;
+      border: #ccc solid 1px;
+      background: #eee;
+    }
+    #logout input[type=submit]:hover, #decision p button:hover{
+      border: #aaa solid 1px;
+      background: #ccc;
+    }
+    #logout input[type=submit]:active, #decision p button:active{
+      border: #aaa solid 1px;
+      background: #bbb;
+    }
+    #logout {
+      float: right;
+      width: auto;
     }
   </style>
 
   <body>
     <header>
-      <p>User: <b><%=@offer[:applicant][:utorid]%></b>
-        <button onclick="logout()">Logout</button>
-      </p>
+      <form id="logout" action="/logout" method="post">
+        <p>User: <b><%=@offer[:applicant][:utorid]%></b></p>
+        <input type="hidden" value="pb/<%= @offer[:mangled] %>" name="current_page"/>
+        <input value="Logout" type="submit" />
+      </form>
       <div>
         <h1>Offer for Teaching Assistantship of <%=@offer[:position]%></h1>
       </div>
@@ -150,14 +167,8 @@
       function fetchPdfData(){
         getHelper("<%= @offer[:mangled] %>/pdf", setPdfViewPort, true);
       }
-      function logout_cleanup(response){
-        // TO-DO
-      }
       function deleteCookie(cookiename){
         document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      }
-      function logout(){
-        postHelper('/logout', {}, logout_cleanup);
       }
       function setPdfViewPort(response){
         let fileURL = URL.createObjectURL(response);

@@ -48,7 +48,8 @@ class AppController < ApplicationController
     end
     @_request.reset_session
     reset_session
-    render json: cookies.as_json
+    @url = params[:current_page]
+    render :logout, layout: false
   end
 
   private
