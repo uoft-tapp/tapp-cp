@@ -488,7 +488,7 @@ function exportOffers(round) {
 }
 
 function logout() {
-    postHelper('/logout', {});
+    postHelper('/logout', { current_page: document.location.pathname });
 }
 
 // get current user role and username

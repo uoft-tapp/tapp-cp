@@ -551,7 +551,7 @@ function updateSessionPay(session, pay) {
 }
 
 function logout() {
-    postHelper('/logout', {});
+    postHelper('/logout', { current_page: document.location.pathname });
 }
 
 // get current user role(s) and username
