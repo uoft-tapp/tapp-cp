@@ -50,7 +50,7 @@ class AppController < ApplicationController
     #env['rack.session.options'][:skip] = true
     @_request.reset_session
     reset_session
-    render 'public/logout.html'
+    render file: 'public/logout.html'
   end
 
   private

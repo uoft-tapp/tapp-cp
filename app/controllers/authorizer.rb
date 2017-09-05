@@ -27,7 +27,7 @@ module Authorizer
         render status: 403, file: 'public/403.html'
       end
       if !session[:logged_in]
-        render 'public/logout.html'
+        render file: 'public/logout.html'
       end
     end
   end
@@ -39,7 +39,7 @@ module Authorizer
         render status: 403, file: 'public/403.html'
       end
       if !session[:logged_in]
-        render 'public/logout.html'
+        render file: 'public/logout.html'
       end
     end
   end
