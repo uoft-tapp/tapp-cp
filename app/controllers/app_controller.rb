@@ -13,7 +13,6 @@ class AppController < ApplicationController
   end
 
   ''' CP functions '''
-
   def cp
     render :cp, layout: false
   end
