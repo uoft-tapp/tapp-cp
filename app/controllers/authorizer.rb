@@ -26,6 +26,9 @@ module Authorizer
       if get_utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
         render status: 403, file: 'public/403.html'
       end
+      if !session[:logged_in]
+        render 'public/logout.html'
+      end
     end
   end
 
@@ -34,6 +37,9 @@ module Authorizer
     if ENV['RAILS_ENV'] == 'production'
       if !has_role(expected_roles)
         render status: 403, file: 'public/403.html'
+      end
+      if !session[:logged_in]
+        render 'public/logout.html'
       end
     end
   end
@@ -79,6 +85,7 @@ module Authorizer
   def get_utorid
     if request.env['HTTP_X_FORWARDED_USER']
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
+      session[:logged_in] = true
       set_cookie_keys
       return session[:utorid]
     else

@@ -41,16 +41,16 @@ class AppController < ApplicationController
   end
 
   def logout
-    #if ENV['RAILS_ENV'] == 'production'
-    #  session[:keys].each do |key|
-    #    cookies.delete(key.to_sym)
-    #  end
-    #end
-    env['rack.session.options'][:skip] = true
+    if ENV['RAILS_ENV'] == 'production'
+      session[:keys].each do |key|
+        cookies.delete(key.to_sym)
+      end
+    end
+    session[:logged_in] = false
+    #env['rack.session.options'][:skip] = true
     @_request.reset_session
     reset_session
-    @url = params[:current_page]
-    render :logout, layout: false
+    render 'public/logout.html'
   end
 
   private
