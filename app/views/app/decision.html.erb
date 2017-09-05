@@ -167,9 +167,6 @@
       function fetchPdfData(){
         getHelper("<%= @offer[:mangled] %>/pdf", setPdfViewPort, true);
       }
-      function deleteCookie(cookiename){
-        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      }
       function setPdfViewPort(response){
         let fileURL = URL.createObjectURL(response);
         let viewPort= document.getElementById("pdf_view_port");

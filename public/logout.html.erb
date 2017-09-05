@@ -68,7 +68,7 @@
     <p>Please click <a onClick='reenter_session("<%= @url %>")'>here</a> to log in again.</p>
   </div>
   <script>
-  window.location.replace('<%= @url %>');
+  location.reload(true);
   function reenter_session(url){
     fetch("/reenter-session", {
         headers: {
@@ -78,11 +78,8 @@
         method: 'POST',
         credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
     }).then(function(response){
-        return_to_page(url);
+        window.location.replace(url);
     });
-  }
-  function return_to_page(url){
-    window.location.href = url;
   }
   </script>
 </body>
