@@ -10,6 +10,6 @@ class CreateTemplates < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    add_index(:templates, [:name, :instructor, :id], unique: true)
+    add_index(:templates, [:name, :instructor_id, :id], unique: true)
   end
 end

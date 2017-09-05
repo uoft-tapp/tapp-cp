@@ -5,6 +5,5 @@ class CreateTrainings < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    add_index(:trainings, [:name, :id], unique: true)
   end
 end

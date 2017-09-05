@@ -24,6 +24,9 @@ Rails.application.routes.draw do
     get "pdf" => "offers#get_contract"
     post "accept" => "offers#accept_offer"
   end
+  resources :duties
+  resources :trainings
+  resources :categories
 
   # shared resources
   resources :sessions

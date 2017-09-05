@@ -73,7 +73,7 @@ ActiveRecord::Schema.define(version: 20170907234300) do
   end
 
   create_table "categories", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.bigint "category_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["applicant_id", "position_id", "id"], name: "index_ddahs_on_applicant_id_and_position_id_and_id", unique: true
     t.index ["applicant_id"], name: "index_ddahs_on_applicant_id"
     t.index ["category_id"], name: "index_ddahs_on_category_id"
     t.index ["department_id"], name: "index_ddahs_on_department_id"
@@ -97,13 +98,13 @@ ActiveRecord::Schema.define(version: 20170907234300) do
   end
 
   create_table "departments", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "duties", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -190,7 +191,7 @@ ActiveRecord::Schema.define(version: 20170907234300) do
   end
 
   create_table "templates", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.boolean "optional"
     t.bigint "position_id"
     t.bigint "instructor_id"
@@ -201,11 +202,12 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.index ["category_id"], name: "index_templates_on_category_id"
     t.index ["department_id"], name: "index_templates_on_department_id"
     t.index ["instructor_id"], name: "index_templates_on_instructor_id"
+    t.index ["name", "instructor_id", "id"], name: "index_templates_on_name_and_instructor_id_and_id", unique: true
     t.index ["position_id"], name: "index_templates_on_position_id"
   end
 
   create_table "trainings", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

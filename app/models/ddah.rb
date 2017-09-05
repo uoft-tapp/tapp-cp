@@ -7,4 +7,5 @@ class Ddah < ApplicationRecord
   belongs_to :category
   has_many :allocations
   has_many :trainings
+  validates :applicant, uniqueness: {scope: :position}
 end
