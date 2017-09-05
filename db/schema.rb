@@ -15,6 +15,16 @@ ActiveRecord::Schema.define(version: 20170907234300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "allocations", force: :cascade do |t|
+    t.integer "num_unit"
+    t.string "type"
+    t.integer "minutes"
+    t.bigint "duty_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["duty_id"], name: "index_allocations_on_duty_id"
+  end
+
   create_table "applicants", force: :cascade do |t|
     t.string "utorid", null: false
     t.string "app_id", null: false
@@ -60,6 +70,42 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.integer "hours"
     t.index ["applicant_id"], name: "index_assignments_on_applicant_id"
     t.index ["position_id"], name: "index_assignments_on_position_id"
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "ddahs", force: :cascade do |t|
+    t.boolean "optional"
+    t.bigint "applicant_id"
+    t.bigint "position_id"
+    t.bigint "template_id"
+    t.bigint "instructor_id"
+    t.bigint "department_id"
+    t.bigint "category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["applicant_id"], name: "index_ddahs_on_applicant_id"
+    t.index ["category_id"], name: "index_ddahs_on_category_id"
+    t.index ["department_id"], name: "index_ddahs_on_department_id"
+    t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
+    t.index ["position_id"], name: "index_ddahs_on_position_id"
+    t.index ["template_id"], name: "index_ddahs_on_template_id"
+  end
+
+  create_table "departments", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "duties", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "instructors", force: :cascade do |t|
@@ -143,10 +189,42 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "templates", force: :cascade do |t|
+    t.string "name"
+    t.boolean "optional"
+    t.bigint "position_id"
+    t.bigint "instructor_id"
+    t.bigint "department_id"
+    t.bigint "category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_templates_on_category_id"
+    t.index ["department_id"], name: "index_templates_on_department_id"
+    t.index ["instructor_id"], name: "index_templates_on_instructor_id"
+    t.index ["position_id"], name: "index_templates_on_position_id"
+  end
+
+  create_table "trainings", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "allocations", "duties"
   add_foreign_key "applications", "applicants"
   add_foreign_key "assignments", "applicants"
   add_foreign_key "assignments", "positions"
+  add_foreign_key "ddahs", "applicants"
+  add_foreign_key "ddahs", "categories"
+  add_foreign_key "ddahs", "departments"
+  add_foreign_key "ddahs", "instructors"
+  add_foreign_key "ddahs", "positions"
+  add_foreign_key "ddahs", "templates"
   add_foreign_key "positions", "sessions"
   add_foreign_key "preferences", "applications"
   add_foreign_key "preferences", "positions"
+  add_foreign_key "templates", "categories"
+  add_foreign_key "templates", "departments"
+  add_foreign_key "templates", "instructors"
+  add_foreign_key "templates", "positions"
 end
