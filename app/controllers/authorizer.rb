@@ -86,9 +86,11 @@ module Authorizer
   '''
   def get_utorid
     if request.env['HTTP_X_FORWARDED_USER']
-      session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
-      session[:logged_in] = true
-      set_cookie_keys
+      if !session[:utorid]
+        session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
+        session[:logged_in]= true
+        set_cookie_keys
+      end
       return session[:utorid]
     else
       return session[:utorid]

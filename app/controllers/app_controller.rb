@@ -42,13 +42,13 @@ class AppController < ApplicationController
 
   def logout
     #if ENV['RAILS_ENV'] == 'production'
-    #  session[:keys].each do |key|
-    #    cookies.delete(key.to_sym)
-    #  end
+      #session[:keys].each do |key|
+      #  cookies.delete(key.to_sym)
+      #end
     #end
     #@_request.reset_session
-    #reset_session
-    session[:logged_in] = false
+    @url = params[:current_page]
+    session[:logged_in]= false
     render file: 'public/logout.html'
   end
 
