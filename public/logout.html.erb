@@ -51,6 +51,10 @@
     color: #666;
     box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
   }
+  a{
+    color: blue;
+    text-decoration: underline;
+  }
   </style>
 </head>
 
@@ -60,7 +64,7 @@
       <h1>Session Ended.</h1>
       <p>To ensure your security, please close the browser if you are using a public machine.</p>
     </div>
-    <p>Please click <a href="" onClick='reenter_session("<%= @url %>")'>here</a> to log in again.</p>
+    <p>Please click <a onClick='reenter_session("<%= @url %>")'>here</a> to log in again.</p>
   </div>
   <script>
   function reenter_session(url){
