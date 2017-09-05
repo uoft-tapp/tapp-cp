@@ -113,9 +113,8 @@
     </div>
 
     <script>
-      setTimeout(refresh, 1);
       function refresh(){
-          window.location.reload();
+        setTimeout(window.location.reload, 1);
       }
       function setupPage(offer_status, fetch=false){
         if (fetch)
