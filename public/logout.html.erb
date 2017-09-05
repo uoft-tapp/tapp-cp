@@ -60,27 +60,23 @@
       <h1>Session Ended.</h1>
       <p>To ensure your security, please close the browser if you are using a public machine.</p>
     </div>
-    <p>Please click <a onclick='reenter_session("<%= @url %>")'>Here</a> to log in again.</p>
+    <p>Please click <a href="" onClick='reenter_session("<%= @url %>")'>here</a> to log in again.</p>
   </div>
   <script>
-  function postHelper(url, data, action){
-    fetch(url, {
+  function reenter_session(url){
+    fetch("/reenter-session", {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
         },
         method: 'POST',
-        body: JSON.stringify(data),
         credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
     }).then(function(response){
-        action(data);
+        return_to_page(url);
     });
   }
-  function reenter_session(url){
-    postHelper("reenter-session", {current_page: url}, return_to_page);
-  }
-  function return_to_page(data){
-    window.location.href = data.current_page;
+  function return_to_page(url){
+    window.location.href = url;
   }
   </script>
 </body>
