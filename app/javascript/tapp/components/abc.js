@@ -142,34 +142,13 @@ class ABC extends React.Component {
                             <p>Nothing here yet!</p>
                             <p>Select one or more courses to start.</p>
                         </Well>}
-                    {selected[0] &&
+                    {selected.map((course, i) =>
                         <CoursePanel
-                            key="course-panel-1"
-                            panelStyle={styles[0]}
-                            course={selected[0]}
+                            key={"course-panel-" + i}
+                            panelStyle={styles[i]}
+                            course={selected[i]}
                             {...this.props}
-                        />}
-                    {selected[1] &&
-                        <CoursePanel
-                            key="course-panel-2"
-                            panelStyle={styles[1]}
-                            course={selected[1]}
-                            {...this.props}
-                        />}
-                    {selected[2] &&
-                        <CoursePanel
-                            key="course-panel-3"
-                            panelStyle={styles[2]}
-                            course={selected[2]}
-                            {...this.props}
-                        />}
-                    {selected[3] &&
-                        <CoursePanel
-                            key="course-panel-4"
-                            panelStyle={styles[3]}
-                            course={selected[3]}
-                            {...this.props}
-                        />}
+                        />)}
                 </div>
             </Grid>
         );
