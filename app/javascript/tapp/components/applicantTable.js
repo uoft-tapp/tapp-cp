@@ -107,7 +107,6 @@ class ApplicantTable extends React.Component {
     }
 
     render() {
-        console.log(this.props.layout);
         return (
             <div
                 className={
