@@ -29,19 +29,10 @@ GEM
       globalid (>= 0.3.6)
     activemodel (5.1.1)
       activesupport (= 5.1.1)
-    activemodel-serializers-xml (1.0.1)
-      activemodel (> 5.x)
-      activerecord (> 5.x)
-      activesupport (> 5.x)
-      builder (~> 3.1)
     activerecord (5.1.1)
       activemodel (= 5.1.1)
       activesupport (= 5.1.1)
       arel (~> 8.0)
-    activeresource (5.0.0)
-      activemodel (>= 5.0, < 6)
-      activemodel-serializers-xml (~> 1.0)
-      activesupport (>= 5.0, < 6)
     activesupport (5.1.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
@@ -216,7 +207,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activeresource
   byebug
   coffee-rails (~> 4.2)
   guard
@@ -237,4 +227,4 @@ DEPENDENCIES
   webpacker
 
 BUNDLED WITH
-   1.15.0
+   1.15.4
