@@ -46,7 +46,7 @@ class AppController < ApplicationController
     #    cookies.delete(key.to_sym)
     #  end
     #end
-    response.headers.delete("Set-Cookie")
+    env['rack.session.options'][:skip] = true
     @_request.reset_session
     reset_session
     @url = params[:current_page]
