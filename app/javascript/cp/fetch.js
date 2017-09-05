@@ -143,27 +143,26 @@ function importAssignments() {
     appState.setImporting(true);
 
     postHelper('/import/locked-assignments', {})
-        .then(
-            resp => {
-                // import succeeded
-                if (resp.ok) {
-                    return resp.json().then(resp => {
-                          // import succeeded with errors
-                          if (resp.errors) {
-                              return resp.message.forEach(message => appState.alert(message));
-                          }
-                          return Promise.resolve();
-                    });
-                }
-                // import failed with errors
-                if (resp.status == 404) {
-                    return resp.json()
-                        .then(resp => resp.message.forEach(message => appState.alert(message)))
-                        .then(Promise.reject);
-                }
-                return respFailure(resp);
+        .then(resp => {
+            // import succeeded
+            if (resp.ok) {
+                return resp.json().then(resp => {
+                    // import succeeded with errors
+                    if (resp.errors) {
+                        return resp.message.forEach(message => appState.alert(message));
+                    }
+                    return Promise.resolve();
+                });
             }
-        )
+            // import failed with errors
+            if (resp.status == 404) {
+                return resp
+                    .json()
+                    .then(resp => resp.message.forEach(message => appState.alert(message)))
+                    .then(Promise.reject);
+            }
+            return respFailure(resp);
+        })
         .then(
             () => {
                 appState.setImporting(false, true);
@@ -185,27 +184,26 @@ function importOffers(data) {
     appState.setImporting(true);
 
     postHelper('/import/offers', { chass_offers: data })
-        .then(
-            resp => {
-                // import succeeded
-                if (resp.ok) {
-                    return resp.json().then(resp => {
-                          // import succeeded with errors
-                          if (resp.errors) {
-                              return resp.message.forEach(message => appState.alert(message));
-                          }
-                          return Promise.resolve();
-                    });
-                }
-                // import failed with errors
-                if (resp.status == 404) {
-                    return resp.json()
-                        .then(resp => resp.message.forEach(message => appState.alert(message)))
-                        .then(Promise.reject);
-                }
-                return respFailure(resp);
+        .then(resp => {
+            // import succeeded
+            if (resp.ok) {
+                return resp.json().then(resp => {
+                    // import succeeded with errors
+                    if (resp.errors) {
+                        return resp.message.forEach(message => appState.alert(message));
+                    }
+                    return Promise.resolve();
+                });
             }
-        )
+            // import failed with errors
+            if (resp.status == 404) {
+                return resp
+                    .json()
+                    .then(resp => resp.message.forEach(message => appState.alert(message)))
+                    .then(Promise.reject);
+            }
+            return respFailure(resp);
+        })
         .then(
             () => {
                 appState.setImporting(false, true);
@@ -231,10 +229,18 @@ function sendContracts(offers) {
         .then(resp => {
             if (resp.status == 404) {
                 // some contracts cannot be sent
+                let offersList = appState.getOffersList();
+
                 return resp.json().then(res => {
-                    let invalidOffers = res.invalid_offers;
-                    invalidOffers.forEach(offer => {
-                        appState.alert('<b>Error</b>: Cannot nag send contract for offer ' + offer);
+                    res.invalid_offers.forEach(offer => {
+                        appState.alert(
+                            '<b>Error</b>: Cannot send contract to' +
+                                offersList.getIn([offer.toString(), 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer.toString(), 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer.toString(), 'position'])
+                        );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
@@ -269,11 +275,19 @@ function nag(offers) {
     postHelper('/offers/can-nag', { contracts: offers })
         .then(resp => {
             if (resp.status == 404) {
-                // some contracts cannot be sent
+                // some applicants cannot be nagged
+                let offersList = appState.getOffersList();
+
                 return resp.json().then(res => {
-                    let invalidOffers = res.invalid_offers;
-                    invalidOffers.forEach(offer => {
-                        appState.alert('<b>Error</b>: Cannot nag applicant about offer ' + offer);
+                    res.invalid_offers.forEach(offer => {
+                        appState.alert(
+                            '<b>Error</b>: Cannot nag ' +
+                                offersList.getIn([offer.toString(), 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer.toString(), 'firstName']) +
+                                ' about ' +
+                                offersList.getIn([offer.toString(), 'position'])
+                        );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
@@ -309,11 +323,18 @@ function setHrProcessed(offers) {
         .then(resp => {
             if (resp.status == 404) {
                 // some offers cannot be updated
+                let offersList = appState.getOffersList();
+
                 return resp.json().then(res => {
-                    let invalidOffers = res.invalid_offers;
-                    invalidOffers.forEach(offer => {
+                    res.invalid_offers.forEach(offer => {
                         appState.alert(
-                            '<b>Error</b>: Cannot mark offer ' + offer + ' as HR processed'
+                            '<b>Error</b>: Cannot mark offer to ' +
+                                offersList.getIn([offer.toString(), 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer.toString(), 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer.toString(), 'position']) +
+                                ' as HR processed'
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -355,11 +376,18 @@ function setDdahAccepted(offers) {
         .then(resp => {
             if (resp.status == 404) {
                 // some offers cannot be updated
+                let offersList = appState.getOffersList();
+
                 return resp.json().then(res => {
-                    let invalidOffers = res.invalid_offers;
-                    invalidOffers.forEach(offer => {
+                    res.invalid_offers.forEach(offer => {
                         appState.alert(
-                            '<b>Error</b>: Cannot mark offer ' + offer + ' as DDAH accepted'
+                            '<b>Error</b>: Cannot mark offer to ' +
+                                offersList.getIn([offer.toString(), 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer.toString(), 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer.toString(), 'position']) +
+                                ' as DDAH accepted'
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -452,10 +480,18 @@ function print(offers) {
         .then(resp => {
             if (resp.status == 404) {
                 // some contracts cannot be printed
+                let offersList = appState.getOffersList();
+
                 return resp.json().then(res => {
-                    let invalidOffers = res.invalid_offers;
-                    invalidOffers.forEach(offer => {
-                        appState.alert('<b>Error</b>: Cannot print contract for offer ' + offer);
+                    res.invalid_offers.forEach(offer => {
+                        appState.alert(
+                            '<b>Error</b>: Cannot print ' +
+                                offersList.getIn([offer.toString(), 'position']) +
+                                ' contract for ' +
+                                offersList.getIn([offer.toString(), 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer.toString(), 'firstName'])
+                        );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
                     });
