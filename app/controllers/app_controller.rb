@@ -46,10 +46,9 @@ class AppController < ApplicationController
         cookies.delete(key.to_sym)
       end
     end
-    session[:logged_in] = false
-    #env['rack.session.options'][:skip] = true
     @_request.reset_session
     reset_session
+    session[:logged_in] = false
     render file: 'public/logout.html'
   end
 
