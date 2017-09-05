@@ -17,7 +17,7 @@ function respFailure(resp) {
 
 function fetchHelper(URL, init) {
     return fetch(URL, init).catch(function(error) {
-        appState.alert('<b>' + init.method + ' ' + URL + ' error</b> ' + ': ' + error);
+        appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
         return Promise.reject(error);
     });
 }
@@ -40,15 +40,15 @@ function postHelper(URL, body) {
         },
         method: 'POST',
         body: JSON.stringify(body),
-        credentials: 'include'
+        credentials: 'include',
     });
 }
 
 function deleteHelper(URL) {
     return fetchHelper(URL, {
-	method: 'DELETE' ,
-        credentials: 'include'
-	});
+        method: 'DELETE',
+        credentials: 'include',
+    });
 }
 
 function putHelper(URL, body) {
@@ -58,7 +58,7 @@ function putHelper(URL, body) {
         },
         method: 'PUT',
         body: JSON.stringify(body),
-        credentials: 'include'
+        credentials: 'include',
     });
 }
 
@@ -379,27 +379,26 @@ function importChass(data, year, semester) {
         year: year,
         semester: semester,
     })
-        .then(
-            resp => {
-                // import succeeded
-                if (resp.ok) {
-                    return resp.json().then(resp => {
-                          // import succeeded with errors
-                          if (resp.errors) {
-                              return resp.message.forEach(message => appState.alert(message));
-                          }
-                          return Promise.resolve();
-                    });
-                }
-                // import failed with errors
-                if (resp.status == 404) {
-                    return resp.json()
-                        .then(resp => resp.message.forEach(message => appState.alert(message)))
-                        .then(Promise.reject);
-                }
-                return respFailure(resp);
+        .then(resp => {
+            // import succeeded
+            if (resp.ok) {
+                return resp.json().then(resp => {
+                    // import succeeded with errors
+                    if (resp.errors) {
+                        return resp.message.forEach(message => appState.alert(message));
+                    }
+                    return Promise.resolve();
+                });
             }
-        )
+            // import failed with errors
+            if (resp.status == 404) {
+                return resp
+                    .json()
+                    .then(resp => resp.message.forEach(message => appState.alert(message)))
+                    .then(Promise.reject);
+            }
+            return respFailure(resp);
+        })
         .then(
             () => {
                 appState.setImporting(false, true);

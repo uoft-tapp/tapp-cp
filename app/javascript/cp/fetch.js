@@ -16,7 +16,7 @@ function respFailure(resp) {
 
 function fetchHelper(URL, init) {
     return fetch(URL, init).catch(function(error) {
-        appState.alert('<b>' + init.method + ' ' + URL + ' error</b> ' + ': ' + error);
+        appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
         return Promise.reject(error);
     });
 }
