@@ -17,6 +17,12 @@ Rails.application.routes.draw do
   resources :applications, only: [:index, :show]
   resources :positions
   resources :instructors
+  scope 'instructors/:utorid' do
+    resources :offers, only: [:index, :show]
+    resources :positions, only: [:index, :show]
+    resources :ddahs
+    resources :templates
+  end
 
   # CP resources
   resources :offers do
@@ -24,12 +30,12 @@ Rails.application.routes.draw do
     get "pdf" => "offers#get_contract"
     post "accept" => "offers#accept_offer"
   end
-  resources :duties
-  resources :trainings
-  resources :categories
+  resources :duties, only: [:index, :show]
+  resources :trainings, only: [:index, :show]
+  resources :categories, only: [:index, :show]
 
   # shared resources
-  resources :sessions
+  resources :sessions, only: [:index, :show, :update]
 
   # TAPP routes
   get "/export/chass/:round_id", to: "export#chass"
