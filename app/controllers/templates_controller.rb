@@ -38,6 +38,12 @@ class TemplatesController < ApplicationController
   def update
     template = Template.find(params[:id])
     template.update_attributes!(template_params)
+    if params[:categories]
+      template.category_ids = params[:categories]
+    end
+    if params[:trainings]
+      template.training_ids = params[:trainings]
+    end
   end
 
   private

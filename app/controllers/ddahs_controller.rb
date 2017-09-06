@@ -38,6 +38,12 @@ class DdahsController < ApplicationController
   def update
     ddah = Ddah.find(params[:id])
     ddah.update_attributes!(ddah_params)
+    if params[:categories]
+      ddah.category_ids = params[:categories]
+    end
+    if params[:trainings]
+      ddah.training_ids = params[:trainings]
+    end
   end
 
   private
