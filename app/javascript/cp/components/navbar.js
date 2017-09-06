@@ -49,7 +49,12 @@ const Auth = props => {
             {roles.map(
                 r =>
                     role != r &&
-                    <MenuItem key={'switch-' + r} onClick={() => props.appState.selectUserRole(r)}>
+                    <MenuItem
+                        key={'switch-' + r}
+                        onClick={() => {
+                            props.appState.selectUserRole(r);
+                            props.appState.fetchAll();
+                        }}>
                         Switch to {r} role
                     </MenuItem>
             )}

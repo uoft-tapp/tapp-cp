@@ -155,3 +155,20 @@ footer div p {
     font-weight: bold;
     margin-top: 5px;
 }
+
+#ddah-grid input {
+    width: 100%;
+    border: 0;
+}
+
+#ddah-grid thead {
+    background-color: #e7e7e7;
+}
+
+#ddah-grid tr:last-child {
+    border-top: 2px solid #ddd;
+}
+
+#ddah-grid td:last-child {
+    background-color: #f9f9f9;
+}

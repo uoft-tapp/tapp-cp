@@ -118,7 +118,7 @@ function onFetchSessionsSuccess(resp) {
 
 /* Function to GET all resources */
 
-function fetchAll() {
+function adminFetchAll() {
     appState.setFetchingOffersList(true);
     appState.setFetchingSessionsList(true);
 
@@ -137,6 +137,9 @@ function fetchAll() {
             appState.setFetchingSessionsList(false, true);
         })
         .catch(() => appState.setFetchingSessionsList(false));
+}
+
+function instructorFetchAll() {
 }
 
 // import locked assignments from TAPP
@@ -660,7 +663,7 @@ function exportOffers(session) {
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
-    getHelper('/roles')
+    return getHelper('/roles')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(resp => {
             if (resp.development) {
@@ -681,7 +684,8 @@ function fetchAuth() {
 }
 
 export {
-    fetchAll,
+    adminFetchAll,
+    instructorFetchAll,
     importOffers,
     importAssignments,
     sendContracts,

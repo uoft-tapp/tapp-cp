@@ -14,10 +14,11 @@ import ReactDOM from 'react-dom';
 import { Alert } from 'react-bootstrap';
 
 import { appState } from '../cp/appState.js';
-import { fetchAll, fetchAuth } from '../cp/fetch.js';
+import { fetchAuth } from '../cp/fetch.js';
 
 import { Navbar } from '../cp/components/navbar.js';
 import { ControlPanel } from '../cp/components/controlPanel.js';
+import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
 
 /*** Main app component ***/
 
@@ -26,10 +27,8 @@ class App extends React.Component {
         super(props);
 
         // get current user role and username
-        fetchAuth();
-
-        // start fetching data
-        fetchAll();
+        // then start fetching data
+        fetchAuth().then(() => this.props.appState.fetchAll());
     }
 
     componentDidMount() {
@@ -49,9 +48,8 @@ class App extends React.Component {
             <div>
                 <Navbar {...this.props} />
 
-                {role == 'cp_admin' && <ControlPanel {...this.props} />}
-                {role == 'hr_assistant' && <ControlPanel {...this.props} />}
-                {role == 'instructor' && null}
+                {(role == 'cp_admin' || role == 'hr_assistant') && <ControlPanel {...this.props} />}
+                {role == 'instructor' && <InstrControlPanel {...this.props} />}
 
                 <div className="container-fluid" id="alert-container">
                     {this.props.appState.getAlerts().map(alert =>

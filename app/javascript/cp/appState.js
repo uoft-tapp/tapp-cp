@@ -316,6 +316,15 @@ class AppState {
         fetch.exportOffers(session);
     }
 
+    fetchAll() {
+        let role = this.getSelectedUserRole();
+        if (role == 'cp_admin' || role == 'hr_assistant') {
+            fetch.adminFetchAll();
+        } else if (role == 'instructor') {
+            fetch.instructorFetchAll();
+        }
+    }
+
     // check if offers are being fetched
     fetchingOffers() {
         return this.get('offers.fetching') > 0;
