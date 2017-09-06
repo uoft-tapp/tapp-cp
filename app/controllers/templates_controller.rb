@@ -27,7 +27,24 @@ class TemplatesController < ApplicationController
     end
   end
 
+  def destroy
+    template = Template.find(params[:id])
+    template.allocations.each do |allocation|
+      allocation.destroy!
+    end
+    template.destroy!
+  end
+
+  def update
+    template = Template.find(params[:id])
+    template.update_attributes!(template_params)
+  end
+
   private
+  def template_params
+    params.permit(:name, :optional)
+  end
+
   def get_all_templates_for_utorid(utorid)
     templates = []
     Template.all.each do |template|

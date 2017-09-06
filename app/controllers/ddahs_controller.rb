@@ -27,7 +27,24 @@ class DdahsController < ApplicationController
     end
   end
 
+  def destroy
+    ddah = Ddah.find(params[:id])
+    ddah.allocations.each do |allocation|
+      allocation.destroy!
+    end
+    ddah.destroy!
+  end
+
+  def update
+    ddah = Ddah.find(params[:id])
+    ddah.update_attributes!(ddah_params)
+  end
+
   private
+  def ddah_params
+    params.permit(:optional)
+  end
+
   def get_all_ddah_for_utorid(utorid)
     ddahs = []
     Ddah.all.each do |ddah|

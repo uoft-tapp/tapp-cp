@@ -7,8 +7,8 @@ class AllocationsController < ApplicationController
   def index
     if params[:ddah_id]
       render json: get_all_allocations(params[:ddah_id], :ddah_id)
-    elsif params[:template_id]
-      render json: get_all_allocations(params[:template_id], :template_id)
+    elsif params[:allocation_id]
+      render json: get_all_allocations(params[:allocation_id], :allocation_id)
     else
       render json: Allocation.all.to_json
     end
@@ -23,8 +23,8 @@ class AllocationsController < ApplicationController
       else
         render status: 404, json: {status: 404}
       end
-    elsif params[:template_id]
-      allocations = id_array(get_all_allocations(params[:template_id], :template_id))
+    elsif params[:allocation_id]
+      allocations = id_array(get_all_allocations(params[:allocation_id], :allocation_id))
       if allocations.include?(params[:id])
         allocation = Allocation.find(params[:id])
         render json: allocation.to_json
@@ -37,7 +37,21 @@ class AllocationsController < ApplicationController
     end
   end
 
+  def destroy
+    allocation = Allocation.find(params[:id])
+    allocation.destroy!
+  end
+
+  def update
+    allocation = Allocation.find(params[:id])
+    allocation.update_attributes!(allocation_params)
+  end
+
   private
+  def allocation_params
+    params.permit(:num_unit, :type, :minutes, :duty_id)
+  end
+
   def get_all_allocations(val, attr)
     allocations = []
     Allocation.all.each do |allocation|

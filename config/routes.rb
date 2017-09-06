@@ -22,15 +22,18 @@ Rails.application.routes.draw do
   scope 'instructors/:utorid' do
     resources :offers, only: [:index, :show]
     resources :positions, only: [:index, :show]
-    resources :ddahs, only: [:index, :show]
-    resources :templates, only: [:index, :show]
+    resources :ddahs, only: [:index, :show, :create]
+    resources :templates, only: [:index, :show, :create]
   end
   scope 'ddahs/:ddah_id' do
-    resources :allocations, only: [:index, :show]
+    resources :allocations, only: [:index, :show, :create]
   end
   scope 'templates/:template_id' do
-    resources :allocations, only: [:index, :show]
+    resources :allocations, only: [:index, :show, :create]
   end
+  resources :ddahs, only: [:update, :destroy]
+  resources :templates, only: [:update, :destroy]
+  resources :allocations, only: [:update, :destroy]
 
   # CP resources
   resources :offers do
