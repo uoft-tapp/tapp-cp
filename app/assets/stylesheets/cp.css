@@ -135,8 +135,3 @@ footer div p {
 #offers-grid .sessions #pay input {
     width: 100px;
 }
-
-.highlightOnHover:hover {
-    font-weight: bold;
-    cursor: pointer;
-}

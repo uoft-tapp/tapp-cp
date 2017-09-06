@@ -487,10 +487,6 @@ function exportOffers(round) {
     });
 }
 
-function logout() {
-    postHelper('/logout', {});
-}
-
 // get current user role and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -523,6 +519,5 @@ export {
     importEnrolment,
     unlockAssignment,
     exportOffers,
-    logout,
     fetchAuth,
 };

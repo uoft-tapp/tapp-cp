@@ -550,10 +550,6 @@ function updateSessionPay(session, pay) {
         );
 }
 
-function logout() {
-    postHelper('/logout', {});
-}
-
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -590,6 +586,5 @@ export {
     withdrawOffers,
     print,
     updateSessionPay,
-    logout,
     fetchAuth,
 };
