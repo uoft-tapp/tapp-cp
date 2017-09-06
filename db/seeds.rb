@@ -5,8 +5,6 @@
 #
 #   movies = Movie.create!([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create!(name: 'Luke', movie: movies.first)
-Department.create!(name: "Computer Science")
-
 Duty.create!(name: "Training")
 Duty.create!(name: "Additional Training (if required)")
 Duty.create!(name: "Preparation")

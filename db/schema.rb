@@ -87,22 +87,15 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.bigint "offer_id"
     t.bigint "template_id"
     t.bigint "instructor_id"
-    t.bigint "department_id"
     t.bigint "category_id"
+    t.string "department", default: "Computer Science"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_ddahs_on_category_id"
-    t.index ["department_id"], name: "index_ddahs_on_department_id"
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
     t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
     t.index ["offer_id"], name: "index_ddahs_on_offer_id"
     t.index ["template_id"], name: "index_ddahs_on_template_id"
-  end
-
-  create_table "departments", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "duties", force: :cascade do |t|
@@ -197,12 +190,11 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.boolean "optional"
     t.bigint "position_id"
     t.bigint "instructor_id"
-    t.bigint "department_id"
     t.bigint "category_id"
+    t.string "department", default: "Computer Science"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_templates_on_category_id"
-    t.index ["department_id"], name: "index_templates_on_department_id"
     t.index ["instructor_id"], name: "index_templates_on_instructor_id"
     t.index ["name", "instructor_id", "id"], name: "index_templates_on_name_and_instructor_id_and_id", unique: true
     t.index ["position_id"], name: "index_templates_on_position_id"
@@ -221,7 +213,6 @@ ActiveRecord::Schema.define(version: 20170907234300) do
   add_foreign_key "assignments", "applicants"
   add_foreign_key "assignments", "positions"
   add_foreign_key "ddahs", "categories"
-  add_foreign_key "ddahs", "departments"
   add_foreign_key "ddahs", "instructors"
   add_foreign_key "ddahs", "offers"
   add_foreign_key "ddahs", "templates"
@@ -229,7 +220,6 @@ ActiveRecord::Schema.define(version: 20170907234300) do
   add_foreign_key "preferences", "applications"
   add_foreign_key "preferences", "positions"
   add_foreign_key "templates", "categories"
-  add_foreign_key "templates", "departments"
   add_foreign_key "templates", "instructors"
   add_foreign_key "templates", "positions"
 end
