@@ -144,9 +144,9 @@ class ABC extends React.Component {
                         </Well>}
                     {selected.map((course, i) =>
                         <CoursePanel
-                            key={"course-panel-" + i}
+                            key={"course-panel-" + course}
                             panelStyle={styles[i]}
-                            course={selected[i]}
+                            course={course}
                             {...this.props}
                         />)}
                 </div>
