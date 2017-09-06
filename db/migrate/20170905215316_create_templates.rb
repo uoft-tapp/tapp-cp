@@ -5,7 +5,7 @@ class CreateTemplates < ActiveRecord::Migration[5.1]
       t.boolean :optional
       t.references :position, foreign_key: true
       t.references :instructor, foreign_key: true
-      t.references :category, foreign_key: true
+      t.string :tutorial_category, default: "Classroom TA"
       t.string :department, default: "Computer Science"
 
       t.timestamps
