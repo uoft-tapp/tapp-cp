@@ -109,7 +109,6 @@ class OffersController < ApplicationController
   end
 
   def get_contract_student
-    puts "hello"
     get_contract_pdf(params)
   end
 
