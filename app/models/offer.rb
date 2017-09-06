@@ -3,7 +3,6 @@ class Offer < ApplicationRecord
   belongs_to :applicant
   belongs_to :position
   include Model
-  include Mangler
 
   def get_deadline
     offer = self.json
@@ -19,7 +18,7 @@ class Offer < ApplicationRecord
     instructors = position.instructors
     session = Session.find(position[:session_id])
     if offer[:link]
-      offer[:link]= get_route(offer[:link])
+      offer[:link]= "#{ENV["domain"]}#{offer[:link]}"
     end
     data = {
       position: position[:position],

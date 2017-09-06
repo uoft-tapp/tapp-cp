@@ -403,10 +403,10 @@ RSpec.describe OffersController, type: :controller do
     end
   end
 
-  describe "GET pb/:mangled/pdf" do
-    context "when :mangled is valid" do
+  describe "GET pb/:offer_id/pdf" do
+    context "when :offer_id is valid" do
       it "returns status 200 a pdf" do
-        get :get_contract_mangled, params: {mangled: offer[:link]}
+        get :get_contract_student, params: {offer_id: offer[:id]}
         expect(response.status).to eq(200)
         expect(response.content_type).to eq("application/pdf")
         expect(response.header["Content-Disposition"]).to eq(
@@ -414,20 +414,20 @@ RSpec.describe OffersController, type: :controller do
       end
     end
 
-    context "when :mangled is invalid" do
+    context "when :offer_id is invalid" do
       it "returns status 404 and an error message" do
-        get :get_contract_mangled, params: {mangled: "poops"}
+        get :get_contract_student, params: {offer_id: "poops"}
         expect(response.status).to eq(404)
       end
     end
   end
 
-  describe "POST pb/:mangled/:status" do
+  describe "POST pb/:offer_id/:status" do
     context "when offer_id does exists" do
       context "when status is pending" do
         context "code = accept" do
           it "updates the offer status to Accepted" do
-            post :set_status_mangled, params: {mangled: sent_offer[:link], status: "accept"}
+            post :set_status_student, params: {offer_id: sent_offer[:id], status: "accept"}
             expect(response.status).to eq(200)
             body = {success: true, status: "accepted", message: "You've just accepted this offer."}
             expect(response.body).to eq(body.to_json)
@@ -436,7 +436,7 @@ RSpec.describe OffersController, type: :controller do
 
         context "code = reject" do
           it "updates the offer status to Rejected" do
-            post :set_status_mangled, params: {mangled: sent_offer[:link], status: "reject"}
+            post :set_status_student, params: {offer_id: sent_offer[:id], status: "reject"}
             expect(response.status).to eq(200)
             body = {success: true, status: "rejected", message: "You've just rejected this offer."}
             expect(response.body).to eq(body.to_json)
@@ -445,7 +445,7 @@ RSpec.describe OffersController, type: :controller do
 
         context "code = withdraw" do
           it "updates the offer status to Withdrawn" do
-            post :set_status_mangled, params: {mangled: sent_offer[:link], status: "withdraw"}
+            post :set_status_student, params: {offer_id: sent_offer[:id], status: "withdraw"}
             expect(response.status).to eq(404)
             body = {success: false, message: "Error: no permission to set such status"}
             expect(response.body).to eq(body.to_json)
@@ -456,7 +456,7 @@ RSpec.describe OffersController, type: :controller do
       context "when status is Unsent" do
         context "code = accept" do
           it "returns a status 404 with a message" do
-            post :set_status_mangled, params: {mangled: offer[:link], status: "accept"}
+            post :set_status_student, params: {offer_id: offer[:id], status: "accept"}
             expect(response.status).to eq(404)
             body = {success: false, message: "You cannot accept an unsent offer."}
             expect(response.body).to eq(body.to_json)
@@ -465,7 +465,7 @@ RSpec.describe OffersController, type: :controller do
 
         context "code = reject" do
           it "updates the offer status to Rejected" do
-            post :set_status_mangled, params: {mangled: offer[:link], status: "reject"}
+            post :set_status_student, params: {offer_id: offer[:id], status: "reject"}
             expect(response.status).to eq(404)
             body = {success: false, message: "You cannot reject an unsent offer."}
             expect(response.body).to eq(body.to_json)
@@ -474,7 +474,7 @@ RSpec.describe OffersController, type: :controller do
 
         context "code = withdraw" do
           it "updates the offer status to Withdrawn" do
-            post :set_status_mangled, params: {mangled: offer[:link], status: "withdraw"}
+            post :set_status_student, params: {offer_id: offer[:id], status: "withdraw"}
             expect(response.status).to eq(404)
             body = {success: false, message: "Error: no permission to set such status"}
             expect(response.body).to eq(body.to_json)
@@ -485,7 +485,7 @@ RSpec.describe OffersController, type: :controller do
       context "when status decided" do
         context "code = accept" do
           it "returns a status 404 with a message" do
-            post :set_status_mangled, params: {mangled: accepted_offer[:link], status: "accept"}
+            post :set_status_student, params: {offer_id: accepted_offer[:id], status: "accept"}
             expect(response.status).to eq(200)
             body = {success: true, status: "accepted", message: "You've just accepted this offer."}
             expect(response.body).to eq(body.to_json)
@@ -494,7 +494,7 @@ RSpec.describe OffersController, type: :controller do
 
         context "code = reject" do
           it "updates the offer status to Rejected" do
-            post :set_status_mangled, params: {mangled: accepted_offer[:link], status: "reject"}
+            post :set_status_student, params: {offer_id: accepted_offer[:id], status: "reject"}
             expect(response.status).to eq(200)
             body = {success: true, status: "rejected", message: "You've just rejected this offer."}
             expect(response.body).to eq(body.to_json)
@@ -503,7 +503,7 @@ RSpec.describe OffersController, type: :controller do
 
         context "code = withdraw" do
           it "updates the offer status to Withdrawn" do
-            post :set_status_mangled, params: {mangled: accepted_offer[:link], status: "withdraw"}
+            post :set_status_student, params: {offer_id: accepted_offer[:id], status: "withdraw"}
             expect(response.status).to eq(404)
             body = {success: false, message: "Error: no permission to set such status"}
             expect(response.body).to eq(body.to_json)

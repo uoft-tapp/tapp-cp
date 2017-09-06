@@ -71,7 +71,7 @@ module Authorizer
   end
 
   def utorid_of_applicant_corresponding_to_student_facing_route(params)
-    offer = Offer.find_by(link: params[:mangled])
+    offer = Offer.find(params[:offer_id])
     if offer
       offer = offer.format
       return offer[:applicant][:utorid]

@@ -1,10 +1,9 @@
 class OffersController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :set_domain
-  include Mangler
   include Authorizer
-  before_action :cp_access, except: [:get_contract_mangled, :set_status_mangled]
-  before_action :correct_applicant, only: [:get_contract_mangled, :set_status_mangled]
+  before_action :cp_access, except: [:get_contract_student, :set_status_student]
+  before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
 
   def index
     render json: get_all_offers
@@ -56,19 +55,8 @@ class OffersController < ApplicationController
     params[:offers].each do |id|
       offer = Offer.find(id)
         if ENV['RAILS_ENV'] != 'test'
-          '''
-            We create mangled, which is a hash of the data from get_utorid_position
-            the data from get_utorid_position is a json that can be reused
-            on the /pb/:mangled routes, where :mangled = mangled.
-            This is where we mangled our routes so that an attacker can\'t
-            see how to masquerade as another applicant.
-            get_route(mangled) creates the link that we send to the applicant,
-            so that they can see the view for making decision on whether or not
-            to accept an offer.
-          '''
-          mangled = crypt(get_utorid_position(offer.format), id)
-          offer.update_attributes!(link: mangled)
-          CpMailer.contract_email(offer.format, get_route(mangled)).deliver_now
+          offer.update_attributes!(link: "/pb/#{offer[:id]}")
+          CpMailer.contract_email(offer.format,"#{ENV["domain"]}#{offer[:link]}").deliver_now!
         end
         offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
     end
@@ -93,18 +81,7 @@ class OffersController < ApplicationController
       offer = Offer.find(id)
       offer.increment!(:nag_count, 1)
       if ENV['RAILS_ENV'] != 'test'
-        '''
-         We create mangled, which is a hash of the data from get_utorid_position
-         the data from get_utorid_position is a json that can be reused
-         on the /pb/:mangled routes, where :mangled = mangled.
-         This is where we mangled our routes so that an attacker can`t
-         see how to masquerade as another applicant.
-         get_route(mangled) creates the link that we send to the applicant,
-         so that they can see the view for making decision on whether or not
-         to accept an offer.
-        '''
-        mangled = offer[:link]
-        CpMailer.nag_email(offer.format, get_route(mangled)).deliver_now
+        CpMailer.nag_email(offer.format, "#{ENV["domain"]}#{offer[:link]}").deliver_now!
       end
     end
     render json: {message: "You've sent the nag emails."}
@@ -127,32 +104,17 @@ class OffersController < ApplicationController
     send_data generator.render, filename: "contracts.pdf", disposition: "inline"
   end
 
-  '''
-    Gets the applicant version of the contract on the admin side.
-  '''
   def get_contract
     get_contract_pdf(params)
   end
 
-  '''
-    Gets the applicant version of the contract through mangled route for the applicant
-    side.
-  '''
-  def get_contract_mangled
-    offer_id = get_offer_id(params[:mangled])
-    get_contract_pdf({offer_id: offer_id})
+  def get_contract_student
+    get_contract_pdf(params)
   end
 
-  '''
-    Sets the offer status as either `Accepted` or `Rejected`. An applicant
-    can`t set the offer into any other status. This action is for the applicant
-    and it uses a mangled route so that an attacker can`t easily make the decision
-    for the offers of other applicant.
-  '''
-  def set_status_mangled
-    offer_id = get_offer_id(params[:mangled])
+  def set_status_student
     if params[:status] == "accept" || params[:status]== "reject"
-      status_setter({offer_id: offer_id, status: params[:status]})
+      status_setter({offer_id: params[:offer_id], status: params[:status]})
     else
       render status: 404, json: {success: false, message: "Error: no permission to set such status"}
     end
@@ -167,6 +129,12 @@ class OffersController < ApplicationController
   end
 
   private
+  def get_contract_pdf(params)
+    offer = Offer.find(params[:offer_id])
+    generator = ContractGenerator.new([offer.format])
+    send_data generator.render, filename: "contract.pdf", disposition: "inline"
+  end
+
   def offer_params
     params.permit(:hr_status, :ddah_status)
   end
@@ -217,22 +185,6 @@ class OffersController < ApplicationController
     when "withdraw"
       return {name: "Withdrawn", action: "withdraw"}
     end
-  end
-
-  def get_utorid_position(offer)
-    {
-      utorid: offer[:applicant][:utorid],
-      position_id: offer[:position_id],
-    }
-  end
-
-  '''
-    Gets the applicant version of the contract.
-  '''
-  def get_contract_pdf(params)
-    offer = Offer.find(params[:offer_id])
-    generator = ContractGenerator.new([offer.format])
-    send_data generator.render, filename: "contract.pdf", disposition: "inline"
   end
 
   def set_domain
