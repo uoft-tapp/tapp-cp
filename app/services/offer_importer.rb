@@ -1,8 +1,8 @@
 class OfferImporter
 
-  def import_json(data)
+  def import_json(file)
     exceptions = []
-    data[:offers].each do |offer|
+    file[:offers].each do |offer|
       position = Position.find_by(position: offer["course_id"], round_id: offer["round_id"])
       applicant = Applicant.find_by(utorid: offer["utorid"])
       if position && applicant
@@ -14,7 +14,7 @@ class OfferImporter
         exceptions.push("Error: either Position #{offer["course_id"]} or Applicant #{offer["utorid"]} is invalid.")
       end
     end
-    if exceptions.length == data[:offers].length
+    if exceptions.length == file[:offers].length
       return {imported: false, errors: true, message: exceptions}
     elsif exceptions.length > 0
       return {imported: true, errors: true, message: exceptions}
