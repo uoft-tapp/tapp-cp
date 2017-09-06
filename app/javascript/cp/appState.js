@@ -169,10 +169,6 @@ class AppState {
         return filters.has(field) && filters.get(field).includes(category);
     }
 
-    logout() {
-        fetch.logout();
-    }
-
     // add a notification to the list of unread notifications
     notify(text) {
         let notifications = this.get('notifications');

@@ -342,10 +342,6 @@ class AppState {
         return this.get('assignmentForm.panels[' + index + '].expanded');
     }
 
-    logout() {
-        fetch.logout();
-    }
-
     // add a notification to the list of unread notifications
     notify(text) {
         this.add('nav.notifications', text);
