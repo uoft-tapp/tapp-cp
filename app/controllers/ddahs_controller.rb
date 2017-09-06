@@ -4,7 +4,11 @@ class DdahsController < ApplicationController
   before_action :cp_access
 
   def index
-    render json: Ddah.all.to_json
+    if params[:utorid]
+      
+    else
+      render json: Ddah.all.to_json
+    end
   end
 
   def show

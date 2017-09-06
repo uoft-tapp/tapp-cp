@@ -2,8 +2,7 @@ class CreateDdahs < ActiveRecord::Migration[5.1]
   def change
     create_table :ddahs do |t|
       t.boolean :optional
-      t.references :applicant, foreign_key: true
-      t.references :position, foreign_key: true
+      t.references :offer, foreign_key: true
       t.references :template, foreign_key: true
       t.references :instructor, foreign_key: true
       t.references :department, foreign_key: true
@@ -11,6 +10,6 @@ class CreateDdahs < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    add_index(:ddahs, [:applicant_id, :position_id, :id], unique: true)
+    add_index(:ddahs, [:offer_id, :id], unique: true)
   end
 end

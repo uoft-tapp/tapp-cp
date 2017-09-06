@@ -80,20 +80,18 @@ ActiveRecord::Schema.define(version: 20170907234300) do
 
   create_table "ddahs", force: :cascade do |t|
     t.boolean "optional"
-    t.bigint "applicant_id"
-    t.bigint "position_id"
+    t.bigint "offer_id"
     t.bigint "template_id"
     t.bigint "instructor_id"
     t.bigint "department_id"
     t.bigint "category_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["applicant_id", "position_id", "id"], name: "index_ddahs_on_applicant_id_and_position_id_and_id", unique: true
-    t.index ["applicant_id"], name: "index_ddahs_on_applicant_id"
     t.index ["category_id"], name: "index_ddahs_on_category_id"
     t.index ["department_id"], name: "index_ddahs_on_department_id"
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
-    t.index ["position_id"], name: "index_ddahs_on_position_id"
+    t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
+    t.index ["offer_id"], name: "index_ddahs_on_offer_id"
     t.index ["template_id"], name: "index_ddahs_on_template_id"
   end
 
@@ -216,11 +214,10 @@ ActiveRecord::Schema.define(version: 20170907234300) do
   add_foreign_key "applications", "applicants"
   add_foreign_key "assignments", "applicants"
   add_foreign_key "assignments", "positions"
-  add_foreign_key "ddahs", "applicants"
   add_foreign_key "ddahs", "categories"
   add_foreign_key "ddahs", "departments"
   add_foreign_key "ddahs", "instructors"
-  add_foreign_key "ddahs", "positions"
+  add_foreign_key "ddahs", "offers"
   add_foreign_key "ddahs", "templates"
   add_foreign_key "positions", "sessions"
   add_foreign_key "preferences", "applications"
