@@ -17,11 +17,13 @@ Rails.application.routes.draw do
   resources :applications, only: [:index, :show]
   resources :positions
   resources :instructors
+
+  get 'instructors/utorid/:utorid' => "instructors#show_by_utorid"
   scope 'instructors/:utorid' do
     resources :offers, only: [:index, :show]
     resources :positions, only: [:index, :show]
-    resources :ddahs
-    resources :templates
+    resources :ddahs, only: [:index, :show]
+    resources :templates, only: [:index, :show]
   end
 
   # CP resources

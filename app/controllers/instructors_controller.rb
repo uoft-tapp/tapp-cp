@@ -13,4 +13,9 @@ class InstructorsController < ApplicationController
     render json: instructor.to_json
   end
 
+  def show_by_utorid
+    instructor = Instructor.find_by(utorid: params[:utorid])
+    render json: instructor.to_json
+  end
+
 end

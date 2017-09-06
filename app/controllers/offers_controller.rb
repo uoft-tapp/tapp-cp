@@ -6,7 +6,18 @@ class OffersController < ApplicationController
   before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
 
   def index
-    render json: get_all_offers
+    if params[:utorid]
+      offers = []
+      Offer.all.each do |offer|
+        position = Position.find(offer[:position_id])
+        if get_utorids(position).include?(params[:utorid])
+          offers.push(offer.format)
+        end
+      end
+      render json: offers
+    else
+      render json: get_all_offers
+    end
   end
 
   def show
@@ -213,6 +224,14 @@ class OffersController < ApplicationController
     if invalid.length > 0
       render status: 404, json: {invalid_offers: invalid}
     end
+  end
+
+  def get_utorids(position)
+    utorids = []
+    position.instructors.each do |instructor|
+      utorids.push(instructor[:utorid])
+    end
+    return utorids
   end
 
 end

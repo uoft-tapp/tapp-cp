@@ -4,8 +4,18 @@ class PositionsController < ApplicationController
   before_action :tapp_admin
 
   def index
-    @positions = Position.all.includes(:instructors)
-    render json: @positions.to_json(include: [:instructors])
+    if params[:utorid]
+      positions = []
+      Position.all.includes(:instructors).each do |position|
+        if get_utorids(position).include?(params[:utorid])
+          positions.push(position)
+        end
+      end
+      render json: positions.to_json(include: [:instructors])
+    else
+      positions = Position.all.includes(:instructors)
+      render json: positions.to_json(include: [:instructors])
+    end
   end
 
   def show
@@ -36,6 +46,14 @@ class PositionsController < ApplicationController
         position.update_attributes!(attribute => date)
       end
     end
+  end
+
+  def get_utorids(position)
+    utorids = []
+    position.instructors.each do |instructor|
+      utorids.push(instructor[:utorid])
+    end
+    return utorids
   end
 
 end
