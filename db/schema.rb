@@ -20,9 +20,13 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.string "type"
     t.integer "minutes"
     t.bigint "duty_id"
+    t.bigint "ddah_id"
+    t.bigint "template_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["ddah_id"], name: "index_allocations_on_ddah_id"
     t.index ["duty_id"], name: "index_allocations_on_duty_id"
+    t.index ["template_id"], name: "index_allocations_on_template_id"
   end
 
   create_table "applicants", force: :cascade do |t|
@@ -210,7 +214,9 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "allocations", "ddahs"
   add_foreign_key "allocations", "duties"
+  add_foreign_key "allocations", "templates"
   add_foreign_key "applications", "applicants"
   add_foreign_key "assignments", "applicants"
   add_foreign_key "assignments", "positions"

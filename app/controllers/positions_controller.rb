@@ -1,17 +1,12 @@
 class PositionsController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
+  include Model
   before_action :tapp_admin
 
   def index
     if params[:utorid]
-      positions = []
-      Position.all.includes(:instructors).each do |position|
-        if get_utorids(position).include?(params[:utorid])
-          positions.push(position)
-        end
-      end
-      render json: positions.to_json(include: [:instructors])
+      render json: get_all_positions_for_utorid(params[:utorid]).to_json(include: [:instructors])
     else
       positions = Position.all.includes(:instructors)
       render json: positions.to_json(include: [:instructors])
@@ -19,8 +14,18 @@ class PositionsController < ApplicationController
   end
 
   def show
-    position = Position.includes(:instructors).find(params[:id])
-    render json: position.to_json(include: [:instructors])
+    if params[:utorid]
+      positions = id_array(get_all_positions_for_utorid(params[:utorid]))
+      if positions.include?(params[:id])
+        position = Position.includes(:instructors).find(params[:id])
+        render json: position.to_json(include: [:instructors])
+      else
+        render status: 404, json: {status: 404}
+      end
+    else
+      position = Position.includes(:instructors).find(params[:id])
+      render json: position.to_json(include: [:instructors])
+    end
   end
 
   def update
@@ -55,5 +60,18 @@ class PositionsController < ApplicationController
     end
     return utorids
   end
+
+  def get_all_positions_for_utorid(utorid)
+    positions = []
+    Position.all.includes(:instructors).each do |position|
+      position.instructors.each do |instructor|
+        if instructor[:utorid] == utorid
+          offers.push(offer)
+        end
+      end
+    end
+    return positions
+  end
+
 
 end

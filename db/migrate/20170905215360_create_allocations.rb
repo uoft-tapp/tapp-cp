@@ -5,6 +5,8 @@ class CreateAllocations < ActiveRecord::Migration[5.1]
       t.string :type
       t.integer :minutes
       t.references :duty, foreign_key: true
+      t.references :ddah, foreign_key: true
+      t.references :template, foreign_key: true
 
       t.timestamps
     end

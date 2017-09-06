@@ -7,22 +7,25 @@ class OffersController < ApplicationController
 
   def index
     if params[:utorid]
-      offers = []
-      Offer.all.each do |offer|
-        position = Position.find(offer[:position_id])
-        if get_utorids(position).include?(params[:utorid])
-          offers.push(offer.format)
-        end
-      end
-      render json: offers
+      render json: get_all_offers_for_utorid(params[:utorid])
     else
       render json: get_all_offers
     end
   end
 
   def show
-    offer = Offer.find(params[:id])
-    render json: offer.format
+    if params[:utorid]
+      offers = id_array(get_all_offers_for_utorid(params[:utorid]))
+      if offers.include?(params[:id])
+        offer = Offer.find(params[:id])
+        render json: offer.format
+      else
+        render status: 404, json: {status: 404}
+      end
+    else
+      offer = Offer.find(params[:id])
+      render json: offer.format
+    end
   end
 
   # can update HR status for offers that are accepted or pending
@@ -226,12 +229,18 @@ class OffersController < ApplicationController
     end
   end
 
-  def get_utorids(position)
-    utorids = []
-    position.instructors.each do |instructor|
-      utorids.push(instructor[:utorid])
+  def get_all_offers_for_utorid(utorid)
+    offers = []
+    Offer.all.each do |offer|
+      position = Position.find(offer[:position_id])
+      position.instructors.each do |instructor|
+        if instructor[:utorid] == utorid
+          offers.push(offer)
+        end
+      end
     end
-    return utorids
+    return offers
   end
+
 
 end
