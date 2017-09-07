@@ -25,15 +25,8 @@ Rails.application.routes.draw do
     resources :ddahs, only: [:index, :show, :create]
     resources :templates, only: [:index, :show, :create]
   end
-  scope 'ddahs/:ddah_id' do
-    resources :allocations, only: [:index, :show, :create]
-  end
-  scope 'templates/:template_id' do
-    resources :allocations, only: [:index, :show, :create]
-  end
   resources :ddahs, only: [:update, :destroy]
   resources :templates, only: [:update, :destroy]
-  resources :allocations, only: [:update, :destroy]
 
   # CP resources
   resources :offers do
