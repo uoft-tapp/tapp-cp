@@ -40,12 +40,14 @@ class AppController < ApplicationController
 
   def logout
     @url = params[:current_page]
-    session[:logged_in]= false
+    #@_request.reset_session
+    #reset_session
+    session[:logged_out] = false
     render file: 'public/logout.html'
   end
 
   def reenter_session
-    session[:logged_in]= true
+    session[:logged_in] = true
   end
 
 end

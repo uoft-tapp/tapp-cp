@@ -23,10 +23,11 @@ module Authorizer
   '''
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
+      utorid = get_utorid
       if !session[:logged_in]
         render file: 'public/logout.html'
       else
-        if get_utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
+        if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
           render status: 403, file: 'public/403.html'
         end
       end
@@ -86,9 +87,13 @@ module Authorizer
   '''
   def get_utorid
     if request.env['HTTP_X_FORWARDED_USER']
-      if !session[:utorid]
-        session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
+      session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
+      if session[:logged_in].nil?
+        Rails.logger.info("logged_in is nil")
+        Rails.logger.info("logged_in value is #{session[:logged_in]}")
         session[:logged_in]= true
+      else
+        Rails.logger.info("logged_in is already assigned")
       end
       return session[:utorid]
     else
