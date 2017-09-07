@@ -132,7 +132,11 @@ class CourseForm extends React.Component {
                                 </p>
                                 <Form
                                     type="date"
-                                    defaultVal={this.props.course.startDate.split('T')[0]}
+                                    defaultVal={
+                                        this.props.course.startDate
+                                            ? this.props.course.startDate.split('T')[0]
+                                            : undefined
+                                    }
                                     update={val => {
                                         if (val != this.props.course.startDate) {
                                             this.props.updateCourse(
@@ -148,7 +152,11 @@ class CourseForm extends React.Component {
                                 </p>
                                 <Form
                                     type="date"
-                                    defaultVal={this.props.course.endDate.split('T')[0]}
+                                    defaultVal={
+                                        this.props.course.endDate
+                                            ? this.props.course.endDate.split('T')[0]
+                                            : undefined
+                                    }
                                     update={val => {
                                         if (val != this.props.course.endDate) {
                                             this.props.updateCourse(
