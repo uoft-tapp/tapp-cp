@@ -90,6 +90,7 @@ module Authorizer
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
       if session[:logged_in].nil?
         Rails.logger.info("logged_in is nil")
+        Rails.logger.info("logged_in value is #{session[:logged_in]}")
         session[:logged_in]= true
       else
         Rails.logger.info("logged_in is already assigned")
