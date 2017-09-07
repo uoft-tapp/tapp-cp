@@ -27,6 +27,15 @@ class TemplatesController < ApplicationController
     end
   end
 
+  def create
+    position = Position.find(params[:position_id])
+    instructor = Instructor.find_by!(params[:utorid])
+    position.templates.create!(
+      name: params[:name],
+      instructor_id: instructor[:id],
+    )
+  end
+
   def destroy
     template = Template.find(params[:id])
     template.allocations.each do |allocation|

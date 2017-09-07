@@ -27,6 +27,21 @@ class DdahsController < ApplicationController
     end
   end
 
+  def create
+    offer = Offer.find(params[:offer_id])
+    instructor = Instructor.find_by!(params[:utorid])
+    if params[:use_template]
+      offer.ddahs.create!(
+        template_id: params[:template_id],
+      )
+    else
+      offer.ddahs.create!(
+        instructor_id: instructor[:id],
+        optional: true,
+      )
+    end
+  end
+
   def destroy
     ddah = Ddah.find(params[:id])
     ddah.allocations.each do |allocation|

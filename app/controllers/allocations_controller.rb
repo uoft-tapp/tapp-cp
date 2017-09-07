@@ -37,6 +37,26 @@ class AllocationsController < ApplicationController
     end
   end
 
+  def create
+    if params[:template_id]
+      template = Template.find(params[:template_id])
+      template.allocations.create!(
+        num_unit: params[:num_unit],
+        type: params[:type],
+        minutes: params[:minutes],
+        duty_id: params[:duty_id],
+      )
+    elsif params[:ddah_id]
+      ddah = Ddah.find(params[:ddah_id])
+      ddah.allocations.create!(
+        num_unit: params[:num_unit],
+        type: params[:type],
+        minutes: params[:minutes],
+        duty_id: params[:duty_id],
+      )
+    end
+  end
+
   def destroy
     allocation = Allocation.find(params[:id])
     allocation.destroy!
