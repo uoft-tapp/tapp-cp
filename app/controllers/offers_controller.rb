@@ -42,7 +42,7 @@ class OffersController < ApplicationController
     invalid = []
     params[:contracts].each do |offer_id|
       offer = Offer.find(offer_id)
-      if offer[:send_date]
+      if offer[:status] != "Unsent" && offer[:status] != "Pending"
         invalid.push(offer[:id])
       end
     end
