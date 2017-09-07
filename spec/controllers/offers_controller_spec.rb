@@ -136,10 +136,10 @@ RSpec.describe OffersController, type: :controller do
         end
       end
       context "when not all offers are valid" do
-        it "returns a status 400 and a json containing invalid offer_id's" do
-          post :can_send_contract, params: {contracts: [offer[:id], sent_offer[:id]]}
+        it "returns a status 404 and a json containing invalid offer_id's" do
+          post :can_send_contract, params: {contracts: [offer[:id], accepted_offer[:id]]}
           expect(response.status).to eq(404)
-          json = {invalid_offers: [sent_offer[:id]]}.to_json
+          json = {invalid_offers: [accepted_offer[:id]]}.to_json
           expect(response.body).to eq(json)
         end
       end
@@ -253,9 +253,9 @@ RSpec.describe OffersController, type: :controller do
           context "code = withdraw" do
             it "updates the offer status to Withdrawn" do
               post :set_status, params: {offer_id: offer[:id], status: "withdraw"}
-              expect(response.status).to eq(404)
-              body = {success: false, message: "You cannot withdraw an unsent offer."}
-              expect(response.body).to eq(body.to_json)
+              expect(response.status).to eq(200)
+              offer.reload
+              expect(offer[:status]).to eq("Withdrawn")
             end
           end
         end
