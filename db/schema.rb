@@ -186,7 +186,7 @@ ActiveRecord::Schema.define(version: 20170907234300) do
 
   create_table "templates", force: :cascade do |t|
     t.string "name", null: false
-    t.boolean "optional"
+    t.boolean "optional", default: true
     t.bigint "position_id"
     t.bigint "instructor_id"
     t.string "tutorial_category", default: "Classroom TA"
