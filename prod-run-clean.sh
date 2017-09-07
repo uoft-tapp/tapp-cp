@@ -7,6 +7,10 @@ die(){
 
 # start up tapp for production 
 
+echo 'have you pulled from master appropriately?'
+git status
+
+echo
 echo 'have you shut down containers already with docker down?'
 echo 'examine running containers, if any in table below'
 docker ps
@@ -26,22 +30,16 @@ read -p 'enter to cp prod.env.devfault .env :' JUNK
 cp prod.env.default .env
 )
 
-read -p 'enter to `docker rm -f` your containers: ' JUNK
+read -p 'enter to `docker-compose build`  ' JUNK
 
 (set -x
-docker-compose rm -f  || die docker-compose rm -f failed
+docker-compose build || die docker-compose build  failed
 )
 
-read -p 'enter to `docker-compose build --force-rm`  ' JUNK
+read -p 'enter to `docker-compose up -d tapp containers: ' JUNK
 
 (set -x
-docker-compose build --force-rm || die docker-compose build  --force-rm failed
-)
-
-read -p 'enter to `docker-compose up tapp containers: (will want -d in production) ' JUNK
-
-(set -x
-docker-compose up -d  || die docker-compose up failed
+docker-compose up -d  || die docker-compose up -d failed
 )
 
 #there is probably a race condition here. migrate can't work until container is really up.
@@ -61,7 +59,7 @@ read -p 'enter to `migrate postgres db: ' JUNK
 
 
 (set -x
-  docker-compose \
-   run rails-app rake db:migrate 
-)|| die "rake db:migrate failed"
+  docker-compose  run rails-app rake db:migrate  || die "rake db:migrate failed"
+)
 
+echo to see the log: docker-compose logs --follow
