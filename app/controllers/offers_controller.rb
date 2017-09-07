@@ -160,11 +160,11 @@ class OffersController < ApplicationController
   def status_setter(params)
     status = get_status(params)
     offer = Offer.find(params[:offer_id])
-    if offer[:status] == "Unsent"
-      render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
-    else
+    if status[:action] == "withdraw" || offer[:status] != "Unsent"
       update_status(offer, status)
       render json: {success: true, status: status[:name].downcase, message: "You've just #{status[:name].downcase} this offer."}
+    else
+      render status: 404, json: {success: false, message: "You cannot #{status[:action]} an unsent offer."}
     end
   end
 
