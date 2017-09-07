@@ -1,0 +1,12 @@
+{
+    "offers": [
+    {
+        "course_id": "CSC300TEST",
+        "round_id": 110,
+        "utorid": "zaleskim",
+        "hours": 60,
+        "session": "Winter",
+        "year": 2017
+    }
+	]
+}
