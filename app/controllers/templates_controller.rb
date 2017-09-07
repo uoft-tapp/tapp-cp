@@ -1,5 +1,6 @@
 class TemplatesController < ApplicationController
   protect_from_forgery with: :null_session
+  include DdahUpdater
   include Authorizer
   include Model
   before_action :cp_access
@@ -47,12 +48,7 @@ class TemplatesController < ApplicationController
   def update
     template = Template.find(params[:id])
     template.update_attributes!(template_params)
-    if params[:categories]
-      template.category_ids = params[:categories]
-    end
-    if params[:trainings]
-      template.training_ids = params[:trainings]
-    end
+    update_form(template, param)
   end
 
   private

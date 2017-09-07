@@ -1,5 +1,6 @@
 class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
+  include DdahUpdater
   include Authorizer
   include Model
   before_action :cp_access
@@ -53,12 +54,7 @@ class DdahsController < ApplicationController
   def update
     ddah = Ddah.find(params[:id])
     ddah.update_attributes!(ddah_params)
-    if params[:categories]
-      ddah.category_ids = params[:categories]
-    end
-    if params[:trainings]
-      ddah.training_ids = params[:trainings]
-    end
+    update_form(ddah, param)
   end
 
   private
