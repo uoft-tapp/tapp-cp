@@ -14,12 +14,29 @@ class OffersController < ApplicationController
     render json: offer.format
   end
 
+  # can update HR status for offers that are accepted or pending
   def can_hr_update
-    offers_accepted(params[:offers])
+    check_offers_status(params[:offers], ["Accepted", "Pending"])
   end
 
+  # can update DDAH status for offers that are accepted or pending
   def can_ddah_update
-    offers_accepted(params[:offers])
+    check_offers_status(params[:offers], ["Accepted", "Pending"])
+  end
+
+  # can send contracts for offers that are unsent or pending
+  def can_send_contract
+    check_offers_status(params[:contracts], ["Unsent", "Pending"])
+  end
+
+  # can nag for offers that are pending
+  def can_nag
+    check_offers_status(params[:contracts], ["Pending"])
+  end
+
+  # can print contracts for offers that are pending, accepted, or rejected
+  def can_print
+    check_offers_status(params[:contracts], ["Pending", "Accepted", "Rejected"])
   end
 
   def update
@@ -38,19 +55,6 @@ class OffersController < ApplicationController
     end
   end
 
-  def can_send_contract
-    invalid = []
-    params[:contracts].each do |offer_id|
-      offer = Offer.find(offer_id)
-      if offer[:status] != "Unsent" && offer[:status] != "Pending"
-        invalid.push(offer[:id])
-      end
-    end
-    if invalid.length > 0
-      render status: 404, json: {invalid_offers: invalid}
-    end
-  end
-
   def send_contracts
     params[:offers].each do |id|
       offer = Offer.find(id)
@@ -63,19 +67,6 @@ class OffersController < ApplicationController
     render status: 200, json: {message: "You've successfully sent out all the contracts."}
   end
 
-  def can_nag
-    invalid = []
-    params[:contracts].each do |offer_id|
-      offer = Offer.find(offer_id)
-      if offer[:status] != "Pending"
-        invalid.push(offer[:id])
-      end
-    end
-    if invalid.length > 0
-      render status: 404, json: {invalid_offers: invalid}
-    end
-  end
-
   def batch_email_nags
     params[:contracts].each do |id|
       offer = Offer.find(id)
@@ -85,10 +76,6 @@ class OffersController < ApplicationController
       end
     end
     render json: {message: "You've sent the nag emails."}
-  end
-
-  def can_print
-    offers_accepted(params[:contracts])
   end
 
   def combine_contracts_print
@@ -191,11 +178,13 @@ class OffersController < ApplicationController
     ENV["domain"] = request.base_url
   end
 
-  def offers_accepted(offers)
+  # check that all offers have an expected status
+  # expects an array of status(es)
+  def check_offers_status(offers, status)
     invalid = []
     offers.each do |offer_id|
       offer = Offer.find(offer_id)
-      if offer[:status] != "Accepted"
+      if !(status.include? offer[:status])
         invalid.push(offer[:id])
       end
     end

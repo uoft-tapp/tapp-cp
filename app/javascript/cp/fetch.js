@@ -234,7 +234,7 @@ function sendContracts(offers) {
                 return resp.json().then(res => {
                     res.invalid_offers.forEach(offer => {
                         appState.alert(
-                            '<b>Error</b>: Cannot send contract to' +
+                            '<b>Error</b>: Cannot send contract to ' +
                                 offersList.getIn([offer.toString(), 'lastName']) +
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
