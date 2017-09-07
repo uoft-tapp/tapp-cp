@@ -156,19 +156,60 @@ footer div p {
     margin-top: 5px;
 }
 
-#ddah-grid input {
-    width: 100%;
-    border: 0;
+#instr-grid table {
+    width: 900px;
 }
 
-#ddah-grid thead {
+#instr-grid #worksheet-table th:first-child, /* first column: # of units */
+#instr-grid #worksheet-table th:nth-child(4), /* fourth column: time/task */
+#instr-grid #worksheet-table th:nth-child(5) { /* fifth column: total time */
+    width: 100px;
+}
+
+/* third column: type of unit */
+#instr-grid #worksheet-table th:nth-child(3) {
+    width: 350px;
+}
+
+/* second column: total time */
+#instr-grid #summary-table th:nth-child(2) {
+    width: 100px;
+}
+
+#instr-grid table th,
+#instr-grid table td {
+    vertical-align: middle;
+}
+
+#instr-grid #worksheet-table th,
+#instr-grid #worksheet-table td {
+    text-align: center;
+}
+
+#instr-grid #summary-table th,
+#instr-grid #summary-table td:nth-child(2) {
+    text-align: center;
+}
+
+#instr-grid #summary-table td:first-child {
+    text-align: left;
+}
+
+#instr-grid input, #instr-grid select {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: none;
+}
+
+#instr-grid thead {
     background-color: #e7e7e7;
 }
 
-#ddah-grid tr:last-child {
+#instr-grid tr:last-child {
     border-top: 2px solid #ddd;
 }
 
-#ddah-grid td:last-child {
+#instr-grid #worksheet-table td:last-child {
     background-color: #f9f9f9;
 }

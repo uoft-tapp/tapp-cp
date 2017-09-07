@@ -20,9 +20,12 @@ const initialState = {
 
     selectedSession: '',
 
+    ddah: [{ units: null, duty: null, type: null, time: null }],
+
     /** DB data **/
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
+    duties: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -84,6 +87,14 @@ class AppState {
      ** view state getters and setters **
      ************************************/
 
+    // add a row to the ddah form
+    addAllocation() {
+        this.set(
+            'ddah',
+            this.get('ddah').push(fromJS({ units: null, duty: null, type: null, time: null }))
+        );
+    }
+
     // apply a sort to the offers table
     // note that we do not allow multiple sorts on the same field (incl. in different directions)
     addSort(field) {
@@ -140,6 +151,25 @@ class AppState {
 
     getCurrentUserRoles() {
         return this.get('roles');
+    }
+
+    getDdah() {
+        return this.get('ddah');
+    }
+
+    // returns an array of JS objects { name, total } representing the total
+    getDutiesSummary() {
+        let summary = [];
+
+        this.getDutiesList().forEach((duty, i) => {
+            summary[i] = { name: duty, total: 0 };
+        });
+
+        this.get('ddah').forEach(allocation => {
+            summary[allocation.duty] += allocation.time / 60;
+        });
+
+        return summary;
     }
 
     getFilters() {
@@ -237,19 +267,13 @@ class AppState {
         }
     }
 
+    updateDdah(allocation, key, val) {
+        this.set('ddah[' + allocation + '].' + key, val);
+    }
+
     /******************************
      ** data getters and setters **
      ******************************/
-
-    // check if any data is being fetched
-    anyFetching() {
-        return [this.get('offers.fetching'), this.get('sessions.fetching')].some(val => val > 0);
-    }
-
-    // check if any data has not yet been fetched
-    anyNull() {
-        return [this.get('offers.list'), this.get('sessions.list')].some(val => val == null);
-    }
 
     clearHrStatus(offers) {
         if (offers.length == 0) {
@@ -325,6 +349,11 @@ class AppState {
         }
     }
 
+    // check if duties are being fetched
+    fetchingDuties() {
+        return this.get('duties.fetching') > 0;
+    }
+
     // check if offers are being fetched
     fetchingOffers() {
         return this.get('offers.fetching') > 0;
@@ -333,6 +362,20 @@ class AppState {
     // check if sessions are being fetched
     fetchingSessions() {
         return this.get('sessions.fetching') > 0;
+    }
+
+    // get a sorted list of the position names in the current offers list as a JS array
+    getCourseCodes() {
+        let offers = this.getOffersList();
+
+        if (offers) {
+            return offers.map(offer => offer.get('course')).flip().keySeq().toJS();
+        }
+        return [];
+    }
+
+    getDutiesList() {
+        return this.get('duties.list');
     }
 
     getOffersList() {
@@ -363,6 +406,10 @@ class AppState {
 
     importing() {
         return this.get('importing') > 0;
+    }
+
+    isDutiesListNull() {
+        return this.get('duties.list') == null;
     }
 
     isOffersListNull() {
@@ -425,6 +472,24 @@ class AppState {
         }
 
         fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
+    }
+
+    setFetchingDutiesList(fetching, success) {
+        let init = this.get('duties.fetching'),
+            notifications = this.get('notifications');
+        if (fetching) {
+            this.set({
+                'duties.fetching': init + 1,
+                notifications: notifications.push('<i>Fetching duties...</i>'),
+            });
+        } else if (success) {
+            this.set({
+                'duties.fetching': init - 1,
+                notifications: notifications.push('Successfully fetched duties.'),
+            });
+        } else {
+            this.set('duties.fetching', init - 1);
+        }
     }
 
     setFetchingOffersList(fetching, success) {
@@ -501,6 +566,10 @@ class AppState {
         }
 
         fetch.setOfferAccepted(offers[0]);
+    }
+
+    setDutiesList(list) {
+        this.set('duties.list', list);
     }
 
     setOffersList(list) {

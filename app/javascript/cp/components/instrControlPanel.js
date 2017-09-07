@@ -5,17 +5,16 @@ import { DdahForm } from './ddahForm.js';
 
 class InstrControlPanel extends React.Component {
     render() {
-        let nullCheck = false;
+        let nullCheck = this.props.appState.isDutiesListNull();
         if (nullCheck) {
             return <div id="loader" />;
         }
 
-        let fetchCheck = false;
+        let fetchCheck = this.props.appState.fetchingDuties();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         return (
-            <Grid fluid id="ddah-grid">
-                <h4>Allocation of Hours Worksheet</h4>
+            <Grid fluid id="instr-grid">
                 <DdahForm {...this.props} />
             </Grid>
         );

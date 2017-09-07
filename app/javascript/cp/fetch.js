@@ -68,12 +68,27 @@ const getOffers = () =>
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchOffersSuccess);
 
+const getDuties = () =>
+    getHelper('/duties')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchDutiesSuccess);
+
 const getSessions = () =>
     getHelper('/sessions')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchSessionsSuccess);
 
 /* Success callbacks for resource GETters */
+
+function onFetchDutiesSuccess(resp) {
+    let duties = {};
+
+    resp.forEach(duty => {
+        duties[duty.id] = duty.name;
+    });
+
+    return duties;
+}
 
 function onFetchOffersSuccess(resp) {
     let offers = {};
@@ -140,6 +155,15 @@ function adminFetchAll() {
 }
 
 function instructorFetchAll() {
+    appState.setFetchingDutiesList(true);
+
+    // when duties are successfully fetched, update the duties list; set fetching flag to false either way
+    getDuties()
+        .then(duties => {
+            appState.setDutiesList(fromJS(duties));
+            appState.setFetchingDutiesList(false, true);
+        })
+        .catch(() => appState.setFetchingDutiesList(false));
 }
 
 // import locked assignments from TAPP
@@ -669,7 +693,7 @@ function fetchAuth() {
             if (resp.development) {
                 appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
                 // default to cp_admin as selected user role
-                appState.selectUserRole('cp_admin');
+                appState.selectUserRole('instructor');
                 appState.setCurrentUserName('DEV');
             } else {
                 // filter out roles not relevant to this application
