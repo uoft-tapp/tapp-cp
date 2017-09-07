@@ -11,10 +11,12 @@ RUN apk --update --upgrade add curl-dev build-base openssh \
 	nodejs
 
 # Add Yarn to the mix
+# hideous hack by matz. methinks yarn lastest tarball changed.
+# previously would untar to a directory called yarn, now yarn-v1.0.1
 RUN apk add --no-cache curl && \
   mkdir -p /opt && \
   curl -sL https://yarnpkg.com/latest.tar.gz | tar xz -C /opt && \
-  mv /opt/dist /opt/yarn && \
+  mv /opt/yarn-v1.0.1 /opt/yarn && \
   ln -s /opt/yarn/bin/yarn /usr/local/bin && \
   apk del --purge curl
 
