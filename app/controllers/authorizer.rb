@@ -86,12 +86,15 @@ module Authorizer
   '''
   def get_utorid
     if request.env['HTTP_X_FORWARDED_USER']
+      Rails.logger.info("forwarded user")
       if !session[:utorid]
+        Rails.logger.info("no utorid session")
         session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
         session[:logged_in]= true
       end
       return session[:utorid]
     else
+      Rails.logger.info("get from session")
       return session[:utorid]
     end
   end
