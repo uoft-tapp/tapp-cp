@@ -140,7 +140,27 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'Status',
-                data: p => p.offer.get('status'),
+                data: p => (
+                    <span>
+                        {p.offer.get('status')}&nbsp;{p.offer.get('note') ? (
+                            <i
+                                className="fa fa-question-circle"
+                                style={{ fontSize: '16px', cursor: 'pointer' }}
+                                title="Reason"
+                                onClick={() => null}
+                            />
+                        ) : (
+                            p.offer.get('status') == 'Withdrawn' && (
+                                <i
+                                    className="fa fa-question"
+                                    style={{ fontSize: '16px', cursor: 'pointer' }}
+                                    title="Add reason"
+                                    onClick={() => null}
+                                />
+                            )
+                        )}
+                    </span>
+                ),
                 sortData: p => p.get('status'),
 
                 filterLabel: 'Status',

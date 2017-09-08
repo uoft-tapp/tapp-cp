@@ -85,6 +85,7 @@ ActiveRecord::Schema.define(version: 20170829204432) do
     t.integer "year"
     t.string "session"
     t.string "status", default: "Unsent"
+    t.text "commentary"
     t.string "hr_status"
     t.string "ddah_status"
     t.text "link"
