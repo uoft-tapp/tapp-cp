@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170907234300) do
+ActiveRecord::Schema.define(version: 20170908003903) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -127,7 +127,7 @@ ActiveRecord::Schema.define(version: 20170907234300) do
     t.string "session"
     t.string "status", default: "Unsent"
     t.string "hr_status"
-    t.string "ddah_status"
+    t.string "ddah_status", default: "None"
     t.text "link"
     t.datetime "print_time"
     t.datetime "send_date"
