@@ -18,16 +18,6 @@ Rails.application.routes.draw do
   resources :positions
   resources :instructors
 
-  get 'instructors/utorid/:utorid' => "instructors#show_by_utorid"
-  scope 'instructors/:utorid' do
-    resources :offers, only: [:index, :show]
-    resources :positions, only: [:index, :show]
-    resources :ddahs, only: [:index, :show, :create]
-    resources :templates, only: [:index, :show, :create]
-  end
-  resources :ddahs, only: [:update, :destroy]
-  resources :templates, only: [:update, :destroy]
-
   # CP resources
   resources :offers do
     post "decision/:status" => "offers#set_status"
@@ -40,6 +30,17 @@ Rails.application.routes.draw do
 
   # shared resources
   resources :sessions, only: [:index, :show, :update]
+
+  # DDAH routes
+  get 'instructors/utorid/:utorid' => "instructors#show_by_utorid"
+  scope 'instructors/:utorid' do
+    resources :offers, only: [:index, :show]
+    resources :positions, only: [:index, :show]
+    resources :ddahs, only: [:index, :show, :create]
+    resources :templates, only: [:index, :show, :create]
+  end
+  resources :ddahs, only: [:update, :destroy]
+  resources :templates, only: [:update, :destroy]
 
   # TAPP routes
   get "/export/chass/:round_id", to: "export#chass"
@@ -64,9 +65,22 @@ Rails.application.routes.draw do
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
 
+  post "/ddahs/apply-template" => "ddahs#apply_template"
+  post "/ddahs/:id/new-template" => "ddahs#new_template"
+  post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
+  post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
+  post "/ddahs/can-nag-instructor" => "ddahs#can_nag_instructor"
+  post "/ddahs/send-nag-instructor" => "ddahs#send_nag_instructor"
+  post "/ddahs/can-nag-student" => "ddahs#can_nag_student"
+  post "/ddahs/send-nag-student" => "ddahs#send_nag_student"
+
   # student-facing
   get "/pb/:offer_id" => "app#student_view"
   get "/pb/:offer_id/pdf" => "offers#get_contract_student"
   post "/pb/:offer_id/:status" => "offers#set_status_student"
 
+  # student-facing for ddah
+  get "/pb/ddah/:offer_id" => "app#ddah_view"
+  get "/pb/ddah/:offer_id/pdf" => "ddahs#get_ddah_pdf"
+  get "/pb/ddah/:offer_id/accept" => "ddahs#accept_ddah"
 end

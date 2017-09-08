@@ -38,6 +38,10 @@ class AppController < ApplicationController
     end
   end
 
+  def ddah_view
+    # TO-DO
+  end
+
   def logout
     @url = params[:current_page]
     #@_request.reset_session

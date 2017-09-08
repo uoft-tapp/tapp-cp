@@ -57,6 +57,59 @@ class DdahsController < ApplicationController
     update_form(ddah, param)
   end
 
+  '''
+    Template DDAH
+  '''
+  def apply_template
+    # TO-DO
+  end
+
+  def new_template
+    # TO-DO
+  end
+
+  '''
+    Send Mails
+  '''
+  def can_send_ddahs
+    # TO-DO
+  end
+
+  def send_ddahs
+    # TO-DO
+  end
+
+  '''
+    Nag Mails
+  '''
+  def can_nag_instructor
+    # TO-DO
+  end
+
+  def send_nag_instructor
+    # TO-DO
+  end
+
+  def can_nag_student
+    # TO-DO
+  end
+
+  def send_nag_student
+    # TO-DO
+  end
+
+
+  '''
+    Student-Facing
+  '''
+  def get_ddah_pdf
+    # TO-DO
+  end
+
+  def accept_ddah
+    # TO-DO
+  end
+
   private
   def ddah_params
     params.permit(:optional)
