@@ -566,6 +566,11 @@ function noteOffer(offer, note) {
         });
 }
 
+// export all offers from the session to CSV
+function exportOffers(session) {
+    window.open('/export/cp-offers/' + session);
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -603,5 +608,6 @@ export {
     print,
     updateSessionPay,
     noteOffer,
+    exportOffers,
     fetchAuth,
 };

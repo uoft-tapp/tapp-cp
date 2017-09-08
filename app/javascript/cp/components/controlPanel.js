@@ -283,9 +283,9 @@ class ControlPanel extends React.Component {
 
                 <ButtonToolbar id="dropdown-menu">
                     {role == 'cp_admin' && <ImportMenu {...this.props} />}
+                    <ExportButton {...this.props} />
                     {role == 'cp_admin' && <OffersMenu {...this.props} />}
                     {role == 'cp_admin' && <CommMenu {...this.props} />}
-
                     <PrintButton {...this.props} />
 
                     <TableMenu
@@ -321,6 +321,12 @@ class ControlPanel extends React.Component {
         );
     }
 }
+
+const ExportButton = props => (
+    <Button bsStyle="primary" onClick={() => props.appState.exportOffers()}>
+        Export
+    </Button>
+);
 
 const OffersMenu = props => (
     <DropdownButton bsStyle="primary" title="Update offers" id="offers-dropdown">
