@@ -89,6 +89,9 @@ ActiveRecord::Schema.define(version: 20170908003903) do
     t.bigint "instructor_id"
     t.string "tutorial_category", default: "Classroom TA"
     t.string "department", default: "Computer Science"
+    t.string "supervisor_signature"
+    t.string "ta_coord_signature"
+    t.string "student_signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
