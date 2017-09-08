@@ -39,7 +39,19 @@ class AppController < ApplicationController
   end
 
   def ddah_view
-    # TO-DO
+    ddah = Ddah.find_by(offer_id: params[:offer_id])
+    if ddah
+      offer = Offer.find(params[:offer_id])
+      if offer[:status]== "Sent"
+        @ddah = ddah
+        @offer = offer.format
+        render :ddah, layout: false
+      else
+        render status: 404, json: {message: "Offer #{offer[:id]} hasn't been sent."}
+      end
+    else
+      render status: 404, json: {message: "There is no such page."}
+    end
   end
 
   def logout
