@@ -59,7 +59,7 @@ class ControlPanel extends React.Component {
                             })}
                     />
                 ),
-                data: p => (
+                data: p =>
                     <input
                         type="checkbox"
                         defaultChecked={false}
@@ -92,8 +92,7 @@ class ControlPanel extends React.Component {
 
                             this.lastClicked = p.offerId;
                         }}
-                    />
-                ),
+                    />,
 
                 style: { width: 0.01, textAlign: 'center' },
             },
@@ -209,25 +208,24 @@ class ControlPanel extends React.Component {
             {
                 header: 'Contract Send Date',
                 data: p =>
-                    p.offer.get('sentAt') ? (
-                        <span>
-                            {new Date(p.offer.get('sentAt')).toLocaleString()}&ensp;
-                            <i
-                                className="fa fa-search"
-                                style={{ fontSize: '16px', cursor: 'pointer' }}
-                                title="Applicant View"
-                                onClick={() => this.props.appState.showContractApplicant(p.offerId)}
-                            />&nbsp;
-                            <i
-                                className="fa fa-search-plus"
-                                style={{ fontSize: '16px', cursor: 'pointer' }}
-                                title="Office View"
-                                onClick={() => this.props.appState.showContractHr(p.offerId)}
-                            />
-                        </span>
-                    ) : (
-                        ''
-                    ),
+                    p.offer.get('sentAt')
+                        ? <span>
+                              {new Date(p.offer.get('sentAt')).toLocaleString()}&ensp;
+                              <i
+                                  className="fa fa-search"
+                                  style={{ fontSize: '16px', cursor: 'pointer' }}
+                                  title="Applicant View"
+                                  onClick={() =>
+                                      this.props.appState.showContractApplicant(p.offerId)}
+                              />&nbsp;
+                              <i
+                                  className="fa fa-search-plus"
+                                  style={{ fontSize: '16px', cursor: 'pointer' }}
+                                  title="Office View"
+                                  onClick={() => this.props.appState.showContractHr(p.offerId)}
+                              />
+                          </span>
+                        : '',
                 sortData: p => (p.get('sentAt') ? p.get('sentAt') : ''),
 
                 style: { width: 0.1 },
@@ -333,32 +331,41 @@ const OffersMenu = props => (
         <MenuItem onClick={() => props.appState.sendContracts(getSelectedOffers())}>
             Send contract(s)
         </MenuItem>
+        <MenuItem divider />
+        <MenuItem onClick={() => props.appState.setOfferAccepted(getSelectedOffers())}>
+            Set status to <i>Accepted</i>
+        </MenuItem>
         <MenuItem onClick={() => props.appState.withdrawOffers(getSelectedOffers())}>
             Withdraw offer(s)
         </MenuItem>
+        <MenuItem divider />
         <MenuItem onClick={() => props.appState.setHrProcessed(getSelectedOffers())}>
-            Set HR processed
+            Set HRIS status to <i>Processed</i>
         </MenuItem>
+        <MenuItem onClick={() => props.appState.clearHrStatus(getSelectedOffers())}>
+            Clear HRIS status
+        </MenuItem>
+        <MenuItem divider />
         <MenuItem onClick={() => props.appState.setDdahAccepted(getSelectedOffers())}>
-            Set DDAH accepted
+            Set DDAH status to <i>Accepted</i>
         </MenuItem>
-    </DropdownButton>
-);
+    </DropdownButton>;
 
-const CommMenu = props => (
+const CommMenu = props =>
     <DropdownButton bsStyle="primary" title="Communicate" id="comm-dropdown">
-        <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>Email [blank]</MenuItem>
-        <MenuItem onClick={() => props.appState.emailContract(getSelectedOffers())}>
-            Email [contract]
+        <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>
+            Email&ensp;[blank]
         </MenuItem>
+        <MenuItem onClick={() => props.appState.emailContract(getSelectedOffers())}>
+            Email&ensp;[contract]
+        </MenuItem>
+        <MenuItem divider />
         <MenuItem onClick={() => props.appState.nag(getSelectedOffers())}>Nag</MenuItem>
-    </DropdownButton>
-);
+    </DropdownButton>;
 
-const PrintButton = props => (
+const PrintButton = props =>
     <Button bsStyle="primary" onClick={() => props.appState.print(getSelectedOffers())}>
         Print contracts
-    </Button>
-);
+    </Button>;
 
 export { ControlPanel };

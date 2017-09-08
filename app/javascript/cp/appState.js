@@ -251,6 +251,15 @@ class AppState {
         return [this.get('offers.list'), this.get('sessions.list')].some(val => val == null);
     }
 
+    clearHrStatus(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
+        fetch.clearHrStatus(offers.map(offer => parseInt(offer)));
+    }
+
     // email applicants
     email(offers) {
         let allOffers = this.getOffersList();
@@ -457,6 +466,19 @@ class AppState {
         } else {
             this.set('importing', init - 1);
         }
+    }
+
+    setOfferAccepted(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+        if (offers.length != 1) {
+            this.alert('<b>Error:</b> Can only accept an offer for a single applicant at a time.');
+            return;
+        }
+
+        fetch.setOfferAccepted(offers[0]);
     }
 
     setOffersList(list) {
