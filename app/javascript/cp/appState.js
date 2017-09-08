@@ -20,7 +20,11 @@ const initialState = {
 
     selectedSession: '',
 
-    ddah: [{ units: null, duty: null, type: null, time: null }],
+    ddah: {
+        worksheet: [{ units: null, duty: null, type: null, time: null, total: null }],
+        total: null,
+        summary: {},
+    },
 
     /** DB data **/
     offers: { fetching: 0, list: null },
@@ -90,8 +94,10 @@ class AppState {
     // add a row to the ddah form
     addAllocation() {
         this.set(
-            'ddah',
-            this.get('ddah').push(fromJS({ units: null, duty: null, type: null, time: null }))
+            'ddah.worksheet',
+            this.get('ddah.worksheet').push(
+                fromJS({ units: null, duty: null, type: null, time: null, total: null })
+            )
         );
     }
 
@@ -153,20 +159,24 @@ class AppState {
         return this.get('roles');
     }
 
-    getDdah() {
-        return this.get('ddah');
+    getDdahSummary() {
+        return this.get('ddah.summary');
     }
 
-    // returns an array of JS objects { name, total } representing the total
-    getDutiesSummary() {
-        let summary = [];
+    getDdahTotal() {
+        return this.get('ddah.total');
+    }
 
-        this.getDutiesList().forEach((duty, i) => {
-            summary[i] = { name: duty, total: 0 };
-        });
+    getDdahWorksheet() {
+        return this.get('ddah.worksheet');
+    }
 
-        this.get('ddah').forEach(allocation => {
-            summary[allocation.duty] += allocation.time / 60;
+    // returns a map of duty ids to totals for each duty
+    computeDutiesSummary() {
+        let summary = this.getDutiesList().map(_ => 0);
+
+        this.get('ddah.worksheet').forEach(allocation => {
+            summary = summary.update(allocation.duty, time => time + allocation.time / 60);
         });
 
         return summary;
@@ -268,7 +278,12 @@ class AppState {
     }
 
     updateDdah(allocation, key, val) {
+        // update allocation attribute
         this.set('ddah[' + allocation + '].' + key, val);
+
+        // recompute total if necessary
+
+        // recompute summary values if necessary
     }
 
     /******************************
@@ -369,7 +384,11 @@ class AppState {
         let offers = this.getOffersList();
 
         if (offers) {
-            return offers.map(offer => offer.get('course')).flip().keySeq().toJS();
+            return offers
+                .map(offer => offer.get('course'))
+                .flip()
+                .keySeq()
+                .toJS();
         }
         return [];
     }

@@ -3,7 +3,7 @@ import { Table, Button } from 'react-bootstrap';
 
 class DdahForm extends React.Component {
     render() {
-        let ddah = this.props.appState.getDdah();
+        let ddah = this.props.appState.getDdahWorksheet();
 
         return (
             <div>
@@ -16,7 +16,7 @@ class DdahForm extends React.Component {
     }
 }
 
-const Worksheet = props =>
+const Worksheet = props => (
     <Table bordered condensed hover id="worksheet-table">
         <thead>
             <tr>
@@ -37,7 +37,7 @@ const Worksheet = props =>
             </tr>
         </thead>
         <tbody>
-            {props.ddah.map((row, i) =>
+            {props.ddah.map((row, i) => (
                 <tr key={'allocation-' + i}>
                     <td>
                         <input
@@ -54,11 +54,9 @@ const Worksheet = props =>
                             onChange={event =>
                                 props.appState.updateDdah(i, 'duty', event.target.value)}>
                             <option />
-                            {props.appState.getDutiesList().map((duty, id) =>
-                                <option value={id}>
-                                    {duty}
-                                </option>
-                            )}
+                            {props.appState
+                                .getDutiesList()
+                                .map((duty, id) => <option value={id}>{duty}</option>)}
                         </select>
                     </td>
                     <td>
@@ -79,11 +77,9 @@ const Worksheet = props =>
                                 props.appState.updateDdah(i, 'time', event.target.value)}
                         />
                     </td>
-                    <td>
-                        {row.units && row.time && (row.units * row.time / 60).toFixed(1)}
-                    </td>
+                    <td>{row.total.toFixed(1)}</td>
                 </tr>
-            )}
+            ))}
 
             <tr>
                 <td colSpan="5" style={{ backgroundColor: 'white', textAlign: 'left' }}>
@@ -103,17 +99,14 @@ const Worksheet = props =>
                 <td />
                 <td />
                 <td />
-                <td>
-                    {(props.ddah.reduce((sum, row) => sum + row.units * row.time, 0) / 60).toFixed(
-                        1
-                    )}
-                </td>
+                <td>{props.appState.getDdahTotal().toFixed(1)}</td>
             </tr>
         </tbody>
-    </Table>;
+    </Table>
+);
 
 const Summary = props => {
-    let summary = props.appState.getDutiesSummary();
+    let duties = props.appState.getDutiesList();
 
     return (
         <Table bordered condensed id="summary-table">
@@ -127,25 +120,17 @@ const Summary = props => {
                 </tr>
             </thead>
             <tbody>
-                {summary.map(
-                    duty =>
-                        duty &&
-                        <tr key={'duty-' + duty.name}>
-                            <td>
-                                {duty.name}
-                            </td>
-                            <td>
-                                {duty.total.toFixed(1)}
-                            </td>
-                        </tr>
-                )}
+                {props.appState.getDdahSummary().map((duty, i) => (
+                    <tr key={'duty-' + i}>
+                        <td>{duties[i]}</td>
+                        <td>{duty.toFixed(1)}</td>
+                    </tr>
+                ))}
                 <tr>
                     <td>
                         <b>Total</b>
                     </td>
-                    <td>
-                        {summary.reduce((sum, row) => sum + row.total, 0).toFixed(1)}
-                    </td>
+                    <td>{props.appState.getDdahTotal().toFixed(1)}</td>
                 </tr>
             </tbody>
         </Table>
