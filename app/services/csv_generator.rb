@@ -65,7 +65,42 @@ class CSVGenerator
     end
   end
 
+  def generate_cp_offers(session_id)
+    set_all_offer_in_session(session_id)
+    if @offers.size == 0
+      return {generated: false,
+        msg: "Warning: There are currenly no offers in the system. Operation aborted"}
+    else
+      attributes = [
+        "last_name",
+        "first_name",
+        "email",
+        "student_number",
+        "position",
+        "hours",
+        "status",
+        "contract_send_date",
+        "nag_count",
+        "hris_status",
+        "print_date",
+        "ddah_status",
+      ]
+      data = get_cp_offers(attributes)
+      return {generated: true, data: data, file: "cp_offers.csv", type: "text/csv"}
+    end
+  end
+
   private
+  def set_all_offer_in_session(session_id)
+    session = Session.find(session_id)
+    @offers = Offer.all.map do |offer|
+      offer = offer.format
+      if offer[:session] == session
+        offer
+      end
+    end
+  end
+
   def get_cdf_info(attributes)
     data = CSV.generate do |csv|
       csv << attributes
@@ -150,4 +185,25 @@ class CSVGenerator
     return data
   end
 
+  def get_cp_offers(attributes)
+    data = CSV.generate do |csv|
+      csv << attributes
+      @offers.each do |offer|
+        csv << [
+          offer[:applicant][:last_name],
+          offer[:applicant][:first_name],
+          offer[:applicant][:email],
+          offer[:applicant][:student_number],
+          offer[:position],
+          offer[:hours],
+          offer[:send_date],
+          offer[:nag_count],
+          offer[:hr_status],
+          offer[:print_time],
+          offer[:ddah_status],
+        ]
+      end
+    end
+    return data
+  end
 end

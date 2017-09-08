@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   get "/export/transcript-access", to: "export#transcript_access"
   get "/export/offers", to: "export#offers"
   post "/import/chass", to: "import#chass"
+  get "/export/cp-offers/:session_id", to: "export#cp_offers"
   post "/import/enrollment", to: "import#enrollment"
 
   # CP routes
