@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   resources :offers do
     post "decision/:status" => "offers#set_status"
     get "pdf" => "offers#get_contract"
+    post ":offer_id/accept" => "offer#accept_offer"
   end
 
   # shared resources
@@ -44,6 +45,8 @@ Rails.application.routes.draw do
   post "offers/send-contracts" => "offers#send_contracts"
   post "offers/print" => "offers#combine_contracts_print"
   post "offers/nag" => "offers#batch_email_nags"
+  post "offers/can-clear-hris-status" => "offers#can_clear_hris_status"
+  post "offers/clear-hris-status" => "offers#clear_hris_status"
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
 

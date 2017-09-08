@@ -16,27 +16,31 @@ class OffersController < ApplicationController
 
   # can update HR status for offers that are accepted or pending
   def can_hr_update
-    check_offers_status(params[:offers], ["Accepted", "Pending"])
+    check_offers_status(params[:offers], :status, ["Accepted", "Pending"])
   end
 
   # can update DDAH status for offers that are accepted or pending
   def can_ddah_update
-    check_offers_status(params[:offers], ["Accepted", "Pending"])
+    check_offers_status(params[:offers], :status, ["Accepted", "Pending"])
   end
 
   # can send contracts for offers that are unsent or pending
   def can_send_contract
-    check_offers_status(params[:contracts], ["Unsent", "Pending"])
+    check_offers_status(params[:contracts], :status, ["Unsent", "Pending"])
   end
 
   # can nag for offers that are pending
   def can_nag
-    check_offers_status(params[:contracts], ["Pending"])
+    check_offers_status(params[:contracts], :status, ["Pending"])
   end
 
   # can print contracts for offers that are pending, accepted, or rejected
   def can_print
-    check_offers_status(params[:contracts], ["Pending", "Accepted", "Rejected"])
+    check_offers_status(params[:contracts], :status, ["Pending", "Accepted", "Rejected"])
+  end
+
+  def can_clear_hris_status
+    check_offers_status(params[:contracts], :hris_status, [nil, "Processed", "Printed"])
   end
 
   def update
@@ -115,6 +119,22 @@ class OffersController < ApplicationController
     status_setter(params)
   end
 
+  def clear_hris_status
+    params[:contracts].each do |id|
+      offer = Offer.find(id)
+      offer.update_attributes!(hris_status: nil)
+    end
+  end
+
+  def accept_offer
+    offer = Offer.find(params[:offer_id])
+    if offer[:status]!="Unsent"
+      offer.update_attributes!(status: "Accepted", accepted_date: DateTime.now)
+    else
+      render status: 404, json: {message: "Error: You can't accept an Unsent offer."}
+    end
+  end
+
   private
   def get_contract_pdf(params)
     offer = Offer.find(params[:offer_id])
@@ -143,7 +163,7 @@ class OffersController < ApplicationController
 
   '''
     Sets the status of an offer to either `Accepted`, `Rejected`, or `Withdrawn`
-  '''
+  '''date
   def status_setter(params)
     status = get_status(params)
     offer = Offer.find(params[:offer_id])
@@ -180,11 +200,11 @@ class OffersController < ApplicationController
 
   # check that all offers have an expected status
   # expects an array of status(es)
-  def check_offers_status(offers, status)
+  def check_offers_status(offers, attr, status)
     invalid = []
     offers.each do |offer_id|
       offer = Offer.find(offer_id)
-      if !(status.include? offer[:status])
+      if !(status.include? offer[attr])
         invalid.push(offer[:id])
       end
     end
