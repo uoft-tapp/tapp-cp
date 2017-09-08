@@ -165,7 +165,7 @@ class OffersController < ApplicationController
 
   '''
     Sets the status of an offer to either `Accepted`, `Rejected`, or `Withdrawn`
-  '''date
+  '''
   def status_setter(params)
     status = get_status(params)
     offer = Offer.find(params[:offer_id])
