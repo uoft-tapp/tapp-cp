@@ -51,7 +51,7 @@ class ControlPanel extends React.Component {
                             })}
                     />
                 ),
-                data: p =>
+                data: p => (
                     <input
                         type="checkbox"
                         defaultChecked={false}
@@ -84,7 +84,8 @@ class ControlPanel extends React.Component {
 
                             this.lastClicked = p.offerId;
                         }}
-                    />,
+                    />
+                ),
 
                 style: { width: 0.01, textAlign: 'center' },
             },
@@ -157,39 +158,40 @@ class ControlPanel extends React.Component {
             {
                 header: 'Contract Send Date',
                 data: p =>
-                    p.offer.get('sentAt')
-                        ? <span>
-                              {new Date(p.offer.get('sentAt')).toLocaleString()}&ensp;
-                              <i
-                                  className="fa fa-search"
-                                  style={{ fontSize: '16px', cursor: 'pointer' }}
-                                  title="Applicant View"
-                                  onClick={() =>
-                                      this.props.appState.showContractApplicant(p.offerId)}
-                              />&nbsp;
-                              <i
-                                  className="fa fa-search-plus"
-                                  style={{ fontSize: '16px', cursor: 'pointer' }}
-                                  title="Office View"
-                                  onClick={() => this.props.appState.showContractHr(p.offerId)}
-                              />
-                          </span>
-                        : '',
-                sortData: p => p.get('sentAt'),
+                    p.offer.get('sentAt') ? (
+                        <span>
+                            {new Date(p.offer.get('sentAt')).toLocaleString()}&ensp;
+                            <i
+                                className="fa fa-search"
+                                style={{ fontSize: '16px', cursor: 'pointer' }}
+                                title="Applicant View"
+                                onClick={() => this.props.appState.showContractApplicant(p.offerId)}
+                            />&nbsp;
+                            <i
+                                className="fa fa-search-plus"
+                                style={{ fontSize: '16px', cursor: 'pointer' }}
+                                title="Office View"
+                                onClick={() => this.props.appState.showContractHr(p.offerId)}
+                            />
+                        </span>
+                    ) : (
+                        ''
+                    ),
+                sortData: p => (p.get('sentAt') ? p.get('sentAt') : ''),
 
                 style: { width: 0.1 },
             },
             {
                 header: 'Nag Count',
                 data: p => (p.offer.get('nagCount') ? p.offer.get('nagCount') : ''),
-                sortData: p => p.get('nagCount'),
+                sortData: p => (p.get('nagCount') ? p.get('nagCount') : ''),
 
                 style: { width: 0.05 },
             },
             {
                 header: 'HRIS Status',
-                data: p => (p.offer.get('hrStatus') == undefined ? '-' : p.offer.get('hrStatus')),
-                sortData: p => (p.get('hrStatus') == undefined ? '' : p.get('hrStatus')),
+                data: p => (p.offer.get('hrStatus') ? p.offer.get('hrStatus') : '-'),
+                sortData: p => (p.get('hrStatus') ? p.get('hrStatus') : ''),
 
                 filterLabel: 'HRIS Status',
                 filterCategories: ['-', 'Processed', 'Printed'],
@@ -205,15 +207,14 @@ class ControlPanel extends React.Component {
                     p.offer.get('printedAt')
                         ? new Date(p.offer.get('printedAt')).toLocaleString()
                         : '',
-                sortData: p => p.get('printedAt'),
+                sortData: p => (p.get('printedAt') ? p.get('printedAt') : ''),
 
                 style: { width: 0.07 },
             },
             {
                 header: 'DDAH Status',
-                data: p =>
-                    p.offer.get('ddahStatus') == undefined ? '-' : p.offer.get('ddahStatus'),
-                sortData: p => (p.get('ddahStatus') == undefined ? '' : p.get('ddahStatus')),
+                data: p => (p.offer.get('ddahStatus') ? p.offer.get('ddahStatus') : '-'),
+                sortData: p => (p.get('ddahStatus') ? p.get('ddahStatus') : ''),
 
                 filterLabel: 'DDAH Status',
                 filterCategories: ['-', 'Accepted', 'Pending', 'Signed'],
@@ -270,7 +271,7 @@ class ControlPanel extends React.Component {
     }
 }
 
-const OffersMenu = props =>
+const OffersMenu = props => (
     <DropdownButton bsStyle="primary" title="Update offers" id="offers-dropdown">
         <MenuItem onClick={() => props.appState.sendContracts(getSelectedOffers())}>
             Send contract(s)
@@ -284,20 +285,23 @@ const OffersMenu = props =>
         <MenuItem onClick={() => props.appState.setDdahAccepted(getSelectedOffers())}>
             Set DDAH accepted
         </MenuItem>
-    </DropdownButton>;
+    </DropdownButton>
+);
 
-const CommMenu = props =>
+const CommMenu = props => (
     <DropdownButton bsStyle="primary" title="Communicate" id="comm-dropdown">
         <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>Email [blank]</MenuItem>
         <MenuItem onClick={() => props.appState.emailContract(getSelectedOffers())}>
             Email [contract]
         </MenuItem>
         <MenuItem onClick={() => props.appState.nag(getSelectedOffers())}>Nag</MenuItem>
-    </DropdownButton>;
+    </DropdownButton>
+);
 
-const PrintButton = props =>
+const PrintButton = props => (
     <Button bsStyle="primary" onClick={() => props.appState.print(getSelectedOffers())}>
         Print contracts
-    </Button>;
+    </Button>
+);
 
 export { ControlPanel };
