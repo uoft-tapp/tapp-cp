@@ -329,11 +329,11 @@ RSpec.describe AssignmentsController, type: :controller do
 
     context "when export_date is valid" do
       it "updates the assignment" do
-        patch :update, params: { applicant_id: @applicant.id, id: @assignment.id, export_date: "2017-08-08T15:25:03.000Z"}
+        patch :update, params: { applicant_id: @applicant.id, id: @assignment.id, export_date: "2017-08-08T15:25:03.000-04:00"}
         expect(response.status).to eq(200)
         expect(parsed_body["applicant_id"]).to eq(@applicant.id)
         expect(parsed_body["id"]).to eq(@assignment.id)
-        expect(parsed_body["export_date"]).to eq("2017-08-08T15:25:03.000Z")
+        expect(parsed_body["export_date"]).to eq("2017-08-08T15:25:03.000-04:00")
       end
     end
 

@@ -82,8 +82,8 @@ RSpec.describe PositionsController, type: :controller do
           session_id: session.id,
           cap_enrollment: nil,
           num_waitlisted: nil,
-          start_date: "2017-09-04 00:00:00.000000000 +0000",
-          end_date: "2017-09-05 00:00:00.000000000 +0000",
+          start_date: "2017-09-04 00:00:00.000000000-04:00",
+          end_date: "2017-09-05 00:00:00.000000000-04:00",
         }
         expect(position.instructor_ids).to eq([])
         put :update, params: @params
