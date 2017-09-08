@@ -294,6 +294,19 @@ class AppState {
         a.click();
     }
 
+    // export offers to CSV
+    exportOffers() {
+        let session = this.get('selectedSession');
+        if (!session) {
+            this.alert(
+                '<b>Export offers from all sessions</b> This functionality is not currently supported. Please select a session.'
+            );
+            return;
+        }
+
+        fetch.exportOffers(session);
+    }
+
     // check if offers are being fetched
     fetchingOffers() {
         return this.get('offers.fetching') > 0;
@@ -460,9 +473,12 @@ class AppState {
             if (sessionA.get('year') < sessionB.get('year')) {
                 return 1;
             }
-            return semesterOrder.indexOf(sessionA.get('semester')) - semesterOrder.indexOf(sessionB.get('semester'));
+            return (
+                semesterOrder.indexOf(sessionA.get('semester')) -
+                semesterOrder.indexOf(sessionB.get('semester'))
+            );
         });
-        
+
         this.set('sessions.list', list);
     }
 
