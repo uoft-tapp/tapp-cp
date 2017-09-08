@@ -266,6 +266,10 @@ class AppState {
 
     // email mangled contract link to a single applicant
     emailContract(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
         if (offers.length != 1) {
             this.alert('<b>Error:</b> Can only email a contract link to a single applicant.');
             return;
