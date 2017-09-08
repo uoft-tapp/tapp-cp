@@ -559,7 +559,7 @@ function noteOffer(offer, note) {
             appState.setFetchingOffersList(true);
             getOffers()
                 .then(offers => {
-                    appState.setOffersList(offers);
+                    appState.setOffersList(fromJS(offers));
                     appState.setFetchingOffersList(false, true);
                 })
                 .catch(() => appState.setFetchingOffersList(false));
