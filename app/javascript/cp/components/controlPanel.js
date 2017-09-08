@@ -154,6 +154,7 @@ class ControlPanel extends React.Component {
                             <OverlayTrigger
                                 trigger="click"
                                 placement="bottom"
+                                rootClose={true}
                                 overlay={
                                     <Popover id="offer-note-popover" title="Withdrawn Notes">
                                         <textarea
