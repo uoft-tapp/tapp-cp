@@ -260,7 +260,7 @@ class AppState {
         a.href =
             emails.length == 1
                 ? 'mailto:' + emails[0] // if there is only a single recipient, send normally
-                : 'mailto:?bcc=' + emails.join(';'); // if there are multiple recipients, bcc all
+                : 'mailto:?bcc=' + emails.join(','); // if there are multiple recipients, bcc all
         a.click();
     }
 
