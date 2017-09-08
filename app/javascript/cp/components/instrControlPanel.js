@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'react-bootstrap';
+import { Grid, ButtonToolbar, Button } from 'react-bootstrap';
 
 import { DdahForm } from './ddahForm.js';
 
@@ -16,6 +16,12 @@ class InstrControlPanel extends React.Component {
         return (
             <Grid fluid id="instr-grid">
                 <DdahForm {...this.props} />
+                <ButtonToolbar>
+                    <Button bsStyle="primary">Save Worksheet</Button>
+                    <Button bsStyle="danger" onClick={() => this.props.appState.clearDdah()}>
+                        Clear Worksheet
+                    </Button>
+                </ButtonToolbar>
             </Grid>
         );
     }

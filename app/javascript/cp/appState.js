@@ -131,6 +131,15 @@ class AppState {
         return this.get('selectedFilters').has(field);
     }
 
+    clearDdah() {
+        if (window.confirm('Are you sure that you want to clear the current worksheet?')) {
+            this.set(
+                'ddah.worksheet',
+                fromJS([{ units: null, duty: null, type: null, time: null }])
+            );
+        }
+    }
+
     // remove all selected filters on the offers table
     clearFilters() {
         this.set('selectedFilters', fromJS({}));
@@ -176,8 +185,11 @@ class AppState {
 
     // compute total ddah hours
     getDdahTotal() {
-        let total = this.get('ddah.worksheet').reduce((sum, allocation) => sum + allocation.total, 0);
-        return (isNaN(total) ? 0 : total);
+        let total = this.get('ddah.worksheet').reduce(
+            (sum, allocation) => sum + allocation.total,
+            0
+        );
+        return isNaN(total) ? 0 : total;
     }
 
     getDdahWorksheet() {
@@ -382,11 +394,7 @@ class AppState {
         let offers = this.getOffersList();
 
         if (offers) {
-            return offers
-                .map(offer => offer.get('course'))
-                .flip()
-                .keySeq()
-                .toJS();
+            return offers.map(offer => offer.get('course')).flip().keySeq().toJS();
         }
         return [];
     }

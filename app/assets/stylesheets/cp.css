@@ -207,7 +207,7 @@ footer div p {
 }
 
 #instr-grid tr:last-child {
-    border-top: 2px solid #ddd;
+    border-top: 3px solid #ddd;
 }
 
 #instr-grid #worksheet-table td:last-child {
