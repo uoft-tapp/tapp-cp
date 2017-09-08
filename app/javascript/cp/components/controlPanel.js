@@ -209,7 +209,7 @@ class ControlPanel extends React.Component {
                         : '',
                 sortData: p => (p.get('printedAt') ? p.get('printedAt') : ''),
 
-                style: { width: 0.07 },
+                style: { width: 0.08 },
             },
             {
                 header: 'DDAH Status',
