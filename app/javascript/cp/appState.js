@@ -313,7 +313,7 @@ class AppState {
         let offers = this.getOffersList();
 
         if (offers) {
-            return offers.map(offer => offer.get('position')).flip().keySeq().toJS();
+            return offers.map(offer => offer.get('position')).flip().keySeq().sort().toJS();
         }
         return [];
     }
