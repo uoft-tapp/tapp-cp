@@ -197,6 +197,7 @@ class CSVGenerator
           offer[:applicant][:student_number],
           offer[:position],
           offer[:hours],
+          offer[:status],
           offer[:send_date],
           offer[:nag_count],
           offer[:hr_status],
