@@ -43,7 +43,7 @@ class AppController < ApplicationController
     if ddah
       offer = Offer.find(params[:offer_id])
       if offer[:status]== "Sent"
-        @ddah = ddah
+        @ddah = ddah.format
         @offer = offer.format
         render :ddah, layout: false
       else

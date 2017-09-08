@@ -7,9 +7,9 @@ class TemplatesController < ApplicationController
 
   def index
     if params[:utorid]
-      render json: get_all_templates_for_utorid(params[:utorid])
+      render json: get_all_templates(get_all_templates_for_utorid(params[:utorid]))
     else
-      render json: Template.all.to_json
+      render json: get_all_templates(Template.all)
     end
   end
 
@@ -18,13 +18,13 @@ class TemplatesController < ApplicationController
       templates = id_array(get_all_templates_for_utorid(params[:utorid]))
       if templates.include?(params[:id])
         template = Template.find(params[:id])
-        render json: template.to_json
+        render json: template.format
       else
         render status: 404, json: {status: 404}
       end
     else
       template = Template.find(params[:id])
-      render json: template.to_json
+      render json: template.format
     end
   end
 
@@ -54,6 +54,12 @@ class TemplatesController < ApplicationController
   private
   def template_params
     params.permit(:name, :optional)
+  end
+
+  def get_all_templates(templates)
+    templates.map do |template|
+      template.format
+    end
   end
 
   def get_all_templates_for_utorid(utorid)

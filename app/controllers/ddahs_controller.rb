@@ -7,9 +7,9 @@ class DdahsController < ApplicationController
 
   def index
     if params[:utorid]
-      render json: get_all_ddah_for_utorid(params[:utorid])
+      render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid]))
     else
-      render json: Ddah.all.to_json
+      render json: get_all_ddahs(Ddah.all)
     end
   end
 
@@ -18,13 +18,13 @@ class DdahsController < ApplicationController
       ddahs = id_array(get_all_ddah_for_utorid(params[:utorid]))
       if ddahs.include?(params[:id])
         ddah = Ddah.find(params[:id])
-        render json: ddah.to_json
+        render json: ddah.format
       else
         render status: 404, json: {status: 404}
       end
     else
       ddah = Ddah.find(params[:id])
-      render json: ddah.to_json
+      render json: ddah.format
     end
   end
 
@@ -113,6 +113,12 @@ class DdahsController < ApplicationController
   private
   def ddah_params
     params.permit(:optional)
+  end
+
+  def get_all_ddahs(ddahs)
+    ddahs.map do |ddah|
+      ddah.format
+    end
   end
 
   def get_all_ddah_for_utorid(utorid)
