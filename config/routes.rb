@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   resources :offers do
     post "decision/:status" => "offers#set_status"
     get "pdf" => "offers#get_contract"
-    post ":offer_id/accept" => "offer#accept_offer"
+    post "accept" => "offers#accept_offer"
   end
 
   # shared resources
