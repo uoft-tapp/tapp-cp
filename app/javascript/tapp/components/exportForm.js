@@ -5,34 +5,40 @@ import { Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 class ExportForm extends React.Component {
     exportData(data, format) {
         if (data == 'offers') {
+            // export offers
             if (Object.keys(this.props.getAssignmentsList()).length == 0) {
                 // no assignments have been made
                 this.props.alert('Cannot export offers: no assignments have been made');
                 return;
             }
 
-            // export offers
-            let route;
             if (format == 'csv') {
                 // export offers in CSV format
                 window.open('/export/offers');
-            } else if (
-                confirm(
-                    'This will lock all exported assignments.\nAre you sure you want to proceed?'
-                )
-            ) {
-                // export offers in JSON format
-                this.props.exportOffers();
+            } else if (this.props.getSelectedRound() != null) {
+                // export offers for a round in JSON format
+                if (
+                    confirm(
+                        'This will lock all exported assignments.\nAre you sure you want to proceed?'
+                    )
+                ) {
+                    // export offers in JSON format
+                    this.props.exportOffers();
+                }
+            } else {
+                // export offers for all rounds in JSON format
+                this.props.alert(
+                    '<b>Export JSON for all rounds</b> This functionality is not currently supported. Please select a round.'
+                );
             }
         } else {
-            if (data == 'cdf-info') {
-                if (Object.keys(this.props.getAssignmentsList()).length == 0) {
-                    // no assignments have been made
-                    this.props.alert('Cannot export CDF info: no assignments have been made');
-                    return;
-                }
+            // export other data
+            if (data == 'cdf-info' && Object.keys(this.props.getAssignmentsList()).length == 0) {
+                // no assignments have been made
+                this.props.alert('Cannot export CDF info: no assignments have been made');
+                return;
             }
-            
+
             // export other data in CS
             if (format == 'csv') {
                 window.open('/export/' + data);
@@ -70,7 +76,7 @@ class ExportForm extends React.Component {
                             this.format = ref;
                         }}>
                         <option value="csv">CSV</option>
-                        {this.props.getSelectedRound() && <option value="json">JSON</option>}
+                        <option value="json">JSON</option>
                     </FormControl>
                 </FormGroup>
                 <FormControl.Static style={{ verticalAlign: 'middle' }}>
