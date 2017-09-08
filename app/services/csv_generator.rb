@@ -93,10 +93,11 @@ class CSVGenerator
   private
   def set_all_offer_in_session(session_id)
     session = Session.find(session_id)
-    @offers = Offer.all.map do |offer|
+    @offers = []
+    Offer.all.each do |offer|
       offer = offer.format
       if offer[:session] == session
-        offer
+        @offers.push(offer)
       end
     end
   end
