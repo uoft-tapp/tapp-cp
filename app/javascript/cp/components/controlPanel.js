@@ -150,12 +150,12 @@ class ControlPanel extends React.Component {
                 header: 'Status',
                 data: p => (
                     <span>
-                        {p.offer.get('status')}&nbsp;{p.offer.get('status') == 'Withdrawn' && (
+                        {p.offer.get('status')}&ensp;{p.offer.get('status') == 'Withdrawn' && (
                             <OverlayTrigger
                                 trigger="click"
                                 placement="bottom"
                                 overlay={
-                                    <Popover title="Note">
+                                    <Popover id="offer-note-popover" title="Withdrawn Notes">
                                         <textarea
                                             id="offer-note"
                                             style={{ width: '100%' }}
@@ -163,7 +163,8 @@ class ControlPanel extends React.Component {
                                         />
                                         <br />
                                         <Button
-                                            bsSize="small"
+                                            bsSize="xsmall"
+                                            bsStyle="success"
                                             onClick={() =>
                                                 this.props.appState.noteOffer(
                                                     p.offerId,
