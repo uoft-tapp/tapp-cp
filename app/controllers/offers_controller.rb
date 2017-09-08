@@ -130,6 +130,8 @@ class OffersController < ApplicationController
     offer = Offer.find(params[:offer_id])
     if offer[:status]!="Unsent"
       offer.update_attributes!(status: "Accepted", accepted_date: DateTime.now)
+      offer = offer.format
+      render status: 200, json: {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Accepted'."}
     else
       render status: 404, json: {message: "Error: You can't accept an Unsent offer."}
     end
