@@ -95,6 +95,7 @@ function onFetchOffersSuccess(resp) {
             sentAt: offer.send_date,
             printedAt: offer.print_time,
             link: offer.link,
+	    note: offer.commentary,
         };
     });
 
@@ -550,6 +551,21 @@ function updateSessionPay(session, pay) {
         );
 }
 
+// add/update the note for a withdrawn offer
+function noteOffer(offer, note) {
+    putHelper('/offers/' + offer, { commentary: note })
+        .then(resp => (resp.ok ? resp : respFailure))
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -586,5 +602,6 @@ export {
     withdrawOffers,
     print,
     updateSessionPay,
+    noteOffer,
     fetchAuth,
 };

@@ -1,5 +1,13 @@
 import React from 'react';
-import { Grid, ButtonToolbar, DropdownButton, MenuItem, Button } from 'react-bootstrap';
+import {
+    Grid,
+    ButtonToolbar,
+    DropdownButton,
+    MenuItem,
+    Button,
+    OverlayTrigger,
+    Popover,
+} from 'react-bootstrap';
 
 import { TableMenu } from './tableMenu.js';
 import { Table } from './table.js';
@@ -140,7 +148,49 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'Status',
-                data: p => p.offer.get('status'),
+                data: p => (
+                    <span>
+                        {p.offer.get('status')}&ensp;{p.offer.get('status') == 'Withdrawn' && (
+                            <OverlayTrigger
+                                trigger="click"
+                                placement="bottom"
+                                overlay={
+                                    <Popover id="offer-note-popover" title="Withdrawn Notes">
+                                        <textarea
+                                            id="offer-note"
+                                            style={{ width: '100%' }}
+                                            defaultValue={p.offer.get('note')}
+                                        />
+                                        <br />
+                                        <Button
+                                            bsSize="xsmall"
+                                            bsStyle="success"
+                                            onClick={() =>
+                                                this.props.appState.noteOffer(
+                                                    p.offerId,
+                                                    document.getElementById('offer-note').value
+                                                )}>
+                                            Save
+                                        </Button>
+                                    </Popover>
+                                }>
+                                {p.offer.get('note') ? (
+                                    <i
+                                        className="fa fa-question-circle"
+                                        style={{ fontSize: '16px', cursor: 'pointer' }}
+                                        title="Reason"
+                                    />
+                                ) : (
+                                    <i
+                                        className="fa fa-question"
+                                        style={{ fontSize: '16px', cursor: 'pointer' }}
+                                        title="Add reason"
+                                    />
+                                )}
+                            </OverlayTrigger>
+                        )}
+                    </span>
+                ),
                 sortData: p => p.get('status'),
 
                 filterLabel: 'Status',

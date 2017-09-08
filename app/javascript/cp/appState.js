@@ -351,6 +351,11 @@ class AppState {
         fetch.nag(offers.map(offer => parseInt(offer)));
     }
 
+    // add/update the notes for a withdrawn offer
+    noteOffer(offer, note) {
+        fetch.noteOffer(offer, note);
+    }
+
     print(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');

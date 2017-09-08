@@ -123,7 +123,7 @@ class OffersController < ApplicationController
   end
 
   def offer_params
-    params.permit(:hr_status, :ddah_status)
+    params.permit(:hr_status, :ddah_status, :commentary)
   end
 
   def get_all_offers

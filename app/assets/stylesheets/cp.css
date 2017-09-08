@@ -119,6 +119,14 @@ footer div p {
     word-break: break-all;
 }
 
+#offer-note-popover .popover-content {
+    text-align: right;
+}
+
+#offer-note {
+    max-width: calc(276px - 15px * 2); /* don't allow the text area to be wider than the popover */
+}
+
 #offers-grid .sessions {
     margin: 0 0 1.5vh 0;
 }
