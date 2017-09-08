@@ -77,7 +77,7 @@ const Worksheet = props => (
                                 props.appState.updateDdah(i, 'time', event.target.value)}
                         />
                     </td>
-                    <td>{row.total.toFixed(1)}</td>
+                    <td>{props.appState.getDdahAllocationTotal(i).toFixed(1)}</td>
                 </tr>
             ))}
 
@@ -120,7 +120,7 @@ const Summary = props => {
                 </tr>
             </thead>
             <tbody>
-                {props.appState.getDdahSummary().map((duty, i) => (
+                {props.appState.computeDutiesSummary().map((duty, i) => (
                     <tr key={'duty-' + i}>
                         <td>{duties[i]}</td>
                         <td>{duty.toFixed(1)}</td>

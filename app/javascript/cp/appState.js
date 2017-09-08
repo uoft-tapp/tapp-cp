@@ -21,9 +21,7 @@ const initialState = {
     selectedSession: '',
 
     ddah: {
-        worksheet: [{ units: null, duty: null, type: null, time: null, total: null }],
-        total: null,
-        summary: {},
+        worksheet: [{ units: null, duty: null, type: null, time: null }],
     },
 
     /** DB data **/
@@ -138,6 +136,17 @@ class AppState {
         this.set('selectedFilters', fromJS({}));
     }
 
+    // returns a map of duty ids to totals for each duty
+    computeDutiesSummary() {
+        let summary = this.getDutiesList().map(_ => 0);
+
+        this.get('ddah.worksheet').forEach(allocation => {
+            summary = summary.update(allocation.duty, time => time + allocation.time / 60);
+        });
+
+        return summary;
+    }
+
     dismissAlert(id) {
         let alerts = this.get('alerts');
         let i = alerts.findIndex(alert => alert.get('id') == id);
@@ -159,27 +168,20 @@ class AppState {
         return this.get('roles');
     }
 
-    getDdahSummary() {
-        return this.get('ddah.summary');
+    // compute total hours for ddah allocation
+    getDdahAllocationTotal(allocation) {
+        allocation = this.get('ddah.worksheet[' + allocation + ']');
+        return allocation.get('units') * allocation.get('time') / 60;
     }
 
+    // compute total ddah hours
     getDdahTotal() {
-        return this.get('ddah.total');
+        let total = this.get('ddah.worksheet').reduce((sum, allocation) => sum + allocation.total, 0);
+        return (isNaN(total) ? 0 : total);
     }
 
     getDdahWorksheet() {
         return this.get('ddah.worksheet');
-    }
-
-    // returns a map of duty ids to totals for each duty
-    computeDutiesSummary() {
-        let summary = this.getDutiesList().map(_ => 0);
-
-        this.get('ddah.worksheet').forEach(allocation => {
-            summary = summary.update(allocation.duty, time => time + allocation.time / 60);
-        });
-
-        return summary;
     }
 
     getFilters() {
@@ -277,13 +279,9 @@ class AppState {
         }
     }
 
+    // update allocation attribute
     updateDdah(allocation, key, val) {
-        // update allocation attribute
-        this.set('ddah[' + allocation + '].' + key, val);
-
-        // recompute total if necessary
-
-        // recompute summary values if necessary
+        this.set('ddah.worksheet[' + allocation + '].' + key, val);
     }
 
     /******************************
