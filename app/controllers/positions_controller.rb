@@ -31,7 +31,7 @@ class PositionsController < ApplicationController
 
   def update_date(date, position, attribute)
     if date
-      date = DateTime.parse(date)
+      date = Date.parse(date)
       if date
         position.update_attributes!(attribute => date)
       end
