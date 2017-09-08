@@ -66,4 +66,8 @@ class AppController < ApplicationController
     session[:logged_in] = true
   end
 
+  def test
+    render :test, layout: false
+  end
+
 end

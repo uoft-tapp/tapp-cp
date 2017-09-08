@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>DDAH Test</title>
+  </head>
+  <style>
+    .instructor_section{
+      width: 100%;
+      min-height: 50px;
+    }
+  </style>
+  <body>
+    <h1>DDAH Test</h1>
+    <% Instructor.all.each do |instructor|%>
+      <div class="instructor_section">
+        <h2><%=instructor[:name]%></h2>
+        <button onclick="setupOffers('<%=instructor[:utorid]%>_offers')">GET /instructors/<%=instructor[:utorid]%>/offers</button>
+        <button>GET /instructors/<%=instructor[:utorid]%>/positions</button>
+        <h3>Templates</h3>
+        <div id="<%=instructor[:utorid]%>_templates">
+        </div>
+        <h3>Offers</h3>
+        <div id="<%=instructor[:utorid]%>_offers">
+        </div>
+        <h3>Positions</h3>
+        <div id="<%=instructor[:utorid]%>_positions">
+        </div>
+      </div>
+    <% end %>
+    <script>
+      let offers = {};
+      let positions = {};
+      let templates = {};
+      function setupOffers(id){
+        let div = document.getElementById(id)
+        div.style.border= "red solid 1px";
+      }
+      function fetchHelper(url, init, action, div = null){
+        fetch(url, init).then(function(response) {
+          return response.json();
+        }).then(function(response){
+          if(div!=null){
+            action(div, response);
+          }
+          else{
+            action(response);
+          }
+        });
+      }
+      function getHelper(url, action, div = null){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+            },
+            method: 'GET',
+            credentials: 'include',
+        };
+        fetchHelper(url, init, action, div);
+      }
+      function postHelper(url, data, action, div = null){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'POST',
+            body: JSON.stringify(data),
+            credentials: 'include',
+        };
+        fetchHelper(url, init, action, div);
+      }
+      function putHelper(URL, data, action, div = null) {
+        let init = {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'PUT',
+            body: JSON.stringify(body),
+            credentials: 'include',
+        }
+        fetchHelper(URL, init, action, div);
+      }
+      function deleteHelper(URL, action, div= null) {
+        let init = {
+            method: 'DELETE',
+            credentials: 'include',
+        }
+        fetchHelper(URL, init, action, div);
+      }
+    </script>
+  </body>
+</html>
