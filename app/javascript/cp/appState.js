@@ -260,12 +260,16 @@ class AppState {
         a.href =
             emails.length == 1
                 ? 'mailto:' + emails[0] // if there is only a single recipient, send normally
-                : 'mailto:?bcc=' + emails.join(';'); // if there are multiple recipients, bcc all
+                : 'mailto:?bcc=' + emails.join(','); // if there are multiple recipients, bcc all
         a.click();
     }
 
     // email mangled contract link to a single applicant
     emailContract(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
         if (offers.length != 1) {
             this.alert('<b>Error:</b> Can only email a contract link to a single applicant.');
             return;
