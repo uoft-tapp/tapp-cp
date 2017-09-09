@@ -95,26 +95,34 @@ class DdahsController < ApplicationController
   end
 
   def send_ddahs
-    # TO-DO
+    params[:ddahs].each do |id|
+      ddah = Ddah.find(id)
+      offer = Offer.find(ddah[:offer_id])
+      if ENV['RAILS_ENV'] != 'test'
+        link = "#{ENV["domain"]}#{offer[:link]}".replace("pb", "pb/ddah")
+        CpMailer.ddah_email(ddah.format,link).deliver_now!
+      end
+      offer.update_attributes!({ddah_status: "Pending", send_date: DateTime.now.to_s})
+    end
+    render status: 200, json: {message: "You've successfully sent out all the DDAH's."}
   end
 
-  '''
-    Nag Mails (admin)
-  '''
-  def can_nag_instructor
-    check_ddah_status(params[:ddahs], ["None", "Created"])
-  end
-
-  def send_nag_instructor
-    # TO-DO
-  end
 
   def can_nag_student
     check_ddah_status(params[:ddahs], ["Pending"])
   end
 
   def send_nag_student
-    # TO-DO
+    params[:ddahs].each do |id|
+      ddah = Ddah.find(id)
+      offer = Offer.find(ddah[:offer_id])
+      ddah.increment!(:nag_count, 1)
+      if ENV['RAILS_ENV'] != 'test'
+        link = "#{ENV["domain"]}#{offer[:link]}".replace("pb", "pb/ddah")
+        CpMailer.ddah_nag_email(ddah.format, link).deliver_now!
+      end
+    end
+    render json: {message: "You've sent the nag emails."}
   end
 
   '''

@@ -25,6 +25,31 @@ class CpMailer < ApplicationMailer
     mail(to: email, subject: "CP Alert: New Offers Accepted")
   end
 
+  def ddah_email(ddah, link)
+    email = get_email(ddah[:applicant][:email])
+    @ddah = ddah
+    @url = link
+    mail(to: email, subject: "DDAH Form: TAship of #{ddah[:position][:position]}")
+  end
+
+  def ddah_instructor_nag_email(offer, instructor)
+    email = get_email(instructor[:email])
+    @offer = offer
+    @instructor = instructor
+    @offer[:nag_suffix] = get_nag_suffix(@offer[:ddah_nag_count])
+    mail(to: email, subject: "DDAH Reminder: #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s Form for #{offer[:position]} is Due")
+  end
+
+  def ddah_nag_email(ddah, link)
+    email = get_email(ddah[:applicant][:email])
+    @ddah = ddah
+    @ddah[:nag_suffix] = get_nag_suffix(@ddah[:nag_count])
+    @ddah[:deadline] = format_time(@ddah[:deadline],"%I:%M%p on %B %d, %Y")
+    @url = link
+    mail(to: email, subject: "Reminder for TA Position: #{@ddah[:position][:position]}")
+  end
+
+
   private
   def get_nag_suffix(nag_count)
     case nag_count

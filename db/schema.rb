@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170908003903) do
+ActiveRecord::Schema.define(version: 20170909221736) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -94,6 +94,8 @@ ActiveRecord::Schema.define(version: 20170908003903) do
     t.string "student_signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "nag_count"
+    t.datetime "send_date"
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
     t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
     t.index ["offer_id"], name: "index_ddahs_on_offer_id"
@@ -140,6 +142,7 @@ ActiveRecord::Schema.define(version: 20170908003903) do
     t.datetime "updated_at", null: false
     t.datetime "accept_date"
     t.text "commentary"
+    t.integer "ddah_nag_count", default: 0
     t.index ["applicant_id"], name: "index_offers_on_applicant_id"
     t.index ["position_id"], name: "index_offers_on_position_id"
   end

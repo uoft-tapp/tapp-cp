@@ -96,6 +96,26 @@ class OffersController < ApplicationController
     render json: {message: "You've sent the nag emails."}
   end
 
+  '''
+    Nag Mails (admin)
+  '''
+  def can_nag_instructor
+    check_ddah_status(params[:offers], ["None", "Created"])
+  end
+
+  def send_nag_instructor
+    instructor =
+    params[:offers].each do |id|
+      offer = Offer.find(ddah[:id])
+      if ENV['RAILS_ENV'] != 'test'
+        CPMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+      end
+      offer.update_attributes!({ddah_status: "Pending", send_date: DateTime.now.to_s})
+    end
+    render status: 200, json: {message: "You've successfully sent out all the nag emails."}
+  end
+
+
   def combine_contracts_print
     offers = []
     params[:contracts].each do |offer_id|
