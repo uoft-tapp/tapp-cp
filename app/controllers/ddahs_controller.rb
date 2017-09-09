@@ -30,16 +30,25 @@ class DdahsController < ApplicationController
 
   def create
     offer = Offer.find(params[:offer_id])
-    instructor = Instructor.find_by!(params[:utorid])
-    if params[:use_template]
-      offer.ddahs.create!(
-        template_id: params[:template_id],
-      )
+    instructor = Instructor.find_by!(utorid: params[:utorid])
+    ddah = Ddah.find_by(offer_id: offer[:id])
+    if !ddah
+      if params[:use_template]
+        Ddah.create!(
+          offer_id: offer[:id],
+          template_id: params[:template_id],
+        )
+      else
+        Ddah.create!(
+          offer_id: offer[:id],
+          instructor_id: instructor[:id],
+          optional: true,
+        )
+      end
+      offer.update_attributes!(ddah_status: "Created")
+      render status: 200, json: {message: "A DDAH was successfully created."}
     else
-      offer.ddahs.create!(
-        instructor_id: instructor[:id],
-        optional: true,
-      )
+      render status: 404, json: {message: "Error: A DDAH already exists for this offer."}
     end
   end
 
@@ -104,6 +113,7 @@ class DdahsController < ApplicationController
   '''
   def get_ddah_pdf
     # TO-DO
+    puts "hello"
   end
 
   def accept_ddah

@@ -42,12 +42,12 @@ class AppController < ApplicationController
     ddah = Ddah.find_by(offer_id: params[:offer_id])
     if ddah
       offer = Offer.find(params[:offer_id])
-      if offer[:status]== "Sent"
+      if offer[:ddah_status]== "Sent"
         @ddah = ddah.format
         @offer = offer.format
         render :ddah, layout: false
       else
-        render status: 404, json: {message: "Offer #{offer[:id]} hasn't been sent."}
+        render status: 404, json: {message: "DDAH #{ddah[:id]} hasn't been sent."}
       end
     else
       render status: 404, json: {message: "There is no such page."}
@@ -56,8 +56,6 @@ class AppController < ApplicationController
 
   def logout
     @url = params[:current_page]
-    #@_request.reset_session
-    #reset_session
     session[:logged_out] = false
     render file: 'public/logout.html'
   end
@@ -67,6 +65,10 @@ class AppController < ApplicationController
   end
 
   def test
+    @instructors = []
+    Instructor.all.each do |instructor|
+      @instructors.push(instructor[:utorid].to_s)
+    end
     render :test, layout: false
   end
 

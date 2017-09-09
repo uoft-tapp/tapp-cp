@@ -36,7 +36,7 @@ module DdahUpdater
   def delete_missing_allocations(form, allocations)
     allocation_ids = get_allocation_ids(allocations)
     deleted_allocations = get_deleted_allocations(form.allocation_ids, allocation_ids)
-    deleted_allocations.do each |id|
+    deleted_allocations.each do |id|
       allocation = Allocation.find(id)
       allocation.destroy!
     end

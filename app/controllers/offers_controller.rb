@@ -18,7 +18,7 @@ class OffersController < ApplicationController
       offers = id_array(get_all_offers_for_utorid(params[:utorid]))
       if offers.include?(params[:id])
         offer = Offer.find(params[:id])
-        render json: offer.format
+        render json: offer.instructor_format
       else
         render status: 404, json: {status: 404}
       end
@@ -235,7 +235,7 @@ class OffersController < ApplicationController
       position = Position.find(offer[:position_id])
       position.instructors.each do |instructor|
         if instructor[:utorid] == utorid
-          offers.push(offer)
+          offers.push(offer.instructor_format)
         end
       end
     end

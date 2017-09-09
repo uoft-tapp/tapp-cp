@@ -6,7 +6,7 @@ class PositionsController < ApplicationController
 
   def index
     if params[:utorid]
-      render json: get_all_positions_for_utorid(params[:utorid]).to_json(include: [:instructors])
+      render json: get_all_positions_for_utorid(params[:utorid])
     else
       positions = Position.all.includes(:instructors)
       render json: positions.to_json(include: [:instructors])
@@ -17,8 +17,8 @@ class PositionsController < ApplicationController
     if params[:utorid]
       positions = id_array(get_all_positions_for_utorid(params[:utorid]))
       if positions.include?(params[:id])
-        position = Position.includes(:instructors).find(params[:id])
-        render json: position.to_json(include: [:instructors])
+        position = Position.find(params[:id])
+        render json: position.format
       else
         render status: 404, json: {status: 404}
       end
@@ -63,10 +63,10 @@ class PositionsController < ApplicationController
 
   def get_all_positions_for_utorid(utorid)
     positions = []
-    Position.all.includes(:instructors).each do |position|
+    Position.all.each do |position|
       position.instructors.each do |instructor|
         if instructor[:utorid] == utorid
-          offers.push(offer)
+          positions.push(position.format)
         end
       end
     end

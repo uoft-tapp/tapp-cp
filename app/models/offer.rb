@@ -24,7 +24,7 @@ class Offer < ApplicationRecord
       position: position[:position],
       start_date: position[:start_date],
       end_date: position[:end_date],
-      applicant: applicant,
+      applicant: applicant.format,
       session: session,
       instructors: [],
       deadline: self.get_deadline,
@@ -36,5 +36,28 @@ class Offer < ApplicationRecord
       data[:instructors].push(instructor)
     end
     return offer.merge(data)
+  end
+
+  def instructor_format
+    offer = self.json
+    position = Position.find(self[:position_id])
+    applicant = Applicant.find(self[:applicant_id])
+    data = {
+      position: position[:position],
+      applicant: applicant.format,
+    }
+    excludes = [
+      :accept_date,
+      :commentary,
+      :hr_status,
+      :link,
+      :nag_count,
+      :print_time,
+      :send_date,
+      :signature,
+      :year,
+      :session,
+    ]
+    return offer.merge(data).except(*excludes)
   end
 end

@@ -30,8 +30,9 @@ class TemplatesController < ApplicationController
 
   def create
     position = Position.find(params[:position_id])
-    instructor = Instructor.find_by!(params[:utorid])
-    position.templates.create!(
+    instructor = Instructor.find_by!(utorid: params[:utorid])
+    Template.create!(
+      position_id: position[:id],
       name: params[:name],
       instructor_id: instructor[:id],
     )
@@ -65,8 +66,7 @@ class TemplatesController < ApplicationController
   def get_all_templates_for_utorid(utorid)
     templates = []
     Template.all.each do |template|
-      offer = Offer.find(template[:offer_id])
-      position = Position.find(offer[:position_id])
+      position = Position.find(template[:position_id])
       position.instructors.each do |instructor|
         if instructor[:utorid] == utorid
           templates.push(template)

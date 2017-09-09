@@ -39,8 +39,8 @@ Rails.application.routes.draw do
     resources :ddahs, only: [:index, :show, :create]
     resources :templates, only: [:index, :show, :create]
   end
-  resources :ddahs, only: [:update, :destroy]
-  resources :templates, only: [:update, :destroy]
+  resources :ddahs
+  resources :templates
 
   # TAPP routes
   get "/export/chass/:round_id", to: "export#chass"

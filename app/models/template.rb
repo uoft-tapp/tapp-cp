@@ -9,8 +9,9 @@ class Template < ApplicationRecord
 
   def format
     template = self.json
+    position = Position.find(template[:position_id])
     data = {
-
+      position: position.format,
     }
     return template.merge(data)
   end
