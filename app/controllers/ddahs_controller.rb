@@ -37,6 +37,7 @@ class DdahsController < ApplicationController
         Ddah.create!(
           offer_id: offer[:id],
           template_id: params[:template_id],
+          instructor_id: instructor[:id],
         )
       else
         Ddah.create!(
