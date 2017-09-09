@@ -166,10 +166,10 @@
       }
       function createTemplateOptions(utorid, offer_id){
         options = "<select id='"+utorid+"_offers_"+offer_id+"_template'><option>Choose a Template</option>";
-        position = getPositionByOffer(utorid, offer_id);
+        position_id = getPositionByOffer(utorid, offer_id);
         for (i in app["templates"][utorid]){
           template = app["templates"][utorid][i];
-          if (template["position"]["position_id"]==position)
+          if (template["position"]["id"]==position_id)
            options+="<option value='"+template["id"]+"'>"+template["name"]+"</option>";
         }
         options+="</select>";
@@ -179,9 +179,11 @@
         offers = app["offers"][utorid];
         for (i in offers){
           offer = offers[i];
-          if (offers["id"] == offer_id)
-            return offer["position"]["id"];
+          if (offer["id"] == offer_id){
+            return offer["position_id"];
+          }
         }
+        return null;
       }
       function createCheckBox(div, id){
       	return "<input type='checkbox' onclick='clickCheckBox(this, \""+div.id+"\", "+id+", \"offers\")' />";

@@ -82,7 +82,7 @@ Rails.application.routes.draw do
   # student-facing for ddah
   get "/pb/ddah/:offer_id" => "app#ddah_view"
   get "/pb/ddah/:offer_id/pdf" => "ddahs#get_ddah_pdf"
-  get "/pb/ddah/:offer_id/accept" => "ddahs#accept_ddah"
+  post "/pb/ddah/:offer_id/accept" => "ddahs#accept_ddah"
 
   get "/test" => "app#test"
 end

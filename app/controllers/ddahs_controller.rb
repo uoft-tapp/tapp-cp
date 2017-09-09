@@ -2,7 +2,6 @@ class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
   include DdahUpdater
   include Authorizer
-  include Model
   before_action :cp_access
 
   def index
@@ -34,11 +33,15 @@ class DdahsController < ApplicationController
     ddah = Ddah.find_by(offer_id: offer[:id])
     if !ddah
       if params[:use_template]
-        Ddah.create!(
-          offer_id: offer[:id],
-          template_id: params[:template_id],
-          instructor_id: instructor[:id],
-        )
+        if template_match_offer(params[:template_id], offer)
+          Ddah.create!(
+            offer_id: offer[:id],
+            template_id: params[:template_id],
+            instructor_id: instructor[:id],
+          )
+        else
+          render status: 404, json: {message: "Error: Mismatched Position. Operation Aborted."}
+        end
       else
         Ddah.create!(
           offer_id: offer[:id],
@@ -51,6 +54,12 @@ class DdahsController < ApplicationController
     else
       render status: 404, json: {message: "Error: A DDAH already exists for this offer."}
     end
+  end
+
+  def template_match_offer(template_id, offer)
+    position_id = offer[:position_id]
+    template = Template.find(template_id)
+    return position_id == template[:position_id]
   end
 
   def destroy
@@ -114,11 +123,18 @@ class DdahsController < ApplicationController
   '''
   def get_ddah_pdf
     # TO-DO
-    puts "hello"
   end
 
   def accept_ddah
-    # TO-DO
+    offer = Offer.find(params[:offer_id])
+    if offer[:ddah_status] == "Accepted"
+      render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
+    elsif offer[:ddah_status] == "Pending"
+      offer.update_attributes!(ddah_status: "Accepted", student_signature: params[:signature])
+      render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
+    else
+      render status: 404, json: {message: "Error: You cannot accept an unsent DDaH.", status: offer[:ddah_status]}
+    end
   end
 
   private

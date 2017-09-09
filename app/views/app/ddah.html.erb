@@ -75,6 +75,9 @@
       float: right;
       width: auto;
     }
+    #status {
+      display: none;
+    }
   </style>
 
   <body>
@@ -90,7 +93,7 @@
     </header>
     <embed id="pdf_view_port" type='application/pdf' name="contract.pdf"/>
     <form id='decision'>
-      <p>I hereby accept the DDAH conditions of Teaching Assistantship position offered here:</p>
+      <p>I hereby accept the DDAH conditions of the Teaching Assistantship position offered here:</p>
       <p>
         <label>To accept the contract, type your initial:
           <input id="signature" type="text" name="signature_name" required="required" maxlength="10">
@@ -179,10 +182,23 @@
         }
       }
       function updateStatus(response){
-        fetchPdfData();
+        setupPage(response.ddah_status);
         alert(response.message);
       }
-      fetchPdfData();
+      function setupPage(status){
+        decision = document.getElementById("decision");
+        status = document.getElementById("status");
+        if (status == "Accepted"){
+          decision.style.display = "none";
+          status.style.display = "block";
+        }
+        else{
+          decision.style.display = "block";
+          status.style.display = "none";
+        }
+        fetchPdfData();
+      }
+      setupPage('<%= @offer[:ddah_status]%>')
     </script>
   </body>
 </html>
