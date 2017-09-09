@@ -62,6 +62,8 @@ Rails.application.routes.draw do
   post "offers/nag" => "offers#batch_email_nags"
   post "offers/can-clear-hris-status" => "offers#can_clear_hris_status"
   post "offers/clear-hris-status" => "offers#clear_hris_status"
+  post "/offers/can-nag-instructor" => "offers#can_nag_instructor"
+  post "/offers/send-nag-instructor" => "offers#send_nag_instructor"
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
 
@@ -69,8 +71,6 @@ Rails.application.routes.draw do
   post "/ddahs/:id/new-template" => "ddahs#new_template"
   post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
   post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
-  post "/ddahs/can-nag-instructor" => "ddahs#can_nag_instructor"
-  post "/ddahs/send-nag-instructor" => "ddahs#send_nag_instructor"
   post "/ddahs/can-nag-student" => "ddahs#can_nag_student"
   post "/ddahs/send-nag-student" => "ddahs#send_nag_student"
   post "/ddahs/status/can-finish" => "ddahs#can_finish_ddah"
