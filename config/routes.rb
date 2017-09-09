@@ -73,6 +73,10 @@ Rails.application.routes.draw do
   post "/ddahs/send-nag-instructor" => "ddahs#send_nag_instructor"
   post "/ddahs/can-nag-student" => "ddahs#can_nag_student"
   post "/ddahs/send-nag-student" => "ddahs#send_nag_student"
+  post "/ddahs/status/can-finish" => "ddahs#can_finish_ddah"
+  post "/ddahs/status/finish" => "ddahs#finish_ddah"
+  post "/ddahs/status/can-approve" => "ddahs#can_approve_ddah"
+  post "/ddahs/status/approve" => "ddahs#approve_ddah"
 
   # student-facing
   get "/pb/:offer_id" => "app#student_view"

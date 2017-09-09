@@ -77,7 +77,7 @@ class DdahsController < ApplicationController
   end
 
   '''
-    Template DDAH
+    Template DDAH (instructor)
   '''
   def apply_template
     # TO-DO
@@ -88,7 +88,7 @@ class DdahsController < ApplicationController
   end
 
   '''
-    Send Mails
+    Send Mails (admin)
   '''
   def can_send_ddahs
     check_ddah_status(params[:ddahs], ["Approved"])
@@ -99,7 +99,7 @@ class DdahsController < ApplicationController
   end
 
   '''
-    Nag Mails
+    Nag Mails (admin)
   '''
   def can_nag_instructor
     check_ddah_status(params[:ddahs], ["None", "Created"])
@@ -117,6 +117,37 @@ class DdahsController < ApplicationController
     # TO-DO
   end
 
+  '''
+    Set DDAH status to "Ready" (instructor)
+  '''
+  def can_finish_ddah
+    check_ddah_status(params[:ddahs], ["None", "Created"])
+  end
+
+  def finish_ddah
+    params[:ddahs].each do |id|
+      ddah = Ddah.find(id)
+      offer = Offer.find(ddah[:offer_id])
+      offer.update_attributes!(ddah_status: "Ready", supervisor_signature: params[:signature])
+    end
+    render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Ready'."}
+  end
+
+  '''
+    Set DDAH status to "Approved" (admin)
+  '''
+  def can_approve_ddah
+    check_ddah_status(params[:ddahs], ["Ready"])
+  end
+
+  def approve_ddah
+    params[:ddahs].each do |id|
+      ddah = Ddah.find(id)
+      offer = Offer.find(ddah[:offer_id])
+      offer.update_attributes!(ddah_status: "Approved", ta_coord_signature: params: signature)
+    end
+    render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
+  end
 
   '''
     Student-Facing
