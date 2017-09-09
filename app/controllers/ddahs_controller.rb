@@ -91,7 +91,7 @@ class DdahsController < ApplicationController
     Send Mails
   '''
   def can_send_ddahs
-    # TO-DO
+    check_ddah_status(params[:ddahs], ["Approved"])
   end
 
   def send_ddahs
@@ -102,7 +102,7 @@ class DdahsController < ApplicationController
     Nag Mails
   '''
   def can_nag_instructor
-    # TO-DO
+    check_ddah_status(params[:ddahs], ["None", "Created"])
   end
 
   def send_nag_instructor
@@ -110,7 +110,7 @@ class DdahsController < ApplicationController
   end
 
   def can_nag_student
-    # TO-DO
+    check_ddah_status(params[:ddahs], ["Pending"])
   end
 
   def send_nag_student
@@ -161,5 +161,20 @@ class DdahsController < ApplicationController
     end
     return ddahs
   end
+
+  def check_ddah_status(ddahs, status)
+    invalid = []
+    ddahs.each do |ddah_id|
+      ddah = Ddah.find(ddah_id)
+      offer = Offer.find(ddah[:offer_id])
+      if !(status.include? offer[:ddah_status])
+        invalid.push(ddah[:id])
+      end
+    end
+    if invalid.length > 0
+      render status: 404, json: {invalid_offers: invalid}
+    end
+  end
+
 
 end
