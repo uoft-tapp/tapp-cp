@@ -100,7 +100,7 @@ class OffersController < ApplicationController
     Nag Mails (admin)
   '''
   def can_nag_instructor
-    check_ddah_status(params[:offers], ["None", "Created"])
+    check_ddah_status(params[:offers], :ddah_status, ["None", "Created"])
   end
 
   def send_nag_instructor
