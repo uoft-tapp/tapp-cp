@@ -42,7 +42,7 @@ class AppController < ApplicationController
     ddah = Ddah.find_by(offer_id: params[:offer_id])
     if ddah
       offer = Offer.find(params[:offer_id])
-      if true #offer[:ddah_status]== "Pending" || offer[:ddah_status]== "Accepted" 
+      if offer[:ddah_status]== "Pending" || offer[:ddah_status]== "Accepted" 
         @ddah = ddah.format
         @offer = offer.format
         render :ddah, layout: false
