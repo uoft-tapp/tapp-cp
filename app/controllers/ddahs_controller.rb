@@ -110,6 +110,7 @@ class DdahsController < ApplicationController
       template = Template.create!(data)
       ddah[:template_id] = template[:id]
       template.allocations = ddah.allocation_ids
+      move_allocations_to_template(template, allocations)
       template.trainings = ddah.training_ids
       template.categories = ddah.category_ids
       clear_ddah(ddah)
@@ -118,6 +119,27 @@ class DdahsController < ApplicationController
       render status: 404, json: {message: "Error: A new template cannot be created from a DDAH that is already using a template."}
     end
   end
+
+  def separate_from_template
+    ddah = Ddah.find(params[:ddah_id])
+    if ddah[:template_id]
+      template = Template.find(ddah[:template_id])
+      data = {
+        optional: template[:optional],
+        instructor_id: template[:instructor_id],
+        tutorial_category: template[:tutorial_category],
+        department: template[:department],
+      }
+      ddah.update_attributes!(data)
+      copy_allocations(ddah, template.allocations)
+      ddah.trainings = template.training_ids
+      ddah.categories = template.category_ids
+      render status: 200, json: {message: "The DDAH was successfully separated from its template."}
+    else
+      render status: 404, json: {message: "Error: A DDAH cannot be separated if it does not have a template."}
+    end
+  end
+
 
   '''
     Send Mails (admin)
@@ -266,6 +288,19 @@ class DdahsController < ApplicationController
     end
     ddah.training_ids = []
     ddah.category_ids = []
+  end
+
+  def copy_allocations(ddah, allocations)
+    allocations.each do |val|
+      val = val.except(:id, :template_id).merge({ddah_id: ddah[:id]})
+      allocation = Allocation.create!(val)
+    end
+  end
+
+  def move_allocations_to_ddah(template, allocations)
+    allocations.each do |allocation|
+      allocation.update_attributes!(template_id: template[:id], ddah_id: nil)
+    end
   end
 
 
