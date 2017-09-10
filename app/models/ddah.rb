@@ -30,6 +30,7 @@ class Ddah < ApplicationRecord
         categories: self.categories,
       }
       if ddah[:send_date]
+        data[:link] = offer[:link].replace("pb", "pb/ddah")
         data[:deadline] = self.get_deadline
       end
       return ddah.merge(data)
@@ -44,6 +45,9 @@ class Ddah < ApplicationRecord
         trainings: template.training_ids,
         categories: template.category_ids,
       }
+      data[:allocations] = data[:allocations].map do |allocation|
+        allocation.except(*[:template_id, :ddah_id])
+      end
       attributes = [
         :optional,
         :department,

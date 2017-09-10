@@ -18,6 +18,9 @@ class Template < ApplicationRecord
       trainings: self.training_ids,
       categories: self.category_ids,
     }
+    data[:allocations] = data[:allocations].map do |allocation|
+      allocation.except(*[:template_id, :ddah_id])
+    end
     return template.merge(data)
   end
 end
