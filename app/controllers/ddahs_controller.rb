@@ -152,7 +152,7 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      offer.update_attributes!(ddah_status: "Approved", ta_coord_signature: params: signature)
+      offer.update_attributes!(ddah_status: "Approved", ta_coord_signature: params[:signature])
     end
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
   end
@@ -161,7 +161,13 @@ class DdahsController < ApplicationController
     Student-Facing
   '''
   def get_ddah_pdf
-    # TO-DO
+    ddah = Ddah.find_by(offer_id: params[:offer_id])
+    if ddah
+      generator = DdahGenerator.new(ddah.format, true)
+      send_data generator.render, filename: "ddah.pdf", disposition: "inline"
+    else
+      render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
+    end
   end
 
   def accept_ddah

@@ -237,8 +237,7 @@ class DdahGenerator
     columns=[5.5, 1, 1]
     y = y+ 0.3
     duties = get_model_name_array(Duty)
-    p duties
-    set_table_helper(start, columns, duties.length, y, duties)
+    set_table_helper(start, columns, duties.length, y)
   end
 
   def get_model_name_array(model)
