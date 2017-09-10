@@ -77,6 +77,7 @@ Rails.application.routes.draw do
   post "/ddahs/status/finish" => "ddahs#finish_ddah"
   post "/ddahs/status/can-approve" => "ddahs#can_approve_ddah"
   post "/ddahs/status/approve" => "ddahs#approve_ddah"
+  get "/templates/:template_id/preview" => "templates#preview"
 
   # student-facing
   get "/pb/:offer_id" => "app#student_view"

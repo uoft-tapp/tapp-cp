@@ -10,8 +10,10 @@ class Template < ApplicationRecord
   def format
     template = self.json
     position = Position.find(template[:position_id])
+    instructor = Instructor.find(template[:instructor_id])
     data = {
       position: position.format,
+      supervisor: instructor[:name],
     }
     return template.merge(data)
   end

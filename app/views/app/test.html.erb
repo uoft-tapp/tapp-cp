@@ -56,6 +56,7 @@
           "Action",
       		"Template Name",
           "Position",
+          "Preview",
       	];
       	let rows = [];
       	for (template in templates){
@@ -64,11 +65,15 @@
             createTemplateActionButtons(template["id"]),
             template["name"],
             template["position"]["position"],
+            createTemplatePreviewLink(template["id"]),
       		]);
       	}
         controls = createTemplateControls(utorid);
       	setTable(headers, rows, div);
         setControls(controls, div);
+      }
+      function createTemplatePreviewLink(id){
+        return "<a href='/templates/"+id+"/preview'>Link</a>";
       }
       function createTemplateControls(utorid){
         return createPositionOptions(utorid)+"Template Name: <input id='"+utorid+"_template_name' type='text' /><button onClick='createTemplate(\""+utorid+"\")'>Create Template route: POST /instructors/"+utorid+"/templates</button>";

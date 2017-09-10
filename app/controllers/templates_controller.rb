@@ -58,6 +58,12 @@ class TemplatesController < ApplicationController
     update_form(template, param)
   end
 
+  def preview
+    template = Template.find(params[:template_id])
+    generator = DdahGenerator.new(template.format, true)
+    send_data generator.render, filename: "ddah_template.pdf", disposition: "inline"
+  end
+
   private
   def template_params
     params.permit(:name, :optional)

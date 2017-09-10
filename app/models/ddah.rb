@@ -18,8 +18,12 @@ class Ddah < ApplicationRecord
     ddah = self.json
     offer = Offer.find(ddah[:offer_id])
     applicant = Applicant.find(offer[:applicant_id])
+    instructor = Instructor.find(ddah[:instructor_id])
+    position = Position.find(offer[:position_id])
     data = {
       applicant: applicant.format,
+      supervisor: instructor[:name],
+      position: position.format,
     }
     if ddah[:send_date]
       data[:deadline] = self.get_deadline
