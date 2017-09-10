@@ -73,7 +73,7 @@ class DdahsController < ApplicationController
   def update
     ddah = Ddah.find(params[:id])
     ddah.update_attributes!(ddah_params)
-    update_form(ddah, param)
+    update_form(ddah, params)
   end
 
   '''

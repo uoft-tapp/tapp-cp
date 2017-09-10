@@ -1,5 +1,6 @@
 module DdahUpdater
   def update_form(form, params)
+    puts params
     if params[:categories]
       form.category_ids = params[:categories]
     end
@@ -18,16 +19,17 @@ module DdahUpdater
         allocation = Allocation.find(entry[:id])
         allocation.update_attributes(
           num_unit: entry[:num_unit],
-          type: entry[:type],
+          unit_name: entry[:unit_name],
           minutes: entry[:minutes],
           duty_id: entry[:duty_id],
         )
       else
+        duty = Duty.find(entry[:duty_id])
         form.allocations.create!(
           num_unit: entry[:num_unit],
-          type: entry[:type],
+          unit_name: entry[:unit_name],
           minutes: entry[:minutes],
-          duty_id: entry[:duty_id],
+          duty_id: duty[:id],
         )
       end
     end

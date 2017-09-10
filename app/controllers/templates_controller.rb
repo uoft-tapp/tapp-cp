@@ -54,8 +54,8 @@ class TemplatesController < ApplicationController
 
   def update
     template = Template.find(params[:id])
+    update_form(template, params)
     template.update_attributes!(template_params)
-    update_form(template, param)
   end
 
   def preview

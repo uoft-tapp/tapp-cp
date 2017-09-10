@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 20170910013349) do
 
   create_table "allocations", force: :cascade do |t|
     t.integer "num_unit"
-    t.string "type"
+    t.string "unit_name"
     t.integer "minutes"
     t.bigint "duty_id"
     t.bigint "ddah_id"

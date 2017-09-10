@@ -15,8 +15,8 @@ class Template < ApplicationRecord
       position: position.format,
       supervisor: instructor[:name],
       allocations: self.allocations,
-      trainings: self.trainings,
-      categories: self.categories,
+      trainings: self.training_ids,
+      categories: self.category_ids,
     }
     return template.merge(data)
   end
