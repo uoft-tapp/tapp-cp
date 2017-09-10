@@ -67,8 +67,9 @@ Rails.application.routes.draw do
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
 
+  post "/ddahs/:ddah_id/new-template" => "ddahs#new_template"
+  post "/ddahs/:ddah_id/separate-from-template" => "ddahs#separate_from_template"
   post "/ddahs/apply-template" => "ddahs#apply_template"
-  post "/ddahs/:id/new-template" => "ddahs#new_template"
   post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
   post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
   post "/ddahs/can-nag-student" => "ddahs#can_nag_student"

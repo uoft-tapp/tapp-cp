@@ -98,7 +98,25 @@ class DdahsController < ApplicationController
   end
 
   def new_template
-    # TO-DO
+    ddah = Ddah.find(params[:ddah_id])
+    if !ddah[:template_id]
+      data = {
+        name: params[:name],
+        optional: ddah[:optional],
+        instructor_id: ddah[:instructor_id],
+        tutorial_category: ddah[:tutorial_category],
+        department: ddah[:department],
+      }
+      template = Template.create!(data)
+      ddah[:template_id] = template[:id]
+      template.allocations = ddah.allocation_ids
+      template.trainings = ddah.training_ids
+      template.categories = ddah.category_ids
+      clear_ddah(ddah)
+      render status: 200, json: {message: "A new template was successfully created."}
+    else
+      render status: 404, json: {message: "Error: A new template cannot be created from a DDAH that is already using a template."}
+    end
   end
 
   '''
