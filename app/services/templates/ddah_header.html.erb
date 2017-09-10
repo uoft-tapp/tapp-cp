@@ -2,8 +2,8 @@
 
 <tablerow>Departments: <%= @ddah[:department]%>:Supervising Professor: <%= @ddah[:supervisor]%>:
 
-<tablerow>Course Code: <%= @ddah[:position][:position]%>: Est. Enrolment / TA: <%= @ddah[:position][:current_enrollment]%>:
+<tablerow>Course Code: <%= @ddah[:position][:position]%>: Est. Enrolment / TA: <%= @ddah[:position][:current_enrollment]? @ddah[:position][:current_enrollment]:0%>:
 
-<tablerow>Course Title: <%= @ddah[:position][:course_name]%>: Expected Enrolment: <%= @ddah[:position][:cap_enrollment]%>:
+<tablerow>Course Title: <%= @ddah[:position][:course_name]%>: Expected Enrolment: <%= @ddah[:position][:cap_enrollment]? @ddah[:position][:cap_enrollment]:0 %>:
 
 <tablerow>Tutorial Category: <%= @ddah[:tutorial_category]%> <%= set_radio_button(@ddah[:optional], ["Optional", "Mandatory"])%>:  :

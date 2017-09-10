@@ -21,7 +21,8 @@ class DdahGenerator
     start_new_page
     training_end = set_training(HEADER_Y_COORD)
     summary_end = set_summary(training_end)
-    set_signature(template, summary_end)
+    signature_end = set_signature(template, summary_end)
+    set_review_box(signature_end)
     go_to_page(1)
     set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"))
   end
@@ -99,12 +100,12 @@ class DdahGenerator
     return [[y, x], [end_y, end_x]]
   end
 
-  def draw_box(grids, shaded = false)
+  def draw_box(grids, shaded = false, color = 'DDDDDD')
     grid(grids[0], grids[1]).bounding_box() do
       stroke_bounds
       if shaded
         stroke do
-          fill_color 'DDDDDD'
+          fill_color color
           fill_and_stroke_rectangle [0,bounds.height], bounds.width, bounds.height
           fill_color '000000'
         end
@@ -337,6 +338,20 @@ class DdahGenerator
       signature_box(y+0.7, titles[1], [signature[1]])
       signature_box(y+1.4, titles[2], [signature[2]])
     end
+    return y+2.1
+  end
+
+  def set_review_box(y)
+    titles = ["Prepared by (Supervisor)", "Approved by (Chair/Designated Authority)", "Accepted by (Teaching Assistant)"]
+    signatures = [@ddah[:review_supervisor_signature], @ddah[:review_ta_coord_signature], @ddah[:review_student_signature]]
+    draw_box(get_grids(0.5, y, 7.5, 1), true)
+    signature_box(y+0.5, titles[0], [signatures], titles[0],titles[0],[2.35, 2.35, 2.35])
+    start = 0.7
+    columns=[5, 0.5, 1.55]
+    y = y+ 0.1
+    text = [["MID COURSE REVIEW CHANGES (if any)", "Date", format_date(@ddah[:review_date])]]
+    draw_box(get_grids(start+columns[0]+columns[1], y, 1.55, 0.3), true, "FFFFFF")
+    set_table_data(start, columns, 0, y, 0.3, text)
   end
 
   def format_date(date)
@@ -346,13 +361,12 @@ class DdahGenerator
     end
   end
 
-  def signature_box(y, title, signature)
+  def signature_box(y, h1, signature, h2="SIGNATURE", h3="Date", columns = [2.9, 2.9, 1.3])
     start = 0.7
-    columns=[2.9, 2.9, 1.3]
-    subtitle = [[title,"SIGNATURE", "Date"]]
-    draw_box(get_grids(start, y, columns[0], 0.3))
-    draw_box(get_grids(start+columns[0], y, columns[1], 0.3))
-    draw_box(get_grids(start+columns[0]+columns[1], y, columns[2], 0.3))
+    subtitle = [[h1,h2, h3]]
+    draw_box(get_grids(start, y, columns[0], 0.3), true, "FFFFFF")
+    draw_box(get_grids(start+columns[0], y, columns[1], 0.3), true, "FFFFFF")
+    draw_box(get_grids(start+columns[0]+columns[1], y, columns[2], 0.3), true, "FFFFFF")
     set_table_data(start, columns, 0, y, 0.25, signature, false, REGULAR_CENTER)
     set_table_data(start, columns, 0, y+0.25, 0.5, subtitle, false, SMALL_CENTER)
   end

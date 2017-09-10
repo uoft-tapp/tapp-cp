@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170910081409) do
+ActiveRecord::Schema.define(version: 20170910133931) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -111,6 +111,10 @@ ActiveRecord::Schema.define(version: 20170910081409) do
     t.date "supervisor_sign_date"
     t.date "ta_coord_sign_date"
     t.date "student_sign_date"
+    t.string "review_supervisor_signature"
+    t.string "review_ta_coord_signature"
+    t.string "review_student_signature"
+    t.date "review_date"
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
     t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
     t.index ["offer_id"], name: "index_ddahs_on_offer_id"
