@@ -85,7 +85,16 @@ class DdahsController < ApplicationController
     Template DDAH (instructor)
   '''
   def apply_template
-    # TO-DO
+    params[:ddahs].each do |id|
+      ddah = Ddah.find(id)
+      if ddah[:template_id]
+        clear_ddah(ddah)
+        ddah.update_attributes!(template_id: params[:template_id])
+      else
+        ddah.update_attributes!(template_id: params[:template_id])
+      end
+    end
+    render status: 200, json: {message: "Batch template apply success."}
   end
 
   def new_template
@@ -224,6 +233,21 @@ class DdahsController < ApplicationController
     if invalid.length > 0
       render status: 404, json: {invalid_offers: invalid}
     end
+  end
+
+  def clear_ddah(ddah)
+    ddah.update_attributes!(
+      optional: nil,
+      instructor_id: nil,
+      tutorial_category: nil,
+      department: nil,
+    )
+    ddah.allocations.each do |allocation|
+      ddah.allocation_ids = ddah.allocation_ids - [allocation[:id]]
+      allocation.destroy!
+    end
+    ddah.training_ids = []
+    ddah.category_ids = []
   end
 
 
