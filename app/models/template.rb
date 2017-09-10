@@ -1,9 +1,9 @@
 class Template < ApplicationRecord
   belongs_to :position
   belongs_to :instructor
-  has_many :categories
+  has_and_belongs_to_many :categories
   has_many :allocations
-  has_many :trainings
+  has_and_belongs_to_many :trainings
   validates :name, uniqueness: {scope: :instructor}
   include Model
 
@@ -14,6 +14,9 @@ class Template < ApplicationRecord
     data = {
       position: position.format,
       supervisor: instructor[:name],
+      allocations: self.allocations,
+      trainings: self.trainings,
+      categories: self.categories,
     }
     return template.merge(data)
   end

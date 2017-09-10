@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170909221736) do
+ActiveRecord::Schema.define(version: 20170910013349) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -82,6 +82,18 @@ ActiveRecord::Schema.define(version: 20170909221736) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "categories_ddahs", id: false, force: :cascade do |t|
+    t.bigint "ddah_id", null: false
+    t.bigint "category_id", null: false
+    t.index ["ddah_id", "category_id"], name: "index_categories_ddahs_on_ddah_id_and_category_id"
+  end
+
+  create_table "categories_templates", id: false, force: :cascade do |t|
+    t.bigint "template_id", null: false
+    t.bigint "category_id", null: false
+    t.index ["template_id", "category_id"], name: "index_categories_templates_on_template_id_and_category_id"
+  end
+
   create_table "ddahs", force: :cascade do |t|
     t.boolean "optional"
     t.bigint "offer_id"
@@ -94,12 +106,18 @@ ActiveRecord::Schema.define(version: 20170909221736) do
     t.string "student_signature"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "nag_count"
+    t.integer "nag_count", default: 0
     t.datetime "send_date"
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
     t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
     t.index ["offer_id"], name: "index_ddahs_on_offer_id"
     t.index ["template_id"], name: "index_ddahs_on_template_id"
+  end
+
+  create_table "ddahs_trainings", id: false, force: :cascade do |t|
+    t.bigint "ddah_id", null: false
+    t.bigint "training_id", null: false
+    t.index ["ddah_id", "training_id"], name: "index_ddahs_trainings_on_ddah_id_and_training_id"
   end
 
   create_table "duties", force: :cascade do |t|
@@ -202,6 +220,12 @@ ActiveRecord::Schema.define(version: 20170909221736) do
     t.index ["instructor_id"], name: "index_templates_on_instructor_id"
     t.index ["name", "instructor_id", "id"], name: "index_templates_on_name_and_instructor_id_and_id", unique: true
     t.index ["position_id"], name: "index_templates_on_position_id"
+  end
+
+  create_table "templates_trainings", id: false, force: :cascade do |t|
+    t.bigint "template_id", null: false
+    t.bigint "training_id", null: false
+    t.index ["template_id", "training_id"], name: "index_templates_trainings_on_template_id_and_training_id"
   end
 
   create_table "trainings", force: :cascade do |t|

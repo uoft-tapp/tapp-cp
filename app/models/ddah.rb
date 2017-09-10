@@ -24,6 +24,9 @@ class Ddah < ApplicationRecord
       applicant: applicant.format,
       supervisor: instructor[:name],
       position: position.format,
+      allocations: self.allocations,
+      trainings: self.trainings,
+      categories: self.categories,
     }
     if ddah[:send_date]
       data[:deadline] = self.get_deadline
