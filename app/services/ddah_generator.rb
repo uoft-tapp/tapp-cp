@@ -3,9 +3,10 @@ class DdahGenerator
   Prawn::Font::AFM.hide_m17n_warning = true
   TITLE = 1
   REGULAR_LEFT_ALIGN = 2
-  SMALL_LEFT_ALIGN = 3
-  SIGNATURE = 4
-  INITIAL = 5
+  REGULAR_CENTER = 3
+  SMALL_CENTER = 4
+  SIGNATURE = 5
+  INITIAL = 6
   HEADER_X_COORD = 0.7
   HEADER_Y_COORD = 0.5
 
@@ -51,12 +52,19 @@ class DdahGenerator
         text: text,
         align: :left,
       }
-    when SMALL_LEFT_ALIGN
+    when REGULAR_CENTER
       return {
         font: "Times-Roman",
-        font_size: 7,
+        font_size: 9,
         text: text,
-        align: :justify,
+        align: :center,
+      }
+    when SMALL_CENTER
+      return {
+        font: "Times-Roman",
+        font_size: 6,
+        text: text,
+        align: :center,
       }
     when SIGNATURE
       return {
@@ -134,14 +142,6 @@ class DdahGenerator
     end
   end
 
-  # draws a horizontal according to the fraction of 7.5 inches (because margin
-  # for the document is 0.5 inches on all sides)
-  def draw_line(grids, length)
-    grid(grids[0], grids[1]).bounding_box() do
-      stroke_horizontal_line 0, 470*length, at: 5
-    end
-  end
-
   # reads forms data, which an array of strings, and extract for a "tablerow"
   # and gets the max number of columns needed in the form table
   def get_table_data(form_data)
@@ -182,39 +182,61 @@ class DdahGenerator
     start = 0.5
     columns=[1, 3.5, 1, 1, 1]
     y = y+ 0.8
-    set_table_helper(start, columns, 23, y)
-    large_heading = allocation_data[1].split(":")
-    subtitle = allocation_data[2].split(":")
-    set_table_data(start, columns, 0, y+0.1, 0.3, large_heading)
-    set_table_data(start, columns, 0, y+0.3, 0.5, subtitle, SMALL_LEFT_ALIGN)
+    set_table_helper(start, columns, 24, y)
+    large_heading = [allocation_data[1].split(":")]
+    subtitle = [allocation_data[2].split(":")]
+    set_table_data(start, columns, 0, y, 0.3, large_heading, false, REGULAR_CENTER)
+    set_table_data(start, columns, 0, y+0.2, 0.5, subtitle, false, SMALL_CENTER)
+    set_table_data(start, columns, 25, y, 0.3, [["<b>Total</b>","", get_total_minutes, get_total, ""]])
+    set_table_data(start, columns, 1, y, 0.3, get_allocation_data)
+  end
+
+  def get_allocation_data
+    allocations =[]
+    @ddah[:allocations].each do |allocation|
+      row = [
+        allocation[:num_unit],
+        allocation[:unit_name],
+        allocation[:minutes],
+        get_hours(allocation),
+        "",
+      ]
+      allocations.push(row)
+    end
+    return allocations
   end
 
 
-  def set_table_data(start, columns, row, y, height, data, style = REGULAR_LEFT_ALIGN)
+  def set_table_data(start, columns, row, y, height, data, pad = true, style = REGULAR_LEFT_ALIGN)
     curr = 0
-    while curr <= row
-      if curr == row
-        draw_table_data(start, columns, y, height, data, style)
+    index = 0
+    while curr <= row+data.length-1
+      if curr >= row
+        draw_table_data(start, columns, y, height, data[index], pad, style)
+        index+=1
       end
       if curr == 0
         y = y + 0.5
       else
-        y = y + 0.3
+        y = y + height
       end
       curr +=1
     end
   end
 
-  def draw_table_data(start, columns, y, height, data, style)
+  def draw_table_data(start, columns, y, height, data, pad, style)
     columns.each_with_index do |column, index|
+      if pad
+        data[index] = "#{@whitespace}#{data[index]}"
+      end
       set_text(get_grids(get_column_sum(start, columns, index),
         y, columns[index], height),
-        get_style(style, data[index]))
+        get_style(style, data[index]), false, true)
     end
   end
 
   def set_table_helper(start, columns, rows, y)
-    for index in 0..rows+2
+    for index in 0..rows+1
       if index == 0
         draw_row(start, columns, y, 0.5, true)
         y = y + 0.5
@@ -251,10 +273,33 @@ class DdahGenerator
   def set_training(y)
     draw_box(get_grids(0.5, y, 7.5, 0.3))
     set_text(get_grids(0.5, y, 7.5, 0.3), get_style(TITLE, "Training"), false, true, 5)
-    draw_box(get_grids(0.5, y+0.3, 7.5, 1), true)
-    training = get_model_name_array(Training)
+    draw_box(get_grids(0.5, y+0.3, 7.5, 1.1), true)
+    start = 0.5
+    column1=[3.7]
+    column2=[3.7,4]
+    y-=0.2
+    set_table_data(start, column2, 1, y, 0.24, [["", "Indicate Tutorial Category (1 primary activity)"]])
+    set_table_data(start, column1, 1, y, 0.21, get_checklist(Training, :trainings, 1, 0))
+    set_table_data(start, column2, 1, y+0.2, 0.21, get_checklist(Category, :categories, 2, 1))
+    return y+1.6
+  end
 
-    return y+1.3
+  def get_checklist(model, attr, len, index)
+    data = []
+    model.all.each do |item|
+      if @ddah[attr].include?item[:id]
+        val = "[X]"
+      else
+        val = "[  ]"
+      end
+      row =[]
+      for i in 0..len-1
+        row.push("")
+      end
+      row[index]="#{val} #{item[:name]}"
+      data.push(row)
+    end
+    return data
   end
 
   def set_summary(y)
@@ -264,15 +309,50 @@ class DdahGenerator
     start = 0.5
     columns=[5.5, 1, 1]
     y = y+ 0.3
-    duties = get_model_name_array(Duty)
+    duties = get_summary_data
     set_table_helper(start, columns, duties.length, y)
+    large_heading = [["Duties", "Initial", "Revised"]]
+    subtitle = [["","", "if necessary"]]
+    set_table_data(start, columns, 0, y, 0.3, large_heading, false, REGULAR_CENTER)
+    set_table_data(start, columns, 0, y+0.2, 0.5, subtitle, false, SMALL_CENTER)
+    set_table_data(start, columns, 1, y, 0.3, duties)
+    set_table_data(start, columns, duties.length+1, y, 0.3, [["<b>Total</b>",get_total, ""]])
   end
 
-  def get_model_name_array(model)
-    data = model.all
-    data.map do |item|
-      item[:name]
+  def get_summary_data
+    data = []
+    Duty.all.each do |duty|
+      row = [duty[:name], 0, ""]
+      @ddah[:allocations].each do |allocation|
+        if allocation[:duty_id] == duty[:id]
+          row[1]+=get_hours(allocation)
+        end
+      end
+      row[1] =  '%.1f' % row[1]
+      data.push(row)
     end
+    return data
+  end
+
+  def get_total_minutes
+    total = 0
+    @ddah[:allocations].each do |allocation|
+      total+=allocation[:minutes]
+    end
+    return total
+  end
+
+  def get_total
+    total = 0
+    @ddah[:allocations].each do |allocation|
+      total+=get_hours(allocation)
+    end
+    total =  '%.1f' % total
+    return total
+  end
+
+  def get_hours(allocation)
+    (allocation[:num_unit]*allocation[:minutes])/60
   end
 
   def set_form_table(grids, table_data, rows)

@@ -20,12 +20,16 @@ class Ddah < ApplicationRecord
     applicant = Applicant.find(offer[:applicant_id])
     position = Position.find(offer[:position_id])
     if !ddah[:template_id]
+      allocations = self.allocations.map do |allocation|
+        allocation = allocation.json
+        allocation.except(*[:template_id, :ddah_id])
+      end
       instructor = Instructor.find(ddah[:instructor_id])
       data = {
         applicant: applicant.format,
         supervisor: instructor[:name],
         position: position.format,
-        allocations: self.allocations,
+        allocations: allocations,
         trainings: self.trainings,
         categories: self.categories,
       }
@@ -37,17 +41,18 @@ class Ddah < ApplicationRecord
     else
       template = Template.find(ddah[:template_id])
       instructor = Instructor.find(template[:instructor_id])
+      allocations = template.allocations.map do |allocation|
+        allocation = allocation.json
+        allocation.except(*[:template_id, :ddah_id])
+      end
       data = {
         applicant: applicant.format,
         supervisor: instructor[:name],
         position: position.format,
-        allocations: template.allocations,
+        allocations: allocations,
         trainings: template.training_ids,
         categories: template.category_ids,
       }
-      data[:allocations] = data[:allocations].map do |allocation|
-        allocation.except(*[:template_id, :ddah_id])
-      end
       attributes = [
         :optional,
         :department,

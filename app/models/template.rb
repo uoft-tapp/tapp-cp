@@ -11,16 +11,18 @@ class Template < ApplicationRecord
     template = self.json
     position = Position.find(template[:position_id])
     instructor = Instructor.find(template[:instructor_id])
+    allocations = self.allocations.map do |allocation|
+      allocation = allocation.json
+      allocation.except(*[:template_id, :ddah_id])
+    end
     data = {
       position: position.format,
       supervisor: instructor[:name],
-      allocations: self.allocations,
+      allocations: allocations,
       trainings: self.training_ids,
       categories: self.category_ids,
     }
-    data[:allocations] = data[:allocations].map do |allocation|
-      allocation.except(*[:template_id, :ddah_id])
-    end
+    puts data
     return template.merge(data)
   end
 end
