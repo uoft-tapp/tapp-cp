@@ -217,7 +217,7 @@ class DdahsController < ApplicationController
   def get_ddah_pdf
     ddah = Ddah.find_by(offer_id: params[:offer_id])
     if ddah
-      generator = DdahGenerator.new(ddah.format, true)
+      generator = DdahGenerator.new(ddah.format)
       send_data generator.render, filename: "ddah.pdf", disposition: "inline"
     else
       render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}

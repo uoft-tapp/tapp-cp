@@ -20,7 +20,8 @@ class DdahGenerator
     set_allocation_table(HEADER_X_COORD, HEADER_Y_COORD+1, @parser.get_data("allocations"))
     start_new_page
     training_end = set_training(HEADER_Y_COORD)
-    set_summary(training_end)
+    summary_end = set_summary(training_end)
+    set_signature(template, summary_end)
     go_to_page(1)
     set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"))
   end
@@ -317,6 +318,43 @@ class DdahGenerator
     set_table_data(start, columns, 0, y+0.2, 0.5, subtitle, false, SMALL_CENTER)
     set_table_data(start, columns, 1, y, 0.3, duties)
     set_table_data(start, columns, duties.length+1, y, 0.3, [["<b>Total</b>",get_total, ""]])
+    return y+((duties.length+1)*0.3)+0.7
+  end
+
+  def set_signature(template, y)
+    titles = ["Prepared by (Supervisor)", "Approved by (Chair/Designated Authority)", "Accepted by (Teaching Assistant)"]
+    if template
+      signature = [[@ddah[:supervisor], "", ""], [ENV["TA_COORD"], "", ""], ["", "", ""]]
+      signature_box(y, titles[0], [signature[0]])
+      signature_box(y+0.7, titles[1], [signature[1]])
+      signature_box(y+1.4, titles[2], [signature[2]])
+    else
+      signature = [[@ddah[:supervisor], @ddah[:supervisor_signature], format_date(@ddah[:supervisor_sign_date])],
+        [ENV["TA_COORD"], @ddah[:ta_coord_signature], format_date(@ddah[:ta_coord_sign_date])],
+        ["#{@ddah[:applicant][:first_name]} #{@ddah[:applicant][:last_name]}", @ddah[:student_signature],
+          format_date(@ddah[:student_sign_date])]]
+      signature_box(y, titles[0], [signature[0]])
+      signature_box(y+0.7, titles[1], [signature[1]])
+      signature_box(y+1.4, titles[2], [signature[2]])
+    end
+  end
+
+  def format_date(date)
+    if date
+      date = Date.parse(date)
+      date.strftime("%B %e, %Y")
+    end
+  end
+
+  def signature_box(y, title, signature)
+    start = 0.7
+    columns=[2.9, 2.9, 1.3]
+    subtitle = [[title,"SIGNATURE", "Date"]]
+    draw_box(get_grids(start, y, columns[0], 0.3))
+    draw_box(get_grids(start+columns[0], y, columns[1], 0.3))
+    draw_box(get_grids(start+columns[0]+columns[1], y, columns[2], 0.3))
+    set_table_data(start, columns, 0, y, 0.25, signature, false, REGULAR_CENTER)
+    set_table_data(start, columns, 0, y+0.25, 0.5, subtitle, false, SMALL_CENTER)
   end
 
   def get_summary_data
