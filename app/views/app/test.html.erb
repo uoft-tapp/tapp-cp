@@ -49,7 +49,6 @@
         getHelper("/instructors/"+utorid+"/templates", createTemplateTable, utorid, div);
       }
       function createTemplateTable(templates, div, utorid){
-        console.log(templates);
         app["templates"][utorid] = templates;
         setupOffers(utorid);
       	let headers = [
