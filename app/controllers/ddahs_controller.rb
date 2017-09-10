@@ -73,7 +73,12 @@ class DdahsController < ApplicationController
   def update
     ddah = Ddah.find(params[:id])
     ddah.update_attributes!(ddah_params)
-    update_form(ddah, params)
+    if !ddah[:template_id]
+      update_form(ddah, params)
+      render status: 200, json: {message: "DDAH was updated successfully."}
+    else
+      render status: 404, json: {message: "Error: This DDAH is currently using a template. You need to either update the template or separate this DDAH from the current template."}
+    end
   end
 
   '''
