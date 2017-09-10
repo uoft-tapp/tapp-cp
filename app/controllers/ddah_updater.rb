@@ -1,6 +1,5 @@
 module DdahUpdater
   def update_form(form, params)
-    puts params
     if params[:categories]
       form.category_ids = params[:categories]
     end
@@ -38,7 +37,6 @@ module DdahUpdater
   def delete_missing_allocations(form, allocations)
     allocation_ids = get_allocation_ids(allocations)
     deleted_allocations = get_deleted_allocations(form.allocation_ids, allocation_ids)
-    puts "hello"
     deleted_allocations.each do |id|
       allocation = Allocation.find(id)
       allocation.destroy!
