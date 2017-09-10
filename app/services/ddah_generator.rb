@@ -183,6 +183,34 @@ class DdahGenerator
     columns=[1, 3.5, 1, 1, 1]
     y = y+ 0.8
     set_table_helper(start, columns, 23, y)
+    large_heading = allocation_data[1].split(":")
+    subtitle = allocation_data[2].split(":")
+    set_table_data(start, columns, 0, y+0.1, 0.3, large_heading)
+    set_table_data(start, columns, 0, y+0.3, 0.5, subtitle, SMALL_LEFT_ALIGN)
+  end
+
+
+  def set_table_data(start, columns, row, y, height, data, style = REGULAR_LEFT_ALIGN)
+    curr = 0
+    while curr <= row
+      if curr == row
+        draw_table_data(start, columns, y, height, data, style)
+      end
+      if curr == 0
+        y = y + 0.5
+      else
+        y = y + 0.3
+      end
+      curr +=1
+    end
+  end
+
+  def draw_table_data(start, columns, y, height, data, style)
+    columns.each_with_index do |column, index|
+      set_text(get_grids(get_column_sum(start, columns, index),
+        y, columns[index], height),
+        get_style(style, data[index]))
+    end
   end
 
   def set_table_helper(start, columns, rows, y)
