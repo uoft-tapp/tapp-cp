@@ -190,7 +190,7 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      offer.update_attributes!(ddah_status: "Ready", supervisor_signature: params[:signature])
+      offer.update_attributes!(ddah_status: "Ready", supervisor_signature: params[:signature], supervisor_sign_date: Date.now)
     end
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Ready'."}
   end
@@ -206,7 +206,7 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      offer.update_attributes!(ddah_status: "Approved", ta_coord_signature: params[:signature])
+      offer.update_attributes!(ddah_status: "Approved", ta_coord_signature: params[:signature], ta_coord_sign_date: Date.now)
     end
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
   end
@@ -229,7 +229,7 @@ class DdahsController < ApplicationController
     if offer[:ddah_status] == "Accepted"
       render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
     elsif offer[:ddah_status] == "Pending"
-      offer.update_attributes!(ddah_status: "Accepted", student_signature: params[:signature])
+      offer.update_attributes!(ddah_status: "Accepted", student_signature: params[:signature], student_sign_date: Date.now)
       render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
     else
       render status: 404, json: {message: "Error: You cannot accept an unsent DDaH.", status: offer[:ddah_status]}
