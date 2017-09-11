@@ -82,8 +82,8 @@ const Header = props =>
                 <tr>
                     <td />
                     <td>
-                        <input type="radio" name="opt" />&nbsp;Optional&emsp;
-                        <input type="radio" name="opt" />&nbsp;Mandatory
+                        <input type="radio" name="optional" value={true} />&nbsp;Optional&emsp;
+                        <input type="radio" name="optional" value={false} />&nbsp;Mandatory
                     </td>
                 </tr>
             </tbody>
@@ -187,52 +187,57 @@ const Worksheet = props =>
         </tbody>
     </Table>;
 
-const Training = props =>
-    <div id="training">
-        <table>
-            <thead>
-                <tr className="title">
-                    <th colSpan="2">Training</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <input type="checkbox" />&nbsp;Attending Health and Safety training sessions
-                    </td>
-                    <td>Indicate Tutorial Category (1 primary activity)</td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="checkbox" />&nbsp;Meetings with supervisor
-                    </td>
-                    <td>
-                        <input type="checkbox" />&nbsp;Discussion-based Tutorial
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="checkbox" />&nbsp;Adaptive Teaching Techniques (ATT)
-                    </td>
-                    <td>
-                        <input type="checkbox" />&nbsp;Skill Development Tutorial
-                    </td>
-                </tr>
-                <tr>
-                    <td>(scaling learning activities)</td>
-                    <td>
-                        <input type="checkbox" />&nbsp;Review and Q&amp;A Session
-                    </td>
-                </tr>
-                <tr>
-                    <td />
-                    <td>
-                        <input type="checkbox" />&nbsp;Laboratory/Practical
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>;
+const Training = props => {
+    let trainings = props.appState.getTrainingsList(),
+        categories = props.appState.getCategoriesList();
+
+    return (
+        <div id="training">
+            <table>
+                <thead>
+                    <tr className="title">
+                        <th colSpan="2">Training</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <table className="sub-table">
+                                <tbody>
+                                    {trainings.map(training =>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" />&nbsp;{training}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>
+                            <table className="sub-table">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            Indicate Tutorial Category (1 primary activity)
+                                        </td>
+                                    </tr>
+                                    {categories.map(category =>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" />&nbsp;{category}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
+};
 
 const Summary = props => {
     let duties = props.appState.getDutiesList();
@@ -284,11 +289,20 @@ const Menu = props =>
             onClick={() => {
                 if (props.appState.clearDdah()) {
                     Array.prototype.forEach.call(
-                        document.querySelectorAll(
-                            '#worksheet-table input, #worksheet-table select'
-                        ),
+                        document.querySelectorAll('#instr-grid input, #instr-grid select'),
                         function(input) {
-                            input.value = null;
+                            switch (input.type) {
+                                case 'text':
+                                    input.value = null;
+                                    break;
+                                case 'checkbox':
+                                    input.checked = false;
+                                    break;
+                                case 'radio':
+                                    break;
+                                default:
+                                    input.value = null;
+                            }
                         }
                     );
                 }

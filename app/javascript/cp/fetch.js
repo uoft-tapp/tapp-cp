@@ -63,22 +63,42 @@ function putHelper(URL, body) {
 
 /* Resource GETters */
 
-const getOffers = () =>
-    getHelper('/offers')
+const getCategories = () =>
+    getHelper('/categories')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchOffersSuccess);
+        .then(onFetchCategoriesSuccess);
 
 const getDuties = () =>
     getHelper('/duties')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchDutiesSuccess);
 
+const getOffers = () =>
+    getHelper('/offers')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchOffersSuccess);
+
 const getSessions = () =>
     getHelper('/sessions')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchSessionsSuccess);
 
+const getTrainings = () =>
+    getHelper('/trainings')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchTrainingsSuccess);
+
 /* Success callbacks for resource GETters */
+
+function onFetchCategoriesSuccess(resp) {
+    let categories = {};
+
+    resp.forEach(category => {
+        categories[category.id] = category.name;
+    });
+
+    return categories;
+}
 
 function onFetchDutiesSuccess(resp) {
     let duties = {};
@@ -110,7 +130,7 @@ function onFetchOffersSuccess(resp) {
             sentAt: offer.send_date,
             printedAt: offer.print_time,
             link: offer.link,
-	    note: offer.commentary,
+            note: offer.commentary,
         };
     });
 
@@ -129,6 +149,16 @@ function onFetchSessionsSuccess(resp) {
     });
 
     return sessions;
+}
+
+function onFetchTrainingsSuccess(resp) {
+    let trainings = {};
+
+    resp.forEach(training => {
+        trainings[training.id] = training.name;
+    });
+
+    return trainings;
 }
 
 /* Function to GET all resources */
@@ -155,7 +185,17 @@ function adminFetchAll() {
 }
 
 function instructorFetchAll() {
+    appState.setFetchingCategoriesList(true);
     appState.setFetchingDutiesList(true);
+    appState.setFetchingTrainingsList(true);
+
+    // when categories are successfully fetched, update the categories list; set fetching flag to false either way
+    getCategories()
+        .then(categories => {
+            appState.setCategoriesList(fromJS(categories));
+            appState.setFetchingCategoriesList(false, true);
+        })
+        .catch(() => appState.setFetchingCategoriesList(false));
 
     // when duties are successfully fetched, update the duties list; set fetching flag to false either way
     getDuties()
@@ -164,6 +204,14 @@ function instructorFetchAll() {
             appState.setFetchingDutiesList(false, true);
         })
         .catch(() => appState.setFetchingDutiesList(false));
+
+    // when trainings are successfully fetched, update the trainings list; set fetching flag to false either way
+    getTrainings()
+        .then(trainings => {
+            appState.setTrainingsList(fromJS(trainings));
+            appState.setFetchingTrainingsList(false, true);
+        })
+        .catch(() => appState.setFetchingTrainingsList(false));
 }
 
 // import locked assignments from TAPP
@@ -592,7 +640,7 @@ function noteOffer(offer, note) {
                 .catch(() => appState.setFetchingOffersList(false));
         });
 }
-    
+
 // clear HR status
 function clearHrStatus(offers) {
     let validOffers = offers;

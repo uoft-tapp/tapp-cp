@@ -28,6 +28,8 @@ const initialState = {
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
     duties: { fetching: 0, list: null },
+    trainings: { fetching: 0, list: null },
+    categories: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -386,6 +388,11 @@ class AppState {
         }
     }
 
+    // check if categories are being fetched
+    fetchingCategories() {
+        return this.get('categories.fetching') > 0;
+    }
+
     // check if duties are being fetched
     fetchingDuties() {
         return this.get('duties.fetching') > 0;
@@ -401,6 +408,11 @@ class AppState {
         return this.get('sessions.fetching') > 0;
     }
 
+    // check if trainings are being fetched
+    fetchingTrainings() {
+        return this.get('trainings.fetching') > 0;
+    }
+
     // get a sorted list of the position names in the current offers list as a JS array
     getCourseCodes() {
         let offers = this.getOffersList();
@@ -409,6 +421,10 @@ class AppState {
             return offers.map(offer => offer.get('course')).flip().keySeq().toJS();
         }
         return [];
+    }
+
+    getCategoriesList() {
+        return this.get('categories.list');
     }
 
     getDutiesList() {
@@ -421,6 +437,10 @@ class AppState {
 
     getSessionsList() {
         return this.get('sessions.list');
+    }
+
+    getTrainingsList() {
+        return this.get('trainings.list');
     }
 
     // get a sorted list of the positions in the current offers list as a JS array
@@ -445,6 +465,10 @@ class AppState {
         return this.get('importing') > 0;
     }
 
+    isCategoriesListNull() {
+        return this.get('categories.list') == null;
+    }
+
     isDutiesListNull() {
         return this.get('duties.list') == null;
     }
@@ -455,6 +479,10 @@ class AppState {
 
     isSessionsListNull() {
         return this.get('sessions.list') == null;
+    }
+
+    isTrainingsListNull() {
+        return this.get('trainings.list') == null;
     }
 
     nag(offers) {
@@ -511,6 +539,24 @@ class AppState {
         fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
     }
 
+    setFetchingCategoriesList(fetching, success) {
+        let init = this.get('categories.fetching'),
+            notifications = this.get('notifications');
+        if (fetching) {
+            this.set({
+                'categories.fetching': init + 1,
+                notifications: notifications.push('<i>Fetching categories...</i>'),
+            });
+        } else if (success) {
+            this.set({
+                'categories.fetching': init - 1,
+                notifications: notifications.push('Successfully fetched categories.'),
+            });
+        } else {
+            this.set('categories.fetching', init - 1);
+        }
+    }
+
     setFetchingDutiesList(fetching, success) {
         let init = this.get('duties.fetching'),
             notifications = this.get('notifications');
@@ -565,6 +611,24 @@ class AppState {
         }
     }
 
+    setFetchingTrainingsList(fetching, success) {
+        let init = this.get('trainings.fetching'),
+            notifications = this.get('notifications');
+        if (fetching) {
+            this.set({
+                'trainings.fetching': init + 1,
+                notifications: notifications.push('<i>Fetching trainings...</i>'),
+            });
+        } else if (success) {
+            this.set({
+                'trainings.fetching': init - 1,
+                notifications: notifications.push('Successfully fetched trainings.'),
+            });
+        } else {
+            this.set('trainings.fetching', init - 1);
+        }
+    }
+
     setHrProcessed(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');
@@ -605,6 +669,10 @@ class AppState {
         fetch.setOfferAccepted(offers[0]);
     }
 
+    setCategoriesList(list) {
+        this.set('categories.list', list);
+    }
+
     setDutiesList(list) {
         this.set('duties.list', list);
     }
@@ -630,6 +698,10 @@ class AppState {
         });
 
         this.set('sessions.list', list);
+    }
+
+    setTrainingsList(list) {
+        this.set('trainings.list', list);
     }
 
     showContractApplicant(offer) {

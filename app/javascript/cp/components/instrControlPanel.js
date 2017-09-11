@@ -5,12 +5,14 @@ import { DdahForm } from './ddahForm.js';
 
 class InstrControlPanel extends React.Component {
     render() {
-        let nullCheck = this.props.appState.isDutiesListNull();
+        let nullCheck =
+            this.props.appState.isDutiesListNull() || this.props.appState.isTrainingsListNull();
         if (nullCheck) {
             return <div id="loader" />;
         }
 
-        let fetchCheck = this.props.appState.fetchingDuties();
+        let fetchCheck =
+            this.props.appState.fetchingDuties() || this.props.appState.fetchingTrainings();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         return (

@@ -251,29 +251,33 @@ footer div p {
 
 /* ddah training table */
 
-#instr-grid #training table {
+#instr-grid #training > table {
     border: var(--border);
+}
+
+#instr-grid #training .sub-table {
+    width: auto;
 }
 
 #instr-grid #training thead {
     border-bottom: 3px solid;
 }
 
-#instr-grid #training tr,
-#instr-grid #training td {
+#instr-grid #training table tr,
+#instr-grid #training table td {
     background-color: var(--dark-bg);
 }
 
-#instr-grid #training tr:first-child td {
+#instr-grid #training .sub-table tr:first-child td {
     padding-top: 10px;
 }
 
-#instr-grid #training tr td {
+#instr-grid #training .sub-table tr td {
     padding-left: 10px;
     padding-right: 10px;
 }
 
-#instr-grid #training tr:last-child td {
+#instr-grid #training .sub-table tr:last-child td {
     padding-bottom: 10px;
 }
 
