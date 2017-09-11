@@ -600,7 +600,7 @@ function clearHrStatus(offers) {
             }
         })
         // update valid offers
-        .then(() => putHelper('/offers/clear-hris-status', { contracts: validOffers }))
+        .then(() => postHelper('/offers/clear-hris-status', { contracts: validOffers }))
         .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
