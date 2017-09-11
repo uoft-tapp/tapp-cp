@@ -335,7 +335,7 @@ function setHrProcessed(offers) {
                                 offersList.getIn([offer.toString(), 'firstName']) +
                                 ' for ' +
                                 offersList.getIn([offer.toString(), 'position']) +
-                                ' as HR processed'
+                                ' as HRIS processed'
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -565,6 +565,73 @@ function noteOffer(offer, note) {
                 .catch(() => appState.setFetchingOffersList(false));
         });
 }
+    
+// clear HR status
+function clearHrStatus(offers) {
+    let validOffers = offers;
+
+    // check which offers can have their HR status cleared
+    postHelper('/offers/can-clear-hris-status', { contracts: offers })
+        .then(resp => {
+            if (resp.status == 404) {
+                // some offers cannot be updated
+                let offersList = appState.getOffersList();
+
+                return resp.json().then(res => {
+                    res.invalid_offers.forEach(offer => {
+                        appState.alert(
+                            '<b>Error</b>: Cannot clear HRIS status for offer to ' +
+                                offersList.getIn([offer.toString(), 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer.toString(), 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer.toString(), 'position'])
+                        );
+                        // remove invalid offer(s) from offer list
+                        validOffers.splice(validOffers.indexOf(offer), 1);
+                    });
+                    if (validOffers.length == 0) {
+                        return Promise.reject();
+                    }
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
+            }
+        })
+        // update valid offers
+        .then(() => postHelper('/offers/clear-hris-status', { contracts: validOffers }))
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
+}
+
+// set status to accepted
+function setOfferAccepted(offer) {
+    postHelper('/offers/' + offer + '/accept', {})
+        .then(resp => {
+            if (resp.status == 404) {
+                return resp.json().then(resp => appState.alert(resp.message)).then(Promise.reject);
+            } else if (!resp.ok) {
+                return respFailure(resp);
+            }
+        })
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
+}
 
 // export all offers from the session to CSV
 function exportOffers(session) {
@@ -609,5 +676,7 @@ export {
     updateSessionPay,
     noteOffer,
     exportOffers,
+    clearHrStatus,
+    setOfferAccepted,
     fetchAuth,
 };
