@@ -40,7 +40,7 @@ class OffersController < ApplicationController
   end
 
   def can_clear_hris_status
-    check_offers_status(params[:contracts], :hris_status, [nil, "Processed", "Printed"])
+    check_offers_status(params[:contracts], :hr_status, [nil, "Processed", "Printed"])
   end
 
   def update
@@ -122,7 +122,7 @@ class OffersController < ApplicationController
   def clear_hris_status
     params[:contracts].each do |id|
       offer = Offer.find(id)
-      offer.update_attributes!(hris_status: nil)
+      offer.update_attributes!(hr_status: nil)
     end
   end
 
