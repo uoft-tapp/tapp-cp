@@ -122,7 +122,7 @@ class OffersController < ApplicationController
   def clear_hris_status
     params[:contracts].each do |id|
       offer = Offer.find(id)
-      offer.update_attributes!(hr_status: nil)
+      offer.update_attributes!(hr_status: nil, print_time: nil)
     end
   end
 
