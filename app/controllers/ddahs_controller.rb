@@ -238,7 +238,7 @@ class DdahsController < ApplicationController
 
   private
   def ddah_params
-    params.permit(:optional)
+    params.permit(:optional, :scaling_learning)
   end
 
   def get_all_ddahs(ddahs)
