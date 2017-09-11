@@ -161,20 +161,42 @@ footer div p {
     --border: 1px solid black;
     --light-bg: #f9f9f9;
     --dark-bg: #e7e7e7;
+    --ddah-width: 900px;
+    --menu-height: 34px;
+}
+
+#instr-grid #menu {
+    width: calc(var(--ddah-width) + 50px);
+}
+
+#instr-grid #submit,
+#instr-grid #save,
+#instr-grid #clear {
+    float: right;
+}
+
+#instr-grid #ddah-container {
+    width: calc(var(--ddah-width) + 50px);
+    padding: 20px 25px;
+    border: 1px dotted black;
+    margin-top: 1vh;
     
-    max-height: var(--main-div-height);
+    max-height: calc(var(--main-div-height) - var(--menu-height) - 1vh);
     overflow: auto;
+}
+
+#instr-grid h3 {
+    margin: 0 0 1vh 0;
 }
 
 #instr-grid #ddah-header,
 #instr-grid #worksheet-table,
-#instr-grid #training,
-#instr-grid #summary-table {
+#instr-grid #training {
     margin-bottom: 2vh;
 }
 
 #instr-grid table {
-    width: 900px;
+    width: var(--ddah-width);
     margin: 0;
 }
 

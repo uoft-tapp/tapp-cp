@@ -1,94 +1,108 @@
 import React from 'react';
-import { Table, ButtonToolbar, Button } from 'react-bootstrap';
+import { Table, Button } from 'react-bootstrap';
 
 class DdahForm extends React.Component {
     render() {
         return (
-            <div>
+            <div id="ddah-container">
                 <h3>Description of Duties and Allocation of Hours Form</h3>
                 <Header {...this.props} />
                 <Worksheet {...this.props} />
                 <Training {...this.props} />
                 <Summary {...this.props} />
-                <Menu {...this.props} />
             </div>
         );
     }
 }
 
-const Header = props =>
-    <div id="ddah-header">
-        <table>
-            <tbody>
-                <tr>
-                    <td>
-                        <b>Department:</b>
-                    </td>
-                    <td>
-                        <input type="text" />
-                    </td>
-                    <td>
-                        <b>Supervising Professor:</b>
-                    </td>
-                    <td>
-                        <select />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Course Code:</b>
-                    </td>
-                    <td>
-                        <input type="text" />
-                    </td>
-                    <td>
-                        <b>Est. Enrolment / TA:</b>
-                    </td>
-                    <td>
-                        <input type="number" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Course Title:</b>
-                    </td>
-                    <td>
-                        <input type="text" />
-                    </td>
-                    <td>
-                        <b>Expected Enrolment:</b>
-                    </td>
-                    <td>
-                        <input type="number" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Tutorial Category:</b>
-                    </td>
-                    <td>
-                        <input type="text" />
-                    </td>
-                    <td rowSpan="2">
-                        <small>
-                            Requires Training for Scaling Learning<br />Activities to Size of
-                            Tutorial
-                        </small>
-                    </td>
-                    <td rowSpan="2">
-                        <input type="checkbox" />
-                    </td>
-                </tr>
-                <tr>
-                    <td />
-                    <td>
-                        <input type="radio" name="optional" value={true} />&nbsp;Optional&emsp;
-                        <input type="radio" name="optional" value={false} />&nbsp;Mandatory
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>;
+const Header = props => {
+    let course = props.appState.getCoursesList().get(props.selectedCourse);
+
+    return (
+        <div id="ddah-header">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>Department:</b>
+                        </td>
+                        <td>
+                            <input type="text" readOnly value="Computer Science" />
+                        </td>
+                        <td>
+                            <b>Supervising Professor:</b>
+                        </td>
+                        <td>
+                            <select />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Course Code:</b>
+                        </td>
+                        <td>
+                            <input type="text" readOnly value={course ? course.get('code') : ''} />
+                        </td>
+                        <td>
+                            <b>Est. Enrolment / TA:</b>
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                readOnly
+                                value={
+                                    course ? course.get('estimatedEnrol') / props.offers.size : ''
+                                }
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Course Title:</b>
+                        </td>
+                        <td>
+                            <input type="text" readOnly value={course ? course.get('name') : ''} />
+                        </td>
+                        <td>
+                            <b>Expected Enrolment:</b>
+                        </td>
+                        <td>
+                            <input
+                                type="number"
+                                readOnly
+                                value={course ? course.get('estimatedEnrol') : ''}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Tutorial Category:</b>
+                        </td>
+                        <td>
+                            <input type="text" />
+                        </td>
+                        <td rowSpan="2">
+                            <small>
+                                Requires Training for Scaling Learning<br />Activities to Size of
+                                Tutorial
+                            </small>
+                        </td>
+                        <td rowSpan="2">
+                            <input type="checkbox" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td />
+                        <td>
+                            <input type="radio" name="optional" value={true} />&nbsp;Optional&emsp;
+                            <input type="radio" name="optional" value={false} />&nbsp;Mandatory
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
+};
 
 const Worksheet = props =>
     <Table condensed hover id="worksheet-table">
@@ -218,9 +232,7 @@ const Training = props => {
                             <table className="sub-table">
                                 <tbody>
                                     <tr>
-                                        <td>
-                                            Indicate Tutorial Category (1 primary activity)
-                                        </td>
+                                        <td>Indicate Tutorial Category (1 primary activity)</td>
                                     </tr>
                                     {categories.map(category =>
                                         <tr>
@@ -279,36 +291,5 @@ const Summary = props => {
         </Table>
     );
 };
-
-const Menu = props =>
-    <ButtonToolbar>
-        <Button bsStyle="success">Submit for Review</Button>
-        <Button bsStyle="primary">Save as Template</Button>
-        <Button
-            bsStyle="danger"
-            onClick={() => {
-                if (props.appState.clearDdah()) {
-                    Array.prototype.forEach.call(
-                        document.querySelectorAll('#instr-grid input, #instr-grid select'),
-                        function(input) {
-                            switch (input.type) {
-                                case 'text':
-                                    input.value = null;
-                                    break;
-                                case 'checkbox':
-                                    input.checked = false;
-                                    break;
-                                case 'radio':
-                                    break;
-                                default:
-                                    input.value = null;
-                            }
-                        }
-                    );
-                }
-            }}>
-            Clear
-        </Button>
-    </ButtonToolbar>;
 
 export { DdahForm };

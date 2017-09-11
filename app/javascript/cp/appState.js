@@ -20,16 +20,18 @@ const initialState = {
 
     selectedSession: '',
 
-    ddah: {
-        worksheet: [{ units: null, duty: null, type: null, time: null }],
-    },
+    ddah: [{ units: null, duty: null, type: null, time: null }],
+
+    selectedCourse: null,
+    selectedOffer: null,
 
     /** DB data **/
+    categories: { fetching: 0, list: null },
+    courses: { fetching: 0, list: null },
+    duties: { fetching: 0, list: null },
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
-    duties: { fetching: 0, list: null },
     trainings: { fetching: 0, list: null },
-    categories: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -93,7 +95,7 @@ class AppState {
 
     // add a row to the ddah form
     addAllocation() {
-        let worksheet = this.get('ddah.worksheet');
+        let worksheet = this.get('ddah');
 
         // max. 24 rows are supported (this number comes from counting the number of rows generated
         // in the DDAH form PDF)
@@ -101,7 +103,7 @@ class AppState {
             this.alert('No more rows can be added.');
         } else {
             this.set(
-                'ddah.worksheet',
+                'ddah',
                 worksheet.push(fromJS({ units: null, duty: null, type: null, time: null }))
             );
         }
@@ -142,10 +144,7 @@ class AppState {
     // returns true if worksheet was cleared, false if not
     clearDdah() {
         if (window.confirm('Are you sure that you want to clear the current worksheet?')) {
-            this.set(
-                'ddah.worksheet',
-                fromJS([{ units: null, duty: null, type: null, time: null }])
-            );
+            this.set('ddah', fromJS([{ units: null, duty: null, type: null, time: null }]));
             return true;
         }
         return false;
@@ -160,7 +159,7 @@ class AppState {
     computeDutiesSummary() {
         let summary = this.getDutiesList().map(_ => 0);
 
-        this.get('ddah.worksheet').forEach(allocation => {
+        this.get('ddah').forEach(allocation => {
             if (
                 allocation.get('duty') &&
                 allocation.get('time') != undefined &&
@@ -199,7 +198,7 @@ class AppState {
 
     // compute total ddah hours
     getDdahTotal() {
-        let total = this.get('ddah.worksheet').reduce(
+        let total = this.get('ddah').reduce(
             (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
             0
         );
@@ -207,11 +206,19 @@ class AppState {
     }
 
     getDdahWorksheet() {
-        return this.get('ddah.worksheet');
+        return this.get('ddah');
     }
 
     getFilters() {
         return this.get('selectedFilters');
+    }
+
+    getSelectedCourse() {
+        return this.get('selectedCourse');
+    }
+
+    getSelectedOffer() {
+        return this.get('selectedOffer');
     }
 
     getSelectedSession() {
@@ -254,6 +261,14 @@ class AppState {
         let i = sorts.findIndex(f => f.get(0) == field);
 
         this.set('selectedSortFields', sorts.delete(i));
+    }
+
+    selectCourse(course) {
+        this.set('selectedCourse', course);
+    }
+
+    selectOffer(offer) {
+        this.set('selectedOffer', offer);
     }
 
     selectSession(session) {
@@ -307,7 +322,7 @@ class AppState {
 
     // update allocation attribute
     updateDdah(allocation, key, val) {
-        this.set('ddah.worksheet[' + allocation + '].' + key, val);
+        this.set('ddah[' + allocation + '].' + key, val);
     }
 
     /******************************
@@ -393,6 +408,11 @@ class AppState {
         return this.get('categories.fetching') > 0;
     }
 
+    // check if courses are being fetched
+    fetchingCourses() {
+        return this.get('courses.fetching') > 0;
+    }
+
     // check if duties are being fetched
     fetchingDuties() {
         return this.get('duties.fetching') > 0;
@@ -413,18 +433,12 @@ class AppState {
         return this.get('trainings.fetching') > 0;
     }
 
-    // get a sorted list of the position names in the current offers list as a JS array
-    getCourseCodes() {
-        let offers = this.getOffersList();
-
-        if (offers) {
-            return offers.map(offer => offer.get('course')).flip().keySeq().toJS();
-        }
-        return [];
-    }
-
     getCategoriesList() {
         return this.get('categories.list');
+    }
+
+    getCoursesList() {
+        return this.get('courses.list');
     }
 
     getDutiesList() {
@@ -435,12 +449,8 @@ class AppState {
         return this.get('offers.list');
     }
 
-    getSessionsList() {
-        return this.get('sessions.list');
-    }
-
-    getTrainingsList() {
-        return this.get('trainings.list');
+    getOffersForCourse(course) {
+        return this.get('offers.list').filter(offer => offer.get('position') == course);
     }
 
     // get a sorted list of the positions in the current offers list as a JS array
@@ -448,9 +458,17 @@ class AppState {
         let offers = this.getOffersList();
 
         if (offers) {
-            return offers.map(offer => offer.get('position')).flip().keySeq().sort().toJS();
+            return offers.map(offer => offer.get('course')).flip().keySeq().sort().toJS();
         }
         return [];
+    }
+
+    getSessionsList() {
+        return this.get('sessions.list');
+    }
+
+    getTrainingsList() {
+        return this.get('trainings.list');
     }
 
     importAssignments() {
@@ -467,6 +485,10 @@ class AppState {
 
     isCategoriesListNull() {
         return this.get('categories.list') == null;
+    }
+
+    isCoursesListNull() {
+        return this.get('courses.list') == null;
     }
 
     isDutiesListNull() {
@@ -530,6 +552,14 @@ class AppState {
         fetch.sendContracts(offers.map(offer => parseInt(offer)));
     }
 
+    setCategoriesList(list) {
+        this.set('categories.list', list);
+    }
+
+    setCoursesList(list) {
+        this.set('courses.list', list);
+    }
+
     setDdahAccepted(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');
@@ -537,6 +567,10 @@ class AppState {
         }
 
         fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
+    }
+
+    setDutiesList(list) {
+        this.set('duties.list', list);
     }
 
     setFetchingCategoriesList(fetching, success) {
@@ -554,6 +588,24 @@ class AppState {
             });
         } else {
             this.set('categories.fetching', init - 1);
+        }
+    }
+
+    setFetchingCoursesList(fetching, success) {
+        let init = this.get('courses.fetching'),
+            notifications = this.get('notifications');
+        if (fetching) {
+            this.set({
+                'courses.fetching': init + 1,
+                notifications: notifications.push('<i>Fetching courses...</i>'),
+            });
+        } else if (success) {
+            this.set({
+                'courses.fetching': init - 1,
+                notifications: notifications.push('Successfully fetched courses.'),
+            });
+        } else {
+            this.set('courses.fetching', init - 1);
         }
     }
 
@@ -667,14 +719,6 @@ class AppState {
         }
 
         fetch.setOfferAccepted(offers[0]);
-    }
-
-    setCategoriesList(list) {
-        this.set('categories.list', list);
-    }
-
-    setDutiesList(list) {
-        this.set('duties.list', list);
     }
 
     setOffersList(list) {

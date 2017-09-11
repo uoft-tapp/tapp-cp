@@ -68,13 +68,18 @@ const getCategories = () =>
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchCategoriesSuccess);
 
+const getCourses = user =>
+    getHelper('/instructors/' + user + '/positions')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchCoursesSuccess);
+
 const getDuties = () =>
     getHelper('/duties')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchDutiesSuccess);
 
-const getOffers = () =>
-    getHelper('/offers')
+const getOffers = user =>
+    getHelper(user ? '/instructors/' + user + '/offers' : '/offers')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchOffersSuccess);
 
@@ -100,6 +105,35 @@ function onFetchCategoriesSuccess(resp) {
     return categories;
 }
 
+function onFetchCoursesSuccess(resp) {
+    let courses = {};
+
+    resp.forEach(course => {
+        courses[course.id] = {
+            name: course.course_name,
+            code: course.position,
+            campus: (function(code) {
+                switch (code) {
+                    case 1:
+                        return 'St. George';
+                    case 3:
+                        return 'Scarborough';
+                    case 5:
+                        return 'Mississauga';
+                    default:
+                        return 'Other';
+                }
+            })(course.campus_code),
+            session: course.session_id,
+            estimatedEnrol: course.current_enrollment,
+            cap: course.cap_enrollment,
+            waitlist: course.num_waitlisted,
+        };
+    });
+
+    return courses;
+}
+
 function onFetchDutiesSuccess(resp) {
     let duties = {};
 
@@ -120,8 +154,10 @@ function onFetchOffersSuccess(resp) {
             lastName: offer.applicant.last_name,
             studentNumber: offer.applicant.student_number,
             email: offer.applicant.email,
-            position: offer.position,
-            session: offer.session.id,
+            utorid: offer.applicant.utorid,
+            course: offer.position,
+            position: offer.position_id,
+            session: offer.session ? offer.session.id : undefined,
             hours: offer.hours,
             nagCount: offer.nag_count,
             status: offer.status,
@@ -185,8 +221,12 @@ function adminFetchAll() {
 }
 
 function instructorFetchAll() {
+    let user = appState.getCurrentUserName();
+
     appState.setFetchingCategoriesList(true);
+    appState.setFetchingCoursesList(true);
     appState.setFetchingDutiesList(true);
+    appState.setFetchingOffersList(true);
     appState.setFetchingTrainingsList(true);
 
     // when categories are successfully fetched, update the categories list; set fetching flag to false either way
@@ -197,6 +237,14 @@ function instructorFetchAll() {
         })
         .catch(() => appState.setFetchingCategoriesList(false));
 
+    // when courses are successfully fetched, update the courses list; set fetching flag to false either way
+    getCourses(user)
+        .then(courses => {
+            appState.setCoursesList(fromJS(courses));
+            appState.setFetchingCoursesList(false, true);
+        })
+        .catch(() => appState.setFetchingCoursesList(false));
+
     // when duties are successfully fetched, update the duties list; set fetching flag to false either way
     getDuties()
         .then(duties => {
@@ -204,6 +252,14 @@ function instructorFetchAll() {
             appState.setFetchingDutiesList(false, true);
         })
         .catch(() => appState.setFetchingDutiesList(false));
+
+    // when offers are successfully fetched, update the offers list; set fetching flag to false either way
+    getOffers(user)
+        .then(offers => {
+            appState.setOffersList(fromJS(offers));
+            appState.setFetchingOffersList(false, true);
+        })
+        .catch(() => appState.setFetchingOffersList(false));
 
     // when trainings are successfully fetched, update the trainings list; set fetching flag to false either way
     getTrainings()
