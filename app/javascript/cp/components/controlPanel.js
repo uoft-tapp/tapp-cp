@@ -147,9 +147,9 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'Status',
-                data: p => (
+                data: p =>
                     <span>
-                        {p.offer.get('status')}&ensp;{p.offer.get('status') == 'Withdrawn' && (
+                        {p.offer.get('status')}&ensp;{p.offer.get('status') == 'Withdrawn' &&
                             <OverlayTrigger
                                 trigger="click"
                                 placement="bottom"
@@ -174,23 +174,19 @@ class ControlPanel extends React.Component {
                                         </Button>
                                     </Popover>
                                 }>
-                                {p.offer.get('note') ? (
-                                    <i
-                                        className="fa fa-question-circle"
-                                        style={{ fontSize: '16px', cursor: 'pointer' }}
-                                        title="Reason"
-                                    />
-                                ) : (
-                                    <i
-                                        className="fa fa-question"
-                                        style={{ fontSize: '16px', cursor: 'pointer' }}
-                                        title="Add reason"
-                                    />
-                                )}
-                            </OverlayTrigger>
-                        )}
-                    </span>
-                ),
+                                {p.offer.get('note')
+                                    ? <i
+                                          className="fa fa-question-circle"
+                                          style={{ fontSize: '16px', cursor: 'pointer' }}
+                                          title="Reason"
+                                      />
+                                    : <i
+                                          className="fa fa-question"
+                                          style={{ fontSize: '16px', cursor: 'pointer' }}
+                                          title="Add reason"
+                                      />}
+                            </OverlayTrigger>}
+                    </span>,
                 sortData: p => p.get('status'),
 
                 filterLabel: 'Status',
@@ -320,13 +316,12 @@ class ControlPanel extends React.Component {
     }
 }
 
-const ExportButton = props => (
+const ExportButton = props =>
     <Button bsStyle="primary" onClick={() => props.appState.exportOffers()}>
         Export
-    </Button>
-);
+    </Button>;
 
-const OffersMenu = props => (
+const OffersMenu = props =>
     <DropdownButton bsStyle="primary" title="Update offers" id="offers-dropdown">
         <MenuItem onClick={() => props.appState.sendContracts(getSelectedOffers())}>
             Send contract(s)
