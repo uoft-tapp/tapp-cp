@@ -37,17 +37,15 @@ class ControlPanel extends React.Component {
         const role = this.props.appState.getSelectedUserRole();
 
         let nullCheck =
-            role == 'cp_admin'
-                ? this.props.appState.anyNull()
-                : this.props.appState.isOffersListNull();
+            this.props.appState.isOffersListNull() ||
+            (role == 'cp_admin' && this.props.appState.isSessionsListNull());
         if (nullCheck) {
             return <div id="loader" />;
         }
 
         let fetchCheck =
-            role == 'cp_admin'
-                ? this.props.appState.anyFetching()
-                : this.props.appState.fetchingOffers();
+            this.props.appState.fetchingOffers() ||
+            (role == 'cp_admin' && this.props.appState.fetchingSessions());
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         this.config = [
