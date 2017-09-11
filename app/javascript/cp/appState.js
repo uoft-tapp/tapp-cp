@@ -91,12 +91,18 @@ class AppState {
 
     // add a row to the ddah form
     addAllocation() {
-        this.set(
-            'ddah.worksheet',
-            this.get('ddah.worksheet').push(
-                fromJS({ units: null, duty: null, type: null, time: null })
-            )
-        );
+        let worksheet = this.get('ddah.worksheet');
+
+        // max. 24 rows are supported (this number comes from counting the number of rows generated
+        // in the DDAH form PDF)
+        if (worksheet.size == 24) {
+            this.alert('No more rows can be added.');
+        } else {
+            this.set(
+                'ddah.worksheet',
+                worksheet.push(fromJS({ units: null, duty: null, type: null, time: null }))
+            );
+        }
     }
 
     // apply a sort to the offers table
@@ -131,6 +137,7 @@ class AppState {
         return this.get('selectedFilters').has(field);
     }
 
+    // returns true if worksheet was cleared, false if not
     clearDdah() {
         if (window.confirm('Are you sure that you want to clear the current worksheet?')) {
             this.set(

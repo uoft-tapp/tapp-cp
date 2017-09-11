@@ -156,10 +156,62 @@ footer div p {
     margin-top: 5px;
 }
 
-#instr-grid table {
-    width: 900px;
+/* instructor view */
+#instr-grid {
+    --border: 1px solid black;
+    --light-bg: #f9f9f9;
+    --dark-bg: #e7e7e7;
+    
+    max-height: var(--main-div-height);
+    overflow: auto;
 }
 
+#instr-grid #ddah-header,
+#instr-grid #worksheet-table,
+#instr-grid #training,
+#instr-grid #summary-table {
+    margin-bottom: 2vh;
+}
+
+#instr-grid table {
+    width: 900px;
+    margin: 0;
+}
+
+#instr-grid table th,
+#instr-grid table td {
+    vertical-align: middle;
+}
+
+#instr-grid .title th {
+    background-color: var(--light-bg);
+    font-size: large;
+    text-align: center;
+    padding: 5px;
+}
+
+/* ddah header */
+
+#instr-grid #ddah-header table {
+    background-color: var(--dark-bg);
+    border: var(--border);
+}
+
+#instr-grid #ddah-header tr:first-child td {
+    padding-top: 10px;
+}
+
+#instr-grid #ddah-header tr td {
+    padding: 3px 10px;
+}
+
+#instr-grid #ddah-header tr:last-child td {
+    padding-bottom: 10px;
+}
+
+/* ddah worksheet table */
+
+/* worksheet table column widths */
 #instr-grid #worksheet-table th:first-child, /* first column: # of units */
 #instr-grid #worksheet-table th:nth-child(4), /* fourth column: time/task */
 #instr-grid #worksheet-table th:nth-child(5) { /* fifth column: total time */
@@ -171,45 +223,86 @@ footer div p {
     width: 350px;
 }
 
-/* second column: total time */
-#instr-grid #summary-table th:nth-child(2) {
-    width: 100px;
-}
-
-#instr-grid table th,
-#instr-grid table td {
-    vertical-align: middle;
+#instr-grid #worksheet-table thead {
+    background-color: var(--dark-bg);
 }
 
 #instr-grid #worksheet-table th,
 #instr-grid #worksheet-table td {
     text-align: center;
+    border: var(--border);
 }
 
-#instr-grid #summary-table th,
-#instr-grid #summary-table td:nth-child(2) {
-    text-align: center;
-}
-
-#instr-grid #summary-table td:first-child {
-    text-align: left;
-}
-
-#instr-grid input, #instr-grid select {
+#instr-grid #worksheet-table input,
+#instr-grid #worksheet-table select {
     width: 100%;
     height: 100%;
     border: 0;
     background: none;
 }
 
-#instr-grid thead {
-    background-color: #e7e7e7;
-}
-
-#instr-grid tr:last-child {
-    border-top: 3px solid #ddd;
+#instr-grid #worksheet-table tr:last-child {
+    border-top: 3px solid;
 }
 
 #instr-grid #worksheet-table td:last-child {
-    background-color: #f9f9f9;
+    background-color: var(--light-bg);
+}
+
+/* ddah training table */
+
+#instr-grid #training table {
+    border: var(--border);
+}
+
+#instr-grid #training thead {
+    border-bottom: 3px solid;
+}
+
+#instr-grid #training tr,
+#instr-grid #training td {
+    background-color: var(--dark-bg);
+}
+
+#instr-grid #training tr:first-child td {
+    padding-top: 10px;
+}
+
+#instr-grid #training tr td {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#instr-grid #training tr:last-child td {
+    padding-bottom: 10px;
+}
+
+/* ddah summary table */
+
+#instr-grid #summary-table thead {
+    background-color: var(--dark-bg);
+}
+
+/* second column: total time */
+#instr-grid #summary-table th:nth-child(2) {
+    width: 100px;
+}
+
+#instr-grid #summary-table th,
+#instr-grid #summary-table td:nth-child(2) {
+    text-align: center;
+    border: var(--border);
+}
+
+#instr-grid #summary-table td:first-child {
+    text-align: left;
+    border: var(--border);
+}
+
+#instr-grid #summary-table tr:last-child {
+    border-top: 3px solid;
+}
+
+#instr-grid #summary-table td:last-child {
+    background-color: var(--light-bg);
 }
