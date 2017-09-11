@@ -24,9 +24,23 @@ Rails.application.routes.draw do
     get "pdf" => "offers#get_contract"
     post "accept" => "offers#accept_offer"
   end
+  resources :duties, only: [:index, :show]
+  resources :trainings, only: [:index, :show]
+  resources :categories, only: [:index, :show]
 
   # shared resources
-  resources :sessions
+  resources :sessions, only: [:index, :show, :update]
+
+  # DDAH routes
+  get 'instructors/utorid/:utorid' => "instructors#show_by_utorid"
+  scope 'instructors/:utorid' do
+    resources :offers, only: [:index, :show]
+    resources :positions, only: [:index, :show]
+    resources :ddahs, only: [:index, :show, :create]
+    resources :templates, only: [:index, :show, :create]
+  end
+  resources :ddahs
+  resources :templates
 
   # TAPP routes
   get "/export/chass/:round_id", to: "export#chass"
@@ -48,12 +62,33 @@ Rails.application.routes.draw do
   post "offers/nag" => "offers#batch_email_nags"
   post "offers/can-clear-hris-status" => "offers#can_clear_hris_status"
   post "offers/clear-hris-status" => "offers#clear_hris_status"
+  post "/offers/can-nag-instructor" => "offers#can_nag_instructor"
+  post "/offers/send-nag-instructor" => "offers#send_nag_instructor"
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
+
+  post "/ddahs/:ddah_id/new-template" => "ddahs#new_template"
+  post "/ddahs/:ddah_id/separate-from-template" => "ddahs#separate_from_template"
+  post "/ddahs/apply-template" => "ddahs#apply_template"
+  post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
+  post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
+  post "/ddahs/can-nag-student" => "ddahs#can_nag_student"
+  post "/ddahs/send-nag-student" => "ddahs#send_nag_student"
+  post "/ddahs/status/can-finish" => "ddahs#can_finish_ddah"
+  post "/ddahs/status/finish" => "ddahs#finish_ddah"
+  post "/ddahs/status/can-approve" => "ddahs#can_approve_ddah"
+  post "/ddahs/status/approve" => "ddahs#approve_ddah"
+  get "/templates/:template_id/preview" => "templates#preview"
 
   # student-facing
   get "/pb/:offer_id" => "app#student_view"
   get "/pb/:offer_id/pdf" => "offers#get_contract_student"
   post "/pb/:offer_id/:status" => "offers#set_status_student"
 
+  # student-facing for ddah
+  get "/pb/ddah/:offer_id" => "app#ddah_view"
+  get "/pb/ddah/:offer_id/pdf" => "ddahs#get_ddah_pdf"
+  post "/pb/ddah/:offer_id/accept" => "ddahs#accept_ddah"
+
+  get "/test" => "app#test"
 end

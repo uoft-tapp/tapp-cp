@@ -373,7 +373,7 @@ RSpec.describe OffersController, type: :controller do
   describe "PATCH /offers/:id" do
     before(:each) do
       expect(offer[:hr_status]).to eq(nil)
-      expect(offer[:ddah_status]).to eq(nil)
+      expect(offer[:ddah_status]).to eq("None")
     end
     it "returns status 204 and updates offer" do
       patch :update, params: {id: offer[:id], hr_status: "printed", ddah_status: "accepted"}
@@ -387,7 +387,7 @@ RSpec.describe OffersController, type: :controller do
   describe "PATCH /offers/batch-update" do
     before(:each) do
       expect(offer[:hr_status]).to eq(nil)
-      expect(offer[:ddah_status]).to eq(nil)
+      expect(offer[:ddah_status]).to eq("None")
     end
     it "returns status 204 and updates offer" do
       patch :update, params: {id: "batch-update", offers: [offer[:id]], hr_status: "printed", ddah_status: "accepted"}

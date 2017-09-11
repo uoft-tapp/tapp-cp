@@ -1,8 +1,12 @@
 require 'erb'
 class TemplateParser
 
-  def initialize(files, offer)
-    @offer = offer
+  def initialize(files, data, type)
+    if type == "offer"
+      @offer = data
+    elsif type== "ddah"
+      @ddah = data
+    end
     @data = {}
     files.each do |file|
       set_template_data(file)
@@ -55,6 +59,14 @@ class TemplateParser
       return ug
     else
       return ""
+    end
+  end
+
+  def set_radio_button(bool, labels)
+    if bool
+      return "(#{labels[0]})"
+    else
+      return "(#{labels[1]})"
     end
   end
 

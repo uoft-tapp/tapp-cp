@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <style>
+    body, h1, div, form, p, label, input, button{
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    form, div{
+      width: 800px;
+      margin: 0 auto;
+      padding: 0;
+      text-align: center;
+    }
+    .admonishment{
+      margin-top: 10px;
+      border-top: #DDD solid 1px;
+      padding: 5px;
+      font-size: 14px;
+    }
+    #pdf_view_port{
+      width: 100vw;
+      height: calc(100vh - 200px);
+      border-bottom: 1px #333 solid;
+    }
+    #decision p{
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+    #decision input[type=text]{
+      width: 100px;
+      font-size: 16px;
+    }
+    label{
+      padding: 0 10px;
+    }
+    header{
+      background: #333;
+      color: #fff;
+      height: 30px;
+    }
+    header div{
+      width: 800px;
+      margin: 0 auto;
+    }
+    header h1{
+      font-size: 22px;
+      text-align: center;
+    }
+    #logout p{
+      font-size: 14px;
+      float: left;
+      padding: 3px;
+    }
+    #logout input[type=submit], #decision p button{
+      margin: 2px 5px 2px 5px;
+      padding: 0 5px;
+      font-size: 14px;
+      outline: 0;
+      border: #ccc solid 1px;
+      background: #eee;
+    }
+    #logout input[type=submit]:hover, #decision p button:hover{
+      border: #aaa solid 1px;
+      background: #ccc;
+    }
+    #logout input[type=submit]:active, #decision p button:active{
+      border: #aaa solid 1px;
+      background: #bbb;
+    }
+    #logout {
+      float: right;
+      width: auto;
+    }
+    #status {
+      display: none;
+    }
+  </style>
+
+  <body>
+    <header>
+      <form id="logout" action="/logout" method="post">
+        <p>User: <b><%=@offer[:applicant][:utorid]%></b></p>
+        <input type="hidden" value="pb/ddah/<%= @offer[:id] %>" name="current_page"/>
+        <input value="Logout" type="submit" />
+      </form>
+      <div>
+        <h1>DDAH for Teaching Assistantship of <%=@offer[:position]%></h1>
+      </div>
+    </header>
+    <embed id="pdf_view_port" type='application/pdf' name="contract.pdf"/>
+    <form id='decision'>
+      <p>I hereby accept the DDAH conditions of the Teaching Assistantship position offered here:</p>
+      <p>
+        <label>To accept the contract, type your initial:
+          <input id="signature" type="text" name="signature_name" required="required" maxlength="10">
+        </label>
+      </p>
+      <p><button type='button' onclick='submitDecision()'>Accept</button></p>
+    </form>
+    <div id='status'>
+      <h2>Status: Accepted</h2>
+      <p>You have accepted the DDAH conditions of this TAship.</p>
+    </div>
+    <div class='admonishment'>
+      <p><b>Important:</b> TO-DO</p>
+    </div>
+
+    <script>
+      // helper factoring out frequently used code around a fetch
+      function fetchHelper(url, init, action, blob=false){
+        fetch(url, init).then(function(response) {
+          if (blob){
+            return response.blob();
+          }
+          else{
+            return response.json();
+          }
+        }).then(function(response){
+            action(response);
+        });
+      }
+      function postHelper(url, data, action, blob=false){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            method: 'POST',
+            body: JSON.stringify(data),
+            credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
+        };
+        fetchHelper(url, init, action, blob);
+      }
+      function getHelper(url, action, blob=false){
+        let init = {
+            headers: {
+                Accept: 'application/json',
+            },
+            method: 'GET',
+            credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
+        };
+        fetchHelper(url, init, action, blob);
+      }
+      function fetchPdfData(){
+        getHelper("/pb/ddah/<%= @offer[:id] %>/pdf", setPdfViewPort, true);
+      }
+      function setPdfViewPort(response){
+        let fileURL = URL.createObjectURL(response);
+        let viewPort= document.getElementById("pdf_view_port");
+        viewPort.setAttribute("src", fileURL);
+      }
+      function getDecision(){
+        let decision = document.getElementsByName('decision');
+        let selected = null;
+        decision.forEach(function(item, index){
+          if (item.checked)
+            selected = item;
+        });
+        return selected;
+      }
+      function submitDecision(){
+        let signature = document.getElementById('signature');
+        if (signature.value.trim()!=""){
+          postStatus(signature.value.trim());
+        }
+        else{
+          alert("Error: you haven't signed your name yet.");
+        }
+      }
+      function postStatus(signature = null){
+        let res = confirm("Are you sure you want to accept the DDAH conditions for this TAship?");
+        let data = {}
+        if (signature!=null){
+          data["signature"] = signature;
+        }
+        if (res) {
+          postHelper("/pb/ddah/<%= @offer[:id] %>/accept", data, updateStatus);
+        }
+      }
+      function updateStatus(response){
+        setupPage(response.ddah_status);
+        alert(response.message);
+      }
+      function setupPage(status){
+        decision = document.getElementById("decision");
+        status = document.getElementById("status");
+        if (status == "Accepted"){
+          decision.style.display = "none";
+          status.style.display = "block";
+        }
+        else{
+          decision.style.display = "block";
+          status.style.display = "none";
+        }
+        fetchPdfData();
+      }
+      setupPage('<%= @offer[:ddah_status]%>')
+    </script>
+  </body>
+</html>

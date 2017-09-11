@@ -6,12 +6,26 @@ class OffersController < ApplicationController
   before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
 
   def index
-    render json: get_all_offers
+    if params[:utorid]
+      render json: get_all_offers_for_utorid(params[:utorid])
+    else
+      render json: get_all_offers
+    end
   end
 
   def show
-    offer = Offer.find(params[:id])
-    render json: offer.format
+    if params[:utorid]
+      offers = id_array(get_all_offers_for_utorid(params[:utorid]))
+      if offers.include?(params[:id])
+        offer = Offer.find(params[:id])
+        render json: offer.instructor_format
+      else
+        render status: 404, json: {status: 404}
+      end
+    else
+      offer = Offer.find(params[:id])
+      render json: offer.format
+    end
   end
 
   # can update HR status for offers that are accepted or pending
@@ -81,6 +95,26 @@ class OffersController < ApplicationController
     end
     render json: {message: "You've sent the nag emails."}
   end
+
+  '''
+    Nag Mails (admin)
+  '''
+  def can_nag_instructor
+    check_ddah_status(params[:offers], :ddah_status, ["None", "Created"])
+  end
+
+  def send_nag_instructor
+    instructor =
+    params[:offers].each do |id|
+      offer = Offer.find(ddah[:id])
+      if ENV['RAILS_ENV'] != 'test'
+        CPMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+      end
+      offer.update_attributes!({ddah_status: "Pending", send_date: DateTime.now.to_s})
+    end
+    render status: 200, json: {message: "You've successfully sent out all the nag emails."}
+  end
+
 
   def combine_contracts_print
     offers = []
@@ -214,5 +248,19 @@ class OffersController < ApplicationController
       render status: 404, json: {invalid_offers: invalid}
     end
   end
+
+  def get_all_offers_for_utorid(utorid)
+    offers = []
+    Offer.all.each do |offer|
+      position = Position.find(offer[:position_id])
+      position.instructors.each do |instructor|
+        if instructor[:utorid] == utorid
+          offers.push(offer.instructor_format)
+        end
+      end
+    end
+    return offers
+  end
+
 
 end

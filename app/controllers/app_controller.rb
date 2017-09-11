@@ -4,7 +4,7 @@ class AppController < ApplicationController
   before_action :tapp_admin, only: [:tapp]
   before_action :cp_access, only: [:cp]
   before_action :app_access, only: [:roles]
-  before_action :correct_applicant, only: [:student_view]
+  before_action :correct_applicant, only: [:student_view, :ddah_view]
 
   ''' TAPP functions '''
   def tapp
@@ -38,16 +38,38 @@ class AppController < ApplicationController
     end
   end
 
+  def ddah_view
+    ddah = Ddah.find_by(offer_id: params[:offer_id])
+    if ddah
+      offer = Offer.find(params[:offer_id])
+      if offer[:ddah_status]== "Pending" || offer[:ddah_status]== "Accepted" 
+        @ddah = ddah.format
+        @offer = offer.format
+        render :ddah, layout: false
+      else
+        render status: 404, json: {message: "DDAH #{ddah[:id]} hasn't been sent."}
+      end
+    else
+      render status: 404, json: {message: "There is no such page."}
+    end
+  end
+
   def logout
     @url = params[:current_page]
-    #@_request.reset_session
-    #reset_session
     session[:logged_out] = false
     render file: 'public/logout.html'
   end
 
   def reenter_session
     session[:logged_in] = true
+  end
+
+  def test
+    @instructors = []
+    Instructor.all.each do |instructor|
+      @instructors.push(instructor[:utorid].to_s)
+    end
+    render :test, layout: false
   end
 
 end

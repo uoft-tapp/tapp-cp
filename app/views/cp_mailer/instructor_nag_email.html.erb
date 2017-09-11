@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <p>Dear <%= @instructor[:name] %>,</p>
+    <p>
+      You have not finished the DDAH for <%=offer[:applicant][:first_name]%> <%=offer[:applicant][:last_name]%>'s TAship of <%=offer[:position]%>. The deadline is soon. This is your <%= @offer[:ddah_nag_count] %><%= @offer[:nag_suffix] %> warning.
+    </p>
+    <p>Have a great day!</p>
+  </body>
+</html>

@@ -19,7 +19,7 @@ class ContractGenerator
       @tab = Prawn::Text::NBSP * 10
       define_grid(columns: 75, rows: 100, gutter: 0)
       templates = ["header", "letter", "general_info", "signature", "office_form"]
-      @parser = TemplateParser.new(templates, @offer)
+      @parser = TemplateParser.new(templates, @offer, "offer")
       header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("header"))
       salary_page = set_letter(header_end, @parser.get_data("letter"))
       set_ta_coord_signature(@letter_end, @parser.get_data("signature"))
