@@ -78,6 +78,9 @@ const Menu = props => {
                 Submit for Review
             </Button>
             <Button bsStyle="primary" id="save">
+                Save
+            </Button>
+            <Button bsStyle="warning" id="template">
                 Save as Template
             </Button>
             <Button

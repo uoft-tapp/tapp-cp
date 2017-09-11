@@ -61,6 +61,17 @@ function putHelper(URL, body) {
     });
 }
 
+function patchHelper(URL, body) {
+    return fetchHelper(URL, {
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+        },
+        method: 'PATCH',
+        body: JSON.stringify(body),
+        credentials: 'include',
+    });
+}
+
 /* Resource GETters */
 
 const getCategories = () =>
@@ -87,6 +98,11 @@ const getSessions = () =>
     getHelper('/sessions')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchSessionsSuccess);
+
+const getTemplates = user =>
+    getHelper('/instructors/' + user + '/templates')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchTemplatesSuccess);
 
 const getTrainings = () =>
     getHelper('/trainings')
@@ -187,6 +203,31 @@ function onFetchSessionsSuccess(resp) {
     return sessions;
 }
 
+function onFetchTemplatesSuccess(resp) {
+    let templates = {};
+
+    resp.forEach(template => {
+        templates[template.id] = {
+            name: template.name,
+            optional: template.optional,
+            position: template.position,
+            tutorialCategory: template.tutorial_category,
+            allocations: template.allocations.map(
+                allocation => ({
+                    units: allocation.num_unit,
+                    duty: allocation.duty_id,
+                    type: allocation.unit_name,
+                    time: allocation.minutes
+                })
+            ),
+            trainings: template.trainings,
+            categories: template.trainings,
+        };
+    });
+
+    return templates;
+}
+
 function onFetchTrainingsSuccess(resp) {
     let trainings = {};
 
@@ -227,6 +268,7 @@ function instructorFetchAll() {
     appState.setFetchingCoursesList(true);
     appState.setFetchingDutiesList(true);
     appState.setFetchingOffersList(true);
+    appState.setFetchingTemplatesList(true);
     appState.setFetchingTrainingsList(true);
 
     // when categories are successfully fetched, update the categories list; set fetching flag to false either way
@@ -260,6 +302,14 @@ function instructorFetchAll() {
             appState.setFetchingOffersList(false, true);
         })
         .catch(() => appState.setFetchingOffersList(false));
+
+    // when templates are successfully fetched, update the templates list; set fetching flag to false either way
+    getTemplates()
+        .then(templates => {
+            appState.setTemplatesList(fromJS(templates));
+            appState.setFetchingTemplatesList(false, true);
+        })
+        .catch(() => appState.setFetchingTemplatesList(false));
 
     // when trainings are successfully fetched, update the trainings list; set fetching flag to false either way
     getTrainings()

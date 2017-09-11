@@ -171,6 +171,7 @@ footer div p {
 
 #instr-grid #submit,
 #instr-grid #save,
+#instr-grid #template,
 #instr-grid #clear {
     float: right;
 }

@@ -31,6 +31,7 @@ const initialState = {
     duties: { fetching: 0, list: null },
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
+    templates: { fetching: 0, list: null },
     trainings: { fetching: 0, list: null },
 
     importing: 0,
@@ -428,6 +429,11 @@ class AppState {
         return this.get('sessions.fetching') > 0;
     }
 
+    // check if templates are being fetched
+    fetchingTemplates() {
+        return this.get('templates.fetching') > 0;
+    }
+
     // check if trainings are being fetched
     fetchingTrainings() {
         return this.get('trainings.fetching') > 0;
@@ -501,6 +507,10 @@ class AppState {
 
     isSessionsListNull() {
         return this.get('sessions.list') == null;
+    }
+
+    isTemplatesListNull() {
+        return this.get('templates.list') == null;
     }
 
     isTrainingsListNull() {
@@ -663,6 +673,24 @@ class AppState {
         }
     }
 
+    setFetchingTemplatesList(fetching, success) {
+        let init = this.get('templates.fetching'),
+            notifications = this.get('notifications');
+        if (fetching) {
+            this.set({
+                'templates.fetching': init + 1,
+                notifications: notifications.push('<i>Fetching templates...</i>'),
+            });
+        } else if (success) {
+            this.set({
+                'templates.fetching': init - 1,
+                notifications: notifications.push('Successfully fetched templates.'),
+            });
+        } else {
+            this.set('templates.fetching', init - 1);
+        }
+    }
+
     setFetchingTrainingsList(fetching, success) {
         let init = this.get('trainings.fetching'),
             notifications = this.get('notifications');
@@ -742,6 +770,10 @@ class AppState {
         });
 
         this.set('sessions.list', list);
+    }
+
+    setTemplatesList(list) {
+        this.set('templates.list', list);
     }
 
     setTrainingsList(list) {
