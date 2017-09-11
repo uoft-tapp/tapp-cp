@@ -94,7 +94,7 @@ class AppState {
         this.set(
             'ddah.worksheet',
             this.get('ddah.worksheet').push(
-                fromJS({ units: null, duty: null, type: null, time: null, total: null })
+                fromJS({ units: null, duty: null, type: null, time: null })
             )
         );
     }
@@ -137,7 +137,9 @@ class AppState {
                 'ddah.worksheet',
                 fromJS([{ units: null, duty: null, type: null, time: null }])
             );
+            return true;
         }
+        return false;
     }
 
     // remove all selected filters on the offers table
@@ -150,7 +152,16 @@ class AppState {
         let summary = this.getDutiesList().map(_ => 0);
 
         this.get('ddah.worksheet').forEach(allocation => {
-            summary = summary.update(allocation.duty, time => time + allocation.time / 60);
+            if (
+                allocation.get('duty') &&
+                allocation.get('time') != undefined &&
+                allocation.get('units') != undefined
+            ) {
+                summary = summary.update(
+                    allocation.get('duty'),
+                    time => time + allocation.get('time') / 60
+                );
+            }
         });
 
         return summary;
@@ -177,19 +188,13 @@ class AppState {
         return this.get('roles');
     }
 
-    // compute total hours for ddah allocation
-    getDdahAllocationTotal(allocation) {
-        allocation = this.get('ddah.worksheet[' + allocation + ']');
-        return allocation.get('units') * allocation.get('time') / 60;
-    }
-
     // compute total ddah hours
     getDdahTotal() {
         let total = this.get('ddah.worksheet').reduce(
-            (sum, allocation) => sum + allocation.total,
+            (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
             0
         );
-        return isNaN(total) ? 0 : total;
+        return isNaN(total) ? 0 : total / 60;
     }
 
     getDdahWorksheet() {

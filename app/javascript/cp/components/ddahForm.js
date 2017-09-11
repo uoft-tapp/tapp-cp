@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, ButtonToolbar, Button } from 'react-bootstrap';
 
 class DdahForm extends React.Component {
     render() {
@@ -11,12 +11,31 @@ class DdahForm extends React.Component {
                 <Worksheet ddah={ddah} {...this.props} />
                 <h4>Allocation of Hours Summary</h4>
                 <Summary ddah={ddah} {...this.props} />
+                <ButtonToolbar>
+                    <Button bsStyle="primary">Save Worksheet</Button>
+                    <Button
+                        bsStyle="danger"
+                        onClick={() => {
+                            if (this.props.appState.clearDdah()) {
+                                Array.prototype.forEach.call(
+                                    document.querySelectorAll(
+                                        '#worksheet-table input, #worksheet-table select'
+                                    ),
+                                    function(input) {
+                                        input.value = null;
+                                    }
+                                );
+                            }
+                        }}>
+                        Clear Worksheet
+                    </Button>
+                </ButtonToolbar>
             </div>
         );
     }
 }
 
-const Worksheet = props => (
+const Worksheet = props =>
     <Table bordered condensed hover id="worksheet-table">
         <thead>
             <tr>
@@ -37,13 +56,13 @@ const Worksheet = props => (
             </tr>
         </thead>
         <tbody>
-            {props.ddah.map((row, i) => (
+            {props.ddah.map((row, i) =>
                 <tr key={'allocation-' + i}>
                     <td>
                         <input
                             type="number"
                             min="0"
-                            defaultValue={row.units}
+                            defaultValue={row.get('units')}
                             onChange={event =>
                                 props.appState.updateDdah(i, 'units', event.target.value)}
                         />
@@ -54,16 +73,18 @@ const Worksheet = props => (
                             onChange={event =>
                                 props.appState.updateDdah(i, 'duty', event.target.value)}>
                             <option />
-                            {props.appState
-                                .getDutiesList()
-                                .map((duty, id) => <option value={id}>{duty}</option>)}
+                            {props.appState.getDutiesList().map((duty, id) =>
+                                <option value={id}>
+                                    {duty}
+                                </option>
+                            )}
                         </select>
                     </td>
                     <td>
                         <input
                             type="text"
                             autoComplete="on"
-                            defaultValue={row.type}
+                            defaultValue={row.get('type')}
                             onChange={event =>
                                 props.appState.updateDdah(i, 'type', event.target.value)}
                         />
@@ -72,14 +93,16 @@ const Worksheet = props => (
                         <input
                             type="number"
                             min="0"
-                            defaultValue={row.time}
+                            defaultValue={row.get('time')}
                             onChange={event =>
                                 props.appState.updateDdah(i, 'time', event.target.value)}
                         />
                     </td>
-                    <td>{props.appState.getDdahAllocationTotal(i).toFixed(1)}</td>
+                    <td>
+                        {(row.get('units') * row.get('time') / 60).toFixed(1)}
+                    </td>
                 </tr>
-            ))}
+            )}
 
             <tr>
                 <td colSpan="5" style={{ backgroundColor: 'white', textAlign: 'left' }}>
@@ -99,11 +122,12 @@ const Worksheet = props => (
                 <td />
                 <td />
                 <td />
-                <td>{props.appState.getDdahTotal().toFixed(1)}</td>
+                <td>
+                    {props.appState.getDdahTotal().toFixed(1)}
+                </td>
             </tr>
         </tbody>
-    </Table>
-);
+    </Table>;
 
 const Summary = props => {
     let duties = props.appState.getDutiesList();
@@ -120,17 +144,23 @@ const Summary = props => {
                 </tr>
             </thead>
             <tbody>
-                {props.appState.computeDutiesSummary().map((duty, i) => (
+                {props.appState.computeDutiesSummary().map((duty, i) =>
                     <tr key={'duty-' + i}>
-                        <td>{duties[i]}</td>
-                        <td>{duty.toFixed(1)}</td>
+                        <td>
+                            {duties.get(i)}
+                        </td>
+                        <td>
+                            {duty.toFixed(1)}
+                        </td>
                     </tr>
-                ))}
+                )}
                 <tr>
                     <td>
                         <b>Total</b>
                     </td>
-                    <td>{props.appState.getDdahTotal().toFixed(1)}</td>
+                    <td>
+                        {props.appState.getDdahTotal().toFixed(1)}
+                    </td>
                 </tr>
             </tbody>
         </Table>
