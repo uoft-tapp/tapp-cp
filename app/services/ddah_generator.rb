@@ -5,8 +5,7 @@ class DdahGenerator
   REGULAR_LEFT_ALIGN = 2
   REGULAR_CENTER = 3
   SMALL_CENTER = 4
-  SIGNATURE = 5
-  INITIAL = 6
+  SMALL_LEFT_ALIGN = 4
   HEADER_X_COORD = 0.7
   HEADER_Y_COORD = 0.5
 
@@ -17,14 +16,13 @@ class DdahGenerator
     define_grid(columns: 75, rows: 100, gutter: 0)
     templates = ["ddah_header", "allocations"]
     @parser = TemplateParser.new(templates, @ddah, "ddah")
-    set_allocation_table(HEADER_X_COORD, HEADER_Y_COORD+1, @parser.get_data("allocations"))
+    header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"))
+    set_allocation_table(HEADER_X_COORD, header_end, @parser.get_data("allocations"))
     start_new_page
     training_end = set_training(HEADER_Y_COORD)
     summary_end = set_summary(training_end)
     signature_end = set_signature(template, summary_end)
     set_review_box(signature_end)
-    go_to_page(1)
-    set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"))
   end
 
   private
@@ -68,17 +66,10 @@ class DdahGenerator
         text: text,
         align: :center,
       }
-    when SIGNATURE
-      return {
-        font: get_font("signature"),
-        font_size: 25,
-        text: text,
-        align: :left,
-      }
-    when INITIAL
+    when SMALL_LEFT_ALIGN
       return {
         font: "Times-Roman",
-        font_size: 16,
+        font_size: 6,
         text: text,
         align: :left,
       }
@@ -174,8 +165,43 @@ class DdahGenerator
   def set_header(x, y, header_data)
     set_logo(get_grids(x, y-0.1, 1.8, 0.9))
     set_text(get_grids(x, y-0.1, 7.5, 0.4), get_style(TITLE, header_data[0]))
-    draw_box(get_grids(0.5, y+0.35, 7.5, 1.1), true)
-    set_form_table(get_grids(0.7, y+0.35, 7.5, 1), get_table_data(header_data), header_data.size-1)
+    draw_box(get_grids(0.5, y+0.35, 7.5, 1.3), true)
+    y = y+ 0.4
+    y = set_header_helper(header_data, 1, y, 0.25)
+    set_table_data(3.75, [3.8], 0, y, 0.3, get_scaling_data(header_data), false, SMALL_LEFT_ALIGN)
+    set_table_data(1.7, [1, 1], 0, y+0.2, 0.3, get_optional_data, false, SMALL_LEFT_ALIGN)
+    return y+0.1
+  end
+
+  def get_optional_data
+    if @ddah[:optional]
+      [["(*) Optional", "( ) Mandatory"]]
+    else
+      [["(*) Optional", "( ) Mandatory"]]
+    end
+  end
+
+  def get_scaling_data(header_data)
+    if @ddah[:scaling_learning]
+      [["[X] #{header_data[header_data.length-1]}"]]
+    else
+      [["[ ] #{header_data[header_data.length-1]}"]]
+    end
+  end
+
+  def set_header_helper(data, start_index, y, height)
+    start = 0.5
+    columns=[1.3, 2.5, 1.5, 2.2]
+    for i in start_index..data.length-2
+      row = convert_to_row(data[i])
+      set_table_data(start, columns, 0, y, height, row)
+      y+=height
+    end
+    return y-height
+  end
+
+  def convert_to_row(data)
+    return [data.split(":")]
   end
 
   def set_allocation_table(x, y, allocation_data)

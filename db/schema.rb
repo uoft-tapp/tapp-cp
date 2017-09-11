@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170910133931) do
+ActiveRecord::Schema.define(version: 20170911185127) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -115,6 +115,7 @@ ActiveRecord::Schema.define(version: 20170910133931) do
     t.string "review_ta_coord_signature"
     t.string "review_student_signature"
     t.date "review_date"
+    t.boolean "scaling_learning", default: false
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
     t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
     t.index ["offer_id"], name: "index_ddahs_on_offer_id"
@@ -224,6 +225,7 @@ ActiveRecord::Schema.define(version: 20170910133931) do
     t.string "department", default: "Computer Science"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "scaling_learning", default: false
     t.index ["instructor_id"], name: "index_templates_on_instructor_id"
     t.index ["name", "instructor_id", "id"], name: "index_templates_on_name_and_instructor_id_and_id", unique: true
     t.index ["position_id"], name: "index_templates_on_position_id"
