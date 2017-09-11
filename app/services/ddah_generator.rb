@@ -4,10 +4,15 @@ class DdahGenerator
   TITLE = 1
   REGULAR_LEFT_ALIGN = 2
   REGULAR_CENTER = 3
-  SMALL_CENTER = 4
-  SMALL_LEFT_ALIGN = 4
+  REGULAR_CHECKLIST = 4
+  SMALL_CENTER = 5
+  SMALL_LEFT_ALIGN = 6
   HEADER_X_COORD = 0.7
   HEADER_Y_COORD = 0.5
+  CHECKBOX = "\u2610"
+  FILLED_CHECKBOX = "\u2611"
+  RADIOBUTTON = "\u25CB"
+  FILLED_RADIOBUTTON = "\u29BF"
 
   def initialize(ddah, template = false)
     @ddah = ddah
@@ -52,6 +57,13 @@ class DdahGenerator
         text: text,
         align: :left,
       }
+    when REGULAR_CHECKLIST
+      return {
+        font: get_font("Symbola"),
+        font_size: 8,
+        text: text,
+        align: :left,
+      }
     when REGULAR_CENTER
       return {
         font: "Times-Roman",
@@ -68,8 +80,8 @@ class DdahGenerator
       }
     when SMALL_LEFT_ALIGN
       return {
-        font: "Times-Roman",
-        font_size: 8,
+        font: get_font("Symbola"),
+        font_size: 7,
         text: text,
         align: :left,
       }
@@ -149,24 +161,24 @@ class DdahGenerator
     draw_box(get_grids(0.5, y+0.35, 7.5, 1.3), true)
     y = y+ 0.4
     y = set_header_helper(header_data, 1, y, 0.25)
-    set_table_data(3.75, [3.8], 0, y, 0.3, get_scaling_data(header_data), false, SMALL_LEFT_ALIGN)
-    set_table_data(1.7, [1, 1], 0, y+0.2, 0.3, get_optional_data, false, SMALL_LEFT_ALIGN)
+    set_table_data(4.45, [3.8], 0, y, 0.3, get_scaling_data(header_data), false, SMALL_LEFT_ALIGN)
+    set_table_data(2, [1, 1], 0, y+0.2, 0.3, get_optional_data, false, SMALL_LEFT_ALIGN)
     return y+0.1
   end
 
   def get_optional_data
     if @ddah[:optional]
-      [["(*) Optional", "( ) Mandatory"]]
+      [["#{FILLED_RADIOBUTTON} Optional", "#{RADIOBUTTON} Mandatory"]]
     else
-      [["(*) Optional", "( ) Mandatory"]]
+      [["#{RADIOBUTTON} Optional", "#{FILLED_RADIOBUTTON} Mandatory"]]
     end
   end
 
   def get_scaling_data(header_data)
     if @ddah[:scaling_learning]
-      [["[X] #{header_data[header_data.length-1]}"]]
+      [["#{FILLED_CHECKBOX} #{header_data[header_data.length-1]}"]]
     else
-      [["[ ] #{header_data[header_data.length-1]}"]]
+      [["#{CHECKBOX} #{header_data[header_data.length-1]}"]]
     end
   end
 
@@ -284,12 +296,12 @@ class DdahGenerator
     set_text(get_grids(0.5, y, 7.5, 0.3), get_style(TITLE, "Training"), false, true, 5)
     draw_box(get_grids(0.5, y+0.3, 7.5, 1.1), true)
     start = 0.5
-    column1=[3.7]
-    column2=[3.7,4]
+    column1=[3.9]
+    column2=[3.9,4]
     y-=0.2
     set_table_data(start, column2, 1, y, 0.24, [["", "Indicate Tutorial Category (1 primary activity)"]])
-    set_table_data(start, column1, 1, y, 0.21, get_checklist(Training, :trainings, 1, 0))
-    set_table_data(start, column2, 1, y+0.2, 0.21, get_checklist(Category, :categories, 2, 1))
+    set_table_data(start, column1, 1, y, 0.21, get_checklist(Training, :trainings, 1, 0), true, REGULAR_CHECKLIST)
+    set_table_data(start, column2, 1, y+0.2, 0.21, get_checklist(Category, :categories, 2, 1), true, REGULAR_CHECKLIST)
     return y+1.6
   end
 
@@ -297,9 +309,9 @@ class DdahGenerator
     data = []
     model.all.each do |item|
       if @ddah[attr].include?item[:id]
-        val = "[X]"
+        val = "#{FILLED_CHECKBOX}"
       else
-        val = "[  ]"
+        val = "#{CHECKBOX}"
       end
       row =[]
       for i in 0..len-1
