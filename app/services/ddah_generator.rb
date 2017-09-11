@@ -69,7 +69,7 @@ class DdahGenerator
     when SMALL_LEFT_ALIGN
       return {
         font: "Times-Roman",
-        font_size: 6,
+        font_size: 8,
         text: text,
         align: :left,
       }
@@ -135,25 +135,6 @@ class DdahGenerator
     end
   end
 
-  # reads forms data, which an array of strings, and extract for a "tablerow"
-  # and gets the max number of columns needed in the form table
-  def get_table_data(form_data)
-    table_data = []
-    i = 0
-    max = 1
-    form_data.each_with_index do |value, index|
-      if index!=0
-        type_data = @parser.get_type(value)
-        if type_data[:type] == "tablerow"
-          table_data.push(type_data[:data])
-          if type_data[:data].size > max
-            max = type_data[:data].size
-          end
-        end
-      end
-    end
-    return [table_data, max]
-  end
 
   def set_logo(grids)
     logo = "#{Rails.root}/app/assets/images/dcs_logo_blue.jpg"
@@ -432,29 +413,5 @@ class DdahGenerator
   def get_hours(allocation)
     (allocation[:num_unit]*allocation[:minutes])/60
   end
-
-  def set_form_table(grids, table_data, rows)
-    grid(grids[0], grids[1]).bounding_box do
-      define_grid(columns: table_data[1], rows: rows, gutter: 0)
-      table_data[0].each_with_index do |row, curr_row|
-        row_multiplier= row.size/table_data[1].to_f
-        row.each_with_index do |cell, index|
-          horizontal_1 =  index*row_multiplier
-          if row_multiplier ==1
-            horizontal_2 =  horizontal_1
-          else
-            horizontal_2 =  (index+1)*row_multiplier-1
-          end
-          grids = [[curr_row, horizontal_1], [curr_row, horizontal_2]]
-          if index%2 == 0
-            set_text(grids, get_style(REGULAR_LEFT_ALIGN, "<b>#{cell}</b>"), false, true)
-          else
-            set_text(grids, get_style(REGULAR_LEFT_ALIGN, "#{cell}"), false, true)
-          end
-        end
-      end
-    end
-  end
-
 
 end
