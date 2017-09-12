@@ -174,6 +174,10 @@ footer div p {
     margin-right: 1vw;
 }
 
+#instr-grid #select-menu > li:first-child {
+    border-bottom: 3px double slategray;
+}
+
 #instr-grid #applicant-menu {
     margin-top: 5px;
 }
@@ -187,6 +191,14 @@ footer div p {
     border: 1px solid #fff;
 }
 
+/* for "no selected course" message */
+#no-selection {
+    width: 50vw;
+    margin: auto;
+    text-align: center;
+    color: #555;
+}
+
 #instr-grid #ddah-menu-container {
     width: calc(var(--ddah-width) + 50px);
     float: left;
@@ -195,7 +207,7 @@ footer div p {
 #instr-grid #ddah-container {
     width: calc(var(--ddah-width) + 50px);
     padding: 20px 25px;
-    border: 1px dotted black;
+    border: 2px solid var(--dark-bg);
     margin-top: 1vh;
     
     max-height: calc(var(--main-div-height) - var(--menu-height) - 1vh);
@@ -203,6 +215,7 @@ footer div p {
 }
 
 #instr-grid h3 {
+    text-align: center;
     margin: 0 0 1vh 0;
 }
 

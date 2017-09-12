@@ -51,7 +51,11 @@ const Header = props => {
                                 type="number"
                                 readOnly
                                 value={
-                                    course ? course.get('estimatedEnrol') / props.offers.size : ''
+                                    course
+                                        ? course.get('estimatedEnrol') /
+                                          props.appState.getOffersForCourse(props.selectedCourse)
+                                              .size
+                                        : ''
                                 }
                             />
                         </td>

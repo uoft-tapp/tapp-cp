@@ -1,38 +1,41 @@
 import React from 'react';
-import { Grid, ButtonToolbar, Button, Nav, NavItem } from 'react-bootstrap';
+import { Grid, ButtonToolbar, Button, Nav, NavItem, Well } from 'react-bootstrap';
 
 import { DdahForm } from './ddahForm.js';
 
 class InstrControlPanel extends React.Component {
     render() {
-        let nullCheck =
-            this.props.appState.isCategoriesListNull() ||
-            this.props.appState.isCoursesListNull() ||
-            this.props.appState.isDutiesListNull() ||
-            this.props.appState.isOffersListNull() ||
-            this.props.appState.isTrainingsListNull();
+        let nullCheck = this.props.appState.instrAnyNull();
         if (nullCheck) {
             return <div id="loader" />;
         }
 
-        let fetchCheck =
-            this.props.appState.fetchingCategories() ||
-            this.props.appState.fetchingCourses() ||
-            this.props.appState.fetchingDuties() ||
-            this.props.appState.fetchingOffers() ||
-            this.props.appState.fetchingTrainings();
+        let fetchCheck = this.props.appState.instrAnyFetching();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         let selectedCourse = this.props.appState.getSelectedCourse();
-        let offers = selectedCourse ? this.props.appState.getOffersForCourse(selectedCourse) : null;
+        let selectedOffer = this.props.appState.getSelectedOffer();
 
         return (
             <Grid fluid id="instr-grid" style={cursorStyle}>
-                <SelectMenu selectedCourse={selectedCourse} offers={offers} {...this.props} />
-                <div id="ddah-menu-container">
-                    <ActionMenu {...this.props} />
-                    <DdahForm selectedCourse={selectedCourse} offers={offers} {...this.props} />
-                </div>
+                <SelectMenu
+                    selectedCourse={selectedCourse}
+                    selectedOffer={selectedOffer}
+                    {...this.props}
+                />
+                {selectedCourse && selectedOffer
+                    ? <div id="ddah-menu-container">
+                          <ActionMenu {...this.props} />
+                          <DdahForm
+                              selectedCourse={selectedCourse}
+                              selectedOffer={selectedOffer}
+                              {...this.props}
+                          />
+                      </div>
+                    : <Well id="no-selection">
+                          <h4>Nothing here yet!</h4>
+                          <h5>Select a course and applicant to start, or create a template.</h5>
+                      </Well>}
             </Grid>
         );
     }
@@ -40,7 +43,7 @@ class InstrControlPanel extends React.Component {
 
 const SelectMenu = props => {
     let courses = props.appState.getCoursesList(),
-        selectedOffer = props.appState.getSelectedOffer();
+        templates = props.appState.getTemplatesList();
 
     return (
         <Nav
@@ -49,22 +52,30 @@ const SelectMenu = props => {
             stacked
             activeKey={props.selectedCourse}
             onSelect={eventKey => props.appState.selectCourse(eventKey)}>
+            <NavItem disabled>Templates</NavItem>
+            {templates.map((template, i) =>
+                <NavItem eventKey={'template-' + i}>
+                    {template.get('name')}
+                </NavItem>
+            )}
+            <NavItem>Create a template</NavItem>
             {courses.map((course, i) =>
-                <NavItem eventKey={i}>
+                <NavItem eventKey={'course-' + i}>
                     {course.get('code')}
                     {i == props.selectedCourse &&
-                        props.offers &&
                         <Nav
                             id="applicant-menu"
                             bsStyle="pills"
                             stacked
-                            activeKey={selectedOffer}
+                            activeKey={props.selectedOffer}
                             onSelect={eventKey => props.appState.selectOffer(eventKey)}>
-                            {props.offers.map((offer, i) =>
-                                <NavItem eventKey={i}>
-                                    {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
-                                </NavItem>
-                            )}
+                            {props.appState
+                                .getOffersForCourse(props.selectedCourse)
+                                .map((offer, i) =>
+                                    <NavItem eventKey={i}>
+                                        {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
+                                    </NavItem>
+                                )}
                         </Nav>}
                 </NavItem>
             )}
@@ -80,9 +91,6 @@ const ActionMenu = props => {
             </Button>
             <Button bsStyle="primary" id="save">
                 Save
-            </Button>
-            <Button bsStyle="warning" id="template">
-                Save as Template
             </Button>
             <Button
                 id="clear"

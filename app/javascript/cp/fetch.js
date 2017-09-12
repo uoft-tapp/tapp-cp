@@ -304,7 +304,7 @@ function instructorFetchAll() {
         .catch(() => appState.setFetchingOffersList(false));
 
     // when templates are successfully fetched, update the templates list; set fetching flag to false either way
-    getTemplates()
+    getTemplates(user)
         .then(templates => {
             appState.setTemplatesList(fromJS(templates));
             appState.setFetchingTemplatesList(false, true);

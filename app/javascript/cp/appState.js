@@ -330,6 +330,30 @@ class AppState {
      ** data getters and setters **
      ******************************/
 
+    // check if any data needed by instructors is being fetched
+    instrAnyFetching() {
+        return [
+            this.get('categories.fetching'),
+            this.get('courses.fetching'),
+            this.get('duties.fetching'),
+            this.get('offers.fetching'),
+            this.get('templates.fetching'),
+            this.get('trainings.fetching'),
+        ].some(val => val > 0);
+    }
+
+    // check if any data needed by instructors has not yet been fetched
+    instrAnyNull() {
+        return [
+            this.get('categories.list'),
+            this.get('courses.list'),
+            this.get('duties.list'),
+            this.get('offers.list'),
+            this.get('templates.list'),
+            this.get('trainings.list'),
+        ].some(val => val == null);
+    }
+
     clearHrStatus(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');
@@ -471,6 +495,10 @@ class AppState {
 
     getSessionsList() {
         return this.get('sessions.list');
+    }
+
+    getTemplatesList() {
+        return this.get('templates.list');
     }
 
     getTrainingsList() {
