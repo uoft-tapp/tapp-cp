@@ -15,7 +15,7 @@ RSpec.describe OffersController, type: :controller do
       open: true,
       campus_code: 1,
       course_name: "Computational Thinking",
-      current_enrollment: nil,
+      current_enrolment: nil,
       duties: "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted.",
       qualifications: "Must be enrolled in, or have completed, an undergraduate program in computer science or education (or equivalent). Demonstrated excellent English communication skills. Patience teaching technical concepts to students with a wide variety of non-technical backgrounds. Must have completed or be in the process of completing a course involving functional programming. Must be able to write code in the Intermediate Student Language of Racket, and trace it in the same manner as the Intermediate Student Language Stepper of the DrRacket development environment.",
       hours: 54,

@@ -42,7 +42,7 @@ describe ChassImporter do
       end
 
       it "sets the current enrolment correctly" do
-        expect(Position.first.current_enrollment).to eq(100)
+        expect(Position.first.current_enrolment).to eq(100)
       end
 
       it "sets the position attributes correctly" do

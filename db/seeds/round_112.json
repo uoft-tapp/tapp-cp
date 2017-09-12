@@ -14,7 +14,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "112",
             "course_name": "Computational Thinking (round 112)",
             "course_id": "CSC104H1S"
@@ -33,7 +33,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "3",
-            "enrollment": "90",
+            "enrolment": "90",
             "round_id": "112",
             "course_name": "Database System Technology (round 112)",
             "course_id": "CSC443H1F"

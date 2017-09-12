@@ -41,7 +41,7 @@ class PositionsController < ApplicationController
   private
   def position_params
     params.permit(:duties, :qualifications, :hours, :estimated_count,
-      :estimated_total_hours, :open, :current_enrollment, :cap_enrollment, :num_waitlisted)
+      :estimated_total_hours, :open, :current_enrolment, :cap_enrolment, :num_waitlisted)
   end
 
   def update_date(date, position, attribute)

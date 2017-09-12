@@ -1100,7 +1100,7 @@ class AppState {
                 data['hours'] = val;
                 break;
             case 'estimatedEnrol':
-                data['current_enrollment'] = val;
+                data['current_enrolment'] = val;
                 break;
             case 'qual':
                 data['qualifications'] = val;
@@ -1109,7 +1109,7 @@ class AppState {
                 data['duties'] = val;
                 break;
             case 'cap':
-                data['cap_enrollment'] = val;
+                data['cap_enrolment'] = val;
                 break;
             case 'waitlist':
                 data['num_waitlisted'] = val;
