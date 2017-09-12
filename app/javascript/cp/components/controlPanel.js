@@ -274,7 +274,7 @@ class ControlPanel extends React.Component {
         ];
 
         return (
-            <Grid fluid id="offers-grid">
+            <Grid fluid id="offers-grid" style={cursorStyle}>
                 {role == 'cp_admin' && <SessionsForm {...this.props} />}
 
                 <ButtonToolbar id="dropdown-menu">

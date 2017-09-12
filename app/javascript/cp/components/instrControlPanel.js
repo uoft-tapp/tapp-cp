@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, ButtonToolbar, DropdownButton, MenuItem, Button } from 'react-bootstrap';
+import { Grid, ButtonToolbar, Button, Nav, NavItem } from 'react-bootstrap';
 
 import { DdahForm } from './ddahForm.js';
 
@@ -27,53 +27,54 @@ class InstrControlPanel extends React.Component {
         let offers = selectedCourse ? this.props.appState.getOffersForCourse(selectedCourse) : null;
 
         return (
-            <Grid fluid id="instr-grid">
-                <Menu selectedCourse={selectedCourse} offers={offers} {...this.props} />
-                <DdahForm selectedCourse={selectedCourse} offers={offers} {...this.props} />
+            <Grid fluid id="instr-grid" style={cursorStyle}>
+                <SelectMenu selectedCourse={selectedCourse} offers={offers} {...this.props} />
+                <div id="ddah-menu-container">
+                    <ActionMenu {...this.props} />
+                    <DdahForm selectedCourse={selectedCourse} offers={offers} {...this.props} />
+                </div>
             </Grid>
         );
     }
 }
 
-const Menu = props => {
+const SelectMenu = props => {
     let courses = props.appState.getCoursesList(),
         selectedOffer = props.appState.getSelectedOffer();
 
     return (
-        <ButtonToolbar id="menu">
-            <DropdownButton
-                id="courses-dropdown"
-                bsStyle="info"
-                title={
-                    props.selectedCourse ? courses.getIn([props.selectedCourse, 'code']) : 'Course'
-                }
-                onSelect={eventKey => props.appState.selectCourse(eventKey)}>
-                {courses.map((course, i) =>
-                    <MenuItem eventKey={i}>
-                        {course.get('code')}
-                    </MenuItem>
-                )}
-            </DropdownButton>
-            <DropdownButton
-                id="offers-dropdown"
-                bsStyle="info"
-                disabled={props.selectedCourse == null}
-                title={
-                    selectedOffer && props.offers
-                        ? props.offers.getIn([selectedOffer, 'lastName']) +
-                          ' · ' +
-                          props.offers.getIn([selectedOffer, 'utorid'])
-                        : 'Applicant'
-                }
-                onSelect={eventKey => props.appState.selectOffer(eventKey)}>
-                {props.offers &&
-                    props.offers.map((offer, i) =>
-                        <MenuItem eventKey={i}>
-                            {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
-                        </MenuItem>
-                    )}
-            </DropdownButton>
+        <Nav
+            id="select-menu"
+            bsStyle="pills"
+            stacked
+            activeKey={props.selectedCourse}
+            onSelect={eventKey => props.appState.selectCourse(eventKey)}>
+            {courses.map((course, i) =>
+                <NavItem eventKey={i}>
+                    {course.get('code')}
+                    {i == props.selectedCourse &&
+                        props.offers &&
+                        <Nav
+                            id="applicant-menu"
+                            bsStyle="pills"
+                            stacked
+                            activeKey={selectedOffer}
+                            onSelect={eventKey => props.appState.selectOffer(eventKey)}>
+                            {props.offers.map((offer, i) =>
+                                <NavItem eventKey={i}>
+                                    {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
+                                </NavItem>
+                            )}
+                        </Nav>}
+                </NavItem>
+            )}
+        </Nav>
+    );
+};
 
+const ActionMenu = props => {
+    return (
+        <ButtonToolbar id="action-menu">
             <Button bsStyle="success" id="submit">
                 Submit for Review
             </Button>
