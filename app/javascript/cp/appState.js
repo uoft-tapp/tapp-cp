@@ -387,6 +387,19 @@ class AppState {
         fetch.print(offers.map(offer => parseInt(offer)));
     }
 
+    resetOffer(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+        if (offers.length != 1) {
+            this.alert('<b>Error:</b> Can only reset offer status for a single applicant at a time.');
+            return;
+        }
+
+        fetch.resetOffer(offers[0]);
+    }
+
     sendContracts(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');

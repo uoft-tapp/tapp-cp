@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     post "decision/:status" => "offers#set_status"
     get "pdf" => "offers#get_contract"
     post "accept" => "offers#accept_offer"
+    post "reset" => "offers#reset_offer"
   end
   resources :duties, only: [:index, :show]
   resources :trainings, only: [:index, :show]

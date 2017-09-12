@@ -171,6 +171,14 @@ class OffersController < ApplicationController
     end
   end
 
+  def reset_offer
+    offer = Offer.find(params[:offer_id])
+    offer.update_attributes!(status: "Unsent", accept_date: nil, commentary: nil, hr_status: nil, nag_count: nil,
+                             print_time: nil, send_date: nil, signature: nil)
+    offer = offer.format
+    render status: 200, json: {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Unsent'."}
+  end
+
   private
   def get_contract_pdf(params)
     offer = Offer.find(params[:offer_id])

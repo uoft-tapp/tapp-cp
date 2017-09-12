@@ -327,6 +327,9 @@ const OffersMenu = props =>
             Send contract(s)
         </MenuItem>
         <MenuItem divider />
+        <MenuItem onClick={() => props.appState.resetOffer(getSelectedOffers())}>
+            Reset status to <i>Unsent</i>
+        </MenuItem>
         <MenuItem onClick={() => props.appState.setOfferAccepted(getSelectedOffers())}>
             Set status to <i>Accepted</i>
         </MenuItem>

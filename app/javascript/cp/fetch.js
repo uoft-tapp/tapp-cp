@@ -633,6 +633,25 @@ function setOfferAccepted(offer) {
         });
 }
 
+// set status to unsent and clear other information
+function resetOffer(offer) {
+    postHelper('/offers/' + offer + '/reset', {})
+        .then(resp => {
+            if (!resp.ok) {
+                return respFailure(resp);
+            }
+        })
+        .then(() => {
+            appState.setFetchingOffersList(true);
+            getOffers()
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingOffersList(false, true);
+                })
+                .catch(() => appState.setFetchingOffersList(false));
+        });
+}
+
 // export all offers from the session to CSV
 function exportOffers(session) {
     window.open('/export/cp-offers/' + session);
@@ -678,5 +697,6 @@ export {
     exportOffers,
     clearHrStatus,
     setOfferAccepted,
+    resetOffer,
     fetchAuth,
 };
