@@ -167,28 +167,18 @@ footer div p {
 
 #instr-grid #select-menu {
     height: var(--main-div-height);
-    background-color: var(--dark-bg);
     overflow: auto;
     width: auto;
     float: left;
     margin-right: 1vw;
 }
 
-#instr-grid #select-menu > li:first-child {
-    border-bottom: 3px double slategray;
+#instr-grid #select-menu button {
+    padding: 5px 15px;
 }
 
 #instr-grid #applicant-menu {
-    margin-top: 5px;
-}
-
-#instr-grid #applicant-menu a {
-    color: #fff;
-    padding: 2px 10px;
-}
-
-#instr-grid #applicant-menu li.active a {
-    border: 1px solid #fff;
+    margin: 0;
 }
 
 /* for "no selected course" message */

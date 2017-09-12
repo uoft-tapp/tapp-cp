@@ -1,5 +1,14 @@
 import React from 'react';
-import { Grid, ButtonToolbar, Button, Nav, NavItem, Well } from 'react-bootstrap';
+import {
+    Grid,
+    ButtonToolbar,
+    Button,
+    PanelGroup,
+    Panel,
+    ListGroup,
+    ListGroupItem,
+    Well,
+} from 'react-bootstrap';
 
 import { DdahForm } from './ddahForm.js';
 
@@ -46,40 +55,43 @@ const SelectMenu = props => {
         templates = props.appState.getTemplatesList();
 
     return (
-        <Nav
-            id="select-menu"
-            bsStyle="pills"
-            stacked
-            activeKey={props.selectedCourse}
-            onSelect={eventKey => props.appState.selectCourse(eventKey)}>
-            <NavItem disabled>Templates</NavItem>
-            {templates.map((template, i) =>
-                <NavItem eventKey={'template-' + i}>
-                    {template.get('name')}
-                </NavItem>
-            )}
-            <NavItem>Create a template</NavItem>
-            {courses.map((course, i) =>
-                <NavItem eventKey={'course-' + i}>
-                    {course.get('code')}
-                    {i == props.selectedCourse &&
-                        <Nav
-                            id="applicant-menu"
-                            bsStyle="pills"
-                            stacked
-                            activeKey={props.selectedOffer}
-                            onSelect={eventKey => props.appState.selectOffer(eventKey)}>
-                            {props.appState
-                                .getOffersForCourse(props.selectedCourse)
-                                .map((offer, i) =>
-                                    <NavItem eventKey={i}>
-                                        {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
-                                    </NavItem>
-                                )}
-                        </Nav>}
-                </NavItem>
-            )}
-        </Nav>
+        <PanelGroup id="select-menu">
+            <Panel header="Templates">
+                <ListGroup fill>
+                    {templates.map((template, i) =>
+                        <ListGroupItem eventKey={'T' + i}>
+                            {template.get('name')}
+                        </ListGroupItem>
+                    )}
+                    <ListGroupItem bsStyle="info">Create a new template</ListGroupItem>
+                </ListGroup>
+            </Panel>
+
+            <Panel header="Applicants">
+                <ListGroup fill>
+                    {courses.map((course, i) =>
+                        <ListGroupItem onClick={() => props.appState.toggleSelectedCourse(i)}>
+                            {course.get('code')}
+                            {i == props.selectedCourse &&
+                                <ListGroup id="applicant-menu" fill>
+                                    {props.appState
+                                        .getOffersForCourse(props.selectedCourse)
+                                        .map((offer, i) =>
+                                            <ListGroupItem
+                                                active={i == props.selectedOffer}
+                                                onClick={event => {
+                                                    event.stopPropagation();
+                                                    props.appState.toggleSelectedOffer(i);
+                                                }}>
+                                                {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
+                                            </ListGroupItem>
+                                        )}
+                                </ListGroup>}
+                        </ListGroupItem>
+                    )}
+                </ListGroup>
+            </Panel>
+        </PanelGroup>
     );
 };
 

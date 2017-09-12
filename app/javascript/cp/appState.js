@@ -264,14 +264,6 @@ class AppState {
         this.set('selectedSortFields', sorts.delete(i));
     }
 
-    selectCourse(course) {
-        this.set('selectedCourse', course);
-    }
-
-    selectOffer(offer) {
-        this.set('selectedOffer', offer);
-    }
-
     selectSession(session) {
         this.set('selectedSession', session);
     }
@@ -308,6 +300,26 @@ class AppState {
             }
         } else {
             this.set('selectedFilters[' + field + ']', fromJS([category]));
+        }
+    }
+
+    // unselect this course if it is already selected; otherwise select this course
+    toggleSelectedCourse(course) {
+        if (this.get('selectedCourse') == course) {
+            // this course is currently selected
+            this.set('selectedCourse', null);
+        } else {
+            this.set('selectedCourse', course);
+        }
+    }
+
+    // unselect this offer if it is already selected; otherwise select this offer
+    toggleSelectedOffer(offer) {
+        if (this.get('selectedOffer') == offer) {
+            // this offer is currently selected
+            this.set('selectedOffer', null);
+        } else {
+            this.set('selectedOffer', offer);
         }
     }
 
