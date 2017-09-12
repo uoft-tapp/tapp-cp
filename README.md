@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/uoft-tapp/tapp.svg?branch=master)](https://travis-ci.org/uoft-tapp/tapp)
 
-- [FirstDeploymentCombinedCpTappApp](#FirstDeploymentCombinedCpTappApp)
-- [deployment](#deployment)
+- [updateDeployment](#updateDeployment)
+- [initial deployment](#deployment)
 - [backup & restore](#backup-restore)
 - [Task Commands](#task-commands)
 
@@ -104,27 +104,8 @@ To absolutely nuke all the docker images and networks:
 
 `docker system prune --all --force`
 
-## FirstDeploymentCombinedCpTappApp <a id="FirstDeploymentCombinedCpTappApp"></a>
 
-The  first time  we deploy  the combined  app (sept/2017,  delete this
-section once  this has  been accomplished) we  need to  import Karen's
-assignments from the tapp app running on docker.
-
-
-### michelle's recipe for the one-time migration
-```
-[3:47 PM]
-michellemtchai @everyone The dump of the TAPP data to TAPP-CP works! The trick was to keep the `POSTGRES_DB=tapp_production` and `POSTGRES_USER=tapp` in the `.env` file. This way `tapp-cp` takes the data from the dump as the main database. The steps to get the TAPP data to TAPP-CP is the following:
-1) `docker-compose down -v`
-2) `docker-compose up`
-3) do `Ctrl+C` to close docker
-4) `docker-compose run rails-app rake db:drop`
-5) `cat filename | docker exec -i tappcp_postgres_1 psql -U postgres`
-6) `docker-compose up`
-7) `docker-compose run rails-app rake db:migrate`
-```
-
-## Deployment <a id="deployment"></a>
+## Initial Deployment <a id="deployment"></a>
 
 * The Dockerfile contains instructions to set up the image of the container (linux, yarn, npm etc)
 * The `docker-compose` `yml` files setup the services that your container will be using (postgres, rails).
@@ -150,6 +131,10 @@ See https://github.com/uoft-tapp/tapp/blob/master/etc/daemon.json
 
 NB. subnet for docker networks that are created at docker-compose up time are configured in prod.env file
 
+### apache (reverse proxy)
+
+Lloyd to type here.
+
 ### Initial deployment
 
 On the production machine:
@@ -164,7 +149,32 @@ If you don't specify the environment variable that the docker-compose file shoul
 up with an error from postgres ("role "tapp" does not exist"). In that case stop/remove the containers and its volumes,
 `docker-compose down -v`, and restart deployment from step 2.
 
-### Updating an existing deployment
+### Recipe for updating a functioning deployment <a id="updateDeployment"></a>
+
+Update the app after a hotfix or other improvement:
+
+Note, do NOT mess with down. It deletes stuff. (down is not the opposite of up)
+
+In preparation, do:
+
+```
+git fetch && git status
+```
+
+Stare at the status output for a moment to make sure you are good for
+a fast forward.. (in case somebody has changed a file locally)
+
+Regardless of whether the app is running or not:
+
+```
+git pull && docker-compose up -d --build && docker-compose exec rails-app rake db:migrate
+```
+
+Note that the build container step can take a long time, or can be quick, depending on what has changed.
+
+
+#### pedantic
+
 1. Fetch and apply changes: `git pull`
 2. Rebuild the app with the following command:
     ```
@@ -185,15 +195,39 @@ up with an error from postgres ("role "tapp" does not exist"). In that case stop
 
 Note: number 2 will update the rails app but not touch the database.
 
+## FirstDeploymentCombinedCpTappApp <a id="FirstDeploymentCombinedCpTappApp"></a>
+
+The  first time  we deploy  the combined  app (sept/2017,  after which this
+section will likely only be a source of hints for how to recover from a catastrophich failure).
+Then, we  needed to  import Karen's assignments from the tapp app running on docker.
+
+### michelle's recipe for the one-time migration
+
+NB. the seemingly redundant up/down sequence is because we want to
+nuke the postgres volumes (down -v) and then re-initialize the volume
+and database server (up) so we can run drop (now have a truly empty
+postgress with no tables) which we can pour the backup into.
+We run migrate in case the tables from the backup were backlevel relative to our rails app.
+
+```
+[3:47 PM]
+michellemtchai @everyone The dump of the TAPP data to TAPP-CP works! The trick was to keep the `POSTGRES_DB=tapp_production` and `POSTGRES_USER=tapp` in the `.env` file. This way `tapp-cp` takes the data from the dump as the main database. The steps to get the TAPP data to TAPP-CP is the following:
+1) `docker-compose down -v`
+2) `docker-compose up`
+3) do `Ctrl+C` to close docker
+4) `docker-compose run rails-app rake db:drop`
+5) `cat filename | docker exec -i tappcp_postgres_1 psql -U postgres`
+6) `docker-compose up`
+7) `docker-compose run rails-app rake db:migrate`
+```
+
 ## logging
 
 When you run `docker-compose up -d` the stdout goes to a well hidden file. To see where it is for a given service, for instance our rails-app service, type:
 
 ```
-docker inspect --format='{{.LogPath}}' tapp_rails-app
+docker-compose logs --follow rails-app 
 ```
-
-by default the logs are in json and are buried deep in `/var/lib/docker/containers`.
 
 ## Backup/Restore of database <a id="backuprestore"></a>
 
