@@ -1,9 +1,9 @@
-class EnrollmentUpdater
+class EnrolmentUpdater
   def initialize(data)
     lines = data.split("\n")
     if is_valid(lines)
       parse_lines(lines)
-      @status = {updated: true, message: "Enrollment update success."}
+      @status = {updated: true, message: "Enrolment update success."}
     else
       @status = {updated: false, message: "Error: This file is not formatted correctly."}
     end
@@ -93,13 +93,13 @@ class EnrollmentUpdater
     if !course_exists(data, term, course_code)
       data[term][:courses][course_code] = {
         course_name: parsed[:course_name],
-        cap_enrollment: parsed[:cap_enrollment],
-        current_enrollment: parsed[:current_enrollment],
+        cap_enrolment: parsed[:cap_enrolment],
+        current_enrolment: parsed[:current_enrolment],
         num_waitlisted: parsed[:num_waitlisted],
       }
     else
-      data[term][:courses][course_code][:current_enrollment]+=parsed[:current_enrollment]
-      data[term][:courses][course_code][:cap_enrollment]+=parsed[:cap_enrollment]
+      data[term][:courses][course_code][:current_enrolment]+=parsed[:current_enrolment]
+      data[term][:courses][course_code][:cap_enrolment]+=parsed[:cap_enrolment]
       data[term][:courses][course_code][:num_waitlisted]+=parsed[:num_waitlisted]
     end
   end
@@ -110,8 +110,8 @@ class EnrollmentUpdater
       course_name: line[21..50].strip,
       section: line[51..59].strip,
       type: line[60..63].strip,
-      cap_enrollment: line[64..67].to_i,
-      current_enrollment: line[68..71].to_i,
+      cap_enrolment: line[64..67].to_i,
+      current_enrolment: line[68..71].to_i,
       num_waitlisted: line[74..line.length-1].to_i,
     }
   end

@@ -14,7 +14,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "14-21",
             "n_positions": "2",
-            "enrollment": "N/A",
+            "enrolment": "N/A",
             "round_id": "110",
             "course_name": "Computing for Medicine Program",
             "course_id": "C4M101H1F"
@@ -33,7 +33,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "19",
-            "enrollment": "588",
+            "enrolment": "588",
             "round_id": "110",
             "course_name": "Computational Thinking",
             "course_id": "CSC104H1F"
@@ -52,7 +52,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Computational Thinking",
             "course_id": "CSC104H1S"

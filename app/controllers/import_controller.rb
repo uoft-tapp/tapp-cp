@@ -2,7 +2,7 @@ class ImportController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
   before_action :cp_access, only: [:import_offers, :import_locked_assignments]
-  before_action :tapp_admin, only: [:chass, :enrollment]
+  before_action :tapp_admin, only: [:chass, :enrolment]
 
   def import_offers
     importer = OfferImporter.new
@@ -30,8 +30,8 @@ class ImportController < ApplicationController
     end
   end
 
-  def enrollment
-    updater = EnrollmentUpdater.new(params[:enrollment_data])
+  def enrolment
+    updater = EnrolmentUpdater.new(params[:enrolment_data])
     status = updater.get_status
     if status[:updated]==true
       render json: {message: status[:message]}

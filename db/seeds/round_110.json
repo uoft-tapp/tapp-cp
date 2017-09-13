@@ -14,7 +14,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Computational Thinking",
             "course_id": "CSC104H1S"
@@ -33,7 +33,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "30-40",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Intro to Comp Prog ",
             "course_id": "CSC108H1F"
@@ -65,7 +65,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "80",
             "n_positions": "12",
-            "enrollment": "1176",
+            "enrolment": "1176",
             "round_id": "110",
             "course_name": "Intro to Comp Prog - Inverted-classroom and Office Hours TA",
             "course_id": "CSC108H1F-A"
@@ -84,7 +84,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "10-15",
-            "enrollment": "350",
+            "enrolment": "350",
             "round_id": "110",
             "course_name": "Int.To Comp. Program. ",
             "course_id": "CSC180H1F"
@@ -103,7 +103,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "3",
-            "enrollment": "90",
+            "enrolment": "90",
             "round_id": "110",
             "course_name": "Database System Technology",
             "course_id": "CSC443H1F"
@@ -122,7 +122,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "10",
             "n_positions": "0",
-            "enrollment": "0",
+            "enrolment": "0",
             "round_id": "110",
             "course_name": "nameless",
             "course_id": "CSC465H1F/2104HF"

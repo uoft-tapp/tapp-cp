@@ -27,7 +27,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "14-21",
             "n_positions": "2",
-            "enrollment": "N/A",
+            "enrolment": "N/A",
             "round_id": "110",
             "course_name": "Computing for Medicine Program",
             "course_id": "C4M101H1F"
@@ -59,7 +59,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "19",
-            "enrollment": "588",
+            "enrolment": "588",
             "round_id": "110",
             "course_name": "Computational Thinking",
             "course_id": "CSC104H1F"
@@ -78,7 +78,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Computational Thinking",
             "course_id": "CSC104H1S"
@@ -97,7 +97,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "30-40",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Intro to Comp Prog ",
             "course_id": "CSC108H1F"
@@ -135,7 +135,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "80",
             "n_positions": "12",
-            "enrollment": "1176",
+            "enrolment": "1176",
             "round_id": "110",
             "course_name": "Intro to Comp Prog - Inverted-classroom and Office Hours TA",
             "course_id": "CSC108H1F-A"
@@ -173,7 +173,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "25",
-            "enrollment": "1176",
+            "enrolment": "1176",
             "round_id": "110",
             "course_name": "Intro to Comp Prog - Office Hours and Marking TA",
             "course_id": "CSC108H1F-B"
@@ -192,7 +192,7 @@
             "dates": "September 7 - December 31",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "N/A",
+            "enrolment": "N/A",
             "round_id": "110",
             "course_name": "Intro to Comp Prog - Self-paced Preparation",
             "course_id": "CSC108H1S-Prep"
@@ -211,7 +211,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "3",
-            "enrollment": "196",
+            "enrolment": "196",
             "round_id": "110",
             "course_name": "CompSci for Sciences",
             "course_id": "CSC120H1F"
@@ -230,7 +230,7 @@
             "dates": "Aug 15, 2017 - Jan 13, 2018",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "N/A",
+            "enrolment": "N/A",
             "round_id": "110",
             "course_name": "Intro to Comp Sci - Ramp-up Leader",
             "course_id": "CSC148H1-Ramp-up"
@@ -249,7 +249,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Intro to Comp Sci ",
             "course_id": "CSC148H1F"
@@ -268,7 +268,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "8",
-            "enrollment": "480",
+            "enrolment": "480",
             "round_id": "110",
             "course_name": "Intro to Comp Sci - Lab TA",
             "course_id": "CSC148H1F-A"
@@ -287,7 +287,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "8",
-            "enrollment": "480",
+            "enrolment": "480",
             "round_id": "110",
             "course_name": "Intro to Comp Sci - Marking TA",
             "course_id": "CSC148H1F-B"
@@ -306,7 +306,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "100",
             "n_positions": "1",
-            "enrollment": "480",
+            "enrolment": "480",
             "round_id": "110",
             "course_name": "Intro to Comp Sci - Assignment Lead TA",
             "course_id": "CSC148H1F-C"
@@ -332,7 +332,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "14",
-            "enrollment": "392",
+            "enrolment": "392",
             "round_id": "110",
             "course_name": "Math Expr&Rsng for CS",
             "course_id": "CSC165H1F"
@@ -351,7 +351,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "10-15",
-            "enrollment": "350",
+            "enrolment": "350",
             "round_id": "110",
             "course_name": "Int.To Comp. Program. ",
             "course_id": "CSC180H1F"
@@ -377,7 +377,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "20",
-            "enrollment": "560",
+            "enrolment": "560",
             "round_id": "110",
             "course_name": "Software Design ",
             "course_id": "CSC207H1F"
@@ -409,7 +409,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "8",
-            "enrollment": "240",
+            "enrolment": "240",
             "round_id": "110",
             "course_name": "Soft Tools & Sys Prog ",
             "course_id": "CSC209H1F"
@@ -428,7 +428,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "75",
+            "enrolment": "75",
             "round_id": "110",
             "course_name": "PROGRAM DESIGN CSC2104H",
             "course_id": "CSC2104HF"
@@ -447,7 +447,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "210",
+            "enrolment": "210",
             "round_id": "110",
             "course_name": "COMPUTER NETWORKS CSC2209H ",
             "course_id": "CSC2209HF"
@@ -473,7 +473,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "14",
-            "enrollment": "420",
+            "enrolment": "420",
             "round_id": "110",
             "course_name": "Intro to Theory Comp ",
             "course_id": "CSC236H1F"
@@ -492,7 +492,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "0-2",
-            "enrollment": "60",
+            "enrolment": "60",
             "round_id": "110",
             "course_name": "COMPUTABILITY & LOGIC CSC2404H ",
             "course_id": "CSC2404HF"
@@ -511,7 +511,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "70",
+            "enrolment": "70",
             "round_id": "110",
             "course_name": "COMPUTATIONAL LINGUISTICS CSC2501H",
             "course_id": "CSC2501HF"
@@ -530,7 +530,7 @@
             "dates": "s",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "170",
+            "enrolment": "170",
             "round_id": "110",
             "course_name": "COMPUTER GRAPHICS CSC2504H ",
             "course_id": "CSC2504HF"
@@ -549,7 +549,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "332",
+            "enrolment": "332",
             "round_id": "110",
             "course_name": "INTRO MACHINE LEARNING CSC2515H ",
             "course_id": "CSC2515HF"
@@ -568,7 +568,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "60",
+            "enrolment": "60",
             "round_id": "110",
             "course_name": "BUSINESS OF SOFTWARE CSC2527H ",
             "course_id": "CSC2527HF"
@@ -587,7 +587,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "12",
-            "enrollment": "300",
+            "enrolment": "300",
             "round_id": "110",
             "course_name": "Computer Organizatn ",
             "course_id": "CSC258H1F"
@@ -606,7 +606,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "40",
+            "enrolment": "40",
             "round_id": "110",
             "course_name": "TOPICS",
             "course_id": "CSC2600HF"
@@ -625,7 +625,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "8",
-            "enrollment": "250",
+            "enrolment": "250",
             "round_id": "110",
             "course_name": "Data Struct & Anal ",
             "course_id": "CSC263H1F"
@@ -651,7 +651,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "55",
+            "enrolment": "55",
             "round_id": "110",
             "course_name": "Enr Data Struct Anal ",
             "course_id": "CSC265H1F"
@@ -683,7 +683,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "5",
-            "enrollment": "170",
+            "enrolment": "170",
             "round_id": "110",
             "course_name": "Computers and Society",
             "course_id": "CSC300H1F"
@@ -702,7 +702,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "6",
-            "enrollment": "170",
+            "enrolment": "170",
             "round_id": "110",
             "course_name": "Intro to Soft Eng ",
             "course_id": "CSC301H1F"
@@ -734,7 +734,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "55",
+            "enrolment": "55",
             "round_id": "110",
             "course_name": "Algo Game Th & Mech Des",
             "course_id": "CSC304H1F"
@@ -760,7 +760,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "10",
-            "enrollment": "200",
+            "enrolment": "200",
             "round_id": "110",
             "course_name": "Prog on the Web ",
             "course_id": "CSC309H1F"
@@ -786,7 +786,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "10",
-            "enrollment": "200",
+            "enrolment": "200",
             "round_id": "110",
             "course_name": "Interact Comp Media",
             "course_id": "CSC318H1F"
@@ -812,7 +812,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "7",
-            "enrollment": "200",
+            "enrolment": "200",
             "round_id": "110",
             "course_name": "Prog Languages ",
             "course_id": "CSC324H1F"
@@ -838,7 +838,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "4",
-            "enrollment": "125",
+            "enrolment": "125",
             "round_id": "110",
             "course_name": "Numerical Methods ",
             "course_id": "CSC336H1F"
@@ -870,7 +870,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "15",
-            "enrollment": "450",
+            "enrolment": "450",
             "round_id": "110",
             "course_name": "Intro to Databases ",
             "course_id": "CSC343H1F"
@@ -896,7 +896,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "9",
-            "enrollment": "250",
+            "enrolment": "250",
             "round_id": "110",
             "course_name": "Operating Systems ",
             "course_id": "CSC369H1F"
@@ -915,7 +915,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "9",
-            "enrollment": "250",
+            "enrolment": "250",
             "round_id": "110",
             "course_name": "Algo Design & Analysis ",
             "course_id": "CSC373H1F"
@@ -941,7 +941,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "9",
-            "enrollment": "280",
+            "enrolment": "280",
             "round_id": "110",
             "course_name": "Intro Artif Intell",
             "course_id": "CSC384H1F"
@@ -960,7 +960,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "3",
-            "enrollment": "95",
+            "enrolment": "95",
             "round_id": "110",
             "course_name": "Microprocessor Systems",
             "course_id": "CSC385H1F"
@@ -979,7 +979,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "40",
+            "enrolment": "40",
             "round_id": "110",
             "course_name": "Introduction to Video Game Design",
             "course_id": "CSC404H1F"
@@ -1005,7 +1005,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "60",
+            "enrolment": "60",
             "round_id": "110",
             "course_name": "Software Testing and Verification",
             "course_id": "CSC410H1F"
@@ -1024,7 +1024,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "10",
-            "enrollment": "332",
+            "enrolment": "332",
             "round_id": "110",
             "course_name": "Machine Learning ",
             "course_id": "CSC411H1F/2515HF"
@@ -1050,7 +1050,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "5",
-            "enrollment": "170",
+            "enrolment": "170",
             "round_id": "110",
             "course_name": "Computer Graphics CSC418H1/2504H1",
             "course_id": "CSC418H1F/2504HF"
@@ -1069,7 +1069,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "4",
-            "enrollment": "100",
+            "enrolment": "100",
             "round_id": "110",
             "course_name": "Intro Image Unstand",
             "course_id": "CSC420H1F"
@@ -1088,7 +1088,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "2",
-            "enrollment": "50",
+            "enrolment": "50",
             "round_id": "110",
             "course_name": "Human-Comp Interact",
             "course_id": "CSC428H1F/2514HF"
@@ -1114,7 +1114,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "25",
+            "enrolment": "25",
             "round_id": "110",
             "course_name": "Numerical Algorithms",
             "course_id": "CSC436H1F"
@@ -1140,7 +1140,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "2",
-            "enrollment": "60",
+            "enrolment": "60",
             "round_id": "110",
             "course_name": "Computabil & Logic",
             "course_id": "CSC438H1F/2404HF"
@@ -1159,7 +1159,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "3",
-            "enrollment": "90",
+            "enrolment": "90",
             "round_id": "110",
             "course_name": "Database System Technology",
             "course_id": "CSC443H1F"
@@ -1185,7 +1185,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "2",
-            "enrollment": "60",
+            "enrolment": "60",
             "round_id": "110",
             "course_name": "Business Software CSC454H1/2527H",
             "course_id": "CSC454H1F/2527HF"
@@ -1204,7 +1204,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "7",
-            "enrollment": "210",
+            "enrolment": "210",
             "round_id": "110",
             "course_name": "Computer Networks CSC458H1/2209H",
             "course_id": "CSC458H1F/2209HF"
@@ -1223,7 +1223,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "2",
-            "enrollment": "75",
+            "enrolment": "75",
             "round_id": "110",
             "course_name": "Formal Methods Software Design CSC465H1/2104H",
             "course_id": "CSC465H1F/2104HF"
@@ -1249,7 +1249,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "2",
-            "enrollment": "75",
+            "enrolment": "75",
             "round_id": "110",
             "course_name": "Oper Sys Design CSC469H1/2208H",
             "course_id": "CSC469H1F/2208HF"
@@ -1275,7 +1275,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "2",
-            "enrollment": "70",
+            "enrolment": "70",
             "round_id": "110",
             "course_name": "Comp Linguistics CSC485H1/2501H",
             "course_id": "CSC485H1F/2501HF"
@@ -1301,7 +1301,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "1",
-            "enrollment": "40",
+            "enrolment": "40",
             "round_id": "110",
             "course_name": "Capstone Design Project ",
             "course_id": "CSC491H1F/2600HF"
@@ -1320,7 +1320,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Project in CSC CSC494H1 ",
             "course_id": "CSC494H1F"
@@ -1339,7 +1339,7 @@
             "dates": "September 1, 2017 to December 31, 2017",
             "n_hours": "60",
             "n_positions": "",
-            "enrollment": "",
+            "enrolment": "",
             "round_id": "110",
             "course_name": "Project in CSC CSC495H1 ",
             "course_id": "CSC495H1F"
@@ -1358,7 +1358,7 @@
             "dates": "September 7 - December 31",
             "n_hours": "60",
             "n_positions": "6",
-            "enrollment": "N/A",
+            "enrolment": "N/A",
             "round_id": "110",
             "course_name": "Help Centre for First Year courses",
             "course_id": "HLP101H-First"
@@ -1377,7 +1377,7 @@
             "dates": "September 7 - December 31",
             "n_hours": "60",
             "n_positions": "6",
-            "enrollment": "N/A",
+            "enrolment": "N/A",
             "round_id": "110",
             "course_name": "Help Centre TA",
             "course_id": "HLP101H1"

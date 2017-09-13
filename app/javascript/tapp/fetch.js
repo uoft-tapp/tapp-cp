@@ -190,9 +190,9 @@ function onFetchCoursesSuccess(resp) {
             })(course.campus_code),
             instructors: course.instructors.map(instr => instr.id),
             estimatedPositions: course.estimated_count,
-            estimatedEnrol: course.current_enrollment,
+            estimatedEnrol: course.current_enrolment,
             positionHours: course.hours,
-            cap: course.cap_enrollment,
+            cap: course.cap_enrolment,
             waitlist: course.num_waitlisted,
             qual: course.qualifications,
             resp: course.duties,
@@ -412,7 +412,7 @@ function importChass(data, year, semester) {
 function importEnrolment(data) {
     appState.setImporting(true);
 
-    postHelper('/import/enrollment', { enrollment_data: data })
+    postHelper('/import/enrolment', { enrolment_data: data })
         .then(resp => (resp.ok ? resp : Promise.reject(resp)))
         .then(
             () => {
