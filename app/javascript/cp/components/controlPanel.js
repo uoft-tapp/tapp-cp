@@ -128,15 +128,15 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'Position',
-                data: p => p.offer.get('position'),
-                sortData: p => p.get('position'),
+                data: p => p.offer.get('course'),
+                sortData: p => p.get('course'),
 
                 filterLabel: 'Position',
                 filterCategories: this.props.appState.getPositions(),
                 // filter out offers not to that position
                 filterFuncs: this.props.appState
                     .getPositions()
-                    .map(position => p => p.get('position') == position),
+                    .map(position => p => p.get('course') == position),
 
                 style: { width: 0.1 },
             },
