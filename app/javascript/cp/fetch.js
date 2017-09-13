@@ -141,8 +141,8 @@ function onFetchCoursesSuccess(resp) {
                 }
             })(course.campus_code),
             session: course.session_id,
-            estimatedEnrol: course.current_enrollment,
-            cap: course.cap_enrollment,
+            estimatedEnrol: course.current_enrolment,
+            cap: course.cap_enrolment,
             waitlist: course.num_waitlisted,
         };
     });
@@ -210,8 +210,7 @@ function onFetchTemplatesSuccess(resp) {
         templates[template.id] = {
             name: template.name,
             optional: template.optional,
-            position: template.position,
-            tutorialCategory: template.tutorial_category,
+            tutCategory: template.tutorial_category,
             allocations: template.allocations.map(
                 allocation => ({
                     units: allocation.num_unit,

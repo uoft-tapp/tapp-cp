@@ -3,12 +3,14 @@ import { Table, Button } from 'react-bootstrap';
 
 class DdahForm extends React.Component {
     render() {
+        let ddah = this.props.appState.getDdah();
+
         return (
             <div id="ddah-container">
                 <h3>Description of Duties and Allocation of Hours Form</h3>
-                <Header {...this.props} />
-                <Worksheet {...this.props} />
-                <Training {...this.props} />
+                <Header ddah={ddah} {...this.props} />
+                <Worksheet ddah={ddah} {...this.props} />
+                <Training ddah={ddah} {...this.props} />
                 <Summary {...this.props} />
             </div>
         );
@@ -33,7 +35,10 @@ const Header = props => {
                             <b>Supervising Professor:</b>
                         </td>
                         <td>
-                            <select />
+                            <select
+                                onChange={event =>
+                                    props.appState.updateDdah('supervisor', event.target.value)}
+                            />
                         </td>
                     </tr>
                     <tr>
@@ -83,7 +88,12 @@ const Header = props => {
                             <b>Tutorial Category:</b>
                         </td>
                         <td>
-                            <input type="text" />
+                            <input
+                                type="text"
+                                defaultValue={props.ddah.get('tutCategory')}
+                                onChange={event =>
+                                    props.appState.updateDdah('tutCategory', event.target.value)}
+                            />
                         </td>
                         <td rowSpan="2">
                             <small>
@@ -92,14 +102,34 @@ const Header = props => {
                             </small>
                         </td>
                         <td rowSpan="2">
-                            <input type="checkbox" />
+                            <input
+                                type="checkbox"
+                                defaultChecked={props.ddah.get('requiresTraining')}
+                                onChange={event =>
+                                    props.appState.updateDdah(
+                                        'requiresTraining',
+                                        event.target.checked
+                                    )}
+                            />
                         </td>
                     </tr>
                     <tr>
                         <td />
                         <td>
-                            <input type="radio" name="optional" value={true} />&nbsp;Optional&emsp;
-                            <input type="radio" name="optional" value={false} />&nbsp;Mandatory
+                            <input
+                                type="radio"
+                                name="optional"
+                                defaultChecked={props.ddah.get('optional')}
+                                onChange={event =>
+                                    props.appState.updateDdah('optional', event.target.checked)}
+                            />&nbsp;Optional&emsp;
+                            <input
+                                type="radio"
+                                name="optional"
+                                defaultChecked={!props.ddah.get('optional')}
+                                onChange={event =>
+                                    props.appState.updateDdah('optional', !event.target.checked)}
+                            />&nbsp;Mandatory
                         </td>
                     </tr>
                 </tbody>
@@ -132,7 +162,7 @@ const Worksheet = props =>
             </tr>
         </thead>
         <tbody>
-            {props.appState.getDdahWorksheet().map((row, i) =>
+            {props.ddah.get('worksheet').map((row, i) =>
                 <tr key={'allocation-' + i}>
                     <td>
                         <input
@@ -140,14 +170,14 @@ const Worksheet = props =>
                             min="0"
                             defaultValue={row.get('units')}
                             onChange={event =>
-                                props.appState.updateDdah(i, 'units', event.target.value)}
+                                props.appState.updateDdahAllocation(i, 'units', event.target.value)}
                         />
                     </td>
                     <td>
                         <select
-                            defaultValue={row.duty}
+                            defaultValue={row.get('duty')}
                             onChange={event =>
-                                props.appState.updateDdah(i, 'duty', event.target.value)}>
+                                props.appState.updateDdahAllocation(i, 'duty', event.target.value)}>
                             <option />
                             {props.appState.getDutiesList().map((duty, id) =>
                                 <option value={id}>
@@ -162,7 +192,7 @@ const Worksheet = props =>
                             autoComplete="on"
                             defaultValue={row.get('type')}
                             onChange={event =>
-                                props.appState.updateDdah(i, 'type', event.target.value)}
+                                props.appState.updateDdahAllocation(i, 'type', event.target.value)}
                         />
                     </td>
                     <td>
@@ -171,7 +201,7 @@ const Worksheet = props =>
                             min="0"
                             defaultValue={row.get('time')}
                             onChange={event =>
-                                props.appState.updateDdah(i, 'time', event.target.value)}
+                                props.appState.updateDdahAllocation(i, 'time', event.target.value)}
                         />
                     </td>
                     <td>
@@ -222,10 +252,17 @@ const Training = props => {
                         <td>
                             <table className="sub-table">
                                 <tbody>
-                                    {trainings.map(training =>
+                                    {trainings.map((training, i) =>
                                         <tr>
                                             <td>
-                                                <input type="checkbox" />&nbsp;{training}
+                                                <input
+                                                    type="checkbox"
+                                                    defaultValue={props.ddah
+                                                        .get('trainings')
+                                                        .includes(i)}
+                                                    onChange={event =>
+                                                        props.appState.updateDdah('trainings', i)}
+                                                />&nbsp;{training}
                                             </td>
                                         </tr>
                                     )}
@@ -238,10 +275,17 @@ const Training = props => {
                                     <tr>
                                         <td>Indicate Tutorial Category (1 primary activity)</td>
                                     </tr>
-                                    {categories.map(category =>
+                                    {categories.map((category, i) =>
                                         <tr>
                                             <td>
-                                                <input type="checkbox" />&nbsp;{category}
+                                                <input
+                                                    type="checkbox"
+                                                    defaultValue={props.ddah
+                                                        .get('categories')
+                                                        .includes(i)}
+                                                    onChange={event =>
+                                                        props.appState.updateDdah('categories', i)}
+                                                />&nbsp;{category}
                                             </td>
                                         </tr>
                                     )}

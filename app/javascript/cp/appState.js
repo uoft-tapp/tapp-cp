@@ -20,7 +20,16 @@ const initialState = {
 
     selectedSession: '',
 
-    ddah: [{ units: null, duty: null, type: null, time: null }],
+    ddah: {
+        supervisor: null,
+        tutCategory: null,
+        optional: null,
+        requiresTraining: false,
+        worksheet: [{ units: null, duty: null, type: null, time: null }],
+        trainings: [],
+        categories: [],
+        changed: false,
+    },
 
     selectedCourse: null,
     selectedOffer: null,
@@ -96,7 +105,7 @@ class AppState {
 
     // add a row to the ddah form
     addAllocation() {
-        let worksheet = this.get('ddah');
+        let worksheet = this.get('ddah.worksheet');
 
         // max. 24 rows are supported (this number comes from counting the number of rows generated
         // in the DDAH form PDF)
@@ -104,7 +113,7 @@ class AppState {
             this.alert('No more rows can be added.');
         } else {
             this.set(
-                'ddah',
+                'ddah.worksheet',
                 worksheet.push(fromJS({ units: null, duty: null, type: null, time: null }))
             );
         }
@@ -137,15 +146,32 @@ class AppState {
         );
     }
 
+    // check whether the user has made any changes to the current ddah
+    anyDdahChanges() {
+        return this.get('ddah.changed');
+    }
+
     // check whether any of the given filters in the category are selected on the offers table
     anyFilterSelected(field) {
         return this.get('selectedFilters').has(field);
     }
 
-    // returns true if worksheet was cleared, false if not
+    // returns true if form was cleared, false if not
     clearDdah() {
-        if (window.confirm('Are you sure that you want to clear the current worksheet?')) {
-            this.set('ddah', fromJS([{ units: null, duty: null, type: null, time: null }]));
+        if (window.confirm('Are you sure that you want to clear the current form?')) {
+            this.set(
+                'ddah',
+                fromJS({
+                    supervisor: null,
+                    tutCategory: null,
+                    optional: null,
+                    requiresTraining: false,
+                    worksheet: [{ units: null, duty: null, type: null, time: null }],
+                    trainings: [],
+                    categories: [],
+                    changed: false,
+                })
+            );
             return true;
         }
         return false;
@@ -160,7 +186,7 @@ class AppState {
     computeDutiesSummary() {
         let summary = this.getDutiesList().map(_ => 0);
 
-        this.get('ddah').forEach(allocation => {
+        this.get('ddah.worksheet').forEach(allocation => {
             if (
                 allocation.get('duty') &&
                 allocation.get('time') != undefined &&
@@ -175,6 +201,10 @@ class AppState {
 
         return summary;
     }
+
+    /*    createTemplate() {
+        fetch.createTemplate();
+    }*/
 
     dismissAlert(id) {
         let alerts = this.get('alerts');
@@ -199,14 +229,14 @@ class AppState {
 
     // compute total ddah hours
     getDdahTotal() {
-        let total = this.get('ddah').reduce(
+        let total = this.get('ddah.worksheet').reduce(
             (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
             0
         );
         return isNaN(total) ? 0 : total / 60;
     }
 
-    getDdahWorksheet() {
+    getDdah() {
         return this.get('ddah');
     }
 
@@ -280,6 +310,10 @@ class AppState {
         this.set('roles', roles);
     }
 
+    setDdah(ddah) {
+        this.set('ddah', fromJS(Object.assign({}, ddah, { changed: true })));
+    }
+
     // toggle a filter on the offers table
     toggleFilter(field, category) {
         let filters = this.get('selectedFilters');
@@ -333,9 +367,31 @@ class AppState {
         }
     }
 
-    // update allocation attribute
-    updateDdah(allocation, key, val) {
-        this.set('ddah[' + allocation + '].' + key, val);
+    // update ddah attribute
+    updateDdah(attribute, value) {
+        // if the attribute is a array of values, toggle the presence of this value in the array
+        // (i.e. if the value is absent, add it; otherwise, remove it)
+        if (attribute == 'trainings' || attribute == 'categories') {
+            let array = this.get('ddah.' + attribute);
+            let i = array.indexOf(value);
+
+            if (i == -1) {
+                // value is not present
+                this.set({ ['ddah.' + attribute]: array.push(value), 'ddah.changed': true });
+            } else {
+                this.set({ ['ddah.' + attribute]: array.delete(i), 'ddah.changed': true });
+            }
+        } else {
+            this.set({ ['ddah.' + attribute]: value, 'ddah.changed': true });
+        }
+    }
+
+    // update ddah allocation attribute
+    updateDdahAllocation(allocation, attribute, value) {
+        this.set({
+            ['ddah.worksheet[' + allocation + '].' + attribute]: value,
+            'ddah.changed': true,
+        });
     }
 
     /******************************
@@ -586,7 +642,9 @@ class AppState {
             return;
         }
         if (offers.length != 1) {
-            this.alert('<b>Error:</b> Can only reset offer status for a single applicant at a time.');
+            this.alert(
+                '<b>Error:</b> Can only reset offer status for a single applicant at a time.'
+            );
             return;
         }
 
