@@ -1,9 +1,11 @@
 <b>Description of Duties and Allocation of Hours form</b>
 
-<tablerow>Departments: <%= @ddah[:department]%>:Supervising Professor: <%= @ddah[:supervisor]%>:
+<b>Departments</b>: <%= @ddah[:department]%>:<b>Supervising Professor</b>: <%= @ddah[:supervisor]%>:
 
-<tablerow>Course Code: <%= @ddah[:position][:position]%>: Est. Enrolment / TA: <%= @ddah[:position][:current_enrolment]? @ddah[:position][:current_enrolment]:0%>:
+<b>Course Code</b>: <%= @ddah[:position][:position]%>:<b>Est. Enrolment / TA</b>: <%= @ddah[:position][:current_enrolment]? @ddah[:position][:current_enrolment]:0%>:
 
-<tablerow>Course Title: <%= @ddah[:position][:course_name]%>: Expected Enrolment: <%= @ddah[:position][:cap_enrolment]? @ddah[:position][:cap_enrolment]:0 %>:
+<b>Course Title</b>: <%= @ddah[:position][:course_name]%>:<b>Expected Enrolment</b>: <%= @ddah[:position][:cap_enrolment]? @ddah[:position][:cap_enrolment]:0 %>:
 
-<tablerow>Tutorial Category: <%= @ddah[:tutorial_category]%> <%= set_radio_button(@ddah[:optional], ["Optional", "Mandatory"])%>:  :
+<b>Tutorial Category</b>: <%= @ddah[:tutorial_category]%>: :
+
+Requires Training for Scaling Learning Activities to Size of Tutorial

@@ -106,6 +106,7 @@ class DdahsController < ApplicationController
         instructor_id: ddah[:instructor_id],
         tutorial_category: ddah[:tutorial_category],
         department: ddah[:department],
+        scaling_learning: ddah[:scaling_learning],
       }
       template = Template.create!(data)
       ddah[:template_id] = template[:id]
@@ -129,6 +130,7 @@ class DdahsController < ApplicationController
         instructor_id: template[:instructor_id],
         tutorial_category: template[:tutorial_category],
         department: template[:department],
+        scaling_learning: template[:scaling_learning],
       }
       ddah.update_attributes!(data)
       copy_allocations(ddah, template.allocations)
@@ -238,7 +240,7 @@ class DdahsController < ApplicationController
 
   private
   def ddah_params
-    params.permit(:optional)
+    params.permit(:optional, :scaling_learning)
   end
 
   def get_all_ddahs(ddahs)
@@ -281,6 +283,7 @@ class DdahsController < ApplicationController
       instructor_id: nil,
       tutorial_category: nil,
       department: nil,
+      scaling_learning: nil,
     )
     ddah.allocations.each do |allocation|
       ddah.allocation_ids = ddah.allocation_ids - [allocation[:id]]

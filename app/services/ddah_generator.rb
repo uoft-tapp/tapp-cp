@@ -4,11 +4,15 @@ class DdahGenerator
   TITLE = 1
   REGULAR_LEFT_ALIGN = 2
   REGULAR_CENTER = 3
-  SMALL_CENTER = 4
-  SIGNATURE = 5
-  INITIAL = 6
+  REGULAR_CHECKLIST = 4
+  SMALL_CENTER = 5
+  SMALL_LEFT_ALIGN = 6
   HEADER_X_COORD = 0.7
   HEADER_Y_COORD = 0.5
+  CHECKBOX = "\u2610"
+  FILLED_CHECKBOX = "\u2611"
+  RADIOBUTTON = "\u25CB"
+  FILLED_RADIOBUTTON = "\u29BF"
 
   def initialize(ddah, template = false)
     @ddah = ddah
@@ -17,14 +21,13 @@ class DdahGenerator
     define_grid(columns: 75, rows: 100, gutter: 0)
     templates = ["ddah_header", "allocations"]
     @parser = TemplateParser.new(templates, @ddah, "ddah")
-    set_allocation_table(HEADER_X_COORD, HEADER_Y_COORD+1, @parser.get_data("allocations"))
+    header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"))
+    set_allocation_table(HEADER_X_COORD, header_end, @parser.get_data("allocations"))
     start_new_page
     training_end = set_training(HEADER_Y_COORD)
     summary_end = set_summary(training_end)
     signature_end = set_signature(template, summary_end)
     set_review_box(signature_end)
-    go_to_page(1)
-    set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"))
   end
 
   private
@@ -54,6 +57,13 @@ class DdahGenerator
         text: text,
         align: :left,
       }
+    when REGULAR_CHECKLIST
+      return {
+        font: get_font("Symbola"),
+        font_size: 8,
+        text: text,
+        align: :left,
+      }
     when REGULAR_CENTER
       return {
         font: "Times-Roman",
@@ -68,17 +78,10 @@ class DdahGenerator
         text: text,
         align: :center,
       }
-    when SIGNATURE
+    when SMALL_LEFT_ALIGN
       return {
-        font: get_font("signature"),
-        font_size: 25,
-        text: text,
-        align: :left,
-      }
-    when INITIAL
-      return {
-        font: "Times-Roman",
-        font_size: 16,
+        font: get_font("Symbola"),
+        font_size: 7,
         text: text,
         align: :left,
       }
@@ -144,25 +147,6 @@ class DdahGenerator
     end
   end
 
-  # reads forms data, which an array of strings, and extract for a "tablerow"
-  # and gets the max number of columns needed in the form table
-  def get_table_data(form_data)
-    table_data = []
-    i = 0
-    max = 1
-    form_data.each_with_index do |value, index|
-      if index!=0
-        type_data = @parser.get_type(value)
-        if type_data[:type] == "tablerow"
-          table_data.push(type_data[:data])
-          if type_data[:data].size > max
-            max = type_data[:data].size
-          end
-        end
-      end
-    end
-    return [table_data, max]
-  end
 
   def set_logo(grids)
     logo = "#{Rails.root}/app/assets/images/dcs_logo_blue.jpg"
@@ -174,8 +158,43 @@ class DdahGenerator
   def set_header(x, y, header_data)
     set_logo(get_grids(x, y-0.1, 1.8, 0.9))
     set_text(get_grids(x, y-0.1, 7.5, 0.4), get_style(TITLE, header_data[0]))
-    draw_box(get_grids(0.5, y+0.35, 7.5, 1.1), true)
-    set_form_table(get_grids(0.7, y+0.35, 7.5, 1), get_table_data(header_data), header_data.size-1)
+    draw_box(get_grids(0.5, y+0.35, 7.5, 1.3), true)
+    y = y+ 0.4
+    y = set_header_helper(header_data, 1, y, 0.25)
+    set_table_data(4.45, [3.8], 0, y, 0.3, get_scaling_data(header_data), false, SMALL_LEFT_ALIGN)
+    set_table_data(2, [1, 1], 0, y+0.2, 0.3, get_optional_data, false, SMALL_LEFT_ALIGN)
+    return y+0.1
+  end
+
+  def get_optional_data
+    if @ddah[:optional]
+      [["#{FILLED_RADIOBUTTON} Optional", "#{RADIOBUTTON} Mandatory"]]
+    else
+      [["#{RADIOBUTTON} Optional", "#{FILLED_RADIOBUTTON} Mandatory"]]
+    end
+  end
+
+  def get_scaling_data(header_data)
+    if @ddah[:scaling_learning]
+      [["#{FILLED_CHECKBOX} #{header_data[header_data.length-1]}"]]
+    else
+      [["#{CHECKBOX} #{header_data[header_data.length-1]}"]]
+    end
+  end
+
+  def set_header_helper(data, start_index, y, height)
+    start = 0.5
+    columns=[1.3, 2.5, 1.5, 2.2]
+    for i in start_index..data.length-2
+      row = convert_to_row(data[i])
+      set_table_data(start, columns, 0, y, height, row)
+      y+=height
+    end
+    return y-height
+  end
+
+  def convert_to_row(data)
+    return [data.split(":")]
   end
 
   def set_allocation_table(x, y, allocation_data)
@@ -277,12 +296,12 @@ class DdahGenerator
     set_text(get_grids(0.5, y, 7.5, 0.3), get_style(TITLE, "Training"), false, true, 5)
     draw_box(get_grids(0.5, y+0.3, 7.5, 1.1), true)
     start = 0.5
-    column1=[3.7]
-    column2=[3.7,4]
+    column1=[3.9]
+    column2=[3.9,4]
     y-=0.2
     set_table_data(start, column2, 1, y, 0.24, [["", "Indicate Tutorial Category (1 primary activity)"]])
-    set_table_data(start, column1, 1, y, 0.21, get_checklist(Training, :trainings, 1, 0))
-    set_table_data(start, column2, 1, y+0.2, 0.21, get_checklist(Category, :categories, 2, 1))
+    set_table_data(start, column1, 1, y, 0.21, get_checklist(Training, :trainings, 1, 0), true, REGULAR_CHECKLIST)
+    set_table_data(start, column2, 1, y+0.2, 0.21, get_checklist(Category, :categories, 2, 1), true, REGULAR_CHECKLIST)
     return y+1.6
   end
 
@@ -290,9 +309,9 @@ class DdahGenerator
     data = []
     model.all.each do |item|
       if @ddah[attr].include?item[:id]
-        val = "[X]"
+        val = "#{FILLED_CHECKBOX}"
       else
-        val = "[  ]"
+        val = "#{CHECKBOX}"
       end
       row =[]
       for i in 0..len-1
@@ -406,29 +425,5 @@ class DdahGenerator
   def get_hours(allocation)
     (allocation[:num_unit]*allocation[:minutes])/60
   end
-
-  def set_form_table(grids, table_data, rows)
-    grid(grids[0], grids[1]).bounding_box do
-      define_grid(columns: table_data[1], rows: rows, gutter: 0)
-      table_data[0].each_with_index do |row, curr_row|
-        row_multiplier= row.size/table_data[1].to_f
-        row.each_with_index do |cell, index|
-          horizontal_1 =  index*row_multiplier
-          if row_multiplier ==1
-            horizontal_2 =  horizontal_1
-          else
-            horizontal_2 =  (index+1)*row_multiplier-1
-          end
-          grids = [[curr_row, horizontal_1], [curr_row, horizontal_2]]
-          if index%2 == 0
-            set_text(grids, get_style(REGULAR_LEFT_ALIGN, "<b>#{cell}</b>"), false, true)
-          else
-            set_text(grids, get_style(REGULAR_LEFT_ALIGN, "#{cell}"), false, true)
-          end
-        end
-      end
-    end
-  end
-
 
 end

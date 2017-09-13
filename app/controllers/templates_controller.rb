@@ -66,7 +66,7 @@ class TemplatesController < ApplicationController
 
   private
   def template_params
-    params.permit(:name, :optional)
+    params.permit(:name, :optional, :scaling_learning)
   end
 
   def get_all_templates(templates)
