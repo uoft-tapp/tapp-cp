@@ -64,7 +64,7 @@ const Header = props => {
                                           props.appState.getOffersForCourse(
                                               props.selectedDdah.slice(1)
                                           ).size
-                                        : undefined
+                                        : ''
                                 }
                             />
                         </td>
@@ -86,7 +86,7 @@ const Header = props => {
                                 value={
                                     course && course.get('estimatedEnrol') != null
                                         ? course.get('estimatedEnrol')
-                                        : undefined
+                                        : ''
                                 }
                             />
                         </td>
@@ -180,14 +180,14 @@ const Worksheet = props =>
                         <input
                             type="number"
                             min="0"
-                            defaultValue={row.get('units')}
+                            value={row.get('units') != null ? row.get('units') : ''}
                             onChange={event =>
                                 props.appState.updateDdahAllocation(i, 'units', event.target.value)}
                         />
                     </td>
                     <td>
                         <select
-                            defaultValue={row.get('duty')}
+                            value={row.get('duty') != null ? row.get('duty') : ''}
                             onChange={event =>
                                 props.appState.updateDdahAllocation(i, 'duty', event.target.value)}>
                             <option />
@@ -202,7 +202,7 @@ const Worksheet = props =>
                         <input
                             type="text"
                             autoComplete="on"
-                            defaultValue={row.get('type')}
+                            value={row.get('type') != null ? row.get('type') : ''}
                             onChange={event =>
                                 props.appState.updateDdahAllocation(i, 'type', event.target.value)}
                         />
@@ -211,7 +211,7 @@ const Worksheet = props =>
                         <input
                             type="number"
                             min="0"
-                            defaultValue={row.get('time')}
+                            value={row.get('time') != null ? row.get('time') : ''}
                             onChange={event =>
                                 props.appState.updateDdahAllocation(i, 'time', event.target.value)}
                         />
@@ -269,7 +269,7 @@ const Training = props => {
                                             <td>
                                                 <input
                                                     type="checkbox"
-                                                    defaultValue={props.ddah
+                                                    checked={props.ddah
                                                         .get('trainings')
                                                         .includes(i)}
                                                     onChange={event =>
@@ -292,7 +292,7 @@ const Training = props => {
                                             <td>
                                                 <input
                                                     type="checkbox"
-                                                    defaultValue={props.ddah
+                                                    checked={props.ddah
                                                         .get('categories')
                                                         .includes(i)}
                                                     onChange={event =>

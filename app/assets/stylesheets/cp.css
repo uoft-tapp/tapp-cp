@@ -207,6 +207,11 @@ footer div p {
     display: block;
 }
 
+#instr-grid #action-menu #submit,
+#instr-grid #action-menu #save {
+    float: right;
+}
+
 /* for "no selected course" message */
 #no-selection {
     width: 50vw;

@@ -156,7 +156,6 @@ class AppState {
         return this.get('selectedFilters').has(field);
     }
 
-    // returns true if form was cleared, false if not
     clearDdah() {
         if (window.confirm('Are you sure that you want to clear the current form?')) {
             this.set(
@@ -172,9 +171,7 @@ class AppState {
                     changed: true,
                 })
             );
-            return true;
         }
-        return false;
     }
 
     // remove all selected filters on the offers table

@@ -2,6 +2,7 @@ import React from 'react';
 import {
     Grid,
     ButtonToolbar,
+    ButtonGroup,
     Button,
     PanelGroup,
     Panel,
@@ -100,52 +101,36 @@ const ApplicantsMenu = props => {
 };
 
 const ActionMenu = props => {
-    let templates = props.appState.getTemplatesList();
+    let templates = props.appState.getTemplatesList(),
+        courseSelected = props.selectedDdah.startsWith('C');
 
     return (
         <ButtonToolbar id="action-menu">
-            {props.selectedDdah.startsWith('C') &&
-                <DropdownButton bsStyle="warning" title="Apply template" id="templates-dropdown">
-                    {templates.map((template, i) =>
-                        <MenuItem eventKey={i}>
-                            {template.get('name')}
-                        </MenuItem>
-                    )}
-                </DropdownButton>}
+            <DropdownButton bsStyle="warning" title="Apply template" id="templates-dropdown">
+                {templates.map((template, i) =>
+                    <MenuItem eventKey={i}>
+                        {template.get('name')}
+                    </MenuItem>
+                )}
+            </DropdownButton>
 
-            {props.selectedDdah.startsWith('C') &&
+            <Button id="clear" bsStyle="danger" onClick={() => props.appState.clearDdah()}>
+                Clear
+            </Button>
+
+            {courseSelected &&
                 <Button bsStyle="success" id="submit">
                     Submit for Review
                 </Button>}
-            <Button bsStyle="primary" id="save">
-                Save
-            </Button>
-            <Button
-                id="clear"
-                bsStyle="danger"
-                onClick={() => {
-                    if (props.appState.clearDdah()) {
-                        Array.prototype.forEach.call(
-                            document.querySelectorAll('#instr-grid input, #instr-grid select'),
-                            function(input) {
-                                switch (input.type) {
-                                    case 'text':
-                                        input.value = null;
-                                        break;
-                                    case 'checkbox':
-                                        input.checked = false;
-                                        break;
-                                    case 'radio':
-                                        break;
-                                    default:
-                                        input.value = null;
-                                }
-                            }
-                        );
-                    }
-                }}>
-                Clear
-            </Button>
+
+            {courseSelected
+                ? <ButtonGroup id="save">
+                      <Button bsStyle="primary">Save</Button>
+                      <Button bsStyle="info">Save as Template</Button>
+                  </ButtonGroup>
+                : <Button bsStyle="primary" id="save">
+                      Save
+                  </Button>}
         </ButtonToolbar>
     );
 };
