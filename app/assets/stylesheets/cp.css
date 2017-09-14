@@ -98,14 +98,14 @@ footer div p {
 #offers-grid .sessions ~ .table-container .table-body {
     /* note that this assumes that the header is at most one row high */
     max-height: calc(
-        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - var(--sessions-height)
+        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - var(--sessions-height) - 25px
     );
 }
 
 #offers-grid .table-body {
     /* note that this assumes that the header is at most one row high */
     max-height: calc(
-        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height)
+        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - 25px
     );
     overflow: auto;
 }
@@ -142,4 +142,9 @@ footer div p {
 
 #offers-grid .sessions #pay input {
     width: 100px;
+}
+
+#offers-grid #table-total {
+    font-weight: bold;
+    margin-top: 5px;
 }

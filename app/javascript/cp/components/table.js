@@ -116,6 +116,9 @@ class TableInst extends React.Component {
                         </tbody>
                     </Table>
                 </div>
+                <div id="table-total">
+                    Total = {this.offers.size}
+                </div>
             </div>
         );
     }
