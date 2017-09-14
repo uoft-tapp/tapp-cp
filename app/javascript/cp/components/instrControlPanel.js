@@ -37,7 +37,7 @@ class InstrControlPanel extends React.Component {
                         {...this.props}
                     />
                 </PanelGroup>
-                {selectedDdah
+                {selectedDdah && (selectedDdah.startsWith('T') || selectedOffer)
                     ? <div id="ddah-menu-container">
                           <ActionMenu selectedDdah={selectedDdah} {...this.props} />
                           <DdahForm selectedDdah={selectedDdah} {...this.props} />
