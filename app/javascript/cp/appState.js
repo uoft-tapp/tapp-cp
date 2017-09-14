@@ -962,7 +962,7 @@ class AppState {
             scaling_learning: ddah.get('requiresTraining'),
         };
 
-        fetch.updateTemplate(template, updates);
+        fetch.updateTemplate(template, updates).then(this.set('ddah.changed', false));
     }
 
     withdrawOffers(offers) {

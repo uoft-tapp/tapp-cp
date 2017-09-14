@@ -864,15 +864,17 @@ function createTemplate(name, position) {
 function updateTemplate(id, ddah) {
     let user = appState.getCurrentUserName();
 
-    patchHelper('/templates/' + id, ddah).then(resp => (resp.ok ? resp : respFailure)).then(() => {
-        appState.setFetchingTemplatesList(true);
-        getTemplates(user)
-            .then(templates => {
-                appState.setTemplatesList(fromJS(templates));
-                appState.setFetchingTemplatesList(false, true);
-            })
-            .catch(() => appState.setFetchingTemplatesList(false));
-    });
+    return patchHelper('/templates/' + id, ddah)
+        .then(resp => (resp.ok ? resp : respFailure))
+        .then(() => {
+            appState.setFetchingTemplatesList(true);
+            return getTemplates(user)
+                .then(templates => {
+                    appState.setTemplatesList(fromJS(templates));
+                    appState.setFetchingTemplatesList(false, true);
+                })
+                .catch(() => appState.setFetchingTemplatesList(false));
+        });
 }
 
 // create a new template using data from an existing ddah
