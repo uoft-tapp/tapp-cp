@@ -219,7 +219,7 @@ class DdahGenerator
         allocation[:num_unit],
         allocation[:unit_name],
         allocation[:minutes],
-        get_hours(allocation),
+        '%.1f' % get_hours(allocation),
         "",
       ]
       allocations.push(row)
@@ -423,7 +423,7 @@ class DdahGenerator
   end
 
   def get_hours(allocation)
-    (allocation[:num_unit]*allocation[:minutes])/60
+    (allocation[:num_unit]*allocation[:minutes])/60.0
   end
 
 end
