@@ -212,14 +212,13 @@ function onFetchTemplatesSuccess(resp) {
             tutCategory: template.tutorial_category,
             optional: template.optional,
             requiresTraining: template.scaling_learning,
-            worksheet: template.allocations.map(
-                allocation => ({
-                    units: allocation.num_unit,
-                    duty: allocation.duty_id,
-                    type: allocation.unit_name,
-                    time: allocation.minutes
-                })
-            ),
+            worksheet: template.allocations.map(allocation => ({
+                id: allocation.id,
+                units: allocation.num_unit,
+                duty: allocation.duty_id,
+                type: allocation.unit_name,
+                time: allocation.minutes,
+            })),
             trainings: template.trainings,
             categories: template.trainings,
         };
@@ -717,7 +716,7 @@ function print(offers) {
 // change session pay
 function updateSessionPay(session, pay) {
     putHelper('/sessions/' + session, { pay: pay })
-        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(resp => (resp.ok ? resp : respFailure))
         .then(
             () => {
                 appState.setFetchingSessionsList(true);
@@ -840,10 +839,25 @@ function exportOffers(session) {
 
 // create a new template with the data from ddah
 function createTemplate(name, ddah) {
-/*    postHelper('/instructors/' + appState.getCurrentUserName() + '/templates',
+    /*    postHelper('/instructors/' + appState.getCurrentUserName() + '/templates',
                { name: name, position_id: 0 })
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then*/
+}
+
+// update an existing template
+function updateTemplate(id, ddah) {
+    let user = appState.getCurrentUserName();
+
+    patchHelper('/templates/' + id, ddah).then(resp => (resp.ok ? resp : respFailure)).then(() => {
+        appState.setFetchingTemplatesList(true);
+        getTemplates(user)
+            .then(templates => {
+                appState.setTemplatesList(fromJS(templates));
+                appState.setFetchingTemplatesList(false, true);
+            })
+            .catch(() => appState.setFetchingTemplatesList(false));
+    });
 }
 
 // get current user role(s) and username
@@ -889,5 +903,6 @@ export {
     setOfferAccepted,
     resetOffer,
     createTemplate,
+    updateTemplate,
     fetchAuth,
 };

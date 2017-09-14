@@ -271,7 +271,7 @@ const Training = props => {
                                                     type="checkbox"
                                                     checked={props.ddah
                                                         .get('trainings')
-                                                        .includes(i)}
+                                                        .includes(parseInt(i))}
                                                     onChange={event =>
                                                         props.appState.updateDdah('trainings', i)}
                                                 />&nbsp;{training}
@@ -294,7 +294,7 @@ const Training = props => {
                                                     type="checkbox"
                                                     checked={props.ddah
                                                         .get('categories')
-                                                        .includes(i)}
+                                                        .includes(parseInt(i))}
                                                     onChange={event =>
                                                         props.appState.updateDdah('categories', i)}
                                                 />&nbsp;{category}

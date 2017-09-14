@@ -25,7 +25,7 @@ const initialState = {
         tutCategory: null,
         optional: null,
         requiresTraining: false,
-        worksheet: [{ units: null, duty: null, type: null, time: null }],
+        worksheet: [{ id: null, units: null, duty: null, type: null, time: null }],
         trainings: [],
         categories: [],
         changed: false,
@@ -114,7 +114,9 @@ class AppState {
         } else {
             this.set(
                 'ddah.worksheet',
-                worksheet.push(fromJS({ units: null, duty: null, type: null, time: null }))
+                worksheet.push(
+                    fromJS({ id: null, units: null, duty: null, type: null, time: null })
+                )
             );
         }
     }
@@ -190,7 +192,7 @@ class AppState {
                 allocation.get('units') != undefined
             ) {
                 summary = summary.update(
-                    allocation.get('duty'),
+                    allocation.get('duty').toString(),
                     time => time + allocation.get('units') * allocation.get('time') / 60
                 );
             }
@@ -392,11 +394,11 @@ class AppState {
         // (i.e. if the value is absent, add it; otherwise, remove it)
         if (attribute == 'trainings' || attribute == 'categories') {
             let array = this.get('ddah.' + attribute);
-            let i = array.indexOf(value);
+            let i = array.indexOf(parseInt(value));
 
             if (i == -1) {
                 // value is not present
-                this.set({ ['ddah.' + attribute]: array.push(value), 'ddah.changed': true });
+                this.set({ ['ddah.' + attribute]: array.push(parseInt(value)), 'ddah.changed': true });
             } else {
                 this.set({ ['ddah.' + attribute]: array.delete(i), 'ddah.changed': true });
             }
@@ -907,6 +909,26 @@ class AppState {
 
     updateSessionPay(session, pay) {
         fetch.updateSessionPay(session, pay);
+    }
+
+    updateTemplate(template) {
+        // process ddah for format
+        let ddah = this.get('ddah');
+        let updates = {
+            optional: ddah.get('optional'),
+            categories: ddah.get('categories').toJS(),
+            trainings: ddah.get('trainings').toJS(),
+            allocations: ddah.get('worksheet').map(allocation => ({
+                id: allocation.get('id'),
+                num_unit: allocation.get('units'),
+                unit_name: allocation.get('type'),
+                minutes: allocation.get('time'),
+                duty_id: allocation.get('duty'),
+            })).toJS(),
+            scaling_learning: ddah.get('requiresTraining'),
+        };
+
+        fetch.updateTemplate(template, updates);
     }
 
     withdrawOffers(offers) {

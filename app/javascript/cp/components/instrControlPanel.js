@@ -128,7 +128,10 @@ const ActionMenu = props => {
                       <Button bsStyle="primary">Save</Button>
                       <Button bsStyle="info">Save as Template</Button>
                   </ButtonGroup>
-                : <Button bsStyle="primary" id="save">
+                : <Button
+                      bsStyle="primary"
+                      id="save"
+                      onClick={() => props.appState.updateTemplate(props.selectedDdah.slice(1))}>
                       Save
                   </Button>}
         </ButtonToolbar>
