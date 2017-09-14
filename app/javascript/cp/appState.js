@@ -158,6 +158,13 @@ class AppState {
         return this.get('selectedFilters').has(field);
     }
 
+    applyTemplate(templateId) {
+        let template = this.get('templates.list.' + templateId).delete('name');
+
+        // replace the values in the current ddah with the values in the template (excluding the template name)
+        this.set('ddah', this.get('ddah').set('changed', true).merge(template));
+    }
+
     clearDdah() {
         if (window.confirm('Are you sure that you want to clear the current form?')) {
             this.set(
@@ -403,7 +410,10 @@ class AppState {
 
             if (i == -1) {
                 // value is not present
-                this.set({ ['ddah.' + attribute]: array.push(parseInt(value)), 'ddah.changed': true });
+                this.set({
+                    ['ddah.' + attribute]: array.push(parseInt(value)),
+                    'ddah.changed': true,
+                });
             } else {
                 this.set({ ['ddah.' + attribute]: array.delete(i), 'ddah.changed': true });
             }
@@ -923,13 +933,16 @@ class AppState {
             optional: ddah.get('optional'),
             categories: ddah.get('categories').toJS(),
             trainings: ddah.get('trainings').toJS(),
-            allocations: ddah.get('worksheet').map(allocation => ({
-                id: allocation.get('id'),
-                num_unit: allocation.get('units'),
-                unit_name: allocation.get('type'),
-                minutes: allocation.get('time'),
-                duty_id: allocation.get('duty'),
-            })).toJS(),
+            allocations: ddah
+                .get('worksheet')
+                .map(allocation => ({
+                    id: allocation.get('id'),
+                    num_unit: allocation.get('units'),
+                    unit_name: allocation.get('type'),
+                    minutes: allocation.get('time'),
+                    duty_id: allocation.get('duty'),
+                }))
+                .toJS(),
             scaling_learning: ddah.get('requiresTraining'),
         };
 

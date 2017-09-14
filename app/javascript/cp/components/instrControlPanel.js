@@ -108,7 +108,7 @@ const ActionMenu = props => {
         <ButtonToolbar id="action-menu">
             <DropdownButton bsStyle="warning" title="Apply template" id="templates-dropdown">
                 {templates.map((template, i) =>
-                    <MenuItem eventKey={i}>
+                    <MenuItem onClick={() => props.appState.applyTemplate(i)}>
                         {template.get('name')}
                     </MenuItem>
                 )}

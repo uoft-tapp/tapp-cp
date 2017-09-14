@@ -46,6 +46,7 @@ const Header = props => {
                                 }
                                 onChange={event =>
                                     props.appState.updateDdah('supervisor', event.target.value)}>
+                                <option />
                                 {course &&
                                     course.get('instructors').map((instructor, i) =>
                                         <option value={i}>
