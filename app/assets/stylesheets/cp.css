@@ -221,13 +221,13 @@ footer div p {
 }
 
 #instr-grid #ddah-menu-container {
-    width: calc(var(--ddah-width) + 50px);
+    width: calc(var(--ddah-width) + 60px);
     float: left;
 }
 
 #instr-grid #ddah-container {
-    width: calc(var(--ddah-width) + 50px);
-    padding: 20px 25px;
+    width: calc(var(--ddah-width) + 60px);
+    padding: 20px 30px;
     border: 2px solid var(--dark-bg);
     margin-top: 1vh;
 
@@ -301,6 +301,16 @@ footer div p {
 /* third column: type of unit */
 #instr-grid #worksheet-table th:nth-child(3) {
     width: 350px;
+}
+
+#instr-grid #worksheet-table .delete-button {
+    font-size: 16px;
+    color: red;
+    background-color: white;
+    opacity: 0.75;
+    cursor: pointer;
+    float: right;
+    margin-right: -12px;
 }
 
 #instr-grid #worksheet-table thead {

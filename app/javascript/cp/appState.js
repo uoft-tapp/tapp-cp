@@ -285,6 +285,11 @@ class AppState {
         this.set('notifications', fromJS([]));
     }
 
+    // remove an allocation from ddah
+    removeAllocation(index) {
+        this.set('ddah.worksheet', this.get('ddah.worksheet').delete(index));
+    }
+
     // remove a sort from the offers table
     removeSort(field) {
         let sorts = this.get('selectedSortFields');

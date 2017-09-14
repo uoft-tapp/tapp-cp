@@ -218,6 +218,11 @@ const Worksheet = props =>
                     </td>
                     <td>
                         {(row.get('units') * row.get('time') / 60).toFixed(1)}
+                        <i
+                            className="fa fa-minus-circle delete-button"
+                            title="Delete row"
+                            onClick={() => props.appState.removeAllocation(i)}
+                        />
                     </td>
                 </tr>
             )}
