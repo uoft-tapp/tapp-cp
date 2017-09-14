@@ -870,6 +870,23 @@ function updateTemplate(id, ddah) {
     });
 }
 
+// create a new template using data from an existing ddah
+function createTemplateFromDdah(name, ddah) {
+    let user = appState.getCurrentUserName();
+
+    postHelper('/ddahs/' + ddah + '/new-template', { name: name })
+        .then(resp => (resp.ok ? resp : respFailure))
+        .then(() => {
+            appState.setFetchingTemplatesList(true);
+            getTemplates(user)
+                .then(templates => {
+                    appState.setTemplatesList(fromJS(templates));
+                    appState.setFetchingTemplatesList(false, true);
+                })
+                .catch(() => appState.setFetchingTemplatesList(false));
+        });
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -914,5 +931,6 @@ export {
     resetOffer,
     createTemplate,
     updateTemplate,
+    createTemplateFromDdah,
     fetchAuth,
 };

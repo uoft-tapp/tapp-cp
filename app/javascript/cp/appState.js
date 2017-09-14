@@ -473,6 +473,10 @@ class AppState {
         fetch.createTemplate(name, parseInt(this.get('courses.list').keySeq().first()));
     }
 
+    createTemplateFromDdah(name) {
+        fetch.createTemplateFromDdah(name, this.get('selectedDdah.id'));
+    }
+
     // email applicants
     email(offers) {
         let allOffers = this.getOffersList();

@@ -158,7 +158,16 @@ const OfferActionMenu = props => {
 
             <ButtonGroup id="save">
                 <Button bsStyle="primary">Save</Button>
-                <Button bsStyle="info">Save as Template</Button>
+                <Button
+                    bsStyle="info"
+                    onClick={() => {
+                        let name;
+                        if ((name = window.prompt('Please enter a name for the new template:'))) {
+                            props.appState.createTemplateFromDdah(name);
+                        }
+                    }}>
+                    Save as Template
+                </Button>
             </ButtonGroup>
         </ButtonToolbar>
     );
