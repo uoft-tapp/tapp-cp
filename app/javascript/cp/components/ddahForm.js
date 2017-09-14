@@ -12,6 +12,7 @@ class DdahForm extends React.Component {
                 <Worksheet ddah={ddah} {...this.props} />
                 <Training ddah={ddah} {...this.props} />
                 <Summary {...this.props} />
+                {this.props.appState.isOfferSelected() && <Signatures {...this.props} />}
             </div>
         );
     }
@@ -19,9 +20,10 @@ class DdahForm extends React.Component {
 
 const Header = props => {
     // check whether ddah for offer was selected, and if so, get the course details
-    let course = props.appState.isOfferSelected()
-        ? props.appState.getCoursesList().get(props.selectedDdah)
+    let position = props.appState.isOfferSelected()
+        ? props.appState.getOffersList().getIn([props.selectedDdah, 'position'])
         : null;
+    let course = position ? props.appState.getCoursesList().get(position.toString()) : null;
 
     return (
         <div id="ddah-header">
@@ -72,8 +74,9 @@ const Header = props => {
                                 readOnly
                                 value={
                                     course && course.get('estimatedEnrol') != null
-                                        ? course.get('estimatedEnrol') /
-                                          props.appState.getOffersForCourse(props.selectedDdah).size
+                                        ? (course.get('estimatedEnrol') /
+                                              props.appState.getOffersForCourse(position)
+                                                  .size).toFixed()
                                         : ''
                                 }
                             />
@@ -366,5 +369,7 @@ const Summary = props => {
         </Table>
     );
 };
+
+const Signatures = props => null;
 
 export { DdahForm };
