@@ -281,6 +281,11 @@ footer div p {
     width: 4em;
 }
 
+#instr-grid #ddah-header label {
+    font-weight: normal;
+    margin: 0;
+}
+
 /* ddah worksheet table */
 
 /* worksheet table column widths */
@@ -351,6 +356,11 @@ footer div p {
 #instr-grid #training tr,
 #instr-grid #training td {
     background-color: var(--dark-bg);
+}
+
+#instr-grid #training label {
+    font-weight: normal;
+    margin: 0;
 }
 
 #instr-grid #training .sub-table tr:first-child td {

@@ -157,18 +157,20 @@ const Header = props => {
                     <td>
                         <input
                             type="radio"
+                            id="optional"
                             name="optional"
                             checked={props.ddah.get('optional') == true}
                             onChange={event =>
                                 props.appState.updateDdah('optional', event.target.checked)}
-                        />&nbsp;Optional&emsp;
+                        />&nbsp;<label htmlFor="optional">Optional</label>&emsp;
                         <input
                             type="radio"
+                            id="mandatory"
                             name="optional"
                             checked={props.ddah.get('optional') == false}
                             onChange={event =>
                                 props.appState.updateDdah('optional', !event.target.checked)}
-                        />&nbsp;Mandatory
+                        />&nbsp;<label htmlFor="mandatory">Mandatory</label>
                     </td>
                 </tr>
             </tbody>
@@ -299,12 +301,13 @@ const Training = props => {
                                         <td>
                                             <input
                                                 type="checkbox"
+                                                id={'training-' + i}
                                                 checked={props.ddah
                                                     .get('trainings')
                                                     .includes(parseInt(i))}
                                                 onChange={event =>
                                                     props.appState.updateDdah('trainings', i)}
-                                            />&nbsp;{training}
+                                            />&nbsp;<label htmlFor={'training-' + i}>{training}</label>
                                         </td>
                                     </tr>
                                 )}
@@ -322,12 +325,13 @@ const Training = props => {
                                         <td>
                                             <input
                                                 type="checkbox"
+                                                id={'category-' + i}
                                                 checked={props.ddah
                                                     .get('categories')
                                                     .includes(parseInt(i))}
                                                 onChange={event =>
                                                     props.appState.updateDdah('categories', i)}
-                                            />&nbsp;{category}
+                                            />&nbsp;<label htmlFor={'category-' + i}>{category}</label>
                                         </td>
                                     </tr>
                                 )}
