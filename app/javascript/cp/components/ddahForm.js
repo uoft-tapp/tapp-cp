@@ -18,7 +18,10 @@ class DdahForm extends React.Component {
 }
 
 const Header = props => {
-    let course = props.appState.getCoursesList().get(props.selectedCourse);
+    // check whether ddah for course was selected, and if so, get the course details
+    let course = props.selectedDdah.startsWith('C')
+        ? props.appState.getCoursesList().get(props.selectedDdah.slice(1))
+        : null;
 
     return (
         <div id="ddah-header">
@@ -56,11 +59,12 @@ const Header = props => {
                                 type="number"
                                 readOnly
                                 value={
-                                    course
+                                    course && course.get('estimatedEnrol') != null
                                         ? course.get('estimatedEnrol') /
-                                          props.appState.getOffersForCourse(props.selectedCourse)
-                                              .size
-                                        : ''
+                                          props.appState.getOffersForCourse(
+                                              props.selectedDdah.slice(1)
+                                          ).size
+                                        : undefined
                                 }
                             />
                         </td>
@@ -79,7 +83,11 @@ const Header = props => {
                             <input
                                 type="number"
                                 readOnly
-                                value={course ? course.get('estimatedEnrol') : ''}
+                                value={
+                                    course && course.get('estimatedEnrol') != null
+                                        ? course.get('estimatedEnrol')
+                                        : undefined
+                                }
                             />
                         </td>
                     </tr>
@@ -90,7 +98,11 @@ const Header = props => {
                         <td>
                             <input
                                 type="text"
-                                defaultValue={props.ddah.get('tutCategory')}
+                                value={
+                                    props.ddah.get('tutCategory') != null
+                                        ? props.ddah.get('tutCategory')
+                                        : ''
+                                }
                                 onChange={event =>
                                     props.appState.updateDdah('tutCategory', event.target.value)}
                             />
@@ -104,7 +116,7 @@ const Header = props => {
                         <td rowSpan="2">
                             <input
                                 type="checkbox"
-                                defaultChecked={props.ddah.get('requiresTraining')}
+                                checked={props.ddah.get('requiresTraining') == true}
                                 onChange={event =>
                                     props.appState.updateDdah(
                                         'requiresTraining',
@@ -119,14 +131,14 @@ const Header = props => {
                             <input
                                 type="radio"
                                 name="optional"
-                                defaultChecked={props.ddah.get('optional')}
+                                checked={props.ddah.get('optional') == true}
                                 onChange={event =>
                                     props.appState.updateDdah('optional', event.target.checked)}
                             />&nbsp;Optional&emsp;
                             <input
                                 type="radio"
                                 name="optional"
-                                defaultChecked={!props.ddah.get('optional')}
+                                checked={props.ddah.get('optional') == false}
                                 onChange={event =>
                                     props.appState.updateDdah('optional', !event.target.checked)}
                             />&nbsp;Mandatory

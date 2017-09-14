@@ -31,7 +31,7 @@ const initialState = {
         changed: false,
     },
 
-    selectedCourse: null,
+    selectedDdah: null,
     selectedOffer: null,
 
     /** DB data **/
@@ -169,7 +169,7 @@ class AppState {
                     worksheet: [{ units: null, duty: null, type: null, time: null }],
                     trainings: [],
                     categories: [],
-                    changed: false,
+                    changed: true,
                 })
             );
             return true;
@@ -202,9 +202,9 @@ class AppState {
         return summary;
     }
 
-    /*    createTemplate() {
-        fetch.createTemplate();
-    }*/
+    createTemplate(name) {
+        fetch.createTemplate(name, this.get('ddah').toJS());
+    }
 
     dismissAlert(id) {
         let alerts = this.get('alerts');
@@ -244,8 +244,8 @@ class AppState {
         return this.get('selectedFilters');
     }
 
-    getSelectedCourse() {
-        return this.get('selectedCourse');
+    getSelectedDdah() {
+        return this.get('selectedDdah');
     }
 
     getSelectedOffer() {
@@ -337,13 +337,35 @@ class AppState {
         }
     }
 
-    // unselect this course if it is already selected; otherwise select this course
-    toggleSelectedCourse(course) {
-        if (this.get('selectedCourse') == course) {
-            // this course is currently selected
-            this.set('selectedCourse', null);
+    // unselect this ddah if it is already selected; otherwise select this ddah
+    toggleSelectedDdah(ddah) {
+        if (this.get('selectedDdah') == ddah) {
+            // this ddah is currently selected
+            this.set('selectedDdah', null);
         } else {
-            this.set('selectedCourse', course);
+            let newDdah;
+            if (ddah.startsWith('C')) {
+                // ddah form selected
+
+                // ddah does not already exist for this course
+                newDdah = fromJS({
+                    supervisor: null,
+                    tutCategory: null,
+                    optional: null,
+                    requiresTraining: false,
+                    worksheet: [{ units: null, duty: null, type: null, time: null }],
+                    trainings: [],
+                    categories: [],
+                    changed: true,
+                });
+            } else {
+                // template selected
+                newDdah = this.get('templates.list.' + ddah.slice(1))
+                    .delete('name')
+                    .set('changed', false);
+            }
+
+            this.set({ selectedDdah: ddah, ddah: newDdah });
         }
     }
 

@@ -98,7 +98,8 @@ footer div p {
 #offers-grid .sessions ~ .table-container .table-body {
     /* note that this assumes that the header is at most one row high */
     max-height: calc(
-        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - var(--sessions-height) - 25px
+        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) -
+            var(--sessions-height) - 25px
     );
 }
 
@@ -173,12 +174,37 @@ footer div p {
     margin-right: 1vw;
 }
 
-#instr-grid #select-menu button {
-    padding: 5px 15px;
+#instr-grid #select-menu .panel-body {
+    padding: 0;
 }
 
-#instr-grid #applicant-menu {
+#instr-grid #select-menu ul {
+    list-style: none;
+    padding: 0;
     margin: 0;
+}
+
+#instr-grid #select-menu li {
+    padding: 5px 15px;
+    cursor: pointer;
+}
+
+#instr-grid #select-menu #create {
+    background-color: #337ab7;
+    color: white;
+}
+
+#instr-grid #select-menu #templates-menu li.active,
+#instr-grid #select-menu .applicant-menu li.active {
+    background-color: #d9edf7;
+}
+
+#instr-grid #select-menu .applicant-menu {
+    display: none;
+}
+
+#instr-grid #select-menu li.active .applicant-menu {
+    display: block;
 }
 
 /* for "no selected course" message */
@@ -199,7 +225,7 @@ footer div p {
     padding: 20px 25px;
     border: 2px solid var(--dark-bg);
     margin-top: 1vh;
-    
+
     max-height: calc(var(--main-div-height) - var(--menu-height) - 1vh);
     overflow: auto;
 }
@@ -251,12 +277,19 @@ footer div p {
     padding-bottom: 10px;
 }
 
+#instr-grid #ddah-header input[type="number"] {
+    width: 4em;
+}
+
 /* ddah worksheet table */
 
 /* worksheet table column widths */
-#instr-grid #worksheet-table th:first-child, /* first column: # of units */
-#instr-grid #worksheet-table th:nth-child(4), /* fourth column: time/task */
-#instr-grid #worksheet-table th:nth-child(5) { /* fifth column: total time */
+#instr-grid #worksheet-table th:first-child,
+/* first column: # of units */
+#instr-grid #worksheet-table th:nth-child(4),
+/* fourth column: time/task */
+#instr-grid #worksheet-table th:nth-child(5) {
+    /* fifth column: total time */
     width: 100px;
 }
 

@@ -5,9 +5,10 @@ import {
     Button,
     PanelGroup,
     Panel,
-    ListGroup,
-    ListGroupItem,
     Well,
+    DropdownButton,
+    MenuItem,
+    Modal,
 } from 'react-bootstrap';
 
 import { DdahForm } from './ddahForm.js';
@@ -22,24 +23,23 @@ class InstrControlPanel extends React.Component {
         let fetchCheck = this.props.appState.instrAnyFetching();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
-        let selectedCourse = this.props.appState.getSelectedCourse();
+        let selectedDdah = this.props.appState.getSelectedDdah();
         let selectedOffer = this.props.appState.getSelectedOffer();
 
         return (
             <Grid fluid id="instr-grid" style={cursorStyle}>
-                <SelectMenu
-                    selectedCourse={selectedCourse}
-                    selectedOffer={selectedOffer}
-                    {...this.props}
-                />
-                {selectedCourse && selectedOffer
+                <PanelGroup id="select-menu">
+                    <TemplatesMenu selectedDdah={selectedDdah} {...this.props} />
+                    <ApplicantsMenu
+                        selectedDdah={selectedDdah}
+                        selectedOffer={selectedOffer}
+                        {...this.props}
+                    />
+                </PanelGroup>
+                {selectedDdah
                     ? <div id="ddah-menu-container">
-                          <ActionMenu {...this.props} />
-                          <DdahForm
-                              selectedCourse={selectedCourse}
-                              selectedOffer={selectedOffer}
-                              {...this.props}
-                          />
+                          <ActionMenu selectedDdah={selectedDdah} {...this.props} />
+                          <DdahForm selectedDdah={selectedDdah} {...this.props} />
                       </div>
                     : <Well id="no-selection">
                           <h4>Nothing here yet!</h4>
@@ -50,57 +50,73 @@ class InstrControlPanel extends React.Component {
     }
 }
 
-const SelectMenu = props => {
-    let courses = props.appState.getCoursesList(),
-        templates = props.appState.getTemplatesList();
+const TemplatesMenu = props => {
+    let templates = props.appState.getTemplatesList();
 
     return (
-        <PanelGroup id="select-menu">
-            <Panel header="Templates">
-                <ListGroup fill>
-                    {templates.map((template, i) =>
-                        <ListGroupItem eventKey={'T' + i}>
-                            {template.get('name')}
-                        </ListGroupItem>
-                    )}
-                    <ListGroupItem bsStyle="info">Create a new template</ListGroupItem>
-                </ListGroup>
-            </Panel>
+        <Panel header={<h4>Templates</h4>}>
+            <ul id="templates-menu">
+                {templates.map((template, i) =>
+                    <li
+                        className={'T' + i == props.selectedDdah ? 'active' : ''}
+                        onClick={() => props.appState.toggleSelectedDdah('T' + i)}>
+                        {template.get('name')}
+                    </li>
+                )}
+                <li id="create">Create a new template</li>
+            </ul>
+        </Panel>
+    );
+};
 
-            <Panel header="Applicants">
-                <ListGroup fill>
-                    {courses.map((course, i) =>
-                        <ListGroupItem onClick={() => props.appState.toggleSelectedCourse(i)}>
-                            {course.get('code')}
-                            {i == props.selectedCourse &&
-                                <ListGroup id="applicant-menu" fill>
-                                    {props.appState
-                                        .getOffersForCourse(props.selectedCourse)
-                                        .map((offer, i) =>
-                                            <ListGroupItem
-                                                active={i == props.selectedOffer}
-                                                onClick={event => {
-                                                    event.stopPropagation();
-                                                    props.appState.toggleSelectedOffer(i);
-                                                }}>
-                                                {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
-                                            </ListGroupItem>
-                                        )}
-                                </ListGroup>}
-                        </ListGroupItem>
-                    )}
-                </ListGroup>
-            </Panel>
-        </PanelGroup>
+const ApplicantsMenu = props => {
+    let courses = props.appState.getCoursesList();
+
+    return (
+        <Panel header={<h4>Applicants</h4>}>
+            <ul>
+                {courses.map((course, i) =>
+                    <li
+                        className={'C' + i == props.selectedDdah ? 'active' : ''}
+                        onClick={() => props.appState.toggleSelectedDdah('C' + i)}>
+                        {course.get('code')}
+                        <ul className="applicant-menu">
+                            {props.appState.getOffersForCourse(i).map((offer, i) =>
+                                <li
+                                    className={i == props.selectedOffer ? 'active' : ''}
+                                    onClick={event => {
+                                        event.stopPropagation();
+                                        props.appState.toggleSelectedOffer(i);
+                                    }}>
+                                    {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
+                                </li>
+                            )}
+                        </ul>
+                    </li>
+                )}
+            </ul>
+        </Panel>
     );
 };
 
 const ActionMenu = props => {
+    let templates = props.appState.getTemplatesList();
+
     return (
         <ButtonToolbar id="action-menu">
-            <Button bsStyle="success" id="submit">
-                Submit for Review
-            </Button>
+            {props.selectedDdah.startsWith('C') &&
+                <DropdownButton bsStyle="warning" title="Apply template" id="templates-dropdown">
+                    {templates.map((template, i) =>
+                        <MenuItem eventKey={i}>
+                            {template.get('name')}
+                        </MenuItem>
+                    )}
+                </DropdownButton>}
+
+            {props.selectedDdah.startsWith('C') &&
+                <Button bsStyle="success" id="submit">
+                    Submit for Review
+                </Button>}
             <Button bsStyle="primary" id="save">
                 Save
             </Button>
@@ -133,5 +149,17 @@ const ActionMenu = props => {
         </ButtonToolbar>
     );
 };
+
+const SaveModal = props =>
+    <Modal.Dialog>
+        <Modal.Header closeButton />
+        <Modal.Body>You have unsaved changes.</Modal.Body>
+
+        <Modal.Footer>
+            <Button>Cancel</Button>
+            <Button bsStyle="alert">Discard changes</Button>
+            <Button bsStyle="primary">Save changes</Button>
+        </Modal.Footer>
+    </Modal.Dialog>;
 
 export { InstrControlPanel };

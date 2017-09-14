@@ -209,9 +209,10 @@ function onFetchTemplatesSuccess(resp) {
     resp.forEach(template => {
         templates[template.id] = {
             name: template.name,
-            optional: template.optional,
             tutCategory: template.tutorial_category,
-            allocations: template.allocations.map(
+            optional: template.optional,
+            requiresTraining: template.scaling_learning,
+            worksheet: template.allocations.map(
                 allocation => ({
                     units: allocation.num_unit,
                     duty: allocation.duty_id,
@@ -837,6 +838,14 @@ function exportOffers(session) {
     window.open('/export/cp-offers/' + session);
 }
 
+// create a new template with the data from ddah
+function createTemplate(name, ddah) {
+/*    postHelper('/instructors/' + appState.getCurrentUserName() + '/templates',
+               { name: name, position_id: 0 })
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then*/
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -879,5 +888,6 @@ export {
     clearHrStatus,
     setOfferAccepted,
     resetOffer,
+    createTemplate,
     fetchAuth,
 };
