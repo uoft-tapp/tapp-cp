@@ -8,6 +8,11 @@ class Position < ApplicationRecord
 
   def format
     position = self.json
+    data = { instructors: {} }
+    self.instructors.each do |instructor|
+      data[:instructors][instructor[:id]] = instructor[:name]
+    end
+
     excludes = [
       :duties,
       :round_id,
@@ -19,7 +24,7 @@ class Position < ApplicationRecord
       :end_date,
       :open,
     ]
-    return position.except(*excludes)
+    return position.except(*excludes).merge(data)
   end
 
 end
