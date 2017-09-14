@@ -232,10 +232,8 @@ footer div p {
     margin: 0 0 1vh 0;
 }
 
-#instr-grid #ddah-header,
-#instr-grid #worksheet-table,
-#instr-grid #training {
-    margin-bottom: 2vh;
+#instr-grid table + table {
+    margin-top: 2vh;
 }
 
 #instr-grid table {
@@ -257,7 +255,7 @@ footer div p {
 
 /* ddah header */
 
-#instr-grid #ddah-header table {
+#instr-grid #ddah-header {
     background-color: var(--dark-bg);
     border: var(--border);
 }
@@ -338,7 +336,7 @@ footer div p {
 
 /* ddah training table */
 
-#instr-grid #training > table {
+#instr-grid #training {
     border: var(--border);
 }
 
@@ -350,8 +348,8 @@ footer div p {
     border-bottom: 3px solid;
 }
 
-#instr-grid #training table tr,
-#instr-grid #training table td {
+#instr-grid #training tr,
+#instr-grid #training td {
     background-color: var(--dark-bg);
 }
 
@@ -388,6 +386,7 @@ footer div p {
 #instr-grid #summary-table td:first-child {
     text-align: left;
     border: var(--border);
+    font-weight: bold;
 }
 
 #instr-grid #summary-table tr:last-child {
@@ -396,4 +395,45 @@ footer div p {
 
 #instr-grid #summary-table td:last-child {
     background-color: var(--light-bg);
+}
+
+/* ddah signatures table */
+
+#instr-grid #signatures td {
+    width: 300px;
+    vertical-align: top;
+}
+
+#instr-grid #signatures td input {
+    border: 1px solid black;
+    padding: 3px;
+}
+
+#instr-grid #signatures .input-label {
+    font-size: x-small;
+}
+
+#instr-grid #signatures tr + tr td {
+    padding-top: 1vh;
+}
+
+#instr-grid #signatures td:first-child {
+    text-align: left;
+}
+
+#instr-grid #signatures td:nth-child(2) {
+    text-align: center;
+}
+
+#instr-grid #signatures td:nth-child(3) {
+    text-align: right;
+}
+
+#instr-grid #signatures td:first-child input,
+#instr-grid #signatures td:nth-child(2) input {
+    width: 220px;
+}
+
+#instr-grid #signatures td:nth-child(3) input {
+    width: 120px;
 }
