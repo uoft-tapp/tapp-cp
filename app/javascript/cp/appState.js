@@ -31,8 +31,8 @@ const initialState = {
         changed: false,
     },
 
-    selectedDdah: null,
-    selectedOffer: null,
+    selectedDdah: { type: null, id: null },
+    selectedCourse: null,
 
     /** DB data **/
     categories: { fetching: 0, list: null },
@@ -167,19 +167,7 @@ class AppState {
 
     clearDdah() {
         if (window.confirm('Are you sure that you want to clear the current form?')) {
-            this.set(
-                'ddah',
-                fromJS({
-                    supervisor: null,
-                    tutCategory: null,
-                    optional: null,
-                    requiresTraining: false,
-                    worksheet: [{ units: null, duty: null, type: null, time: null }],
-                    trainings: [],
-                    categories: [],
-                    changed: true,
-                })
-            );
+            this.set('ddah', fromJS(initialState.ddah).set('changed', true));
         }
     }
 
@@ -250,8 +238,12 @@ class AppState {
         return this.get('selectedFilters');
     }
 
+    getSelectedCourse() {
+        return this.get('selectedCourse');
+    }
+
     getSelectedDdah() {
-        return this.get('selectedDdah');
+        return this.get('selectedDdah.id');
     }
 
     getSelectedOffer() {
@@ -279,6 +271,16 @@ class AppState {
         let filters = this.get('selectedFilters');
 
         return filters.has(field) && filters.get(field).includes(category);
+    }
+
+    // check whether the currently-selected ddah is a offer
+    isOfferSelected() {
+        return this.get('selectedDdah.type') == 'offer';
+    }
+
+    // check whether the currently-selected ddah is a template
+    isTemplateSelected() {
+        return this.get('selectedDdah.type') == 'template';
     }
 
     // add a notification to the list of unread notifications
@@ -348,45 +350,46 @@ class AppState {
         }
     }
 
-    // unselect this ddah if it is already selected; otherwise select this ddah
-    toggleSelectedDdah(ddah) {
-        if (this.get('selectedDdah') == ddah) {
-            // this ddah is currently selected
-            this.set('selectedDdah', null);
+    toggleSelectedCourse(course) {
+        if (this.get('selectedCourse') == course) {
+            this.set('selectedCourse', null);
         } else {
-            let newDdah;
-            if (ddah.startsWith('C')) {
-                // ddah form selected
-
-                // ddah does not already exist for this course
-                newDdah = fromJS({
-                    supervisor: null,
-                    tutCategory: null,
-                    optional: null,
-                    requiresTraining: false,
-                    worksheet: [{ units: null, duty: null, type: null, time: null }],
-                    trainings: [],
-                    categories: [],
-                    changed: true,
-                });
-            } else {
-                // template selected
-                newDdah = this.get('templates.list.' + ddah.slice(1))
-                    .delete('name')
-                    .set('changed', false);
-            }
-
-            this.set({ selectedDdah: ddah, ddah: newDdah });
+            this.set('selectedCourse', course);
         }
     }
 
-    // unselect this offer if it is already selected; otherwise select this offer
+    // unselect this ddah if it is already selected; otherwise select this ddah
     toggleSelectedOffer(offer) {
-        if (this.get('selectedOffer') == offer) {
-            // this offer is currently selected
-            this.set('selectedOffer', null);
+        let curr = this.get('selectedDdah');
+
+        if (curr.get('type') == 'offer' && curr.get('id') == offer) {
+            // this ddah is currently selected
+            this.set('selectedDdah', fromJS({ type: null, id: null }));
         } else {
-            this.set('selectedOffer', offer);
+            // this ddah is not currently selected
+            let newDdah;
+
+            // ddah does not already exist for this offer, so create a blank one
+            newDdah = fromJS(initialState.ddah).set('changed', true);
+
+            this.set({ selectedDdah: fromJS({ type: 'offer', id: offer }), ddah: newDdah });
+        }
+    }
+
+    // unselect this template if it is already selected; otherwise select this template
+    toggleSelectedTemplate(template) {
+        let curr = this.get('selectedDdah');
+
+        if (curr.get('type') == 'template' && curr.get('id') == template) {
+            // this template is currently selected
+            this.set('selectedDdah', fromJS({ type: null, id: null }));
+        } else {
+            // this template is not currently selected
+            let newDdah = this.get('templates.list.' + template)
+                .delete('name')
+                .set('changed', false);
+
+            this.set({ selectedDdah: fromJS({ type: 'template', id: template }), ddah: newDdah });
         }
     }
 

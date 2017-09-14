@@ -25,21 +25,19 @@ class InstrControlPanel extends React.Component {
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         let selectedDdah = this.props.appState.getSelectedDdah();
-        let selectedOffer = this.props.appState.getSelectedOffer();
 
         return (
             <Grid fluid id="instr-grid" style={cursorStyle}>
                 <PanelGroup id="select-menu">
-                    <TemplatesMenu selectedDdah={selectedDdah} {...this.props} />
-                    <ApplicantsMenu
-                        selectedDdah={selectedDdah}
-                        selectedOffer={selectedOffer}
-                        {...this.props}
-                    />
+                    <TemplateSelectionMenu selectedDdah={selectedDdah} {...this.props} />
+                    <OfferSelectionMenu selectedDdah={selectedDdah} {...this.props} />
                 </PanelGroup>
-                {selectedDdah && (selectedDdah.startsWith('T') || selectedOffer)
+                {this.props.appState.isTemplateSelected() || selectedDdah != null
                     ? <div id="ddah-menu-container">
-                          <ActionMenu selectedDdah={selectedDdah} {...this.props} />
+                          {this.props.appState.isTemplateSelected()
+                              ? <TemplateActionMenu selectedDdah={selectedDdah} {...this.props} />
+                              : <OfferActionMenu selectedDdah={selectedDdah} {...this.props} />}
+
                           <DdahForm selectedDdah={selectedDdah} {...this.props} />
                       </div>
                     : <Well id="no-selection">
@@ -51,7 +49,7 @@ class InstrControlPanel extends React.Component {
     }
 }
 
-const TemplatesMenu = props => {
+const TemplateSelectionMenu = props => {
     let templates = props.appState.getTemplatesList();
 
     return (
@@ -59,8 +57,8 @@ const TemplatesMenu = props => {
             <ul id="templates-menu">
                 {templates.map((template, i) =>
                     <li
-                        className={'T' + i == props.selectedDdah ? 'active' : ''}
-                        onClick={() => props.appState.toggleSelectedDdah('T' + i)}>
+                        className={i == props.selectedDdah ? 'active' : ''}
+                        onClick={() => props.appState.toggleSelectedTemplate(i)}>
                         {template.get('name')}
                     </li>
                 )}
@@ -70,21 +68,22 @@ const TemplatesMenu = props => {
     );
 };
 
-const ApplicantsMenu = props => {
-    let courses = props.appState.getCoursesList();
+const OfferSelectionMenu = props => {
+    let courses = props.appState.getCoursesList(),
+        selectedCourse = props.appState.getSelectedCourse();
 
     return (
         <Panel header={<h4>Applicants</h4>}>
             <ul>
                 {courses.map((course, i) =>
-                    <li
-                        className={'C' + i == props.selectedDdah ? 'active' : ''}
-                        onClick={() => props.appState.toggleSelectedDdah('C' + i)}>
+                    <li onClick={() => props.appState.toggleSelectedCourse(i)}>
                         {course.get('code')}
-                        <ul className="applicant-menu">
+                        <ul
+                            className="applicant-menu"
+                            style={{ display: i == selectedCourse ? 'block' : 'none' }}>
                             {props.appState.getOffersForCourse(i).map((offer, i) =>
                                 <li
-                                    className={i == props.selectedOffer ? 'active' : ''}
+                                    className={i == props.selectedDdah ? 'active' : ''}
                                     onClick={event => {
                                         event.stopPropagation();
                                         props.appState.toggleSelectedOffer(i);
@@ -100,9 +99,8 @@ const ApplicantsMenu = props => {
     );
 };
 
-const ActionMenu = props => {
-    let templates = props.appState.getTemplatesList(),
-        courseSelected = props.selectedDdah.startsWith('C');
+const TemplateActionMenu = props => {
+    let templates = props.appState.getTemplatesList();
 
     return (
         <ButtonToolbar id="action-menu">
@@ -118,22 +116,41 @@ const ActionMenu = props => {
                 Clear
             </Button>
 
-            {courseSelected &&
-                <Button bsStyle="success" id="submit">
-                    Submit for Review
-                </Button>}
+            <Button
+                bsStyle="primary"
+                id="save"
+                onClick={() => props.appState.updateTemplate(props.selectedDdah)}>
+                Save
+            </Button>
+        </ButtonToolbar>
+    );
+};
 
-            {courseSelected
-                ? <ButtonGroup id="save">
-                      <Button bsStyle="primary">Save</Button>
-                      <Button bsStyle="info">Save as Template</Button>
-                  </ButtonGroup>
-                : <Button
-                      bsStyle="primary"
-                      id="save"
-                      onClick={() => props.appState.updateTemplate(props.selectedDdah.slice(1))}>
-                      Save
-                  </Button>}
+const OfferActionMenu = props => {
+    let templates = props.appState.getTemplatesList();
+
+    return (
+        <ButtonToolbar id="action-menu">
+            <DropdownButton bsStyle="warning" title="Apply template" id="templates-dropdown">
+                {templates.map((template, i) =>
+                    <MenuItem onClick={() => props.appState.applyTemplate(i)}>
+                        {template.get('name')}
+                    </MenuItem>
+                )}
+            </DropdownButton>
+
+            <Button id="clear" bsStyle="danger" onClick={() => props.appState.clearDdah()}>
+                Clear
+            </Button>
+
+            <Button bsStyle="success" id="submit">
+                Submit for Review
+            </Button>
+
+            <ButtonGroup id="save">
+                <Button bsStyle="primary">Save</Button>
+                <Button bsStyle="info">Save as Template</Button>
+            </ButtonGroup>
         </ButtonToolbar>
     );
 };

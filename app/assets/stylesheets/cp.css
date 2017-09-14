@@ -199,14 +199,6 @@ footer div p {
     background-color: #d9edf7;
 }
 
-#instr-grid #select-menu .applicant-menu {
-    display: none;
-}
-
-#instr-grid #select-menu li.active .applicant-menu {
-    display: block;
-}
-
 #instr-grid #action-menu #submit,
 #instr-grid #action-menu #save {
     float: right;

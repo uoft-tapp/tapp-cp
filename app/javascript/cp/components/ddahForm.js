@@ -18,9 +18,9 @@ class DdahForm extends React.Component {
 }
 
 const Header = props => {
-    // check whether ddah for course was selected, and if so, get the course details
-    let course = props.selectedDdah.startsWith('C')
-        ? props.appState.getCoursesList().get(props.selectedDdah.slice(1))
+    // check whether ddah for offer was selected, and if so, get the course details
+    let course = props.appState.isOfferSelected()
+        ? props.appState.getCoursesList().get(props.selectedDdah)
         : null;
 
     return (
@@ -73,9 +73,7 @@ const Header = props => {
                                 value={
                                     course && course.get('estimatedEnrol') != null
                                         ? course.get('estimatedEnrol') /
-                                          props.appState.getOffersForCourse(
-                                              props.selectedDdah.slice(1)
-                                          ).size
+                                          props.appState.getOffersForCourse(props.selectedDdah).size
                                         : ''
                                 }
                             />
