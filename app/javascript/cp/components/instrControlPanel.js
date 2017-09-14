@@ -29,8 +29,16 @@ class InstrControlPanel extends React.Component {
         return (
             <Grid fluid id="instr-grid" style={cursorStyle}>
                 <PanelGroup id="select-menu">
-                    <TemplateSelectionMenu selectedDdah={selectedDdah} {...this.props} />
-                    <OfferSelectionMenu selectedDdah={selectedDdah} {...this.props} />
+                    <TemplateSelectionMenu
+                        selectedDdah={
+                            this.props.appState.isTemplateSelected() ? selectedDdah : null
+                        }
+                        {...this.props}
+                    />
+                    <OfferSelectionMenu
+                        selectedDdah={this.props.appState.isOfferSelected() ? selectedDdah : null}
+                        {...this.props}
+                    />
                 </PanelGroup>
                 {this.props.appState.isTemplateSelected() || selectedDdah != null
                     ? <div id="ddah-menu-container">
