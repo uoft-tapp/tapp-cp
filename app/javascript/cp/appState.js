@@ -191,7 +191,7 @@ class AppState {
             ) {
                 summary = summary.update(
                     allocation.get('duty'),
-                    time => time + allocation.get('time') / 60
+                    time => time + allocation.get('units') * allocation.get('time') / 60
                 );
             }
         });
