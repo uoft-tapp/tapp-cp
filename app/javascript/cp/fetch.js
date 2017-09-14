@@ -838,12 +838,21 @@ function exportOffers(session) {
     window.open('/export/cp-offers/' + session);
 }
 
-// create a new template with the data from ddah
-function createTemplate(name, ddah) {
-    /*    postHelper('/instructors/' + appState.getCurrentUserName() + '/templates',
-               { name: name, position_id: 0 })
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then*/
+// create a new, empty template with this name
+function createTemplate(name, position) {
+    let user = appState.getCurrentUserName();
+
+    postHelper('/instructors/' + user + '/templates', { name: name, position_id: position })
+        .then(resp => (resp.ok ? resp : respFailure))
+        .then(() => {
+            appState.setFetchingTemplatesList(true);
+            getTemplates(user)
+                .then(templates => {
+                    appState.setTemplatesList(fromJS(templates));
+                    appState.setFetchingTemplatesList(false, true);
+                })
+                .catch(() => appState.setFetchingTemplatesList(false));
+        });
 }
 
 // update an existing template

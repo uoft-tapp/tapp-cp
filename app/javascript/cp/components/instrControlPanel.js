@@ -62,7 +62,16 @@ const TemplateSelectionMenu = props => {
                         {template.get('name')}
                     </li>
                 )}
-                <li id="create">Create a new template</li>
+                <li
+                    id="create"
+                    onClick={() => {
+                        let name;
+                        if ((name = window.prompt('Please enter a name for the new template:'))) {
+                            props.appState.createTemplate(name);
+                        }
+                    }}>
+                    Create a new template
+                </li>
             </ul>
         </Panel>
     );

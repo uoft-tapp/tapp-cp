@@ -196,10 +196,6 @@ class AppState {
         return summary;
     }
 
-    createTemplate(name) {
-        fetch.createTemplate(name, this.get('ddah').toJS());
-    }
-
     dismissAlert(id) {
         let alerts = this.get('alerts');
         let i = alerts.findIndex(alert => alert.get('id') == id);
@@ -468,6 +464,13 @@ class AppState {
         }
 
         fetch.clearHrStatus(offers.map(offer => parseInt(offer)));
+    }
+
+    createTemplate(name) {
+        // the route to create a new template expects a position with which to associate the template
+        // we don't associate templates with positions in the front-end model, so we pick a position id
+        // without caring which
+        fetch.createTemplate(name, parseInt(this.get('courses.list').keySeq().first()));
     }
 
     // email applicants
