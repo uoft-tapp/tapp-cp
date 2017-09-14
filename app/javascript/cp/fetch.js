@@ -144,6 +144,7 @@ function onFetchCoursesSuccess(resp) {
             estimatedEnrol: course.current_enrolment,
             cap: course.cap_enrolment,
             waitlist: course.num_waitlisted,
+            instructors: course.instructors,
         };
     });
 

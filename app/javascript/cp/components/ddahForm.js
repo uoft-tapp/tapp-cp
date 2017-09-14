@@ -39,9 +39,20 @@ const Header = props => {
                         </td>
                         <td>
                             <select
+                                value={
+                                    props.ddah.get('supervisor') != null
+                                        ? props.ddah.get('supervisor')
+                                        : ''
+                                }
                                 onChange={event =>
-                                    props.appState.updateDdah('supervisor', event.target.value)}
-                            />
+                                    props.appState.updateDdah('supervisor', event.target.value)}>
+                                {course &&
+                                    course.get('instructors').map((instructor, i) =>
+                                        <option value={i}>
+                                            {instructor}
+                                        </option>
+                                    )}
+                            </select>
                         </td>
                     </tr>
                     <tr>
