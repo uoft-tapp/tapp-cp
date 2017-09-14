@@ -128,6 +128,7 @@ const TemplateActionMenu = props => {
             <Button
                 bsStyle="primary"
                 id="save"
+                disabled={!props.appState.anyDdahChanges()}
                 onClick={() => props.appState.updateTemplate(props.selectedDdah)}>
                 Save
             </Button>
@@ -157,7 +158,9 @@ const OfferActionMenu = props => {
             </Button>
 
             <ButtonGroup id="save">
-                <Button bsStyle="primary">Save</Button>
+                <Button bsStyle="primary" disabled={!props.appState.anyDdahChanges()}>
+                    Save
+                </Button>
                 <Button
                     bsStyle="info"
                     onClick={() => {

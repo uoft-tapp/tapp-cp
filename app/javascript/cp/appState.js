@@ -112,12 +112,12 @@ class AppState {
         if (worksheet.size == 24) {
             this.alert('No more rows can be added.');
         } else {
-            this.set(
-                'ddah.worksheet',
-                worksheet.push(
+            this.set({
+                'ddah.worksheet': worksheet.push(
                     fromJS({ id: null, units: null, duty: null, type: null, time: null })
-                )
-            );
+                ),
+                'ddah.changed': true,
+            });
         }
     }
 
@@ -292,7 +292,10 @@ class AppState {
 
     // remove an allocation from ddah
     removeAllocation(index) {
-        this.set('ddah.worksheet', this.get('ddah.worksheet').delete(index));
+        this.set({
+            'ddah.worksheet': this.get('ddah.worksheet').delete(index),
+            'ddah.changed': true,
+        });
     }
 
     // remove a sort from the offers table
@@ -470,7 +473,10 @@ class AppState {
         // the route to create a new template expects a position with which to associate the template
         // we don't associate templates with positions in the front-end model, so we pick a position id
         // without caring which
-        fetch.createTemplate(name, parseInt(this.get('courses.list').keySeq().first()));
+        fetch
+            .createTemplate(name, parseInt(this.get('courses.list').keySeq().first()))
+            // when the request succeeds, display the new template
+            .then(template => this.toggleSelectedTemplate(template));
     }
 
     createTemplateFromDdah(name) {

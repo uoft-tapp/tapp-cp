@@ -817,11 +817,7 @@ function setOfferAccepted(offer) {
 // set status to unsent and clear other information
 function resetOffer(offer) {
     postHelper('/offers/' + offer + '/reset', {})
-        .then(resp => {
-            if (!resp.ok) {
-                return respFailure(resp);
-            }
-        })
+        .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
             appState.setFetchingOffersList(true);
             getOffers()
@@ -842,14 +838,23 @@ function exportOffers(session) {
 function createTemplate(name, position) {
     let user = appState.getCurrentUserName();
 
-    postHelper('/instructors/' + user + '/templates', { name: name, position_id: position })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
+    return postHelper('/instructors/' + user + '/templates', { name: name, position_id: position })
+        .then(resp => {
+            if (resp.ok) {
+                return resp.json().catch(msgFailure);
+            }
+            if (resp.status == 404) {
+                return resp.json().catch(msgFailure).then(res => msgFailure(res.message));
+            }
+            return respFailure(resp);
+        })
+        .then(resp => {
             appState.setFetchingTemplatesList(true);
-            getTemplates(user)
+            return getTemplates(user)
                 .then(templates => {
                     appState.setTemplatesList(fromJS(templates));
                     appState.setFetchingTemplatesList(false, true);
+                    return resp.id; // return the id of the newly-created template
                 })
                 .catch(() => appState.setFetchingTemplatesList(false));
         });
