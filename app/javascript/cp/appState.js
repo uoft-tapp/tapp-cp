@@ -20,18 +20,18 @@ const initialState = {
 
     selectedSession: '',
 
-    ddah: {
+    ddahWorksheet: {
         supervisor: null,
         tutCategory: null,
         optional: null,
         requiresTraining: false,
-        worksheet: [{ id: null, units: null, duty: null, type: null, time: null }],
+        allocations: [{ id: null, units: null, duty: null, type: null, time: null }],
         trainings: [],
         categories: [],
         changed: false,
     },
 
-    selectedDdah: { type: null, id: null },
+    selectedDdahData: { type: null, id: null },
     selectedCourse: null,
 
     /** DB data **/
@@ -104,20 +104,20 @@ class AppState {
      ** view state getters and setters **
      ************************************/
 
-    // add a row to the ddah form
+    // add a row to the ddah worksheet
     addAllocation() {
-        let worksheet = this.get('ddah.worksheet');
+        let allocations = this.get('ddahWorksheet.allocations');
 
         // max. 24 rows are supported (this number comes from counting the number of rows generated
         // in the DDAH form PDF)
-        if (worksheet.size == 24) {
+        if (allocations.size == 24) {
             this.alert('No more rows can be added.');
         } else {
             this.set({
-                'ddah.worksheet': worksheet.push(
+                'ddahWorksheet.allocations': allocations.push(
                     fromJS({ id: null, units: null, duty: null, type: null, time: null })
                 ),
-                'ddah.changed': true,
+                'ddahWorksheet.changed': true,
             });
         }
     }
@@ -149,9 +149,9 @@ class AppState {
         );
     }
 
-    // check whether the user has made any changes to the current ddah
-    anyDdahChanges() {
-        return this.get('ddah.changed');
+    // check whether the user has made any changes to the current ddah worksheet
+    anyDdahWorksheetChanges() {
+        return this.get('ddahWorksheet.changed');
     }
 
     // check whether any of the given filters in the category are selected on the offers table
@@ -163,38 +163,18 @@ class AppState {
         let template = this.get('templates.list.' + templateId).delete('name');
 
         // replace the values in the current ddah with the values in the template (excluding the template name)
-        this.set('ddah', this.get('ddah').set('changed', true).merge(template));
+        this.set('ddahWorksheet', this.get('ddahWorksheet').set('changed', true).merge(template));
     }
 
     clearDdah() {
         if (window.confirm('Are you sure that you want to clear the current form?')) {
-            this.set('ddah', fromJS(initialState.ddah).set('changed', true));
+            this.set('ddahWorksheet', fromJS(initialState.ddahWorksheet).set('changed', true));
         }
     }
 
     // remove all selected filters on the offers table
     clearFilters() {
         this.set('selectedFilters', fromJS({}));
-    }
-
-    // returns a map of duty ids to totals for each duty
-    computeDutiesSummary() {
-        let summary = this.getDutiesList().map(_ => 0);
-
-        this.get('ddah.worksheet').forEach(allocation => {
-            if (
-                allocation.get('duty') &&
-                allocation.get('time') != undefined &&
-                allocation.get('units') != undefined
-            ) {
-                summary = summary.update(
-                    allocation.get('duty').toString(),
-                    time => time + allocation.get('units') * allocation.get('time') / 60
-                );
-            }
-        });
-
-        return summary;
     }
 
     dismissAlert(id) {
@@ -219,16 +199,36 @@ class AppState {
     }
 
     // compute total ddah hours
-    getDdahTotal() {
-        let total = this.get('ddah.worksheet').reduce(
+    getDdahWorksheetTotal() {
+        let total = this.get('ddahWorksheet.allocations').reduce(
             (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
             0
         );
         return isNaN(total) ? 0 : total / 60;
     }
 
-    getDdah() {
-        return this.get('ddah');
+    getDdahWorksheet() {
+        return this.get('ddahWorksheet');
+    }
+
+    // returns a map of duty ids to totals for each duty
+    getDutiesSummary() {
+        let summary = this.getDutiesList().map(_ => 0);
+
+        this.get('ddahWorksheet.allocations').forEach(allocation => {
+            if (
+                allocation.get('duty') &&
+                allocation.get('time') != undefined &&
+                allocation.get('units') != undefined
+            ) {
+                summary = summary.update(
+                    allocation.get('duty').toString(),
+                    time => time + allocation.get('units') * allocation.get('time') / 60
+                );
+            }
+        });
+
+        return summary;
     }
 
     getFilters() {
@@ -239,8 +239,8 @@ class AppState {
         return this.get('selectedCourse');
     }
 
-    getSelectedDdah() {
-        return this.get('selectedDdah.id');
+    getSelectedDdahData() {
+        return this.get('selectedDdahData.id');
     }
 
     getSelectedOffer() {
@@ -270,14 +270,14 @@ class AppState {
         return filters.has(field) && filters.get(field).includes(category);
     }
 
-    // check whether the currently-selected ddah is a offer
+    // check whether the currently-selected ddah data corresponds to an offer
     isOfferSelected() {
-        return this.get('selectedDdah.type') == 'offer';
+        return this.get('selectedDdahData.type') == 'offer';
     }
 
-    // check whether the currently-selected ddah is a template
+    // check whether the currently-selected ddah data corresponds to a template
     isTemplateSelected() {
-        return this.get('selectedDdah.type') == 'template';
+        return this.get('selectedDdahData.type') == 'template';
     }
 
     // add a notification to the list of unread notifications
@@ -291,11 +291,11 @@ class AppState {
         this.set('notifications', fromJS([]));
     }
 
-    // remove an allocation from ddah
+    // remove an allocation from the ddah worksheet
     removeAllocation(index) {
         this.set({
-            'ddah.worksheet': this.get('ddah.worksheet').delete(index),
-            'ddah.changed': true,
+            'ddahWorksheet.allocations': this.get('ddahWorksheet.allocations').delete(index),
+            'ddahWorksheet.changed': true,
         });
     }
 
@@ -323,8 +323,8 @@ class AppState {
         this.set('roles', roles);
     }
 
-    setDdah(ddah) {
-        this.set('ddah', fromJS(Object.assign({}, ddah, { changed: true })));
+    setDdahWorksheet(ddah) {
+        this.set('ddahWorksheet', fromJS(Object.assign({}, ddah, { changed: true })));
     }
 
     // toggle a filter on the offers table
@@ -358,38 +358,55 @@ class AppState {
         }
     }
 
-    // unselect this ddah if it is already selected; otherwise select this ddah
+    // unselect this offer if it is already selected; otherwise select this offer
     toggleSelectedOffer(offer) {
-        let curr = this.get('selectedDdah');
+        let curr = this.get('selectedDdahData');
 
         if (curr.get('type') == 'offer' && curr.get('id') == offer) {
-            // this ddah is currently selected
-            this.set('selectedDdah', fromJS({ type: null, id: null }));
+            // this offer is currently selected
+            this.set('selectedDdahData', fromJS({ type: null, id: null }));
         } else {
-            // this ddah is not currently selected
-            let newDdah;
+            // this offer is not currently selected
 
-            // ddah does not already exist for this offer, so create a blank one
-            newDdah = fromJS(initialState.ddah).set('changed', true);
+            let newDdahData = this.get('ddahs.list').find(ddah => ddah.get('offer') == offer);
 
-            this.set({ selectedDdah: fromJS({ type: 'offer', id: offer }), ddah: newDdah });
+            if (newDdahData) {
+                // ddah found for this offer
+                this.set({
+                    selectedDdahData: fromJS({ type: 'offer', id: offer }),
+                    ddahWorksheet: newDdahData.delete('offer').delete('position'),
+                });
+            } else {
+                // ddah does not already exist for this offer, so create a new one
+                fetch.createDdah(offer).then(newDdah => {
+                    // set the ddah worksheet data from the newly-created ddah
+                    newDdahData = this.get('ddahs.list.' + newDdah);
+                    this.set({
+                        selectedDdahData: fromJS({ type: 'offer', id: offer }),
+                        ddahWorksheet: newDdahData.delete('offer').delete('position'),
+                    });
+                });
+            }
         }
     }
 
     // unselect this template if it is already selected; otherwise select this template
     toggleSelectedTemplate(template) {
-        let curr = this.get('selectedDdah');
+        let curr = this.get('selectedDdahData');
 
         if (curr.get('type') == 'template' && curr.get('id') == template) {
             // this template is currently selected
-            this.set('selectedDdah', fromJS({ type: null, id: null }));
+            this.set('selectedDdahData', fromJS({ type: null, id: null }));
         } else {
             // this template is not currently selected
             let newDdah = this.get('templates.list.' + template)
                 .delete('name')
                 .set('changed', false);
 
-            this.set({ selectedDdah: fromJS({ type: 'template', id: template }), ddah: newDdah });
+            this.set({
+                selectedDdahData: fromJS({ type: 'template', id: template }),
+                ddahWorksheet: newDdah,
+            });
         }
     }
 
@@ -404,32 +421,35 @@ class AppState {
     }
 
     // update ddah attribute
-    updateDdah(attribute, value) {
+    updateDdahWorksheet(attribute, value) {
         // if the attribute is a array of values, toggle the presence of this value in the array
         // (i.e. if the value is absent, add it; otherwise, remove it)
         if (attribute == 'trainings' || attribute == 'categories') {
-            let array = this.get('ddah.' + attribute);
+            let array = this.get('ddahWorksheet.' + attribute);
             let i = array.indexOf(parseInt(value));
 
             if (i == -1) {
                 // value is not present
                 this.set({
-                    ['ddah.' + attribute]: array.push(parseInt(value)),
-                    'ddah.changed': true,
+                    ['ddahWorksheet.' + attribute]: array.push(parseInt(value)),
+                    'ddahWorksheet.changed': true,
                 });
             } else {
-                this.set({ ['ddah.' + attribute]: array.delete(i), 'ddah.changed': true });
+                this.set({
+                    ['ddahWorksheet.' + attribute]: array.delete(i),
+                    'ddahWorksheet.changed': true,
+                });
             }
         } else {
-            this.set({ ['ddah.' + attribute]: value, 'ddah.changed': true });
+            this.set({ ['ddahWorksheet.' + attribute]: value, 'ddahWorksheet.changed': true });
         }
     }
 
     // update ddah allocation attribute
-    updateDdahAllocation(allocation, attribute, value) {
+    updateDdahWorksheetAllocation(allocation, attribute, value) {
         this.set({
-            ['ddah.worksheet[' + allocation + '].' + attribute]: value,
-            'ddah.changed': true,
+            ['ddahWorksheet.allocations[' + allocation + '].' + attribute]: value,
+            'ddahWorksheet.changed': true,
         });
     }
 
@@ -483,7 +503,7 @@ class AppState {
     }
 
     createTemplateFromDdah(name) {
-        fetch.createTemplateFromDdah(name, this.get('selectedDdah.id'));
+        fetch.createTemplateFromDdah(name, this.get('selectedDdahData.id'));
     }
 
     // email applicants
@@ -846,19 +866,17 @@ class AppState {
         fetch.showContractHr(offer);
     }
 
-    updateSessionPay(session, pay) {
-        fetch.updateSessionPay(session, pay);
-    }
+    updateDdah(offer) {
+        let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
 
-    updateTemplate(template) {
         // process ddah for format
-        let ddah = this.get('ddah');
+        let ddah = this.get('ddahWorksheet');
         let updates = {
             optional: ddah.get('optional'),
             categories: ddah.get('categories').toJS(),
             trainings: ddah.get('trainings').toJS(),
             allocations: ddah
-                .get('worksheet')
+                .get('allocations')
                 .map(allocation => ({
                     id: allocation.get('id'),
                     num_unit: allocation.get('units'),
@@ -870,7 +888,34 @@ class AppState {
             scaling_learning: ddah.get('requiresTraining'),
         };
 
-        fetch.updateTemplate(template, updates).then(this.set('ddah.changed', false));
+        fetch.updateDdah(ddahId, updates).then(this.set('ddahWorksheet.changed', false));
+    }
+
+    updateSessionPay(session, pay) {
+        fetch.updateSessionPay(session, pay);
+    }
+
+    updateTemplate(template) {
+        // process ddah for format
+        let ddah = this.get('ddahWorksheet');
+        let updates = {
+            optional: ddah.get('optional'),
+            categories: ddah.get('categories').toJS(),
+            trainings: ddah.get('trainings').toJS(),
+            allocations: ddah
+                .get('allocations')
+                .map(allocation => ({
+                    id: allocation.get('id'),
+                    num_unit: allocation.get('units'),
+                    unit_name: allocation.get('type'),
+                    minutes: allocation.get('time'),
+                    duty_id: allocation.get('duty'),
+                }))
+                .toJS(),
+            scaling_learning: ddah.get('requiresTraining'),
+        };
+
+        fetch.updateTemplate(template, updates).then(this.set('ddahWorksheet.changed', false));
     }
 
     withdrawOffers(offers) {

@@ -168,7 +168,7 @@ function onFetchDdahsSuccess(resp) {
             tutCategory: ddah.tutorial_category,
             optional: ddah.optional,
             requiresTraining: ddah.scaling_learning,
-            worksheet: ddah.allocations.map(allocation => ({
+            allocations: ddah.allocations.map(allocation => ({
                 id: allocation.id,
                 units: allocation.num_unit,
                 duty: allocation.duty_id,
@@ -245,7 +245,7 @@ function onFetchTemplatesSuccess(resp) {
             tutCategory: template.tutorial_category,
             optional: template.optional,
             requiresTraining: template.scaling_learning,
-            worksheet: template.allocations.map(allocation => ({
+            allocations: template.allocations.map(allocation => ({
                 id: allocation.id,
                 units: allocation.num_unit,
                 duty: allocation.duty_id,
@@ -902,10 +902,10 @@ function createTemplate(name, position) {
 }
 
 // update an existing template
-function updateTemplate(id, ddah) {
+function updateTemplate(id, ddahData) {
     let user = appState.getCurrentUserName();
 
-    return patchHelper('/templates/' + id, ddah)
+    return patchHelper('/templates/' + id, ddahData)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
             appState.setFetchingDataList('templates', true);
@@ -941,7 +941,7 @@ function createDdah(offer) {
 
     // although the template and ddah models have a relationship in the database, they do not have a
     // relationship in the front-end, and so we do not 'use a template' in this way to create a ddah
-    postHelper('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer })
+    return postHelper('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer })
         .then(resp => {
             if (resp.ok) {
                 return resp.json().catch(msgFailure);
@@ -953,20 +953,21 @@ function createDdah(offer) {
         })
         .then(resp => {
             appState.setFetchingDataList('ddahs', true);
-            getDdahs(user)
+            return getDdahs(user)
                 .then(ddahs => {
                     appState.setDdahsList(fromJS(ddahs));
                     appState.setFetchingDataList('ddahs', false, true);
+                    return resp.id; // return the id of the newly-created ddah
                 })
                 .catch(() => appState.setFetchingDataList('ddahs', false));
         });
 }
 
 // update an existing ddah
-function updateDdah(id, ddah) {
+function updateDdah(id, ddahData) {
     let user = appState.getCurrentUserName();
 
-    return patchHelper('/ddahs/' + id, ddah)
+    return patchHelper('/ddahs/' + id, ddahData)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
             appState.setFetchingDataList('ddahs', true);

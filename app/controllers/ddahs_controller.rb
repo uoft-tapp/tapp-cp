@@ -53,14 +53,14 @@ class DdahsController < ApplicationController
           render status: 404, json: {message: "Error: Mismatched Position. Operation Aborted."}
         end
       else
-        Ddah.create!(
+        ddah = Ddah.create!(
           offer_id: offer[:id],
           instructor_id: instructor[:id],
           optional: true,
         )
       end
       offer.update_attributes!(ddah_status: "Created")
-      render status: 200, json: {message: "A DDAH was successfully created."}
+      render status: 201, json: ddah.to_json
     else
       render status: 404, json: {message: "Error: A DDAH already exists for this offer."}
     end

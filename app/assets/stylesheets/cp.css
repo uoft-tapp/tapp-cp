@@ -301,24 +301,24 @@ footer div p {
     margin: 0;
 }
 
-/* ddah worksheet table */
+/* ddah allocations table */
 
-/* worksheet table column widths */
-#instr-grid #worksheet-table th:first-child,
+/* allocations table column widths */
+#instr-grid #allocations-table th:first-child,
 /* first column: # of units */
-#instr-grid #worksheet-table th:nth-child(4),
+#instr-grid #allocations-table th:nth-child(4),
 /* fourth column: time/task */
-#instr-grid #worksheet-table th:nth-child(5) {
+#instr-grid #allocations-table th:nth-child(5) {
     /* fifth column: total time */
     width: 100px;
 }
 
 /* third column: type of unit */
-#instr-grid #worksheet-table th:nth-child(3) {
+#instr-grid #allocations-table th:nth-child(3) {
     width: 350px;
 }
 
-#instr-grid #worksheet-table .delete-button {
+#instr-grid #allocations-table .delete-button {
     font-size: 16px;
     color: red;
     background-color: white;
@@ -328,29 +328,29 @@ footer div p {
     margin-right: -12px;
 }
 
-#instr-grid #worksheet-table thead {
+#instr-grid #allocations-table thead {
     background-color: var(--dark-bg);
 }
 
-#instr-grid #worksheet-table th,
-#instr-grid #worksheet-table td {
+#instr-grid #allocations-table th,
+#instr-grid #allocations-table td {
     text-align: center;
     border: var(--border);
 }
 
-#instr-grid #worksheet-table input,
-#instr-grid #worksheet-table select {
+#instr-grid #allocations-table input,
+#instr-grid #allocations-table select {
     width: 100%;
     height: 100%;
     border: 0;
     background: none;
 }
 
-#instr-grid #worksheet-table tr:last-child {
+#instr-grid #allocations-table tr:last-child {
     border-top: 3px solid;
 }
 
-#instr-grid #worksheet-table td:last-child {
+#instr-grid #allocations-table td:last-child {
     background-color: var(--light-bg);
 }
 

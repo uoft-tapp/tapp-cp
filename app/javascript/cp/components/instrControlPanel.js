@@ -24,29 +24,37 @@ class InstrControlPanel extends React.Component {
         let fetchCheck = this.props.appState.instrAnyFetching();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
-        let selectedDdah = this.props.appState.getSelectedDdah();
+        let selectedDdahData = this.props.appState.getSelectedDdahData();
 
         return (
             <Grid fluid id="instr-grid" style={cursorStyle}>
                 <PanelGroup id="select-menu">
                     <TemplateSelectionMenu
-                        selectedDdah={
-                            this.props.appState.isTemplateSelected() ? selectedDdah : null
+                        selectedDdahData={
+                            this.props.appState.isTemplateSelected() ? selectedDdahData : null
                         }
                         {...this.props}
                     />
                     <OfferSelectionMenu
-                        selectedDdah={this.props.appState.isOfferSelected() ? selectedDdah : null}
+                        selectedDdahData={
+                            this.props.appState.isOfferSelected() ? selectedDdahData : null
+                        }
                         {...this.props}
                     />
                 </PanelGroup>
-                {this.props.appState.isTemplateSelected() || selectedDdah != null
+                {this.props.appState.isTemplateSelected() || selectedDdahData != null
                     ? <div id="ddah-menu-container">
                           {this.props.appState.isTemplateSelected()
-                              ? <TemplateActionMenu selectedDdah={selectedDdah} {...this.props} />
-                              : <OfferActionMenu selectedDdah={selectedDdah} {...this.props} />}
+                              ? <TemplateActionMenu
+                                    selectedTemplate={selectedDdahData}
+                                    {...this.props}
+                                />
+                              : <OfferActionMenu
+                                    selectedOffer={selectedDdahData}
+                                    {...this.props}
+                                />}
 
-                          <DdahForm selectedDdah={selectedDdah} {...this.props} />
+                          <DdahForm selectedDdahData={selectedDdahData} {...this.props} />
                       </div>
                     : <Well id="no-selection">
                           <h4>Nothing here yet!</h4>
@@ -77,7 +85,7 @@ const TemplateSelectionMenu = props => {
             <ul id="templates-menu">
                 {templates.map((template, i) =>
                     <li
-                        className={i == props.selectedDdah ? 'active' : ''}
+                        className={i == props.selectedDdahData ? 'active' : ''}
                         onClick={() => props.appState.toggleSelectedTemplate(i)}>
                         {template.get('name')}
                     </li>
@@ -102,7 +110,7 @@ const OfferSelectionMenu = props => {
                             style={{ display: i == selectedCourse ? 'block' : 'none' }}>
                             {props.appState.getOffersForCourse(i).map((offer, i) =>
                                 <li
-                                    className={i == props.selectedDdah ? 'active' : ''}
+                                    className={i == props.selectedDdahData ? 'active' : ''}
                                     onClick={event => {
                                         event.stopPropagation();
                                         props.appState.toggleSelectedOffer(i);
@@ -138,8 +146,8 @@ const TemplateActionMenu = props => {
             <Button
                 bsStyle="primary"
                 id="save"
-                disabled={!props.appState.anyDdahChanges()}
-                onClick={() => props.appState.updateTemplate(props.selectedDdah)}>
+                disabled={!props.appState.anyDdahWorksheetChanges()}
+                onClick={() => props.appState.updateTemplate(props.selectedTemplate)}>
                 Save
             </Button>
         </ButtonToolbar>
@@ -168,7 +176,10 @@ const OfferActionMenu = props => {
             </Button>
 
             <ButtonGroup id="save">
-                <Button bsStyle="primary" disabled={!props.appState.anyDdahChanges()}>
+                <Button
+                    bsStyle="primary"
+                    disabled={!props.appState.anyDdahWorksheetChanges()}
+                    onClick={() => props.appState.updateDdah(props.selectedOffer)}>
                     Save
                 </Button>
                 <Button
