@@ -24,37 +24,34 @@ class InstrControlPanel extends React.Component {
         let fetchCheck = this.props.appState.instrAnyFetching();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
-        let selectedDdahData = this.props.appState.getSelectedDdahData();
+        let selectedDdahId = this.props.appState.getSelectedDdahId();
 
         return (
             <Grid fluid id="instr-grid" style={cursorStyle}>
                 <PanelGroup id="select-menu">
                     <TemplateSelectionMenu
-                        selectedDdahData={
-                            this.props.appState.isTemplateSelected() ? selectedDdahData : null
+                        selectedTemplate={
+                            this.props.appState.isTemplateSelected() ? selectedDdahId : null
                         }
                         {...this.props}
                     />
                     <OfferSelectionMenu
-                        selectedDdahData={
-                            this.props.appState.isOfferSelected() ? selectedDdahData : null
+                        selectedOffer={
+                            this.props.appState.isOfferSelected() ? selectedDdahId : null
                         }
                         {...this.props}
                     />
                 </PanelGroup>
-                {this.props.appState.isTemplateSelected() || selectedDdahData != null
+                {selectedDdahId != null
                     ? <div id="ddah-menu-container">
                           {this.props.appState.isTemplateSelected()
                               ? <TemplateActionMenu
-                                    selectedTemplate={selectedDdahData}
+                                    selectedTemplate={selectedDdahId}
                                     {...this.props}
                                 />
-                              : <OfferActionMenu
-                                    selectedOffer={selectedDdahData}
-                                    {...this.props}
-                                />}
+                              : <OfferActionMenu selectedOffer={selectedDdahId} {...this.props} />}
 
-                          <DdahForm selectedDdahData={selectedDdahData} {...this.props} />
+                          <DdahForm selectedDdahId={selectedDdahId} {...this.props} />
                       </div>
                     : <Well id="no-selection">
                           <h4>Nothing here yet!</h4>
@@ -83,13 +80,18 @@ const TemplateSelectionMenu = props => {
                 </span>
             }>
             <ul id="templates-menu">
-                {templates.map((template, i) =>
-                    <li
-                        className={i == props.selectedDdahData ? 'active' : ''}
-                        onClick={() => props.appState.toggleSelectedTemplate(i)}>
-                        {template.get('name')}
-                    </li>
-                )}
+                {templates
+                    .sort(
+                        (a, b) =>
+                            a.get('name').toLowerCase() > b.get('name').toLowerCase() ? 1 : -1
+                    )
+                    .map((template, i) =>
+                        <li
+                            className={i == props.selectedTemplate ? 'active' : ''}
+                            onClick={() => props.appState.toggleSelectedTemplate(i)}>
+                            {template.get('name')}
+                        </li>
+                    )}
             </ul>
         </Panel>
     );
@@ -102,7 +104,7 @@ const OfferSelectionMenu = props => {
     return (
         <Panel header={<h4>Applicants</h4>}>
             <ul id="offers-menu">
-                {courses.map((course, i) =>
+                {courses.sort((a, b) => (a.get('code') > b.get('code') ? 1 : -1)).map((course, i) =>
                     <li onClick={() => props.appState.toggleSelectedCourse(i)}>
                         {course.get('code')}
                         <ul
@@ -110,7 +112,7 @@ const OfferSelectionMenu = props => {
                             style={{ display: i == selectedCourse ? 'block' : 'none' }}>
                             {props.appState.getOffersForCourse(i).map((offer, i) =>
                                 <li
-                                    className={i == props.selectedDdahData ? 'active' : ''}
+                                    className={i == props.selectedOffer ? 'active' : ''}
                                     onClick={event => {
                                         event.stopPropagation();
                                         props.appState.toggleSelectedOffer(i);

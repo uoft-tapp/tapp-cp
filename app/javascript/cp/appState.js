@@ -239,7 +239,7 @@ class AppState {
         return this.get('selectedCourse');
     }
 
-    getSelectedDdahData() {
+    getSelectedDdahId() {
         return this.get('selectedDdahData.id');
     }
 
