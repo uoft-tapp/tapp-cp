@@ -16,20 +16,26 @@ module DdahUpdater
     allocations.each do |entry|
       if entry[:id]
         allocation = Allocation.find(entry[:id])
-        allocation.update_attributes(
+        data = {
           num_unit: entry[:num_unit],
           unit_name: entry[:unit_name],
           minutes: entry[:minutes],
-          duty_id: entry[:duty_id],
-        )
+        }
+        if entry[:duty_id]
+          data[:duty_id] = entry[:duty_id]
+        end
+        allocation.update_attributes(data)
       else
-        duty = Duty.find(entry[:duty_id])
-        form.allocations.create!(
+        data = {
           num_unit: entry[:num_unit],
           unit_name: entry[:unit_name],
           minutes: entry[:minutes],
-          duty_id: duty[:id],
-        )
+        }
+        if entry[:duty_id]
+          duty = Duty.find(entry[:duty_id])
+          data[:duty_id] = duty[:id]
+        end
+        form.allocations.create!(data)
       end
     end
   end
