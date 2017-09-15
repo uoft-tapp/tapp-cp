@@ -119,7 +119,14 @@ const OfferSelectionMenu = props => {
                                         event.stopPropagation();
                                         props.appState.toggleSelectedOffer(i);
                                     }}>
-                                    {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}
+                                    {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}&ensp;
+                                    {offer.get('ddahStatus') != 'None' &&
+                                        offer.get('ddahStatus') != 'Created' &&
+                                        <i
+                                            className="fa fa-check-circle"
+                                            style={{ color: 'green' }}
+                                            title="Form submitted"
+                                        />}
                                 </li>
                             )}
                         </ul>
