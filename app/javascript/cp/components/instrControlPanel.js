@@ -61,7 +61,19 @@ const TemplateSelectionMenu = props => {
     let templates = props.appState.getTemplatesList();
 
     return (
-        <Panel header={<h4>Templates</h4>}>
+        <Panel
+            header={<h4>Templates</h4>}
+            footer={
+                <span
+                    onClick={() => {
+                        let name;
+                        if ((name = window.prompt('Please enter a name for the new template:'))) {
+                            props.appState.createTemplate(name);
+                        }
+                    }}>
+                    Create a new template
+                </span>
+            }>
             <ul id="templates-menu">
                 {templates.map((template, i) =>
                     <li
@@ -70,16 +82,6 @@ const TemplateSelectionMenu = props => {
                         {template.get('name')}
                     </li>
                 )}
-                <li
-                    id="create"
-                    onClick={() => {
-                        let name;
-                        if ((name = window.prompt('Please enter a name for the new template:'))) {
-                            props.appState.createTemplate(name);
-                        }
-                    }}>
-                    Create a new template
-                </li>
             </ul>
         </Panel>
     );
@@ -91,7 +93,7 @@ const OfferSelectionMenu = props => {
 
     return (
         <Panel header={<h4>Applicants</h4>}>
-            <ul>
+            <ul id="offers-menu">
                 {courses.map((course, i) =>
                     <li onClick={() => props.appState.toggleSelectedCourse(i)}>
                         {course.get('code')}

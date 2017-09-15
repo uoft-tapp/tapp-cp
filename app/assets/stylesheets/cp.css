@@ -167,15 +167,28 @@ footer div p {
 }
 
 #instr-grid #select-menu {
-    height: var(--main-div-height);
-    overflow: auto;
     width: auto;
     float: left;
     margin-right: 1vw;
 }
 
+#instr-grid #select-menu .panel-heading {
+    padding: 10px 15px !important;
+    height: 37px;
+}
+
 #instr-grid #select-menu .panel-body {
     padding: 0;
+    overflow: auto;
+}
+
+#instr-grid #templates-menu {
+    /* allow at most 6 templates to show */
+    max-height: calc(6 * 30px);
+}
+
+#instr-grid #offers-menu {
+    max-height: calc(var(--main-div-height) - 2 * 37px - 7 * 30px - 5px);
 }
 
 #instr-grid #select-menu ul {
@@ -189,7 +202,9 @@ footer div p {
     cursor: pointer;
 }
 
-#instr-grid #select-menu #create {
+#instr-grid #select-menu .panel-footer {
+    padding: 5px 15px;
+    cursor: pointer;
     background-color: #337ab7;
     color: white;
 }
