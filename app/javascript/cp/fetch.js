@@ -84,6 +84,11 @@ const getCourses = user =>
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchCoursesSuccess);
 
+const getDdahs = user =>
+    getHelper('/instructors/' + user + '/ddahs')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchDdahsSuccess);
+
 const getDuties = () =>
     getHelper('/duties')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
@@ -149,6 +154,33 @@ function onFetchCoursesSuccess(resp) {
     });
 
     return courses;
+}
+
+function onFetchDdahsSuccess(resp) {
+    let ddahs = {};
+
+    resp.forEach(ddah => {
+        ddahs[ddah.id] = {
+            offer: ddah.offer_id,
+            position: ddah.position.id,
+            department: ddah.department,
+            supervisor: ddah.supervisor,
+            tutCategory: ddah.tutorial_category,
+            optional: ddah.optional,
+            requiresTraining: ddah.scaling_learning,
+            worksheet: ddah.allocations.map(allocation => ({
+                id: allocation.id,
+                units: allocation.num_unit,
+                duty: allocation.duty_id,
+                type: allocation.unit_name,
+                time: allocation.minutes,
+            })),
+            trainings: ddah.trainings,
+            categories: ddah.trainings,
+        };
+    });
+
+    return ddahs;
 }
 
 function onFetchDutiesSuccess(resp) {
@@ -241,83 +273,92 @@ function onFetchTrainingsSuccess(resp) {
 /* Function to GET all resources */
 
 function adminFetchAll() {
-    appState.setFetchingOffersList(true);
-    appState.setFetchingSessionsList(true);
+    appState.setFetchingDataList('offers', true);
+    appState.setFetchingDataList('sessions', true);
 
     // when offers are successfully fetched, update the offers list; set fetching flag to false either way
     getOffers()
         .then(offers => {
             appState.setOffersList(fromJS(offers));
-            appState.setFetchingOffersList(false, true);
+            appState.setFetchingDataList('offers', false, true);
         })
-        .catch(() => appState.setFetchingOffersList(false));
+        .catch(() => appState.setFetchingDataList('offers', false));
 
     // when sessions are successfully fetched, update the sessions list; set fetching flag to false either way
     getSessions()
         .then(sessions => {
             appState.setSessionsList(fromJS(sessions));
-            appState.setFetchingSessionsList(false, true);
+            appState.setFetchingDataList('sessions', false, true);
         })
-        .catch(() => appState.setFetchingSessionsList(false));
+        .catch(() => appState.setFetchingDataList('sessions', false));
 }
 
 function instructorFetchAll() {
     let user = appState.getCurrentUserName();
 
-    appState.setFetchingCategoriesList(true);
-    appState.setFetchingCoursesList(true);
-    appState.setFetchingDutiesList(true);
-    appState.setFetchingOffersList(true);
-    appState.setFetchingTemplatesList(true);
-    appState.setFetchingTrainingsList(true);
+    appState.setFetchingDataList('categories', true);
+    appState.setFetchingDataList('courses', true);
+    //    appState.setFetchingDataList('ddahs', true);
+    appState.setFetchingDataList('duties', true);
+    appState.setFetchingDataList('offers', true);
+    appState.setFetchingDataList('templates', true);
+    appState.setFetchingDataList('trainings', true);
 
     // when categories are successfully fetched, update the categories list; set fetching flag to false either way
     getCategories()
         .then(categories => {
             appState.setCategoriesList(fromJS(categories));
-            appState.setFetchingCategoriesList(false, true);
+            appState.setFetchingDataList('categories', false, true);
         })
-        .catch(() => appState.setFetchingCategoriesList(false));
+        .catch(() => appState.setFetchingDataList('categories', false));
 
     // when courses are successfully fetched, update the courses list; set fetching flag to false either way
     getCourses(user)
         .then(courses => {
             appState.setCoursesList(fromJS(courses));
-            appState.setFetchingCoursesList(false, true);
+            appState.setFetchingDataList('courses', false, true);
         })
-        .catch(() => appState.setFetchingCoursesList(false));
+        .catch(() => appState.setFetchingDataList('courses', false));
 
+    // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
+    /*    getDdahs()
+        .then(ddahs => {
+            appState.setDdahsList(fromJS(ddahs));
+            appState.setFetchingDataList('ddahs', false, true);
+        })
+        .catch(() => appState.setFetchingDataList('ddahs', false));
+*/
     // when duties are successfully fetched, update the duties list; set fetching flag to false either way
     getDuties()
         .then(duties => {
             appState.setDutiesList(fromJS(duties));
-            appState.setFetchingDutiesList(false, true);
+            appState.setFetchingDataList('duties', false, true);
         })
-        .catch(() => appState.setFetchingDutiesList(false));
+        .catch(() => appState.setFetchingDataList('duties', false));
 
     // when offers are successfully fetched, update the offers list; set fetching flag to false either way
     getOffers(user)
         .then(offers => {
             appState.setOffersList(fromJS(offers));
-            appState.setFetchingOffersList(false, true);
+            appState.setFetchingDataList('offers', false, true);
         })
-        .catch(() => appState.setFetchingOffersList(false));
+        .catch(() => appState.setFetchingDataList('offers', false));
 
     // when templates are successfully fetched, update the templates list; set fetching flag to false either way
     getTemplates(user)
         .then(templates => {
             appState.setTemplatesList(fromJS(templates));
-            appState.setFetchingTemplatesList(false, true);
+            appState.setFetchingDataList('templates', false, true);
         })
-        .catch(() => appState.setFetchingTemplatesList(false));
+        .catch(() => appState.setFetchingDataList('templates', false));
 
     // when trainings are successfully fetched, update the trainings list; set fetching flag to false either way
     getTrainings()
         .then(trainings => {
             appState.setTrainingsList(fromJS(trainings));
-            appState.setFetchingTrainingsList(false, true);
+            appState.setFetchingDataList('trainings', false, true);
         })
-        .catch(() => appState.setFetchingTrainingsList(false));
+        .catch(() => appState.setFetchingDataList('trainings', false));
 }
 
 // import locked assignments from TAPP
@@ -349,13 +390,13 @@ function importAssignments() {
             () => {
                 appState.setImporting(false, true);
 
-                appState.setFetchingOffersList(true);
+                appState.setFetchingDataList('offers', true);
                 getOffers()
                     .then(offers => {
                         appState.setOffersList(fromJS(offers));
-                        appState.setFetchingOffersList(false, true);
+                        appState.setFetchingDataList('offers', false, true);
                     })
-                    .catch(() => appState.setFetchingOffersList(false));
+                    .catch(() => appState.setFetchingDataList('offers', false));
             },
             () => appState.setImporting(false)
         );
@@ -390,13 +431,13 @@ function importOffers(data) {
             () => {
                 appState.setImporting(false, true);
 
-                appState.setFetchingOffersList(true);
+                appState.setFetchingDataList('offers', true);
                 getOffers()
                     .then(offers => {
                         appState.setOffersList(fromJS(offers));
-                        appState.setFetchingOffersList(false, true);
+                        appState.setFetchingDataList('offers', false, true);
                     })
-                    .catch(() => appState.setFetchingOffersList(false));
+                    .catch(() => appState.setFetchingDataList('offers', false));
             },
             () => appState.setImporting(false)
         );
@@ -439,13 +480,13 @@ function sendContracts(offers) {
         // send contracts for valid offers
         .then(() => postHelper('/offers/send-contracts', { offers: validOffers }))
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -486,13 +527,13 @@ function nag(offers) {
         // nag valid offers
         .then(() => postHelper('/offers/nag', { contracts: validOffers }))
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -539,13 +580,13 @@ function setHrProcessed(offers) {
             })
         )
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -591,13 +632,13 @@ function setDdahAccepted(offers) {
             })
         )
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -637,13 +678,13 @@ function withdrawOffers(offers) {
             if (resp.type != 'error') {
                 // network error did not occur
                 if (resp.ok) {
-                    appState.setFetchingOffersList(true);
+                    appState.setFetchingDataList('offers', true);
                     getOffers()
                         .then(offers => {
                             appState.setOffersList(fromJS(offers));
-                            appState.setFetchingOffersList(false, true);
+                            appState.setFetchingDataList('offers', false, true);
                         })
-                        .catch(() => appState.setFetchingOffersList(false));
+                        .catch(() => appState.setFetchingDataList('offers', false));
                 } else {
                     // request failed
                     resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
@@ -704,13 +745,13 @@ function print(offers) {
     });
 
     printPromise.then(() => {
-        appState.setFetchingOffersList(true);
+        appState.setFetchingDataList('offers', true);
         getOffers()
             .then(offers => {
                 appState.setOffersList(fromJS(offers));
-                appState.setFetchingOffersList(false, true);
+                appState.setFetchingDataList('offers', false, true);
             })
-            .catch(() => appState.setFetchingOffersList(false));
+            .catch(() => appState.setFetchingDataList('offers', false));
     });
 }
 
@@ -720,13 +761,13 @@ function updateSessionPay(session, pay) {
         .then(resp => (resp.ok ? resp : respFailure))
         .then(
             () => {
-                appState.setFetchingSessionsList(true);
+                appState.setFetchingDataList('sessions', true);
                 getSessions()
                     .then(sessions => {
                         appState.setSessionsList(fromJS(sessions));
-                        appState.setFetchingSessionsList(false, true);
+                        appState.setFetchingDataList('sessions', false, true);
                     })
-                    .catch(() => appState.setFetchingSessionsList(false));
+                    .catch(() => appState.setFetchingDataList('sessions', false));
             },
             resp => resp.json().then(resp => appState.alert(resp.message)) // IS THIS REALLY WHAT WE EXPECT?
         );
@@ -737,13 +778,13 @@ function noteOffer(offer, note) {
     putHelper('/offers/' + offer, { commentary: note })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -783,13 +824,13 @@ function clearHrStatus(offers) {
         // update valid offers
         .then(() => postHelper('/offers/clear-hris-status', { contracts: validOffers }))
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -804,13 +845,13 @@ function setOfferAccepted(offer) {
             }
         })
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -819,13 +860,13 @@ function resetOffer(offer) {
     postHelper('/offers/' + offer + '/reset', {})
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingOffersList(true);
+            appState.setFetchingDataList('offers', true);
             getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
-                    appState.setFetchingOffersList(false, true);
+                    appState.setFetchingDataList('offers', false, true);
                 })
-                .catch(() => appState.setFetchingOffersList(false));
+                .catch(() => appState.setFetchingDataList('offers', false));
         });
 }
 
@@ -849,14 +890,14 @@ function createTemplate(name, position) {
             return respFailure(resp);
         })
         .then(resp => {
-            appState.setFetchingTemplatesList(true);
+            appState.setFetchingDataList('templates', true);
             return getTemplates(user)
                 .then(templates => {
                     appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingTemplatesList(false, true);
+                    appState.setFetchingDataList('templates', false, true);
                     return resp.id; // return the id of the newly-created template
                 })
-                .catch(() => appState.setFetchingTemplatesList(false));
+                .catch(() => appState.setFetchingDataList('templates', false));
         });
 }
 
@@ -867,13 +908,13 @@ function updateTemplate(id, ddah) {
     return patchHelper('/templates/' + id, ddah)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingTemplatesList(true);
+            appState.setFetchingDataList('templates', true);
             return getTemplates(user)
                 .then(templates => {
                     appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingTemplatesList(false, true);
+                    appState.setFetchingDataList('templates', false, true);
                 })
-                .catch(() => appState.setFetchingTemplatesList(false));
+                .catch(() => appState.setFetchingDataList('templates', false));
         });
 }
 
@@ -884,13 +925,13 @@ function createTemplateFromDdah(name, ddah) {
     postHelper('/ddahs/' + ddah + '/new-template', { name: name })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingTemplatesList(true);
+            appState.setFetchingDataList('templates', true);
             getTemplates(user)
                 .then(templates => {
                     appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingTemplatesList(false, true);
+                    appState.setFetchingDataList('templates', false, true);
                 })
-                .catch(() => appState.setFetchingTemplatesList(false));
+                .catch(() => appState.setFetchingDataList('templates', false));
         });
 }
 
