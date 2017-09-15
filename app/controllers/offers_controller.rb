@@ -2,7 +2,8 @@ class OffersController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :set_domain
   include Authorizer
-  before_action :cp_access, except: [:get_contract_student, :set_status_student]
+  before_action :cp_access, except: [:index, :show, :get_contract_student, :set_status_student]
+  before_action :either_cp_admin_instructor(true), only: [:index, :show]
   before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
 
   def index

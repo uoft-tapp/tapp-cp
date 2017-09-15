@@ -24,15 +24,17 @@ module Authorizer
   end
 
   def correct_instructor
-    # TO DO 
+    # TO DO
   end
 
-  def either_cp_admin_instructor
-    set_roles
-    if params[:utorid]
-      # TO DO
-    else
-      expected_roles = ["cp_admin"]
+  def either_cp_admin_instructor(hr_assistant = false)
+    if !params[:utorid]
+      set_roles
+      if hr_assistant
+        expected_roles = ["cp_admin", "hr_assistant"]
+      else
+        expected_roles = ["cp_admin"]
+      end
       access(expected_roles)
     end
   end
