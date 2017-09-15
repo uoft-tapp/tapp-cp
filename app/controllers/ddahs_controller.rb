@@ -4,9 +4,14 @@ class DdahsController < ApplicationController
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
   before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
-  before_action :both_cp_admin_instructor, only: [:pdf, :apply_template, :separate_from_template, :new_template]
   before_action :correct_instructor, only: [:can_finish_ddah, :finish_ddah]
   before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
+  before_action  only: [:pdf, :separate_from_template, :new_template] do
+    both_cp_admin_instructor(Ddah)
+  end
+  before_action only: [:apply_template] do
+    both_cp_admin_instructor(Ddah, :ddahs, true)
+  end
 
   def index
     if params[:utorid]

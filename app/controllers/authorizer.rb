@@ -53,15 +53,17 @@ module Authorizer
 
 
   def both_cp_admin_instructor(model, attr_name = :id, array = false)
-    set_roles
-    expected_roles = ["cp_admin", "instructor"]
-    if has_access(expected_roles)
-      if !has_access(["cp_admin"])
-        instructor = Instructor.find_by(utorid: session[:utorid])
-        correct_instructor(model, instructor[:id], attr_name, array)
+    if ENV['RAILS_ENV'] == 'production'
+      set_roles
+      expected_roles = ["cp_admin", "instructor"]
+      if has_access(expected_roles)
+        if !has_access(["cp_admin"])
+          instructor = Instructor.find_by(utorid: session[:utorid])
+          correct_instructor(model, instructor[:id], attr_name, array)
+        end
+      else
+        render status: 403, file: 'public/403.html'
       end
-    else
-      render status: 403, file: 'public/403.html'
     end
   end
 
@@ -96,12 +98,10 @@ module Authorizer
   end
 
   def has_access(expected_roles)
-    if ENV['RAILS_ENV'] == 'production'
-      if !session[:logged_in]
-        render file: 'public/logout.html'
-      else
-        return !has_role(expected_roles)
-      end
+    if !session[:logged_in]
+      render file: 'public/logout.html'
+    else
+      return !has_role(expected_roles)
     end
   end
 

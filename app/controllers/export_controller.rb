@@ -2,7 +2,9 @@ class ExportController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
   before_action :tapp_admin, except: [:cp_offers]
-  before_action :cp_admin(true), only: [:cp_offers]
+  before_action only: [:cp_offers] do
+    cp_admin(true)
+  end
 
   def chass
     exporter = ChassExporter.new
