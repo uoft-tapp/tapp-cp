@@ -3,190 +3,193 @@ import { Table, Button } from 'react-bootstrap';
 
 class DdahForm extends React.Component {
     render() {
-        let ddah = this.props.appState.getDdahWorksheet();
+        let ddahWorksheet = this.props.appState.getDdahWorksheet();
+
+        // check whether ddah for offer was selected, and if so, get related details
+        let offersCount, course, department;
+        if (this.props.appState.isOfferSelected()) {
+            let position = this.props.appState
+                .getOffersList()
+                .getIn([this.props.selectedDdahId, 'position']);
+
+            offersCount = this.props.appState.getOffersForCourse(position).size;
+            course = this.props.appState.getCoursesList().get(position.toString());
+            department = this.props.appState
+                .getDdahsList()
+                .find(ddah => ddah.get('offer') == this.props.selectedDdahId)
+                .get('department');
+        }
 
         return (
             <div id="ddah-container">
                 <h3>Description of Duties and Allocation of Hours Form</h3>
-                <Header ddah={ddah} {...this.props} />
-                <Allocations ddah={ddah} {...this.props} />
-                <Training ddah={ddah} {...this.props} />
+                <Header
+                    ddahData={ddahWorksheet}
+                    course={course}
+                    department={department}
+                    offersCount={offersCount}
+                    {...this.props}
+                />
+                <Allocations ddahData={ddahWorksheet} {...this.props} />
+                <Training ddahData={ddahWorksheet} {...this.props} />
                 <Summary {...this.props} />
-                {this.props.appState.isOfferSelected() && <Signatures {...this.props} />}
+                {this.props.appState.isOfferSelected() &&
+                    <Signatures ddahData={ddahWorksheet} {...this.props} />}
             </div>
         );
     }
 }
 
-const Header = props => {
-    // check whether ddah for offer was selected, and if so, get the course details
-    let position = props.appState.isOfferSelected()
-        ? props.appState.getOffersList().getIn([props.selectedDdahData, 'position'])
-        : null;
-    let course = position ? props.appState.getCoursesList().get(position.toString()) : null;
-
-    return (
-        <table id="ddah-header">
-            <tbody>
-                <tr>
-                    <td>
-                        <b>Department:</b>
-                    </td>
-                    <td>
-                        <input type="text" readOnly disabled={course == null} />
-                    </td>
-                    <td>
-                        <b>Supervising Professor:</b>
-                    </td>
-                    <td>
-                        <select
-                            value={
-                                props.ddah.get('supervisor') != null
-                                    ? props.ddah.get('supervisor')
-                                    : ''
-                            }
-                            disabled={course == null}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheet(
-                                    'supervisor',
-                                    event.target.value
-                                )}>
-                            <option />
-                            {course &&
-                                course.get('instructors').map(instructor =>
-                                    <option>
-                                        {instructor}
-                                    </option>
-                                )}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Course Code:</b>
-                    </td>
-                    <td>
-                        <input
-                            type="text"
-                            readOnly
-                            value={course ? course.get('code') : ''}
-                            disabled={course == null}
-                        />
-                    </td>
-                    <td>
-                        <b>Est. Enrolment / TA:</b>
-                    </td>
-                    <td>
-                        <input
-                            type="number"
-                            readOnly
-                            value={
-                                course && course.get('estimatedEnrol') != null
-                                    ? (course.get('estimatedEnrol') /
-                                          props.appState.getOffersForCourse(position)
-                                              .size).toFixed()
-                                    : ''
-                            }
-                            disabled={course == null}
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Course Title:</b>
-                    </td>
-                    <td>
-                        <input
-                            type="text"
-                            readOnly
-                            value={course ? course.get('name') : ''}
-                            disabled={course == null}
-                        />
-                    </td>
-                    <td>
-                        <b>Expected Enrolment:</b>
-                    </td>
-                    <td>
-                        <input
-                            type="number"
-                            readOnly
-                            value={
-                                course && course.get('estimatedEnrol') != null
-                                    ? course.get('estimatedEnrol')
-                                    : ''
-                            }
-                            disabled={course == null}
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Tutorial Category:</b>
-                    </td>
-                    <td>
-                        <input
-                            type="text"
-                            value={
-                                props.ddah.get('tutCategory') != null
-                                    ? props.ddah.get('tutCategory')
-                                    : ''
-                            }
-                            onChange={event =>
-                                props.appState.updateDdahWorksheet(
-                                    'tutCategory',
-                                    event.target.value
-                                )}
-                        />
-                    </td>
-                    <td rowSpan="2">
-                        <small>
-                            Requires Training for Scaling Learning<br />Activities to Size of
-                            Tutorial
-                        </small>
-                    </td>
-                    <td rowSpan="2">
-                        <input
-                            type="checkbox"
-                            checked={props.ddah.get('requiresTraining') == true}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheet(
-                                    'requiresTraining',
-                                    event.target.checked
-                                )}
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td />
-                    <td>
-                        <input
-                            type="radio"
-                            id="optional"
-                            name="optional"
-                            checked={props.ddah.get('optional') == true}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheet(
-                                    'optional',
-                                    event.target.checked
-                                )}
-                        />&nbsp;<label htmlFor="optional">Optional</label>&emsp;
-                        <input
-                            type="radio"
-                            id="mandatory"
-                            name="optional"
-                            checked={props.ddah.get('optional') == false}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheet(
-                                    'optional',
-                                    !event.target.checked
-                                )}
-                        />&nbsp;<label htmlFor="mandatory">Mandatory</label>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    );
-};
+const Header = props =>
+    <table id="ddah-header">
+        <tbody>
+            <tr>
+                <td>
+                    <b>Department:</b>
+                </td>
+                <td>
+                    <input
+                        type="text"
+                        readOnly
+                        value={props.department ? props.department : ''}
+                        disabled={props.appState.isTemplateSelected()}
+                    />
+                </td>
+                <td>
+                    <b>Supervising Professor:</b>
+                </td>
+                <td>
+                    <select
+                        value={
+                            props.ddahData.get('supervisor') != null
+                                ? props.ddahData.get('supervisor')
+                                : ''
+                        }
+                        disabled={props.appState.isTemplateSelected()}
+                        onChange={event =>
+                            props.appState.updateDdahWorksheet('supervisor', event.target.value)}>
+                        <option />
+                        {props.course &&
+                            props.course.get('instructors').map(instructor =>
+                                <option>
+                                    {instructor}
+                                </option>
+                            )}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Course Code:</b>
+                </td>
+                <td>
+                    <input
+                        type="text"
+                        readOnly
+                        value={props.course ? props.course.get('code') : ''}
+                        disabled={props.appState.isTemplateSelected()}
+                    />
+                </td>
+                <td>
+                    <b>Est. Enrolment / TA:</b>
+                </td>
+                <td>
+                    <input
+                        type="number"
+                        readOnly
+                        value={
+                            props.course && props.course.get('estimatedEnrol') != null
+                                ? (props.course.get('estimatedEnrol') / props.offersCount).toFixed()
+                                : ''
+                        }
+                        disabled={props.appState.isTemplateSelected()}
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Course Title:</b>
+                </td>
+                <td>
+                    <input
+                        type="text"
+                        readOnly
+                        value={props.course ? props.course.get('name') : ''}
+                        disabled={props.appState.isTemplateSelected()}
+                    />
+                </td>
+                <td>
+                    <b>Expected Enrolment:</b>
+                </td>
+                <td>
+                    <input
+                        type="number"
+                        readOnly
+                        value={
+                            props.course && props.course.get('estimatedEnrol') != null
+                                ? props.course.get('estimatedEnrol')
+                                : ''
+                        }
+                        disabled={props.appState.isTemplateSelected()}
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Tutorial Category:</b>
+                </td>
+                <td>
+                    <input
+                        type="text"
+                        value={
+                            props.ddahData.get('tutCategory') != null
+                                ? props.ddahData.get('tutCategory')
+                                : ''
+                        }
+                        onChange={event =>
+                            props.appState.updateDdahWorksheet('tutCategory', event.target.value)}
+                    />
+                </td>
+                <td rowSpan="2">
+                    <small>
+                        Requires Training for Scaling Learning<br />Activities to Size of Tutorial
+                    </small>
+                </td>
+                <td rowSpan="2">
+                    <input
+                        type="checkbox"
+                        checked={props.ddahData.get('requiresTraining') == true}
+                        onChange={event =>
+                            props.appState.updateDdahWorksheet(
+                                'requiresTraining',
+                                event.target.checked
+                            )}
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td />
+                <td>
+                    <input
+                        type="radio"
+                        id="optional"
+                        name="optional"
+                        checked={props.ddahData.get('optional') == true}
+                        onChange={event =>
+                            props.appState.updateDdahWorksheet('optional', event.target.checked)}
+                    />&nbsp;<label htmlFor="optional">Optional</label>&emsp;
+                    <input
+                        type="radio"
+                        id="mandatory"
+                        name="optional"
+                        checked={props.ddahData.get('optional') == false}
+                        onChange={event =>
+                            props.appState.updateDdahWorksheet('optional', !event.target.checked)}
+                    />&nbsp;<label htmlFor="mandatory">Mandatory</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>;
 
 const Allocations = props =>
     <Table condensed hover id="allocations-table">
@@ -212,7 +215,7 @@ const Allocations = props =>
             </tr>
         </thead>
         <tbody>
-            {props.ddah.get('allocations').map((row, i) =>
+            {props.ddahData.get('allocations').map((row, i) =>
                 <tr key={'allocation-' + i}>
                     <td>
                         <input
@@ -328,7 +331,7 @@ const Training = props => {
                                             <input
                                                 type="checkbox"
                                                 id={'training-' + i}
-                                                checked={props.ddah
+                                                checked={props.ddahData
                                                     .get('trainings')
                                                     .includes(parseInt(i))}
                                                 onChange={event =>
@@ -355,7 +358,7 @@ const Training = props => {
                                             <input
                                                 type="checkbox"
                                                 id={'category-' + i}
-                                                checked={props.ddah
+                                                checked={props.ddahData
                                                     .get('categories')
                                                     .includes(parseInt(i))}
                                                 onChange={event =>
@@ -418,7 +421,7 @@ const Summary = props => {
 };
 
 const Signatures = props => {
-    let offer = props.appState.getOffersList().get(props.selectedDdahData);
+    let offer = props.appState.getOffersList().get(props.selectedDdahId);
 
     return (
         <table id="signatures">
@@ -428,8 +431,8 @@ const Signatures = props => {
                         <input
                             type="text"
                             value={
-                                props.appState.getDdahWorksheet().get('supervisor')
-                                    ? props.appState.getDdahWorksheet().get('supervisor')
+                                props.ddahData.get('supervisor')
+                                    ? props.ddahData.get('supervisor')
                                     : ''
                             }
                             readOnly

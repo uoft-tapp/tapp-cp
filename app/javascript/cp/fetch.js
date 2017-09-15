@@ -298,7 +298,7 @@ function instructorFetchAll() {
 
     appState.setFetchingDataList('categories', true);
     appState.setFetchingDataList('courses', true);
-    //    appState.setFetchingDataList('ddahs', true);
+    appState.setFetchingDataList('ddahs', true);
     appState.setFetchingDataList('duties', true);
     appState.setFetchingDataList('offers', true);
     appState.setFetchingDataList('templates', true);
@@ -321,13 +321,13 @@ function instructorFetchAll() {
         .catch(() => appState.setFetchingDataList('courses', false));
 
     // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
-    /*    getDdahs(user)
+    getDdahs(user)
         .then(ddahs => {
             appState.setDdahsList(fromJS(ddahs));
             appState.setFetchingDataList('ddahs', false, true);
         })
         .catch(() => appState.setFetchingDataList('ddahs', false));
-*/
+
     // when duties are successfully fetched, update the duties list; set fetching flag to false either way
     getDuties()
         .then(duties => {
