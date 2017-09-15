@@ -4,7 +4,7 @@ class TemplatesController < ApplicationController
   include Authorizer
   include Model
   before_action :either_cp_admin_instructor, except: [:preview]
-  before_action :both_cp_admin_instructor, only: [:preview]
+  before_action :both_cp_admin_instructor(Template), only: [:preview]
 
   def index
     if params[:utorid]

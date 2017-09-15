@@ -27,10 +27,6 @@ module Authorizer
     access(expected_roles)
   end
 
-  def correct_instructor
-    # TO DO
-  end
-
   def either_cp_admin_instructor(hr_assistant = false)
     if !params[:utorid]
       set_roles
@@ -43,12 +39,14 @@ module Authorizer
     end
   end
 
-  def both_cp_admin_instructor
+
+  def both_cp_admin_instructor(model, attr_name = :id, array = false)
     set_roles
     expected_roles = ["cp_admin", "instructor"]
     if has_access(expected_roles)
       if !has_access(["cp_admin"])
-        # TO DO
+        instructor = Instructor.find_by(utorid: session[:utorid])
+        correct_instructor(model, instructor[:id], attr_name, array)
       end
     else
       render status: 403, file: 'public/403.html'
@@ -181,6 +179,27 @@ module Authorizer
         end
       else
         session[:roles].push(role[:role])
+      end
+    end
+  end
+
+  '''
+   assumes that instructor_id is an attribute in the model
+  '''
+  def correct_instructor(model, instructor_id, attr_name = :id, array = false)
+    if array
+      allowed = []
+      params[attr_name].each do |id|
+        model = model.find(id)
+        if model[:instructor_id] = instructor_id
+          allowed.push(id)
+        end
+      end
+      params[attr_name] = allowed
+    else
+      model = model.find(params[attr_name])
+      if model[:instructor_id] != instructor_id
+        render status: 403, file: 'public/403.html'
       end
     end
   end
