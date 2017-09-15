@@ -27,6 +27,18 @@ module Authorizer
     access(expected_roles)
   end
 
+  def either_admin_instructor(hr_assistant = false)
+    if !params[:utorid]
+      set_roles
+      if hr_assistant
+        expected_roles = ["tapp_admin", "cp_admin", "hr_assistant"]
+      else
+        expected_roles = ["tapp_admin", "cp_admin"]
+      end
+      access(expected_roles)
+    end
+  end
+
   def either_cp_admin_instructor(hr_assistant = false)
     if !params[:utorid]
       set_roles

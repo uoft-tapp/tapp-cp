@@ -44,8 +44,8 @@ Rails.application.routes.draw do
   scope 'ddahs/:ddah_id' do
     post "new-template" => "ddahs#new_template"
     post "separate-from-template" => "ddahs#separate_from_template"
-    get "pdf", to "ddahs#pdf"
-    post "accept", to "ddahs#accept"
+    get "pdf", to: "ddahs#pdf"
+    post "accept", to: "ddahs#accept"
   end
   resources :templates, only: [:index, :show, :create, :destroy, :update]
 

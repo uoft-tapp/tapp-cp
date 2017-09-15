@@ -4,9 +4,9 @@ class DdahsController < ApplicationController
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
   before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
+  before_action :both_cp_admin_instructor, only: [:pdf, :apply_template, :separate_from_template, :new_template]
+  before_action :correct_instructor, only: [:can_finish_ddah, :finish_ddah]
   before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
-  before_action :both_cp_admin_instructor(Ddah), only: [:pdf]
-  before_action :both_cp_admin_instructor(Ddah, true, :ddahs), only: [:can_finish_ddah, :finish_ddah, :apply_template, :separate_from_template, :new_template]
 
   def index
     if params[:utorid]
@@ -322,20 +322,10 @@ class DdahsController < ApplicationController
     end
   end
 
-<<<<<<< 145c54693df4c7a1ff7879a52682816354aa7d5c
-=======
-  def move_allocations_to_ddah(template, allocations)
-    allocations.each do |allocation|
-      allocation.update_attributes!(template_id: template[:id], ddah_id: nil)
-    end
-  end
-
   def template_match_offer(template_id, offer)
     position_id = offer[:position_id]
     template = Template.find(template_id)
     return position_id == template[:position_id]
   end
 
-
->>>>>>> set up before_actions for route access
 end
