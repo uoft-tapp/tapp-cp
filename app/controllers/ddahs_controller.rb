@@ -155,7 +155,7 @@ class DdahsController < ApplicationController
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
       if ENV['RAILS_ENV'] != 'test'
-        link = "#{ENV["domain"]}#{offer[:link]}".replace("pb", "pb/ddah")
+        link = "#{ENV["domain"]}#{offer[:link]}".sub!("pb", "pb/ddah")
         CpMailer.ddah_email(ddah.format,link).deliver_now!
       end
       offer.update_attributes!({ddah_status: "Pending", send_date: DateTime.now.to_s})

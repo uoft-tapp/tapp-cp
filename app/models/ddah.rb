@@ -2,9 +2,9 @@ class Ddah < ApplicationRecord
   belongs_to :offer
   belongs_to :template, optional: true
   belongs_to :instructor
-  has_many :categories
+  has_and_belongs_to_many :categories
   has_many :allocations
-  has_many :trainings
+  has_and_belongs_to_many :trainings
   include Model
 
   def get_deadline
@@ -30,11 +30,11 @@ class Ddah < ApplicationRecord
         supervisor: instructor[:name],
         position: position.format,
         allocations: allocations,
-        trainings: self.trainings,
-        categories: self.categories,
+        trainings: self.training_ids,
+        categories: self.category_ids,
       }
       if ddah[:send_date]
-        data[:link] = offer[:link].replace("pb", "pb/ddah")
+        data[:link] = offer[:link].sub!("pb", "pb/ddah")
         data[:deadline] = self.get_deadline
       end
       return ddah.merge(data)
