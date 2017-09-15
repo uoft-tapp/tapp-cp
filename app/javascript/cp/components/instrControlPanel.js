@@ -98,18 +98,20 @@ const TemplateSelectionMenu = props => {
 };
 
 const OfferSelectionMenu = props => {
-    let courses = props.appState.getCoursesList(),
-        selectedCourse = props.appState.getSelectedCourse();
+    let courses = props.appState.getCoursesList();
 
     return (
         <Panel header={<h4>Applicants</h4>}>
             <ul id="offers-menu">
                 {courses.sort((a, b) => (a.get('code') > b.get('code') ? 1 : -1)).map((course, i) =>
-                    <li onClick={() => props.appState.toggleSelectedCourse(i)}>
+                    <li
+                        onClick={() => {
+                            let submenu = document.getElementById(i + '-applicant-menu');
+                            submenu.style.display =
+                                submenu.style.display == 'block' ? 'none' : 'block';
+                        }}>
                         {course.get('code')}
-                        <ul
-                            className="applicant-menu"
-                            style={{ display: i == selectedCourse ? 'block' : 'none' }}>
+                        <ul id={i + '-applicant-menu'} className="applicant-menu">
                             {props.appState.getOffersForCourse(i).map((offer, i) =>
                                 <li
                                     className={i == props.selectedOffer ? 'active' : ''}

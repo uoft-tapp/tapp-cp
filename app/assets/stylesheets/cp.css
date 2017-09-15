@@ -191,6 +191,10 @@ footer div p {
     max-height: calc(var(--main-div-height) - 2 * 37px - 7 * 30px - 5px);
 }
 
+#instr-grid .applicant-menu {
+    display: none; /* initially hide all applicant sub-menus */
+}
+
 #instr-grid #select-menu ul {
     list-style: none;
     padding: 0;

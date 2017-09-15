@@ -32,7 +32,6 @@ const initialState = {
     },
 
     selectedDdahData: { type: null, id: null },
-    selectedCourse: null,
 
     /** DB data **/
     categories: { fetching: 0, list: null },
@@ -253,10 +252,6 @@ class AppState {
         return this.get('selectedFilters');
     }
 
-    getSelectedCourse() {
-        return this.get('selectedCourse');
-    }
-
     getSelectedDdahId() {
         return this.get('selectedDdahData.id');
     }
@@ -365,14 +360,6 @@ class AppState {
             }
         } else {
             this.set('selectedFilters[' + field + ']', fromJS([category]));
-        }
-    }
-
-    toggleSelectedCourse(course) {
-        if (this.get('selectedCourse') == course) {
-            this.set('selectedCourse', null);
-        } else {
-            this.set('selectedCourse', course);
         }
     }
 
