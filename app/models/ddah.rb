@@ -59,6 +59,10 @@ class Ddah < ApplicationRecord
         :instructor_id,
         :tutorial_category,
       ]
+      if ddah[:send_date]
+        data[:link] = offer[:link].sub!("pb", "pb/ddah")
+        data[:deadline] = self.get_deadline
+      end
       overwrite(ddah, template, attributes)
       return ddah.merge(data)
     end
