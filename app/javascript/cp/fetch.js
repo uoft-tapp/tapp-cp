@@ -321,7 +321,7 @@ function instructorFetchAll() {
         .catch(() => appState.setFetchingDataList('courses', false));
 
     // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
-    /*    getDdahs()
+    /*    getDdahs(user)
         .then(ddahs => {
             appState.setDdahsList(fromJS(ddahs));
             appState.setFetchingDataList('ddahs', false, true);
@@ -935,6 +935,50 @@ function createTemplateFromDdah(name, ddah) {
         });
 }
 
+// create a new, empty ddah for this offer
+function createDdah(offer) {
+    let user = appState.getCurrentUserName();
+
+    // although the template and ddah models have a relationship in the database, they do not have a
+    // relationship in the front-end, and so we do not 'use a template' in this way to create a ddah
+    postHelper('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer })
+        .then(resp => {
+            if (resp.ok) {
+                return resp.json().catch(msgFailure);
+            }
+            if (resp.status == 404) {
+                return resp.json().catch(msgFailure).then(res => msgFailure(res.message));
+            }
+            return respFailure(resp);
+        })
+        .then(resp => {
+            appState.setFetchingDataList('ddahs', true);
+            getDdahs(user)
+                .then(ddahs => {
+                    appState.setDdahsList(fromJS(ddahs));
+                    appState.setFetchingDataList('ddahs', false, true);
+                })
+                .catch(() => appState.setFetchingDataList('ddahs', false));
+        });
+}
+
+// update an existing ddah
+function updateDdah(id, ddah) {
+    let user = appState.getCurrentUserName();
+
+    return patchHelper('/ddahs/' + id, ddah)
+        .then(resp => (resp.ok ? resp : respFailure))
+        .then(() => {
+            appState.setFetchingDataList('ddahs', true);
+            return getDdahs(user)
+                .then(ddahs => {
+                    appState.setDdahsList(fromJS(ddahs));
+                    appState.setFetchingDataList('ddahs', false, true);
+                })
+                .catch(() => appState.setFetchingDataList('ddahs', false));
+        });
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -980,5 +1024,7 @@ export {
     createTemplate,
     updateTemplate,
     createTemplateFromDdah,
+    createDdah,
+    updateDdah,
     fetchAuth,
 };
