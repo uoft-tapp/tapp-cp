@@ -127,6 +127,13 @@ footer div p {
     max-width: calc(276px - 15px * 2); /* don't allow the text area to be wider than the popover */
 }
 
+/* sessions menu used by hr_assistant */
+#offers-grid #dropdown-menu #sessions {
+    float: left;
+    display: inline-block;
+    margin: 0 5px;
+}
+
 #offers-grid .sessions {
     margin: 0 0 1.5vh 0;
 }
