@@ -7,6 +7,10 @@ import {
     Button,
     OverlayTrigger,
     Popover,
+    Form,
+    FormGroup,
+    ControlLabel,
+    FormControl,
 } from 'react-bootstrap';
 
 import { TableMenu } from './tableMenu.js';
@@ -277,6 +281,7 @@ class ControlPanel extends React.Component {
 
                 <ButtonToolbar id="dropdown-menu">
                     {role == 'cp_admin' && <ImportMenu {...this.props} />}
+                    {role == 'hr_assistant' && <SessionsDropdown {...this.props} />}
                     <ExportButton {...this.props} />
                     {role == 'cp_admin' && <OffersMenu {...this.props} />}
                     {role == 'cp_admin' && <CommMenu {...this.props} />}
@@ -315,6 +320,29 @@ class ControlPanel extends React.Component {
         );
     }
 }
+
+// session selector used by hr_assistant
+const SessionsDropdown = props =>
+    <Form inline id="sessions">
+        <FormGroup>
+            <ControlLabel>Session:</ControlLabel>&ensp;
+            <FormControl
+                id="session"
+                componentClass="select"
+                onChange={event => {
+                    props.appState.selectSession(event.target.value);
+                }}>
+                <option value="" key="session-all">
+                    all
+                </option>
+                {props.appState.getSessionsList().map((session, sessionId) =>
+                    <option value={sessionId}>
+                        {session.get('semester')}&nbsp;{session.get('year')}
+                    </option>
+                )}
+            </FormControl>
+        </FormGroup>
+    </Form>;
 
 const ExportButton = props =>
     <Button bsStyle="primary" onClick={() => props.appState.exportOffers()}>
