@@ -2,7 +2,8 @@ class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
   include DdahUpdater
   include Authorizer
-  before_action :cp_access
+  before_action :cp_access, except: [:student_view, :ddah_view]
+  before_action :correct_applicant, only: [:student_view, :ddah_view]
 
   def index
     if params[:utorid]
