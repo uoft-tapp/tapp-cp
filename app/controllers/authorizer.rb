@@ -17,9 +17,13 @@ module Authorizer
     access(expected_roles)
   end
 
-  def cp_admin
+  def cp_admin(hr_assistant = false)
     set_roles
-    expected_roles = ["cp_admin"]
+    if hr_assistant
+      expected_roles = ["cp_admin", "hr_assistant"]
+    else
+      expected_roles = ["cp_admin"]
+    end
     access(expected_roles)
   end
 
