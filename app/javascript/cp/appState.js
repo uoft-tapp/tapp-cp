@@ -22,7 +22,6 @@ const initialState = {
 
     ddahWorksheet: {
         supervisor: null,
-        tutCategory: null,
         optional: null,
         requiresTraining: false,
         allocations: [{ id: null, units: null, duty: null, type: null, time: null }],
@@ -184,12 +183,13 @@ class AppState {
     // return ddahData in the ddah worksheet format
     createDdahWorksheet(ddahData) {
         let worksheet = {
-            optional: ddahData.get('optional'),
+            supervisor: ddahData.get('supervisor'),
             tutCategory: ddahData.get('tutCategory'),
-            categories: ddahData.get('categories'),
-            trainings: ddahData.get('trainings'),
-            allocations: ddahData.get('allocations'),
+            optional: ddahData.get('optional'),
             requiresTraining: ddahData.get('requiresTraining'),
+            allocations: ddahData.get('allocations'),
+            trainings: ddahData.get('trainings'),
+            categories: ddahData.get('categories'),
         };
 
         return fromJS(worksheet);
@@ -888,7 +888,6 @@ class AppState {
         let ddah = this.get('ddahWorksheet');
         let updates = {
             optional: ddah.get('optional'),
-            tutorial_category: ddah.get('tutCategory'),
             categories: ddah.get('categories').toJS(),
             trainings: ddah.get('trainings').toJS(),
             allocations: ddah
@@ -916,7 +915,6 @@ class AppState {
         let ddah = this.get('ddahWorksheet');
         let updates = {
             optional: ddah.get('optional'),
-            tutorial_category: ddah.get('tutCategory'),
             categories: ddah.get('categories').toJS(),
             trainings: ddah.get('trainings').toJS(),
             allocations: ddah

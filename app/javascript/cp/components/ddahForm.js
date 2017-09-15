@@ -6,18 +6,16 @@ class DdahForm extends React.Component {
         let ddahWorksheet = this.props.appState.getDdahWorksheet();
 
         // check whether ddah for offer was selected, and if so, get related details
-        let offersCount, course, department;
+        let offersCount, course, ddah;
         if (this.props.appState.isOfferSelected()) {
             let position = this.props.appState
                 .getOffersList()
                 .getIn([this.props.selectedDdahId, 'position']);
-
             offersCount = this.props.appState.getOffersForCourse(position).size;
             course = this.props.appState.getCoursesList().get(position.toString());
-            department = this.props.appState
-                .getDdahsList()
-                .find(ddah => ddah.get('offer') == this.props.selectedDdahId)
-                .get('department');
+
+            ddah = this.props.appState.getDdahsList()
+                .find(ddah => ddah.get('offer') == this.props.selectedDdahId);
         }
 
         return (
@@ -26,7 +24,7 @@ class DdahForm extends React.Component {
                 <Header
                     ddahData={ddahWorksheet}
                     course={course}
-                    department={department}
+                    ddah={ddah}
                     offersCount={offersCount}
                     {...this.props}
                 />
@@ -51,7 +49,7 @@ const Header = props =>
                     <input
                         type="text"
                         readOnly
-                        value={props.department ? props.department : ''}
+                        value={props.ddah ? props.ddah.get('department') : ''}
                         disabled={props.appState.isTemplateSelected()}
                     />
                 </td>
@@ -141,13 +139,9 @@ const Header = props =>
                 <td>
                     <input
                         type="text"
-                        value={
-                            props.ddahData.get('tutCategory') != null
-                                ? props.ddahData.get('tutCategory')
-                                : ''
-                        }
-                        onChange={event =>
-                            props.appState.updateDdahWorksheet('tutCategory', event.target.value)}
+                        readOnly
+                        value={props.ddah ? props.ddah.get('tutCategory') : ''}
+                        disabled={props.appState.isTemplateSelected()}
                     />
                 </td>
                 <td rowSpan="2">
