@@ -189,7 +189,7 @@ const OfferActionMenu = props => {
                     onClick={() => {
                         let name;
                         if ((name = window.prompt('Please enter a name for the new template:'))) {
-                            props.appState.createTemplateFromDdah(name);
+                            props.appState.createTemplateFromDdah(name, props.selectedOffer);
                         }
                     }}>
                     Save as Template

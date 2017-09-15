@@ -502,8 +502,9 @@ class AppState {
             .then(template => this.toggleSelectedTemplate(template));
     }
 
-    createTemplateFromDdah(name) {
-        fetch.createTemplateFromDdah(name, this.get('selectedDdahData.id'));
+    createTemplateFromDdah(name, offer) {
+        let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
+        fetch.createTemplateFromDdah(name, ddahId);
     }
 
     // email applicants
