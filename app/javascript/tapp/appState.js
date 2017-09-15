@@ -970,93 +970,21 @@ class AppState {
         this.set('courses.list', list);
     }
 
-    setFetchingApplicantsList(fetching, success) {
-        let init = this.get('applicants.fetching'),
+    setFetchingDataList(data, fetching, success) {
+        let init = this.get(data + '.fetching'),
             notifications = this.get('nav.notifications');
         if (fetching) {
             this.set({
-                'applicants.fetching': init + 1,
-                'nav.notifications': notifications.push('<i>Fetching applicants...</i>'),
+                [data + '.fetching']: init + 1,
+                'nav.notifications': notifications.push('<i>Fetching ' + data + '...</i>'),
             });
         } else if (success) {
             this.set({
-                'applicants.fetching': init - 1,
-                'nav.notifications': notifications.push('Successfully fetched applicants.'),
+                [data + '.fetching']: init - 1,
+                'nav.notifications': notifications.push('Successfully fetched ' + data + '.'),
             });
         } else {
-            this.set('applicants.fetching', init - 1);
-        }
-    }
-
-    setFetchingApplicationsList(fetching, success) {
-        let init = this.get('applications.fetching'),
-            notifications = this.get('nav.notifications');
-        if (fetching) {
-            this.set({
-                'applications.fetching': init + 1,
-                'nav.notifications': notifications.push('<i>Fetching applications...</i>'),
-            });
-        } else if (success) {
-            this.set({
-                'applications.fetching': init - 1,
-                'nav.notifications': notifications.push('Successfully fetched applications.'),
-            });
-        } else {
-            this.set('applications.fetching', init - 1);
-        }
-    }
-
-    setFetchingAssignmentsList(fetching, success) {
-        let init = this.get('assignments.fetching'),
-            notifications = this.get('nav.notifications');
-        if (fetching) {
-            this.set({
-                'assignments.fetching': init + 1,
-                'nav.notifications': notifications.push('<i>Fetching assignments...</i>'),
-            });
-        } else if (success) {
-            this.set({
-                'assignments.fetching': init - 1,
-                'nav.notifications': notifications.push('Successfully fetched assignments.'),
-            });
-        } else {
-            this.set('assignments.fetching', init - 1);
-        }
-    }
-
-    setFetchingCoursesList(fetching, success) {
-        let init = this.get('courses.fetching'),
-            notifications = this.get('nav.notifications');
-        if (fetching) {
-            this.set({
-                'courses.fetching': init + 1,
-                'nav.notifications': notifications.push('<i>Fetching courses...</i>'),
-            });
-        } else if (success) {
-            this.set({
-                'courses.fetching': init - 1,
-                'nav.notifications': notifications.push('Successfully fetched courses.'),
-            });
-        } else {
-            this.set('courses.fetching', init - 1);
-        }
-    }
-
-    setFetchingInstructorsList(fetching, success) {
-        let init = this.get('instructors.fetching'),
-            notifications = this.get('nav.notifications');
-        if (fetching) {
-            this.set({
-                'instructors.fetching': init + 1,
-                'nav.notifications': notifications.push('<i>Fetching instructors...</i>'),
-            });
-        } else if (success) {
-            this.set({
-                'instructors.fetching': init - 1,
-                'nav.notifications': notifications.push('Successfully fetched instructors.'),
-            });
-        } else {
-            this.set('instructors.fetching', init - 1);
+            this.set(data + '.fetching', init - 1);
         }
     }
 

@@ -241,51 +241,51 @@ function onFetchInstructorsSuccess(resp) {
 /* Function to GET all resources */
 
 function fetchAll() {
-    appState.setFetchingApplicantsList(true);
-    appState.setFetchingApplicationsList(true);
-    appState.setFetchingCoursesList(true);
-    appState.setFetchingAssignmentsList(true);
-    appState.setFetchingInstructorsList(true);
+    appState.setFetchingDataList('applicants', true);
+    appState.setFetchingDataList('applications', true);
+    appState.setFetchingDataList('courses', true);
+    appState.setFetchingDataList('assignments', true);
+    appState.setFetchingDataList('instructors', true);
 
     // when applicants are successfully fetched, update the applicants list; set fetching flag to false either way
     getApplicants()
         .then(applicants => {
             appState.setApplicantsList(applicants);
-            appState.setFetchingApplicantsList(false, true);
+            appState.setFetchingDataList('applicants', false, true);
         })
-        .catch(() => appState.setFetchingApplicantsList(false));
+        .catch(() => appState.setFetchingDataList('applicants', false));
 
     // when applications are successfully fetched, update the applications list; set fetching flag to false either way
     getApplications()
         .then(applications => {
             appState.setApplicationsList(applications);
-            appState.setFetchingApplicationsList(false, true);
+            appState.setFetchingDataList('applications', false, true);
         })
-        .catch(() => appState.setFetchingApplicationsList(false));
+        .catch(() => appState.setFetchingDataList('applications', false));
 
     // when assignments are successfully fetched, update the assignments list; set fetching flag to false either way
     getAssignments()
         .then(assignments => {
             appState.setAssignmentsList(assignments);
-            appState.setFetchingAssignmentsList(false, true);
+            appState.setFetchingDataList('assignments', false, true);
         })
-        .catch(() => appState.setFetchingAssignmentsList(false));
+        .catch(() => appState.setFetchingDataList('assignments', false));
 
     // when courses are successfully fetched, update the courses list; set fetching flag to false either way
     getCourses()
         .then(courses => {
             appState.setCoursesList(courses);
-            appState.setFetchingCoursesList(false, true);
+            appState.setFetchingDataList('courses', false, true);
         })
-        .catch(() => appState.setFetchingCoursesList(false));
+        .catch(() => appState.setFetchingDataList('courses', false));
 
     // when instructors are successfully fetched, update the instructors list; set fetching flag to false either way
     getInstructors()
         .then(instructors => {
             appState.setInstructorsList(instructors);
-            appState.setFetchingInstructorsList(false, true);
+            appState.setFetchingDataList('instructors', false, true);
         })
-        .catch(() => appState.setFetchingInstructorsList(false));
+        .catch(() => appState.setFetchingDataList('instructors', false));
 }
 
 /* Task-specific resource modifiers */
@@ -298,13 +298,13 @@ function postAssignment(applicant, course, hours) {
     })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingAssignmentsList(true);
+            appState.setFetchingDataList('assignments', true);
             getAssignments()
                 .then(assignments => {
                     appState.setAssignmentsList(assignments);
-                    appState.setFetchingAssignmentsList(false, true);
+                    appState.setFetchingDataList('assignments', false, true);
                 })
-                .catch(() => appState.setFetchingAssignmentsList(false));
+                .catch(() => appState.setFetchingDataList('assignments', false));
         });
 }
 
@@ -313,13 +313,13 @@ function deleteAssignment(applicant, assignment) {
     deleteHelper('/applicants/' + applicant + '/assignments/' + assignment)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingAssignmentsList(true);
+            appState.setFetchingDataList('assignments', true);
             getAssignments()
                 .then(assignments => {
                     appState.setAssignmentsList(assignments);
-                    appState.setFetchingAssignmentsList(false, true);
+                    appState.setFetchingDataList('assignments', false, true);
                 })
-                .catch(() => appState.setFetchingAssignmentsList(false));
+                .catch(() => appState.setFetchingDataList('assignments', false));
         });
 }
 
@@ -328,13 +328,13 @@ function noteApplicant(applicant, notes) {
     putHelper('/applicants/' + applicant, { commentary: notes })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingApplicantsList(true);
+            appState.setFetchingDataList('applicants', true);
             getApplicants()
                 .then(applicants => {
                     appState.setApplicantsList(applicants);
-                    appState.setFetchingApplicantsList(false, true);
+                    appState.setFetchingDataList('applicants', false, true);
                 })
-                .catch(() => appState.setFetchingApplicantsList(false));
+                .catch(() => appState.setFetchingDataList('applicants', false));
         });
 }
 
@@ -345,13 +345,13 @@ function updateAssignmentHours(applicant, assignment, hours) {
     })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingAssignmentsList(true);
+            appState.setFetchingDataList('assignments', true);
             getAssignments()
                 .then(assignments => {
                     appState.setAssignmentsList(assignments);
-                    appState.setFetchingAssignmentsList(false, true);
+                    appState.setFetchingDataList('assignments', false, true);
                 })
-                .catch(() => appState.setFetchingAssignmentsList(false));
+                .catch(() => appState.setFetchingDataList('assignments', false));
         });
 }
 
@@ -360,13 +360,13 @@ function updateCourse(courseId, data) {
     putHelper('/positions/' + courseId, data)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingCoursesList(true);
+            appState.setFetchingDataList('courses', true);
             getCourses()
                 .then(courses => {
                     appState.setCoursesList(courses);
-                    appState.setFetchingCoursesList(false, true);
+                    appState.setFetchingDataList('courses', false, true);
                 })
-                .catch(() => appState.setFetchingCoursesList(false));
+                .catch(() => appState.setFetchingDataList('courses', false));
         });
 }
 
@@ -418,13 +418,13 @@ function importEnrolment(data) {
             () => {
                 appState.setImporting(false, true);
 
-                appState.setFetchingCoursesList(true);
+                appState.setFetchingDataList('courses', true);
                 getCourses()
                     .then(courses => {
                         appState.setCoursesList(courses);
-                        appState.setFetchingCoursesList(false, true);
+                        appState.setFetchingDataList('courses', false, true);
                     })
-                    .catch(() => appState.setFetchingCoursesList(false));
+                    .catch(() => appState.setFetchingDataList('courses', false));
             },
             resp => {
                 appState.setImporting(false);
@@ -440,13 +440,13 @@ function unlockAssignment(applicant, assignment) {
     })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingAssignmentsList(true);
+            appState.setFetchingDataList('assignments', true);
             getAssignments()
                 .then(assignments => {
                     appState.setAssignmentsList(assignments);
-                    appState.setFetchingAssignmentsList(false, true);
+                    appState.setFetchingDataList('assignments', false, true);
                 })
-                .catch(() => appState.setFetchingAssignmentsList(false));
+                .catch(() => appState.setFetchingDataList('assignments', false));
         });
 }
 
@@ -477,13 +477,13 @@ function exportOffers(round) {
         });
 
     exportPromise.then(() => {
-        appState.setFetchingAssignmentsList(true);
+        appState.setFetchingDataList('assignments', true);
         getAssignments()
             .then(assignments => {
                 appState.setAssignmentsList(assignments);
-                appState.setFetchingAssignmentsList(false, true);
+                appState.setFetchingDataList('assignments', false, true);
             })
-            .catch(() => appState.setFetchingAssignmentsList(false));
+            .catch(() => appState.setFetchingDataList('assignments', false));
     });
 }
 
