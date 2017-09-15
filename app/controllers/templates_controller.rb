@@ -3,7 +3,8 @@ class TemplatesController < ApplicationController
   include DdahUpdater
   include Authorizer
   include Model
-  before_action :cp_access
+  before_action :either_cp_admin_instructor, except: [:preview]
+  before_action :both_cp_admin_instructor, only: [:preview]
 
   def index
     if params[:utorid]

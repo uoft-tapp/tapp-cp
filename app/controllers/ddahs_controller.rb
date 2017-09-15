@@ -2,8 +2,11 @@ class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
   include DdahUpdater
   include Authorizer
-  before_action :cp_access, except: [:student_view, :ddah_view]
-  before_action :correct_applicant, only: [:student_view, :ddah_view]
+  before_action :correct_applicant, only: [:student_pdf, :student_accept]
+  before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
+  before_action :both_cp_admin_instructor, only: [:pdf, :apply_template, :separate_from_template, :new_template]
+  before_action :correct_instructor, only: [:can_finish_ddah, :finish_ddah]
+  before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
 
   def index
     if params[:utorid]
@@ -55,12 +58,6 @@ class DdahsController < ApplicationController
     else
       render status: 404, json: {message: "Error: A DDAH already exists for this offer."}
     end
-  end
-
-  def template_match_offer(template_id, offer)
-    position_id = offer[:position_id]
-    template = Template.find(template_id)
-    return position_id == template[:position_id]
   end
 
   def destroy
@@ -214,32 +211,54 @@ class DdahsController < ApplicationController
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
   end
 
-  '''
-    Student-Facing
-  '''
-  def get_ddah_pdf
-    ddah = Ddah.find_by(offer_id: params[:offer_id])
+  def pdf
+    ddah = Ddah.find(params[:ddah_id])
     if ddah
-      generator = DdahGenerator.new(ddah.format)
-      send_data generator.render, filename: "ddah.pdf", disposition: "inline"
+      get_ddah_pdf(ddah)
     else
       render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
     end
   end
 
-  def accept_ddah
-    offer = Offer.find(params[:offer_id])
-    if offer[:ddah_status] == "Accepted"
-      render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
-    elsif offer[:ddah_status] == "Pending"
-      offer.update_attributes!(ddah_status: "Accepted", student_signature: params[:signature], student_sign_date: Date.now)
-      render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
+  def accept
+    ddah = Ddah.find(params[:ddah_id])
+    accept_ddah(ddah[:offer_id])
+  end
+
+  '''
+    Student-Facing
+  '''
+  def student_pdf
+    ddah = Ddah.find_by(offer_id: params[:offer_id])
+    if ddah
+      get_ddah_pdf(ddah)
     else
-      render status: 404, json: {message: "Error: You cannot accept an unsent DDaH.", status: offer[:ddah_status]}
+      render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
     end
   end
 
+  def student_accept
+    accept_ddah(params[:offer_id], params[:signature], Date.now)
+  end
+
   private
+  def get_ddah_pdf(ddah)
+    generator = DdahGenerator.new(ddah.format)
+    send_data generator.render, filename: "ddah.pdf", disposition: "inline"
+  end
+
+  def accept_ddah(offer_id, signature = nil, date = nil)
+    offer = Offer.find(offer_id)
+    if offer[:ddah_status] == "Accepted"
+      render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
+    elsif offer[:ddah_status] == "Pending"
+      offer.update_attributes!(ddah_status: "Accepted", student_signature: signature, student_sign_date: date)
+      render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
+    else
+      render status: 404, json: {message: "Error: You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
+    end
+  end
+
   def ddah_params
     params.permit(:optional, :scaling_learning)
   end
@@ -303,4 +322,20 @@ class DdahsController < ApplicationController
     end
   end
 
+<<<<<<< 145c54693df4c7a1ff7879a52682816354aa7d5c
+=======
+  def move_allocations_to_ddah(template, allocations)
+    allocations.each do |allocation|
+      allocation.update_attributes!(template_id: template[:id], ddah_id: nil)
+    end
+  end
+
+  def template_match_offer(template_id, offer)
+    position_id = offer[:position_id]
+    template = Template.find(template_id)
+    return position_id == template[:position_id]
+  end
+
+
+>>>>>>> set up before_actions for route access
 end

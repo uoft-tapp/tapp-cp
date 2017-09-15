@@ -17,6 +17,38 @@ module Authorizer
     access(expected_roles)
   end
 
+  def cp_admin
+    set_roles
+    expected_roles = ["cp_admin"]
+    access(expected_roles)
+  end
+
+  def correct_instructor
+    # TO DO 
+  end
+
+  def either_cp_admin_instructor
+    set_roles
+    if params[:utorid]
+      # TO DO
+    else
+      expected_roles = ["cp_admin"]
+      access(expected_roles)
+    end
+  end
+
+  def both_cp_admin_instructor
+    set_roles
+    expected_roles = ["cp_admin", "instructor"]
+    if has_access(expected_roles)
+      if !has_access(["cp_admin"])
+        # TO DO
+      end
+    else
+      render status: 403, file: 'public/403.html'
+    end
+  end
+
   '''
     Checks if the applicant authenticated by Shibboleth matches
     the utorid of the applicant the offer was made to.
@@ -43,6 +75,16 @@ module Authorizer
         if !has_role(expected_roles)
           render status: 403, file: 'public/403.html'
         end
+      end
+    end
+  end
+
+  def has_access(expected_roles)
+    if ENV['RAILS_ENV'] == 'production'
+      if !session[:logged_in]
+        render file: 'public/logout.html'
+      else
+        return !has_role(expected_roles)
       end
     end
   end
