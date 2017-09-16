@@ -32,12 +32,14 @@ module Authorizer
       end
       access(expected_roles)
     else
-      expected_roles = ["instructor"]
-      if has_access(expected_roles)
-        instructor = Instructor.find_by(utorid: session[:utorid])
-        correct_instructor(model, instructor, attr_name, array)
-      else
-        render status: 403, file: 'public/403.html'
+      if ENV['RAILS_ENV'] == 'production'
+        expected_roles = ["instructor"]
+        if has_access(expected_roles)
+          instructor = Instructor.find_by(utorid: session[:utorid])
+          correct_instructor(model, instructor, attr_name, array)
+        else
+          render status: 403, file: 'public/403.html'
+        end
       end
     end
   end
@@ -51,12 +53,14 @@ module Authorizer
       end
       access(expected_roles)
     else
-      expected_roles = ["instructor"]
-      if has_access(expected_roles)
-        instructor = Instructor.find_by(utorid: session[:utorid])
-        correct_instructor(model, instructor, attr_name, array)
-      else
-        render status: 403, file: 'public/403.html'
+      if ENV['RAILS_ENV'] == 'production'
+        expected_roles = ["instructor"]
+        if has_access(expected_roles)
+          instructor = Instructor.find_by(utorid: session[:utorid])
+          correct_instructor(model, instructor, attr_name, array)
+        else
+          render status: 403, file: 'public/403.html'
+        end
       end
     end
   end
