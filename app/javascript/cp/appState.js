@@ -778,7 +778,9 @@ class AppState {
     }
 
     previewDdah(offer) {
-        fetch.previewDdah(offer);
+        let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
+
+        fetch.previewDdah(ddahId);
     }
 
     print(offers) {

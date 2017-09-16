@@ -899,7 +899,7 @@ function createTemplate(name, position) {
 function updateTemplate(id, ddahData) {
     let user = appState.getCurrentUserName();
 
-    return patchHelper('/templates/' + id, ddahData)
+    return patchHelper('/instructors/' + user + '/templates/' + id, ddahData)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
             appState.setFetchingDataList('templates', true);
@@ -961,7 +961,7 @@ function createDdah(offer) {
 function updateDdah(id, ddahData) {
     let user = appState.getCurrentUserName();
 
-    return patchHelper('/ddahs/' + id, ddahData)
+    return patchHelper('/instructors/' + user + '/ddahs/' + id, ddahData)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
             appState.setFetchingDataList('ddahs', true);
@@ -1004,8 +1004,8 @@ function submitDdah(signature, ddah) {
 }
 
 // open a PDF version of the ddah
-function previewDdah(offer) {
-    window.open('/pb/ddah/' + offer + '/pdf');
+function previewDdah(ddah) {
+    window.open('/ddahs/' + ddah + '/pdf');
 }
 
 // get current user role(s) and username
