@@ -592,7 +592,7 @@ class AppState {
 
         let offer = this.getOffersList().get(offers[0]);
 
-        let ddah = this.get('ddahs.list').find(ddah => ddah.get('offer') == offer);
+        let ddah = this.get('ddahs.list').find(ddah => ddah.get('offer') == offers[0]);
         if (!ddah.get('link')) {
             // ddah does not have a ddah link
             this.alert(
