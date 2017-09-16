@@ -54,6 +54,7 @@ module Authorizer
 
   def both_cp_admin_instructor(model, attr_name = :id, array = false)
     if ENV['RAILS_ENV'] == 'production'
+      Rails.logger.info("in both_cp_admin_instructor")
       set_roles
       expected_roles = ["cp_admin", "instructor"]
       if has_access(expected_roles)
