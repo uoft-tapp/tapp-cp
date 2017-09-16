@@ -4,7 +4,7 @@
 
 <b>Course Code</b>: <%= @ddah[:position][:position]%>:<b>Est. Enrolment / TA</b>: <%= get_est_enrol_per_ta(@ddah[:position][:id], @ddah[:position][:current_enrolment]) %>:
 
-<b>Course Title</b>: <%= @ddah[:position][:course_name]%>:<b>Expected Enrolment</b>: <%= @ddah[:position][:cap_enrolment]? @ddah[:position][:cap_enrolment]:0 %>:
+<b>Course Title</b>: <%= @ddah[:position][:course_name]%>:<b>Expected Enrolment</b>: <%= @ddah[:position][:current_enrolment]? @ddah[:position][:current_enrolment]:0 %>:
 
 <b>Tutorial Category</b>: <%= @ddah[:tutorial_category]%>: :
 
