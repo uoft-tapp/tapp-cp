@@ -494,8 +494,8 @@ function sendContracts(offers) {
         });
 }
 
-// nag applicants
-function nag(offers) {
+// nag applicants about offers
+function nagOffers(offers) {
     let validOffers = offers;
 
     // check which applicants can be nagged
@@ -1027,6 +1027,60 @@ function previewDdah(ddah) {
     window.open('/ddahs/' + ddah + '/pdf');
 }
 
+// nag applicants about ddahs
+function nagDdahs(offers) {
+    let validOffers = offers;
+
+    // check which applicants can be nagged
+    postHelper('/ddahs/can-nag-student', { offers: offers })
+        .then(resp => {
+            if (resp.status == 404) {
+                // some applicants cannot be nagged
+                let offersList = appState.getOffersList();
+
+                return resp.json().then(res => {
+                    res.invalid_offers.forEach(offer => {
+                        appState.alert(
+                            '<b>Error</b>: Cannot nag ' +
+                                offersList.getIn([offer.toString(), 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer.toString(), 'firstName']) +
+                                ' about OFFER form for ' +
+                                offersList.getIn([offer.toString(), 'position'])
+                        );
+                        // remove invalid offer(s) from offer list
+                        validOffers.splice(validOffers.indexOf(offer), 1);
+                    });
+
+                    if (validOffers.length == 0) {
+                        return Promise.reject();
+                    }
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
+            }
+        })
+        // nag valid ddahs
+        .then(() => {
+            // map valid offers to ddah ids
+            let validDdahs = validOffers.map(offer =>
+                appState.getDdahsList().findKey(ddah => ddah.get('offer') == offer)
+            );
+
+            return postHelper('/ddahs/send-nag-student', { ddahs: validDdahs });
+        })
+        .then(() => {
+            appState.setFetchingDataList('ddahs', true);
+            getDdahs()
+                .then(ddahs => {
+                    appState.setDdahsList(fromJS(ddahs));
+                    appState.setFetchingDataList('ddahs', false, true);
+                })
+                .catch(() => appState.setFetchingDataList('ddahs', false));
+        });
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -1056,7 +1110,7 @@ export {
     importOffers,
     importAssignments,
     sendContracts,
-    nag,
+    nagOffers,
     setHrProcessed,
     setDdahAccepted,
     showContractApplicant,
@@ -1076,5 +1130,6 @@ export {
     updateDdah,
     submitDdah,
     previewDdah,
+    nagDdahs,
     fetchAuth,
 };

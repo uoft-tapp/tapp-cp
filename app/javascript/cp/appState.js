@@ -809,13 +809,22 @@ class AppState {
         return this.get('trainings.list') == null;
     }
 
-    nag(offers) {
+    nagDdahs(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');
             return;
         }
 
-        fetch.nag(offers.map(offer => parseInt(offer)));
+        fetch.nagDdahs(offers.map(offer => parseInt(offer)));
+    }
+
+    nagOffers(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
+        fetch.nagOffers(offers.map(offer => parseInt(offer)));
     }
 
     // add/update the notes for a withdrawn offer

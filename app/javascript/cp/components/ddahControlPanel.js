@@ -270,12 +270,15 @@ const CommMenu = props =>
             Email&ensp;[DDAH form]
         </MenuItem>
         <MenuItem divider />
+        <MenuItem onClick={() => props.appState.nagDdahs(getSelectedOffers())}>
+            Nag applicant
+        </MenuItem>
         <MenuItem
             onClick={() =>
                 props.appState.alert(
-                    '<b>Nag TAs</b> This functionality is not currently supported.'
+                    '<b>Nag instructors</b> This functionality is not currently supported.'
                 )}>
-            Nag
+            Nag instructor(s)
         </MenuItem>
     </DropdownButton>;
 

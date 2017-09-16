@@ -410,7 +410,7 @@ const CommMenu = props =>
             Email&ensp;[contract]
         </MenuItem>
         <MenuItem divider />
-        <MenuItem onClick={() => props.appState.nag(getSelectedOffers())}>Nag</MenuItem>
+        <MenuItem onClick={() => props.appState.nagOffers(getSelectedOffers())}>Nag</MenuItem>
     </DropdownButton>;
 
 const PrintButton = props =>
