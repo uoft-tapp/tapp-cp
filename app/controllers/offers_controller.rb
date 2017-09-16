@@ -4,7 +4,7 @@ class OffersController < ApplicationController
   include Authorizer
   before_action :cp_admin, except: [:index, :show, :get_contract_student, :set_status_student, :can_print, :combine_contracts_print]
   before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
-  before_action only [:get_contract_pdf, :get_contract, :can_print, :combine_contracts_print] do
+  before_action only: [:get_contract_pdf, :get_contract, :can_print, :combine_contracts_print] do
    cp_admin(true)
   end
   before_action only: [:index, :show] do
