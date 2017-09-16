@@ -90,35 +90,31 @@ module Authorizer
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
       utorid = get_utorid
-      if !session[:logged_in]
-        render file: 'public/logout.html'
-      else
-        if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
-          render status: 403, file: 'public/403.html'
-        end
+      if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
+        render status: 403, file: 'public/403.html'
       end
     end
   end
 
   private
-  def access(expected_roles)
+  def logged_in
     if ENV['RAILS_ENV'] == 'production'
       if !session[:logged_in]
         render file: 'public/logout.html'
-      else
-        if !has_role(expected_roles)
-          render status: 403, file: 'public/403.html'
-        end
+      end
+    end
+  end
+
+  def access(expected_roles)
+    if ENV['RAILS_ENV'] == 'production'
+      if !has_role(expected_roles)
+        render status: 403, file: 'public/403.html'
       end
     end
   end
 
   def has_access(expected_roles)
-    if !session[:logged_in]
-      render file: 'public/logout.html'
-    else
-      return !has_role(expected_roles)
-    end
+    return !has_role(expected_roles)
   end
 
   def has_role(expected_roles)
@@ -165,10 +161,11 @@ module Authorizer
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
       if session[:logged_in].nil?
         Rails.logger.info("logged_in is nil")
-        Rails.logger.info("logged_in value is #{session[:logged_in]}")
+        Rails.logger.info("logged_in value is '#{session[:logged_in]}'")
         session[:logged_in]= true
       else
         Rails.logger.info("logged_in is already assigned")
+        Rails.logger.info("logged_in value is '#{session[:logged_in]}'")
       end
       Rails.logger.info("user is #{session[:utorid]}")
       return session[:utorid]
