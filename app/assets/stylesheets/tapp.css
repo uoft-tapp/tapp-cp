@@ -286,6 +286,8 @@ footer div p {
 }
 .form_table .course {
     font-weight: bold;
+    line-height: 30px; /* height of text input box */
+    font-size: 16px;
 }
 /* margin between text boxes in the first five columns */
 .form_table .col-1 p + p,
