@@ -777,6 +777,10 @@ class AppState {
         fetch.noteOffer(offer, note);
     }
 
+    previewDdah(offer) {
+        fetch.previewDdah(offer);
+    }
+
     print(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');

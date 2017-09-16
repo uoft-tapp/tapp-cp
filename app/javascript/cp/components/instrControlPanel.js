@@ -58,7 +58,10 @@ class InstrControlPanel extends React.Component {
                                         selectedOffer={selectedDdahId}
                                         {...this.props}
                                     />
-                                  : <SubmittedActionMenu {...this.props} />)}
+                                  : <SubmittedActionMenu
+                                        selectedDdahId={selectedDdahId}
+                                        {...this.props}
+                                    />)}
                           <DdahForm selectedDdahId={selectedDdahId} {...this.props} />
                       </div>
                     : <Well id="no-selection">
@@ -232,8 +235,10 @@ const SubmittedActionMenu = props =>
             <Button bsStyle="success" disabled>
                 Successfully submitted
             </Button>
-            <Button bsStyle="success" onClick={() => null}>
-                View PDF
+            <Button
+                bsStyle="success"
+                onClick={() => props.appState.previewDdah(props.selectedDdahId)}>
+                View as PDF
             </Button>
         </ButtonGroup>
     </ButtonToolbar>;

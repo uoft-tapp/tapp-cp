@@ -1003,6 +1003,11 @@ function submitDdah(signature, ddah) {
         });
 }
 
+// open a PDF version of the ddah
+function previewDdah(offer) {
+    window.open('/pb/ddah/' + offer + '/pdf');
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -1051,5 +1056,6 @@ export {
     createDdah,
     updateDdah,
     submitDdah,
+    previewDdah,
     fetchAuth,
 };
