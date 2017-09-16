@@ -91,6 +91,19 @@ class TemplateParser
     end
   end
 
+  def get_est_enrol_per_ta(position_id, current_enrolment)
+    if !current_enrolment
+      current_enrolment = 0
+    end
+    num = 0
+    Assignment.all.each do |assignment|
+      if assignment[:position_id] == position_id
+        num+=1
+      end
+    end
+    return current_enrolment/num
+  end
+
   def list_instructors(instructors)
     list = ""
     instructors.each_with_index do |instructor, index|
