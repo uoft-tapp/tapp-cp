@@ -12,7 +12,7 @@ import '../tapp-styles';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 
 import { appState } from '../tapp/appState.js';
 import { fetchAll, fetchAuth } from '../tapp/fetch.js';
@@ -91,6 +91,7 @@ const AdminRouter = props => {
                         path={routeConfig.summary.route}
                         render={() => <Summary navKey={routeConfig.summary.id} {...props} />}
                     />
+                    <Redirect from="/" to={routeConfig.summary.route} />
                 </Switch>
 
                 {selectedApplicant && <ApplicantModal applicantId={selectedApplicant} {...props} />}
@@ -113,7 +114,7 @@ const AdminRouter = props => {
     );
 };
 
-const InstRouter = props => {
+const InstrRouter = props => {
     return (
         <Router basename="tapp">
             <div>
