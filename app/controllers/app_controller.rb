@@ -62,6 +62,7 @@ class AppController < ApplicationController
 
   def reenter_session
     session[:logged_in] = true
+    redirect_back(fallback_location: request.env['PATH_INFO'])
   end
 
   def test
