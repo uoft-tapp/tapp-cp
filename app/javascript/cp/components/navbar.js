@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import ReactDOMServer from 'react-dom/server';
 
 import {
     Navbar,
@@ -11,6 +12,8 @@ import {
     ControlLabel,
     FormControl,
 } from 'react-bootstrap';
+
+import { DdahAppendix } from './ddahAppendix.js';
 
 /*** Navbar components ***/
 
@@ -81,6 +84,24 @@ const NavbarInst = props =>
         </Navbar.Header>
 
         <Nav pullRight>
+            {props.appState.getSelectedUserRole() == 'instructor' &&
+                <i
+                    className="fa fa-question-circle"
+                    style={{
+                        cursor: 'pointer',
+                        fontSize: '20px',
+                        float: 'left',
+                        padding: '15px 5px',
+                        color: '#5bc0de',
+                    }}
+                    title="List of Suggested Tasks and Teaching Techniques"
+                    onClick={() => {
+                        let popup = window.open();
+                        popup.document.open();
+                        popup.document.write(ReactDOMServer.renderToStaticMarkup(<DdahAppendix />));
+                    }}
+                />}
+
             <Notifications {...props} />
             <Auth {...props} />
         </Nav>
