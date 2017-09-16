@@ -10,7 +10,7 @@ class Ddah < ApplicationRecord
   def get_deadline
     ddah = self.json
     if ddah[:send_date]
-      DateTime.parse(offer[:send_date]).days_ago(-21)
+      DateTime.parse(ddah[:send_date]).days_ago(-21)
     end
   end
 
@@ -59,6 +59,10 @@ class Ddah < ApplicationRecord
         :instructor_id,
         :tutorial_category,
       ]
+      if ddah[:send_date]
+        data[:link] = offer[:link].sub!("pb", "pb/ddah")
+        data[:deadline] = self.get_deadline
+      end
       overwrite(ddah, template, attributes)
       return ddah.merge(data)
     end

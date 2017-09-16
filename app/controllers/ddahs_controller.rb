@@ -2,7 +2,17 @@ class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
   include DdahUpdater
   include Authorizer
-  before_action :cp_access
+  before_action :correct_applicant, only: [:student_pdf, :student_accept]
+  before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
+  before_action  only: [:pdf, :separate_from_template, :new_template] do
+    both_cp_admin_instructor(Ddah)
+  end
+  before_action only: [:apply_template, :can_finish_ddah, :finish_ddah] do
+    both_cp_admin_instructor(Ddah, :ddahs, true)
+  end
+  before_action only: [:index, :show, :create, :destroy, :update] do
+    either_cp_admin_instructor(Ddah)
+  end
 
   def index
     if params[:utorid]
@@ -54,12 +64,6 @@ class DdahsController < ApplicationController
     else
       render status: 404, json: {message: "Error: A DDAH already exists for this offer."}
     end
-  end
-
-  def template_match_offer(template_id, offer)
-    position_id = offer[:position_id]
-    template = Template.find(template_id)
-    return position_id == template[:position_id]
   end
 
   def destroy
@@ -158,7 +162,8 @@ class DdahsController < ApplicationController
         link = "#{ENV["domain"]}#{offer[:link]}".sub!("pb", "pb/ddah")
         CpMailer.ddah_email(ddah.format,link).deliver_now!
       end
-      offer.update_attributes!({ddah_status: "Pending", send_date: DateTime.now.to_s})
+      offer.update_attributes!(ddah_status: "Pending")
+      ddah.update_attributes!(send_date: DateTime.now.to_s)
     end
     render status: 200, json: {message: "You've successfully sent out all the DDAH's."}
   end
@@ -172,11 +177,11 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      ddah.increment!(:nag_count, 1)
       if ENV['RAILS_ENV'] != 'test'
-        link = "#{ENV["domain"]}#{offer[:link]}".replace("pb", "pb/ddah")
+        link = "#{ENV["domain"]}#{offer[:link]}".sub!("pb", "pb/ddah")
         CpMailer.ddah_nag_email(ddah.format, link).deliver_now!
       end
+      ddah.increment!(:nag_count, 1)
     end
     render json: {message: "You've sent the nag emails."}
   end
@@ -192,7 +197,8 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      offer.update_attributes!(ddah_status: "Ready", supervisor_signature: params[:signature], supervisor_sign_date: Date.now)
+      offer.update_attributes!(ddah_status: "Ready")
+      ddah.update_attributes!(supervisor_signature: params[:signature], supervisor_sign_date: DateTime.now.to_date)
     end
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Ready'."}
   end
@@ -208,37 +214,78 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      offer.update_attributes!(ddah_status: "Approved", ta_coord_signature: params[:signature], ta_coord_sign_date: Date.now)
+      offer.update_attributes!(ddah_status: "Approved")
+      ddah.update_attributes!(ta_coord_signature: params[:signature], ta_coord_sign_date: DateTime.now.to_date)
     end
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
   end
 
-  '''
-    Student-Facing
-  '''
-  def get_ddah_pdf
-    ddah = Ddah.find_by(offer_id: params[:offer_id])
+  def pdf
+    ddah = Ddah.find(params[:ddah_id])
     if ddah
-      generator = DdahGenerator.new(ddah.format)
-      send_data generator.render, filename: "ddah.pdf", disposition: "inline"
+      get_ddah_pdf(ddah)
     else
       render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
     end
   end
 
-  def accept_ddah
-    offer = Offer.find(params[:offer_id])
-    if offer[:ddah_status] == "Accepted"
-      render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
-    elsif offer[:ddah_status] == "Pending"
-      offer.update_attributes!(ddah_status: "Accepted", student_signature: params[:signature], student_sign_date: Date.now)
-      render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
+  def accept
+    ddah = Ddah.find(params[:ddah_id])
+    accept_ddah(ddah[:offer_id])
+  end
+
+  '''
+    Student-Facing
+  '''
+  def student_pdf
+    ddah = Ddah.find_by(offer_id: params[:offer_id])
+    if ddah
+      get_ddah_pdf(ddah)
     else
-      render status: 404, json: {message: "Error: You cannot accept an unsent DDaH.", status: offer[:ddah_status]}
+      render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
     end
   end
 
+  def student_accept
+    accept_ddah(params[:offer_id], true, params[:signature])
+  end
+
   private
+  def get_ddah_pdf(ddah)
+    generator = DdahGenerator.new(ddah.format)
+    send_data generator.render, filename: "ddah.pdf", disposition: "inline"
+  end
+
+  def accept_ddah(offer_id, student = false, signature = nil)
+    offer = Offer.find(offer_id)
+    if offer[:ddah_status] == "Accepted"
+      render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
+    else
+      ddah = Ddah.find_by(offer_id: offer_id)
+      if ddah
+        if student
+          accept_student_ddah(ddah, offer, signature, DateTime.now.to_date)
+        else
+          offer.update_attributes!(ddah_status: "Accepted")
+          ddah.update_attributes!(student_signature: signature, student_sign_date:  DateTime.now.to_date)
+          render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
+        end
+      else
+        render status: 404, json: {message: "Error: DDAH not found."}
+      end
+    end
+  end
+
+  def accept_student_ddah(ddah, offer, signature, date)
+    if offer[:ddah_status] == "Pending"
+      offer.update_attributes!(ddah_status: "Accepted")
+      ddah.update_attributes!(student_signature: signature, student_sign_date: date)
+      render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
+    else
+      render status: 404, json: {message: "Error: You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
+    end
+  end
+
   def ddah_params
     params.permit(:optional, :scaling_learning)
   end
@@ -300,6 +347,12 @@ class DdahsController < ApplicationController
       allocation = Allocation.create!(val)
       model.allocations.push(allocation)
     end
+  end
+
+  def template_match_offer(template_id, offer)
+    position_id = offer[:position_id]
+    template = Template.find(template_id)
+    return position_id == template[:position_id]
   end
 
 end

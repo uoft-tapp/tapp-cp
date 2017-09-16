@@ -1,20 +1,79 @@
 module Authorizer
   def tapp_admin
-    set_roles
     expected_roles = ["tapp_admin"]
     access(expected_roles)
   end
 
   def cp_access
-    set_roles
     expected_roles = ["cp_admin", "hr_assistant", "instructor"]
     access(expected_roles)
   end
 
   def app_access
-    set_roles
     expected_roles = ["tapp_admin","cp_admin", "hr_assistant", "instructor"]
     access(expected_roles)
+  end
+
+  def cp_admin(hr_assistant = false)
+    if hr_assistant
+      expected_roles = ["cp_admin", "hr_assistant"]
+    else
+      expected_roles = ["cp_admin"]
+    end
+    access(expected_roles)
+  end
+
+  def either_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
+    if !params[:utorid]
+      if hr_assistant
+        expected_roles = ["tapp_admin", "cp_admin", "hr_assistant"]
+      else
+        expected_roles = ["tapp_admin", "cp_admin"]
+      end
+      access(expected_roles)
+    else
+      expected_roles = ["instructor"]
+      if has_access(expected_roles)
+        instructor = Instructor.find_by(utorid: session[:utorid])
+        correct_instructor(model, instructor, attr_name, array)
+      else
+        render status: 403, file: 'public/403.html'
+      end
+    end
+  end
+
+  def either_cp_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
+    if !params[:utorid]
+      if hr_assistant
+        expected_roles = ["cp_admin", "hr_assistant"]
+      else
+        expected_roles = ["cp_admin"]
+      end
+      access(expected_roles)
+    else
+      expected_roles = ["instructor"]
+      if has_access(expected_roles)
+        instructor = Instructor.find_by(utorid: session[:utorid])
+        correct_instructor(model, instructor, attr_name, array)
+      else
+        render status: 403, file: 'public/403.html'
+      end
+    end
+  end
+
+
+  def both_cp_admin_instructor(model, attr_name = :id, array = false)
+    if ENV['RAILS_ENV'] == 'production'
+      expected_roles = ["cp_admin", "instructor"]
+      if has_access(expected_roles)
+        if !has_access(["cp_admin"])
+          instructor = Instructor.find_by(utorid: session[:utorid])
+          correct_instructor(model, instructor, attr_name, array)
+        end
+      else
+        render status: 403, file: 'public/403.html'
+      end
+    end
   end
 
   '''
@@ -24,27 +83,32 @@ module Authorizer
   def correct_applicant
     if ENV['RAILS_ENV'] == 'production'
       utorid = get_utorid
-      if !session[:logged_in]
-        render file: 'public/logout.html'
-      else
-        if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
-          render status: 403, file: 'public/403.html'
-        end
+      if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
+        render status: 403, file: 'public/403.html'
       end
     end
   end
 
   private
-  def access(expected_roles)
+  def logged_in
     if ENV['RAILS_ENV'] == 'production'
-      if !session[:logged_in]
+      set_roles
+      if request.env['PATH_INFO'] != '/reenter-session' && !session[:logged_in]
         render file: 'public/logout.html'
-      else
-        if !has_role(expected_roles)
-          render status: 403, file: 'public/403.html'
-        end
       end
     end
+  end
+
+  def access(expected_roles)
+    if ENV['RAILS_ENV'] == 'production'
+      if !has_role(expected_roles)
+        render status: 403, file: 'public/403.html'
+      end
+    end
+  end
+
+  def has_access(expected_roles)
+    return !has_role(expected_roles)
   end
 
   def has_role(expected_roles)
@@ -67,18 +131,19 @@ module Authorizer
 
   def is_instructor
     if ENV['RAILS_ENV'] == 'production'
-      return Instructor.find_by(utorid: get_utorid)
+      if get_utorid
+        instructor = Instructor.find_by(utorid: get_utorid)
+        return instructor
+      else
+        return nil
+      end
     end
   end
 
   def utorid_of_applicant_corresponding_to_student_facing_route(params)
     offer = Offer.find(params[:offer_id])
-    if offer
-      offer = offer.format
-      return offer[:applicant][:utorid]
-    else
-      render status: 404, file: 'public/404.html'
-    end
+    offer = offer.format
+    return offer[:applicant][:utorid]
   end
 
   '''
@@ -90,11 +155,13 @@ module Authorizer
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
       if session[:logged_in].nil?
         Rails.logger.info("logged_in is nil")
-        Rails.logger.info("logged_in value is #{session[:logged_in]}")
+        Rails.logger.info("logged_in value is '#{session[:logged_in]}'")
         session[:logged_in]= true
       else
         Rails.logger.info("logged_in is already assigned")
+        Rails.logger.info("logged_in value is '#{session[:logged_in]}'")
       end
+      Rails.logger.info("user is #{session[:utorid]}")
       return session[:utorid]
     else
       return session[:utorid]
@@ -134,6 +201,40 @@ module Authorizer
       else
         session[:roles].push(role[:role])
       end
+    end
+  end
+
+  '''
+   assumes that instructor_id is an attribute in the model
+  '''
+  def correct_instructor(model, instructor, attr_name = :id, array = false)
+    if instructor
+      if array
+        allowed = []
+        params[attr_name].each do |id|
+          data = model.find(id)
+          if instructor_access(model, data, instructor)
+            allowed.push(id)
+          end
+        end
+        params[attr_name] = allowed
+      else
+        data = model.find(params[attr_name])
+        if instructor_access(model, data, instructor)
+          render status: 403, file: 'public/403.html'
+        end
+      end
+    else
+      render status: 403, file: 'public/403.html'
+    end
+  end
+
+  def instructor_access(model, data, instructor)
+    case model
+    when Position
+      data.instructor_ids.include?instructor[:id]
+    else
+      data[:instructor_id] == instructor[:id]
     end
   end
 
