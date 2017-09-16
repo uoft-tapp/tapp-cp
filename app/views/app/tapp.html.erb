@@ -7,6 +7,13 @@
     <%= javascript_pack_tag 'tapp' %>
     <%= stylesheet_pack_tag 'tapp' %>
 
+    <% if ENV['RAILS_ENV'] == 'development' %>
+      <!-- For development in Windows -->
+      <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
+      <script src="<%= @pack_url %>tapp.js"></script>
+      <link rel="stylesheet" media="screen" href="<%= @pack_url %>tapp.css">
+    <% end %>
+
     <!-- FA icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
@@ -16,7 +23,7 @@
 
     <footer>
       <div class="container-fluid">
-	<p class="text-muted">University of Toronto, 2017.</p>
+        <p class="text-muted">University of Toronto, 2017.</p>
       </div>
     </footer>
   </body>
