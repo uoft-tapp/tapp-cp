@@ -142,7 +142,6 @@ module Authorizer
   def is_instructor
     if ENV['RAILS_ENV'] == 'production'
       if get_utorid
-        Rails.logger.info("#{Instructor.all.to_json}")
         instructor = Instructor.find_by(utorid: get_utorid)
         return instructor
       else
