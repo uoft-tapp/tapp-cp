@@ -6,15 +6,17 @@ class DdahForm extends React.Component {
         let ddahWorksheet = this.props.appState.getDdahWorksheet();
 
         // check whether ddah for offer was selected, and if so, get related details
-        let offersCount, course, ddah;
+        let hours, offersCount, course, ddah;
         if (this.props.appState.isOfferSelected()) {
-            let position = this.props.appState
-                .getOffersList()
-                .getIn([this.props.selectedDdahId, 'position']);
+            let offer = this.props.appState.getOffersList().get(this.props.selectedDdahId);
+            let position = offer.get('position');
+
+            hours = offer.get('hours');
             offersCount = this.props.appState.getOffersForCourse(position).size;
             course = this.props.appState.getCoursesList().get(position.toString());
 
-            ddah = this.props.appState.getDdahsList()
+            ddah = this.props.appState
+                .getDdahsList()
                 .find(ddah => ddah.get('offer') == this.props.selectedDdahId);
         }
 
@@ -30,7 +32,7 @@ class DdahForm extends React.Component {
                 />
                 <Allocations ddahData={ddahWorksheet} {...this.props} />
                 <Training ddahData={ddahWorksheet} {...this.props} />
-                <Summary {...this.props} />
+                <Summary hours={hours} {...this.props} />
                 {this.props.appState.isOfferSelected() &&
                     <Signatures ddahData={ddahWorksheet} {...this.props} />}
             </div>
@@ -404,6 +406,10 @@ const Summary = props => {
                 <tr>
                     <td>
                         <b>Total</b>
+                        {props.appState.isOfferSelected() &&
+                            <span style={{ float: 'right', color: 'blue' }}>
+                                Expected: {props.hours.toFixed(1)}
+                            </span>}
                     </td>
                     <td>
                         {props.appState.getDdahWorksheetTotal().toFixed(1)}
