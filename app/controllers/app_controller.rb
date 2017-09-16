@@ -5,7 +5,7 @@ class AppController < ApplicationController
   before_action :cp_access, only: [:cp]
   before_action :app_access, only: [:roles]
   before_action :correct_applicant, only: [:student_view, :ddah_view]
-  before_action :cp_admin, only[:test]
+  before_action :cp_admin, only: [:test]
 
   ''' TAPP functions '''
   def tapp

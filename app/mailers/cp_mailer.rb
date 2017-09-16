@@ -44,6 +44,7 @@ class CpMailer < ApplicationMailer
     email = get_email(ddah[:applicant][:email])
     @ddah = ddah
     @ddah[:nag_suffix] = get_nag_suffix(@ddah[:nag_count])
+    puts @ddah[:send_date]
     @ddah[:deadline] = format_time(@ddah[:deadline],"%I:%M%p on %B %d, %Y")
     @url = link
     mail(to: email, subject: "Reminder for TA Position: #{@ddah[:position][:position]}")
