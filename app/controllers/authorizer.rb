@@ -93,10 +93,8 @@ module Authorizer
   def logged_in
     if ENV['RAILS_ENV'] == 'production'
       set_roles
-      if !request.env['PATH_INFO'] == '/reenter-session'
-        if !session[:logged_in]
-          render file: 'public/logout.html'
-        end
+      if request.env['PATH_INFO'] != '/reenter-session' && !session[:logged_in]
+        render file: 'public/logout.html'
       end
     end
   end
