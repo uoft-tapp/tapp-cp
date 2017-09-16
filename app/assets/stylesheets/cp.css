@@ -82,6 +82,8 @@ footer div p {
     width: 100%;
 }
 
+/* admin control panel view */
+
 #offers-grid #dropdown-menu {
     margin-bottom: 1vh;
 }
@@ -96,7 +98,7 @@ footer div p {
 
 /* for Table in admin view */
 #offers-grid .sessions ~ .table-container .table-body {
-    /* note that this assumes that the header is at most one row high */
+    /* note that this assumes that the header is at most two rows high */
     max-height: calc(
         var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) -
             var(--sessions-height) - 25px
@@ -104,7 +106,7 @@ footer div p {
 }
 
 #offers-grid .table-body {
-    /* note that this assumes that the header is at most one row high */
+    /* note that this assumes that the header is at most two rows high */
     max-height: calc(
         var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - 25px
     );
@@ -474,4 +476,44 @@ footer div p {
 
 #instr-grid #signatures td:nth-child(3) input {
     width: 120px;
+}
+
+/* ddah control panel view */
+
+#ddahs-grid #dropdown-menu {
+    margin-bottom: 1vh;
+}
+
+#ddahs-grid .table-menu > .btn-group:first-child {
+    margin-left: 3vw;
+}
+
+#ddahs-grid table {
+    margin: 0;
+}
+
+#ddahs-grid .table-body {
+    /* note that this assumes that the header is at most two rows high */
+    max-height: calc(var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - 25px);
+    overflow: auto;
+}
+
+#ddahs-grid .table-container th {
+    text-overflow: ellipsis;
+}
+
+#ddahs-grid .table-container td,
+#ddahs-grid .table-container th {
+    word-break: break-all;
+}
+
+#ddahs-grid #table-total {
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+#ddahs-grid #dropdown-menu #sessions {
+    float: left;
+    display: inline-block;
+    margin: 0 5px;
 }

@@ -22,6 +22,7 @@ import { fetchAuth } from '../cp/fetch.js';
 import { routeConfig } from '../cp/routeConfig.js';
 import { Navbar } from '../cp/components/navbar.js';
 import { AdminControlPanel } from '../cp/components/adminControlPanel.js';
+import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
 import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
 
 /*** Main app component ***/
