@@ -1,5 +1,15 @@
 import React from 'react';
-import { Grid, ButtonToolbar, Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import {
+    Grid,
+    ButtonToolbar,
+    Form,
+    FormGroup,
+    ControlLabel,
+    FormControl,
+    DropdownButton,
+    MenuItem,
+    Button,
+} from 'react-bootstrap';
 
 import { TableMenu } from './tableMenu.js';
 import { Table } from './table.js';
@@ -136,13 +146,6 @@ class DdahControlPanel extends React.Component {
                 style: { width: 0.1 },
             },
             {
-                header: 'Nag Count',
-                data: p => (p.offer.get('nagCount') ? p.offer.get('nagCount') : ''),
-                sortData: p => (p.get('nagCount') ? p.get('nagCount') : ''),
-
-                style: { width: 0.05 },
-            },
-            {
                 header: 'DDAH Status',
                 data: p =>
                     p.offer.get('ddahStatus')
@@ -173,6 +176,10 @@ class DdahControlPanel extends React.Component {
             <Grid fluid id="ddahs-grid" style={cursorStyle}>
                 <ButtonToolbar id="dropdown-menu">
                     <SessionsDropdown {...this.props} />
+
+                    <DdahsMenu {...this.props} />
+                    <CommMenu {...this.props} />
+                    <PrintButton {...this.props} />
 
                     <TableMenu
                         config={this.config}
@@ -230,5 +237,56 @@ const SessionsDropdown = props =>
             </FormControl>
         </FormGroup>
     </Form>;
+
+const DdahsMenu = props =>
+    <DropdownButton bsStyle="primary" title="Update DDAH forms" id="ddahs-dropdown">
+        <MenuItem
+            onClick={() =>
+                props.appState.alert(
+                    '<b>Send DDAH forms</b> This functionality is not currently supported.'
+                )}>
+            Send DDAH form(s)
+        </MenuItem>
+        <MenuItem divider />
+        <MenuItem
+            onClick={() =>
+                props.appState.alert(
+                    '<b>Approve DDAH forms</b> This functionality is not currently supported.'
+                )}>
+            Approve DDAH form(s)
+        </MenuItem>
+        <MenuItem divider />
+        <MenuItem onClick={() => props.appState.setDdahAccepted(getSelectedOffers())}>
+            Set DDAH status to <i>Accepted</i>
+        </MenuItem>
+    </DropdownButton>;
+
+const CommMenu = props =>
+    <DropdownButton bsStyle="primary" title="Communicate" id="comm-dropdown">
+        <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>
+            Email&ensp;[blank]
+        </MenuItem>
+        <MenuItem onClick={() => props.appState.emailDdah(getSelectedOffers())}>
+            Email&ensp;[DDAH form]
+        </MenuItem>
+        <MenuItem divider />
+        <MenuItem
+            onClick={() =>
+                props.appState.alert(
+                    '<b>Nag TAs</b> This functionality is not currently supported.'
+                )}>
+            Nag
+        </MenuItem>
+    </DropdownButton>;
+
+const PrintButton = props =>
+    <Button
+        bsStyle="primary"
+        onClick={() =>
+            props.appState.alert(
+                '<b>Print DDAH forms</b> This functionality is not currently supported.'
+            )}>
+        Print DDAH forms
+    </Button>;
 
 export { DdahControlPanel };

@@ -172,6 +172,7 @@ function onFetchDdahsSuccess(resp) {
             authSignDate: ddah.ta_coord_sign_date,
             studentSignature: ddah.student_signature,
             studentSignDate: ddah.student_sign_date,
+            link: ddah.link,
         };
     });
 
@@ -635,8 +636,17 @@ function setDdahAccepted(offers) {
             })
         )
         .then(() => {
+            appState.setFetchingDataList('ddahs', true);
             appState.setFetchingDataList('offers', true);
-            getOffers()
+
+            getDdahs(user)
+                .then(ddahs => {
+                    appState.setDdahsList(fromJS(ddahs));
+                    appState.setFetchingDataList('ddahs', false, true);
+                })
+                .catch(() => appState.setFetchingDataList('ddahs', false));
+
+            getOffers(user)
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
                     appState.setFetchingDataList('offers', false, true);
