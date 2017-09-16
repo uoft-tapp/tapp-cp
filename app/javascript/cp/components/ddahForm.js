@@ -34,7 +34,7 @@ class DdahForm extends React.Component {
                 <Training ddahData={ddahWorksheet} {...this.props} />
                 <Summary hours={hours} {...this.props} />
                 {this.props.appState.isOfferSelected() &&
-                    <Signatures ddahData={ddahWorksheet} {...this.props} />}
+                    <Signatures ddahData={ddahWorksheet} ddah={ddah} {...this.props} />}
             </div>
         );
     }
@@ -445,13 +445,30 @@ const Signatures = props => {
                     </td>
 
                     <td>
-                        <input type="text" readOnly />
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                props.ddah.get('superSignature')
+                                    ? props.ddah.get('superSignature')
+                                    : ''
+                            }
+                        />
                         <br />
                         <span className="input-label">Signature</span>
                     </td>
 
                     <td>
-                        <span className="input-label">Date:</span>&nbsp;<input type="text" readOnly />
+                        <span className="input-label">Date:</span>&nbsp;
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                props.ddah.get('superSignDate')
+                                    ? new Date(props.ddah.get('superSignDate')).toLocaleDateString()
+                                    : ''
+                            }
+                        />
                     </td>
                 </tr>
 
@@ -465,13 +482,30 @@ const Signatures = props => {
                     </td>
 
                     <td>
-                        <input type="text" readOnly />
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                props.ddah.get('authSignature')
+                                    ? props.ddah.get('authSignature')
+                                    : ''
+                            }
+                        />
                         <br />
                         <span className="input-label">Signature</span>
                     </td>
 
                     <td>
-                        <span className="input-label">Date:</span>&nbsp;<input type="text" readOnly />
+                        <span className="input-label">Date:</span>&nbsp;
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                props.ddah.get('authSignDate')
+                                    ? new Date(props.ddah.get('authSignDate')).toLocaleDateString()
+                                    : ''
+                            }
+                        />
                     </td>
                 </tr>
 
@@ -489,13 +523,32 @@ const Signatures = props => {
                     </td>
 
                     <td>
-                        <input type="text" readOnly />
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                props.ddah.get('studentSignature')
+                                    ? props.ddah.get('studentSignature')
+                                    : ''
+                            }
+                        />
                         <br />
                         <span className="input-label">Signature</span>
                     </td>
 
                     <td>
-                        <span className="input-label">Date:</span>&nbsp;<input type="text" readOnly />
+                        <span className="input-label">Date:</span>&nbsp;
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                props.ddah.get('studentSignDate')
+                                    ? new Date(
+                                          props.ddah.get('studentSignDate')
+                                      ).toLocaleDateString()
+                                    : ''
+                            }
+                        />
                     </td>
                 </tr>
             </tbody>

@@ -43,13 +43,22 @@ class InstrControlPanel extends React.Component {
                 </PanelGroup>
                 {selectedDdahId != null
                     ? <div id="ddah-menu-container">
-                          {this.props.appState.isTemplateSelected()
-                              ? <TemplateActionMenu
-                                    selectedTemplate={selectedDdahId}
-                                    {...this.props}
-                                />
-                              : <OfferActionMenu selectedOffer={selectedDdahId} {...this.props} />}
-
+                          {this.props.appState.isTemplateSelected() &&
+                              <TemplateActionMenu
+                                  selectedTemplate={selectedDdahId}
+                                  {...this.props}
+                              />}
+                          {this.props.appState.isOfferSelected() &&
+                              (['None', 'Created'].includes(
+                                  this.props.appState
+                                      .getOffersList()
+                                      .getIn([selectedDdahId, 'ddahStatus'])
+                              )
+                                  ? <OfferActionMenu
+                                        selectedOffer={selectedDdahId}
+                                        {...this.props}
+                                    />
+                                  : <SubmittedActionMenu {...this.props} />)}
                           <DdahForm selectedDdahId={selectedDdahId} {...this.props} />
                       </div>
                     : <Well id="no-selection">
@@ -68,15 +77,7 @@ const TemplateSelectionMenu = props => {
         <Panel
             header={<h4>Templates</h4>}
             footer={
-                <span
-                    onClick={() => {
-                        let name;
-                        if ((name = window.prompt('Please enter a name for the new template:'))) {
-                            props.appState.createTemplate(name);
-                        }
-                    }}>
-                    Create a new template
-                </span>
+                <span onClick={() => props.appState.createTemplate()}>Create a new template</span>
             }>
             <ul id="templates-menu">
                 {templates
@@ -122,6 +123,7 @@ const OfferSelectionMenu = props => {
                         <ul id={i + '-applicant-menu'} className="applicant-menu">
                             {props.appState.getOffersForCourse(i).map((offer, i) =>
                                 <li
+                                    id={'offer-' + i}
                                     className={i == props.selectedOffer ? 'active' : ''}
                                     onClick={event => {
                                         event.stopPropagation();
@@ -198,7 +200,11 @@ const OfferActionMenu = props => {
                 Clear
             </Button>
 
-            <Button bsStyle="success" id="submit">
+            <Button
+                id="submit"
+                bsStyle="success"
+                disabled={props.appState.anyDdahWorksheetChanges()}
+                onClick={() => props.appState.submitDdah(props.selectedOffer)}>
                 Submit for Review
             </Button>
 
@@ -211,17 +217,25 @@ const OfferActionMenu = props => {
                 </Button>
                 <Button
                     bsStyle="info"
-                    onClick={() => {
-                        let name;
-                        if ((name = window.prompt('Please enter a name for the new template:'))) {
-                            props.appState.createTemplateFromDdah(name, props.selectedOffer);
-                        }
-                    }}>
+                    disabled={props.appState.anyDdahWorksheetChanges()}
+                    onClick={() => props.appState.createTemplateFromDdah(props.selectedOffer)}>
                     Save as Template
                 </Button>
             </ButtonGroup>
         </ButtonToolbar>
     );
 };
+
+const SubmittedActionMenu = props =>
+    <ButtonToolbar id="action-menu">
+        <ButtonGroup id="submit">
+            <Button bsStyle="success" disabled>
+                Successfully submitted
+            </Button>
+            <Button bsStyle="success" onClick={() => null}>
+                View PDF
+            </Button>
+        </ButtonGroup>
+    </ButtonToolbar>;
 
 export { InstrControlPanel };

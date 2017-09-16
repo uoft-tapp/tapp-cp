@@ -499,19 +499,27 @@ class AppState {
         fetch.clearHrStatus(offers.map(offer => parseInt(offer)));
     }
 
-    createTemplate(name) {
-        // the route to create a new template expects a position with which to associate the template
-        // we don't associate templates with positions in the front-end model, so we pick a position id
-        // without caring which
-        fetch
-            .createTemplate(name, parseInt(this.get('courses.list').keySeq().first()))
-            // when the request succeeds, display the new template
-            .then(template => this.toggleSelectedTemplate(template));
+    createTemplate() {
+        let name = window.prompt('Please enter a name for the new template:');
+
+        if (name && name.trim()) {
+            // the route to create a new template expects a position with which to associate the template
+            // we don't associate templates with positions in the front-end model, so we pick a position id
+            // without caring which
+            fetch
+                .createTemplate(name, parseInt(this.get('courses.list').keySeq().first()))
+                // when the request succeeds, display the new template
+                .then(template => this.toggleSelectedTemplate(template));
+        }
     }
 
-    createTemplateFromDdah(name, offer) {
-        let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
-        fetch.createTemplateFromDdah(name, ddahId);
+    createTemplateFromDdah(offer) {
+        let name = window.prompt('Please enter a name for the new template:');
+
+        if (name && name.trim()) {
+            let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
+            fetch.createTemplateFromDdah(name, ddahId);
+        }
     }
 
     // email applicants
@@ -683,6 +691,56 @@ class AppState {
 
     isCoursesListNull() {
         return this.get('courses.list') == null;
+    }
+
+    isDdahsListNull() {
+        return this.get('ddahs.list') == null;
+    }
+
+    // verify that the current ddah is valid for submission:
+    //   'optional' must have a value
+    //   at least one tutorial category must be selected
+    //   the total number of hours must be equal to the number of hours in the offer
+    //   all allocation fields must have non-null values
+    isDdahValidForSubmission(ddahId, expectedHours) {
+        let ddah = this.get('ddahs.list.' + ddahId),
+            alerts = [];
+
+        if (ddah.get('optional') !== true && ddah.get('optional') !== false) {
+            alerts.push('<b>Error</b>: Must decide whether tutorial is "Optional" or "Mandatory".');
+        }
+
+        if (ddah.get('categories').size == 0) {
+            alerts.push('<b>Error</b>: Must select at least one tutorial category.');
+        }
+
+        let totalHours =
+            ddah
+                .get('allocations')
+                .reduce(
+                    (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
+                    0
+                ) / 60;
+        if (isNaN(totalHours) || totalHours != expectedHours) {
+            alerts.push('<b>Error</b>: Total time is not equal to the expected number of hours.');
+        }
+
+        let allocations = ddah.get('allocations');
+        if (
+            allocations.some(
+                allocation =>
+                    !allocation.get('units') ||
+                    (!allocation.get('type') || !allocation.get('type').trim()) ||
+                    !allocation.get('time') ||
+                    !allocation.get('duty')
+            )
+        ) {
+            alerts.push('<b>Error</b>: Incomplete field(s) in Allocation of Hours Worksheet.');
+        }
+
+        alerts.forEach(alert => this.alert(alert));
+
+        return alerts.length == 0;
     }
 
     isDutiesListNull() {
@@ -874,6 +932,19 @@ class AppState {
         fetch.showContractHr(offer);
     }
 
+    submitDdah(offer) {
+        let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
+        let expectedHours = this.get('offers.list.' + offer).get('hours');
+
+        if (this.isDdahValidForSubmission(ddahId, expectedHours)) {
+            let signature = window.prompt('Please type a signature to complete the submission:');
+
+            if (signature && signature.trim()) {
+                fetch.submitDdah(signature, parseInt(ddahId));
+            }
+        }
+    }
+
     updateDdah(offer) {
         let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
 
@@ -885,6 +956,14 @@ class AppState {
             trainings: ddah.get('trainings').toJS(),
             allocations: ddah
                 .get('allocations')
+                // remove empty rows
+                .filter(
+                    allocation =>
+                        allocation.get('units') ||
+                        (allocation.get('type') && allocation.get('type').trim()) ||
+                        allocation.get('time') ||
+                        allocation.get('duty')
+                )
                 .map(allocation => ({
                     id: allocation.get('id'),
                     num_unit: allocation.get('units'),

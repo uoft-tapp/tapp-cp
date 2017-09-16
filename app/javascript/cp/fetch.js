@@ -50,17 +50,6 @@ function deleteHelper(URL) {
     });
 }
 
-function putHelper(URL, body) {
-    return fetchHelper(URL, {
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'PUT',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    });
-}
-
 function patchHelper(URL, body) {
     return fetchHelper(URL, {
         headers: {
@@ -176,7 +165,13 @@ function onFetchDdahsSuccess(resp) {
                 time: allocation.minutes,
             })),
             trainings: ddah.trainings,
-            categories: ddah.trainings,
+            categories: ddah.categories,
+            superSignature: ddah.supervisor_signature,
+            superSignDate: ddah.supervisor_sign_date,
+            authSignature: ddah.ta_coord_signature,
+            authSignDate: ddah.ta_coord_sign_date,
+            studentSignature: ddah.student_signature,
+            studentSignDate: ddah.student_sign_date,
         };
     });
 
@@ -242,7 +237,6 @@ function onFetchTemplatesSuccess(resp) {
     resp.forEach(template => {
         templates[template.id] = {
             name: template.name,
-            tutCategory: template.tutorial_category,
             optional: template.optional,
             requiresTraining: template.scaling_learning,
             allocations: template.allocations.map(allocation => ({
@@ -980,6 +974,35 @@ function updateDdah(id, ddahData) {
         });
 }
 
+// submit an existing ddah for approval
+function submitDdah(signature, ddah) {
+    let user = appState.getCurrentUserName();
+
+    // this route expects to perform a batch transaction, where the validity of each transaction has
+    // already been verified with '/ddahs/status/can-finish'
+    // however, in the current interface, only one ddah can be submitted at a time
+    postHelper('/ddahs/status/finish', { signature: signature, ddahs: [ddah] })
+        .then(resp => (resp.ok ? resp : respFailure))
+        .then(() => {
+            appState.setFetchingDataList('ddahs', true);
+            appState.setFetchingDataList('offers', true);
+
+            getDdahs(user)
+                .then(ddahs => {
+                    appState.setDdahsList(fromJS(ddahs));
+                    appState.setFetchingDataList('ddahs', false, true);
+                })
+                .catch(() => appState.setFetchingDataList('ddahs', false));
+
+            getOffers(user)
+                .then(offers => {
+                    appState.setOffersList(fromJS(offers));
+                    appState.setFetchingDataList('offers', false, true);
+                })
+                .catch(() => appState.setFetchingDataList('offers', false));
+        });
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -1027,5 +1050,6 @@ export {
     createTemplateFromDdah,
     createDdah,
     updateDdah,
+    submitDdah,
     fetchAuth,
 };
