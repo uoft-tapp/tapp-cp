@@ -112,5 +112,5 @@ const AlertContainer = props =>
     </div>;
 
 document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.render(<App appState={appState} />, document.getElementById('root'));
+    ReactDOM.render(<App />, document.getElementById('root'));
 });
