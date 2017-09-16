@@ -34,7 +34,7 @@ class Ddah < ApplicationRecord
         categories: self.category_ids,
       }
       if ddah[:send_date]
-        data[:link] = offer[:link].sub!("pb", "pb/ddah")
+        data[:link] = "#{ENV["domain"]}#{offer[:link].sub!("pb", "pb/ddah")}"
         data[:deadline] = self.get_deadline
       end
       return ddah.merge(data)
@@ -60,7 +60,7 @@ class Ddah < ApplicationRecord
         :tutorial_category,
       ]
       if ddah[:send_date]
-        data[:link] = offer[:link].sub!("pb", "pb/ddah")
+        data[:link] = "#{ENV["domain"]}#{offer[:link].sub!("pb", "pb/ddah")}"
         data[:deadline] = self.get_deadline
       end
       overwrite(ddah, template, attributes)

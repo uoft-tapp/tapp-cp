@@ -1,5 +1,6 @@
 class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
+  before_action :set_domain
   include DdahUpdater
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
@@ -353,6 +354,10 @@ class DdahsController < ApplicationController
     position_id = offer[:position_id]
     template = Template.find(template_id)
     return position_id == template[:position_id]
+  end
+
+  def set_domain
+    ENV["domain"] = request.base_url
   end
 
 end
