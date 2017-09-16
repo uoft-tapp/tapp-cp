@@ -57,7 +57,7 @@ class AppController < ApplicationController
 
   def logout
     @url = params[:current_page]
-    session[:logged_out] = false
+    session[:logged_in] = false
     render file: 'public/logout.html'
   end
 

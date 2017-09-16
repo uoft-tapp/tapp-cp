@@ -1,24 +1,20 @@
 module Authorizer
   def tapp_admin
-    set_roles
     expected_roles = ["tapp_admin"]
     access(expected_roles)
   end
 
   def cp_access
-    set_roles
     expected_roles = ["cp_admin", "hr_assistant", "instructor"]
     access(expected_roles)
   end
 
   def app_access
-    set_roles
     expected_roles = ["tapp_admin","cp_admin", "hr_assistant", "instructor"]
     access(expected_roles)
   end
 
   def cp_admin(hr_assistant = false)
-    set_roles
     if hr_assistant
       expected_roles = ["cp_admin", "hr_assistant"]
     else
@@ -29,7 +25,6 @@ module Authorizer
 
   def either_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
     if !params[:utorid]
-      set_roles
       if hr_assistant
         expected_roles = ["tapp_admin", "cp_admin", "hr_assistant"]
       else
@@ -48,7 +43,6 @@ module Authorizer
   end
 
   def either_cp_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
-    set_roles
     if !params[:utorid]
       if hr_assistant
         expected_roles = ["cp_admin", "hr_assistant"]
@@ -70,7 +64,6 @@ module Authorizer
 
   def both_cp_admin_instructor(model, attr_name = :id, array = false)
     if ENV['RAILS_ENV'] == 'production'
-      set_roles
       expected_roles = ["cp_admin", "instructor"]
       if has_access(expected_roles)
         if !has_access(["cp_admin"])
@@ -99,6 +92,7 @@ module Authorizer
   private
   def logged_in
     if ENV['RAILS_ENV'] == 'production'
+      set_roles
       if !session[:logged_in]
         render file: 'public/logout.html'
       end
