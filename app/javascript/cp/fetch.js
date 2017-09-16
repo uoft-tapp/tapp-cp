@@ -74,7 +74,7 @@ const getCourses = user =>
         .then(onFetchCoursesSuccess);
 
 const getDdahs = user =>
-    getHelper('/instructors/' + user + '/ddahs')
+    getHelper(user ? '/instructors/' + user + '/ddahs' : '/ddahs')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchDdahsSuccess);
 
@@ -267,8 +267,17 @@ function onFetchTrainingsSuccess(resp) {
 /* Function to GET all resources */
 
 function adminFetchAll() {
+    appState.setFetchingDataList('ddahs', true);
     appState.setFetchingDataList('offers', true);
     appState.setFetchingDataList('sessions', true);
+
+    // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
+    getDdahs()
+        .then(ddahs => {
+            appState.setDdahsList(fromJS(ddahs));
+            appState.setFetchingDataList('ddahs', false, true);
+        })
+        .catch(() => appState.setFetchingDataList('ddahs', false));
 
     // when offers are successfully fetched, update the offers list; set fetching flag to false either way
     getOffers()
