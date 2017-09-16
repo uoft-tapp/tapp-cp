@@ -246,6 +246,14 @@ footer div p {
     overflow: auto;
 }
 
+#instr-grid #ddah-container.disabled {
+    opacity: 0.8;
+}
+
+#instr-grid #ddah-container.disabled * {
+    pointer-events: none;
+}
+
 #instr-grid h3 {
     text-align: center;
     margin: 0 0 1vh 0;

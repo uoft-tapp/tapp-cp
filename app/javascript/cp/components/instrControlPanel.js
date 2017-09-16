@@ -25,6 +25,10 @@ class InstrControlPanel extends React.Component {
 
         let selectedDdahId = this.props.appState.getSelectedDdahId();
 
+        let status = this.props.appState.isOfferSelected()
+            ? this.props.appState.getOffersList().getIn([selectedDdahId, 'ddahStatus'])
+            : null;
+
         return (
             <Grid fluid id="instr-grid" style={cursorStyle}>
                 <PanelGroup id="select-menu">
@@ -49,11 +53,7 @@ class InstrControlPanel extends React.Component {
                                   {...this.props}
                               />}
                           {this.props.appState.isOfferSelected() &&
-                              (['None', 'Created'].includes(
-                                  this.props.appState
-                                      .getOffersList()
-                                      .getIn([selectedDdahId, 'ddahStatus'])
-                              )
+                              (['None', 'Created'].includes(status)
                                   ? <OfferActionMenu
                                         selectedOffer={selectedDdahId}
                                         {...this.props}
@@ -62,7 +62,11 @@ class InstrControlPanel extends React.Component {
                                         selectedDdahId={selectedDdahId}
                                         {...this.props}
                                     />)}
-                          <DdahForm selectedDdahId={selectedDdahId} {...this.props} />
+                          <DdahForm
+                              status={status}
+                              selectedDdahId={selectedDdahId}
+                              {...this.props}
+                          />
                       </div>
                     : <Well id="no-selection">
                           <h4>Nothing here yet!</h4>

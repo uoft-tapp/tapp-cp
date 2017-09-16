@@ -21,7 +21,9 @@ class DdahForm extends React.Component {
         }
 
         return (
-            <div id="ddah-container">
+            <div
+                id="ddah-container"
+                className={['None', 'Created'].includes(this.props.status) ? '' : 'disabled'}>
                 <h3>Description of Duties and Allocation of Hours Form</h3>
                 <Header
                     ddahData={ddahWorksheet}
