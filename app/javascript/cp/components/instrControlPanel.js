@@ -9,7 +9,6 @@ import {
     Well,
     DropdownButton,
     MenuItem,
-    Modal,
 } from 'react-bootstrap';
 
 import { DdahForm } from './ddahForm.js';
@@ -88,7 +87,16 @@ const TemplateSelectionMenu = props => {
                     .map((template, i) =>
                         <li
                             className={i == props.selectedTemplate ? 'active' : ''}
-                            onClick={() => props.appState.toggleSelectedTemplate(i)}>
+                            onClick={() => {
+                                if (
+                                    !props.appState.anyDdahWorksheetChanges() ||
+                                    window.confirm(
+                                        'You have unsaved changes. Are you sure you want to leave?'
+                                    )
+                                ) {
+                                    props.appState.toggleSelectedTemplate(i);
+                                }
+                            }}>
                             {template.get('name')}
                         </li>
                     )}
@@ -117,7 +125,15 @@ const OfferSelectionMenu = props => {
                                     className={i == props.selectedOffer ? 'active' : ''}
                                     onClick={event => {
                                         event.stopPropagation();
-                                        props.appState.toggleSelectedOffer(i);
+
+                                        if (
+                                            !props.appState.anyDdahWorksheetChanges() ||
+                                            window.confirm(
+                                                'You have unsaved changes. Are you sure you want to leave?'
+                                            )
+                                        ) {
+                                            props.appState.toggleSelectedOffer(i);
+                                        }
                                     }}>
                                     {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}&ensp;
                                     {offer.get('ddahStatus') != 'None' &&
@@ -207,17 +223,5 @@ const OfferActionMenu = props => {
         </ButtonToolbar>
     );
 };
-
-const SaveModal = props =>
-    <Modal.Dialog>
-        <Modal.Header closeButton />
-        <Modal.Body>You have unsaved changes.</Modal.Body>
-
-        <Modal.Footer>
-            <Button>Cancel</Button>
-            <Button bsStyle="alert">Discard changes</Button>
-            <Button bsStyle="primary">Save changes</Button>
-        </Modal.Footer>
-    </Modal.Dialog>;
 
 export { InstrControlPanel };

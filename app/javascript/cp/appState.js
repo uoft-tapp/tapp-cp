@@ -28,7 +28,7 @@ const initialState = {
         trainings: [],
         categories: [],
 
-        changed: true, // "dirty" bit
+        changed: false, // "dirty" bit
     },
 
     selectedDdahData: { type: null, id: null },

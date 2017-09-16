@@ -258,6 +258,7 @@ footer div p {
 #instr-grid table {
     width: var(--ddah-width);
     margin: 0;
+    max-width: none;
 }
 
 #instr-grid table th,
