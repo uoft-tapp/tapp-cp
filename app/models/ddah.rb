@@ -33,7 +33,6 @@ class Ddah < ApplicationRecord
         trainings: self.training_ids,
         categories: self.category_ids,
       }
-      puts "testing"
       if ddah[:send_date]
         data[:link] = offer[:link].sub!("pb", "pb/ddah")
         data[:deadline] = self.get_deadline
