@@ -75,7 +75,6 @@
           'Content-Type': 'application/json; charset=utf-8',
       },
       method: 'POST',
-      body: JSON.stringify(data),
       credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
     }).then(function(res){
       location.reload();
