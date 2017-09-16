@@ -1017,7 +1017,7 @@ function fetchAuth() {
             if (resp.development) {
                 appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
                 // default to cp_admin as selected user role
-                appState.selectUserRole('instructor');
+                appState.selectUserRole('cp_admin');
                 appState.setCurrentUserName('DEV');
             } else {
                 // filter out roles not relevant to this application

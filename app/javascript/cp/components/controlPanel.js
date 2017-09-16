@@ -260,13 +260,25 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'DDAH Status',
-                data: p => (p.offer.get('ddahStatus') ? p.offer.get('ddahStatus') : '-'),
+                data: p =>
+                    p.offer.get('ddahStatus')
+                        ? <span>
+                              {p.offer.get('ddahStatus')}&nbsp;
+                              {!['None', 'Created'].includes(p.offer.get('ddahStatus')) &&
+                                  <i
+                                      className="fa fa-search"
+                                      style={{ fontSize: '16px', cursor: 'pointer' }}
+                                      title="PDF preview"
+                                      onClick={() => this.props.appState.previewDdah(p.offerId)}
+                                  />}
+                          </span>
+                        : '-',
                 sortData: p => (p.get('ddahStatus') ? p.get('ddahStatus') : ''),
 
                 filterLabel: 'DDAH Status',
-                filterCategories: ['-', 'Accepted', 'Pending', 'Signed'],
+                filterCategories: ['-', 'Created', 'Ready', 'Approved', 'Pending', 'Accepted'],
                 filterFuncs: [p => p.get('ddahStatus') == undefined].concat(
-                    ['Accepted', 'Pending', 'Signed'].map(status => p =>
+                    ['Created', 'Ready', 'Approved', 'Pending', 'Accepted'].map(status => p =>
                         p.get('ddahStatus') == status
                     )
                 ),
