@@ -56,7 +56,9 @@ class AppController < ApplicationController
   end
 
   def logout
+    Rails.logger.info("session login: #{session[:logged_in]}")
     session[:logged_in] = false
+    Rails.logger.info("session login: #{session[:logged_in]}")
     redirect_back(fallback_location: request.env['PATH_INFO'])
   end
 
