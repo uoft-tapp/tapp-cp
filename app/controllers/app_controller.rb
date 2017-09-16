@@ -59,14 +59,14 @@ class AppController < ApplicationController
     Rails.logger.info("session login: #{session[:logged_in]}")
     session[:logged_in] = false
     Rails.logger.info("session login: #{session[:logged_in]}")
-    redirect_back(fallback_location: request.env['PATH_INFO'])
+    redirect_back(fallback_location: request.referrer)
   end
 
   def reenter_session
     Rails.logger.info("session login: #{session[:logged_in]}")
     session[:logged_in] = true
     Rails.logger.info("session login: #{session[:logged_in]}")
-    redirect_back(fallback_location: request.env['PATH_INFO'])
+    redirect_back(fallback_location: request.referrer)
   end
 
   def test

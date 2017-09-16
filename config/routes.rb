@@ -4,8 +4,8 @@ Rails.application.routes.draw do
   get '/cp/(*z)', to: "app#cp"
   get '/roles', to: "app#roles"
 
-  get '/logout', to: "app#logout"
-  get '/reenter-session', to: "app#reenter_session"
+  post '/logout', to: "app#logout"
+  post '/reenter-session', to: "app#reenter_session"
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   # TAPP resources
