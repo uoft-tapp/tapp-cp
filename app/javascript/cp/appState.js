@@ -4,12 +4,17 @@ import { fromJS } from 'immutable';
 import * as fetch from './fetch.js';
 
 const initialState = {
-    roles: [], // array of { 'cp_admin', 'hr_assistant', 'instructor' }
-    selectedRole: null,
-    user: null,
+    // navbar component
+    nav: {
+        roles: [], // array of { 'cp_admin', 'hr_assistant', 'instructor' }
+        selectedRole: null,
+        user: null,
 
-    // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
-    notifications: [],
+        selectedTab: null,
+
+        // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
+        notifications: [],
+    },
 
     // list of UI alerts (string can contain HTML, but be careful because it is not sanitized!)
     alerts: [],
@@ -208,11 +213,11 @@ class AppState {
     }
 
     getCurrentUserName() {
-        return this.get('user');
+        return this.get('nav.user');
     }
 
     getCurrentUserRoles() {
-        return this.get('roles');
+        return this.get('nav.roles');
     }
 
     // compute total ddah hours
@@ -265,7 +270,7 @@ class AppState {
     }
 
     getSelectedUserRole() {
-        return this.get('selectedRole');
+        return this.get('nav.selectedRole');
     }
 
     getSorts() {
@@ -273,7 +278,7 @@ class AppState {
     }
 
     getUnreadNotifications() {
-        return this.get('notifications');
+        return this.get('nav.notifications');
     }
 
     // check whether a filter is selected on the offers table
@@ -295,13 +300,13 @@ class AppState {
 
     // add a notification to the list of unread notifications
     notify(text) {
-        let notifications = this.get('notifications');
-        this.set('notifications', notifications.push(text));
+        let notifications = this.get('nav.notifications');
+        this.set('nav.notifications', notifications.push(text));
     }
 
     // clear the list of unread notifications
     readNotifications() {
-        this.set('notifications', fromJS([]));
+        this.set('nav.notifications', fromJS([]));
     }
 
     // remove an allocation from the ddah worksheet
@@ -325,15 +330,15 @@ class AppState {
     }
 
     selectUserRole(role) {
-        this.set('selectedRole', role);
+        this.set('nav.selectedRole', role);
     }
 
     setCurrentUserName(user) {
-        this.set('user', user);
+        this.set('nav.user', user);
     }
 
     setCurrentUserRoles(roles) {
-        this.set('roles', roles);
+        this.set('nav.roles', roles);
     }
 
     setDdahWorksheet(ddah) {
@@ -843,16 +848,16 @@ class AppState {
 
     setFetchingDataList(data, fetching, success) {
         let init = this.get(data + '.fetching'),
-            notifications = this.get('notifications');
+            notifications = this.get('nav.notifications');
         if (fetching) {
             this.set({
                 [data + '.fetching']: init + 1,
-                notifications: notifications.push('<i>Fetching ' + data + '...</i>'),
+                'nav.notifications': notifications.push('<i>Fetching ' + data + '...</i>'),
             });
         } else if (success) {
             this.set({
                 [data + '.fetching']: init - 1,
-                notifications: notifications.push('Successfully fetched ' + data + '.'),
+                'nav.notifications': notifications.push('Successfully fetched ' + data + '.'),
             });
         } else {
             this.set(data + '.fetching', init - 1);
@@ -870,16 +875,16 @@ class AppState {
 
     setImporting(importing, success) {
         let init = this.get('importing'),
-            notifications = this.get('notifications');
+            notifications = this.get('nav.notifications');
         if (importing) {
             this.set({
                 importing: init + 1,
-                notifications: notifications.push('<i>Import in progress...</i>'),
+                'nav.notifications': notifications.push('<i>Import in progress...</i>'),
             });
         } else if (success) {
             this.set({
                 importing: init - 1,
-                notifications: notifications.push('Import completed successfully.'),
+                'nav.notifications': notifications.push('Import completed successfully.'),
             });
         } else {
             this.set('importing', init - 1);
