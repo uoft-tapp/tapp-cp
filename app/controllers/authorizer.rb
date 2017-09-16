@@ -95,11 +95,6 @@ module Authorizer
       else
         if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
           render status: 403, file: 'public/403.html'
-        else
-          offer = Offer.find(params[:offer_id])
-          if !offer
-            render status: 404, file: 'public/404.html'
-          end
         end
       end
     end
@@ -156,11 +151,11 @@ module Authorizer
   end
 
   def utorid_of_applicant_corresponding_to_student_facing_route(params)
-    offer = Offer.find(params[:offer_id])
-    if offer
+    begin
+      offer = Offer.find(params[:offer_id])
       offer = offer.format
       return offer[:applicant][:utorid]
-    else
+    rescue
       render status: 404, file: 'public/404.html'
     end
   end
