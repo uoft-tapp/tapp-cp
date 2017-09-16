@@ -38,7 +38,7 @@ module Authorizer
       access(expected_roles)
     else
       expected_roles = ["instructor"]
-      if has_access
+      if has_access(expected_roles)
         instructor = Instructor.find_by(utorid: session[:utorid])
         correct_instructor(model, instructor, attr_name, array)
       else
@@ -58,7 +58,7 @@ module Authorizer
       access(expected_roles)
     else
       expected_roles = ["instructor"]
-      if has_access
+      if has_access(expected_roles)
         instructor = Instructor.find_by(utorid: session[:utorid])
         correct_instructor(model, instructor, attr_name, array)
       else
