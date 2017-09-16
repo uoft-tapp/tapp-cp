@@ -1056,7 +1056,7 @@ function nagApplicantDdahs(offers) {
                                 offersList.getIn([offer.toString(), 'lastName']) +
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
-                                ' about OFFER form for ' +
+                                ' about DDAH form for ' +
                                 offersList.getIn([offer.toString(), 'course'])
                         );
                         // remove invalid offer(s) from offer list
