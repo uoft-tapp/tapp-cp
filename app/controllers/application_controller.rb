@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
   before_action :set_cache_headers
-  before_action :logged_in, except: ["app#reenter_session"]
+  before_action :logged_in
 
   private
   def set_cache_headers
