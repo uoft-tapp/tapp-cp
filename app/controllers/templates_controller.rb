@@ -38,12 +38,12 @@ class TemplatesController < ApplicationController
     instructor = Instructor.find_by!(utorid: params[:utorid])
     template = Template.find_by(name: params[:name], position_id: position[:id])
     if !template
-      Template.create!(
+      template = Template.create!(
         position_id: position[:id],
         name: params[:name],
         instructor_id: instructor[:id],
       )
-      render status: 200, json: {message: "A Template has been successfully created."}
+      render status: 201, json: template.to_json
     else
       render status: 404, json: {message: "Error: A template with the same name already exists."}
     end

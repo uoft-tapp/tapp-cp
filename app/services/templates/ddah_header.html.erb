@@ -1,6 +1,6 @@
-<b>Description of Duties and Allocation of Hours form</b>
+<b>Description of Duties and Allocation of Hours Form</b>
 
-<b>Departments</b>: <%= @ddah[:department]%>:<b>Supervising Professor</b>: <%= @ddah[:supervisor]%>:
+<b>Department</b>: <%= @ddah[:department]%>:<b>Supervising Professor</b>: <%= @ddah[:supervisor]%>:
 
 <b>Course Code</b>: <%= @ddah[:position][:position]%>:<b>Est. Enrolment / TA</b>: <%= get_est_enrol_per_ta(@ddah[:position][:id], @ddah[:position][:current_enrolment]) %>:
 
