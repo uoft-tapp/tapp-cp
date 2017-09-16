@@ -126,7 +126,8 @@ module Authorizer
   def is_instructor
     if ENV['RAILS_ENV'] == 'production'
       if get_utorid
-        return Instructor.find_by(utorid: get_utorid)
+        instructor = Instructor.find_by(utorid: get_utorid)
+        return instructor
       else
         return nil
       end
@@ -157,6 +158,7 @@ module Authorizer
       else
         Rails.logger.info("logged_in is already assigned")
       end
+      Rails.logger.info("user is #{session[:utorid]}"")
       return session[:utorid]
     else
       return session[:utorid]
