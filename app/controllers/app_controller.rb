@@ -58,7 +58,7 @@ class AppController < ApplicationController
   def logout
     @url = params[:current_page]
     session[:logged_in] = false
-    render file: 'public/logout.html'
+    redirect_back(fallback_location: fallback_location)
   end
 
   def reenter_session
