@@ -56,10 +56,8 @@ class AppController < ApplicationController
   end
 
   def logout
-    @url = fallback_location
-    Rails.logger.info("fallback_location: #{fallback_location}")
     session[:logged_in] = false
-    redirect_back(fallback_location: fallback_location)
+    redirect_back(fallback_location: request.env['PATH_INFO'])
   end
 
   def reenter_session
