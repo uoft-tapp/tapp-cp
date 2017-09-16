@@ -367,7 +367,10 @@ class AppState {
     toggleSelectedOffer(offer) {
         if (this.isOfferSelected() && this.getSelectedDdahId() == offer) {
             // this offer is currently selected
-            this.set('selectedDdahData', fromJS({ type: null, id: null }));
+            this.set({
+                selectedDdahData: fromJS({ type: null, id: null }),
+                ddahWorksheet: fromJS(initialState.ddahWorksheet).set('changed', false),
+            });
         } else {
             // this offer is not currently selected
 
@@ -399,7 +402,10 @@ class AppState {
 
         if (this.isTemplateSelected() && this.getSelectedDdahId() == template) {
             // this template is currently selected, so unselect it
-            this.set('selectedDdahData', fromJS({ type: null, id: null }));
+            this.set({
+                selectedDdahData: fromJS({ type: null, id: null }),
+                ddahWorksheet: fromJS(initialState.ddahWorksheet).set('changed', false),
+            });
         } else {
             let newDdahData = this.get('templates.list.' + template);
 
