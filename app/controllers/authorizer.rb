@@ -125,7 +125,11 @@ module Authorizer
 
   def is_instructor
     if ENV['RAILS_ENV'] == 'production'
-      return Instructor.find_by(utorid: get_utorid)
+      if get_utorid
+        return Instructor.find_by(utorid: get_utorid)
+      else
+        return nil
+      end
     end
   end
 
