@@ -151,13 +151,9 @@ module Authorizer
   end
 
   def utorid_of_applicant_corresponding_to_student_facing_route(params)
-    begin
-      offer = Offer.find(params[:offer_id])
-      offer = offer.format
-      return offer[:applicant][:utorid]
-    rescue
-      render status: 404, file: 'public/404.html'
-    end
+    offer = Offer.find(params[:offer_id])
+    offer = offer.format
+    return offer[:applicant][:utorid]
   end
 
   '''
