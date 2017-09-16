@@ -158,7 +158,7 @@ module Authorizer
       else
         Rails.logger.info("logged_in is already assigned")
       end
-      Rails.logger.info("user is #{session[:utorid]}"")
+      Rails.logger.info("user is #{session[:utorid]}")
       return session[:utorid]
     else
       return session[:utorid]
