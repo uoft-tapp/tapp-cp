@@ -269,6 +269,10 @@ class AppState {
         return this.get('selectedSession');
     }
 
+    getSelectedNavTab() {
+        return this.get('nav.selectedTab');
+    }
+
     getSelectedUserRole() {
         return this.get('nav.selectedRole');
     }
@@ -323,6 +327,11 @@ class AppState {
         let i = sorts.findIndex(f => f.get(0) == field);
 
         this.set('selectedSortFields', sorts.delete(i));
+    }
+
+    // select a navbar tab
+    selectNavTab(eventKey) {
+        this.set('nav.selectedTab', eventKey);
     }
 
     selectSession(session) {

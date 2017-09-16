@@ -11,13 +11,17 @@ import '../cp-styles';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
+
 import { Alert } from 'react-bootstrap';
 
 import { appState } from '../cp/appState.js';
 import { fetchAuth } from '../cp/fetch.js';
 
+import { routeConfig } from '../cp/routeConfig.js';
 import { Navbar } from '../cp/components/navbar.js';
-import { ControlPanel } from '../cp/components/controlPanel.js';
+import { AdminControlPanel } from '../cp/components/adminControlPanel.js';
 import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
 
 /*** Main app component ***/
@@ -44,27 +48,67 @@ class App extends React.Component {
             return <div id="loader" />;
         }
 
-        return (
-            <div>
-                <Navbar {...this.props} />
+        if (role == 'cp_admin') {
+            return <AdminRouter {...this.props} />;
+        }
 
-                {(role == 'cp_admin' || role == 'hr_assistant') && <ControlPanel {...this.props} />}
-                {role == 'instructor' && <InstrControlPanel {...this.props} />}
-
-                <div className="container-fluid" id="alert-container">
-                    {this.props.appState.getAlerts().map(alert =>
-                        <Alert
-                            key={'alert-' + alert.get('id')}
-                            className="alert alert-danger"
-                            onDismiss={() => this.props.appState.dismissAlert(alert.get('id'))}>
-                            <span dangerouslySetInnerHTML={{ __html: alert.get('text') }} />
-                        </Alert>
-                    )}
+        if (role == 'hr_assistant') {
+            return (
+                <div>
+                    <Navbar {...this.props} />
+                    <AdminControlPanel {...this.props} />
+                    <AlertContainer {...this.props} />
                 </div>
-            </div>
-        );
+            );
+        }
+
+        if (role == 'instructor') {
+            return (
+                <div>
+                    <Navbar {...this.props} />
+                    <InstrControlPanel {...this.props} />
+                    <AlertContainer {...this.props} />
+                </div>
+            );
+        }
+
+        return null;
     }
 }
+
+const AdminRouter = props =>
+    <Router basename="cp">
+        <div>
+            <Navbar {...props} />
+
+            <Switch>
+                <Route
+                    path={routeConfig.controlPanel.route}
+                    render={() =>
+                        <AdminControlPanel navKey={routeConfig.controlPanel.id} {...props} />}
+                />
+                <Route
+                    path={routeConfig.ddahs.route}
+                    render={() => <DdahControlPanel navKey={routeConfig.ddahs.id} {...props} />}
+                />
+                <Redirect from="/" to="/controlpanel" />
+            </Switch>
+
+            <AlertContainer {...props} />
+        </div>
+    </Router>;
+
+const AlertContainer = props =>
+    <div className="container-fluid" id="alert-container">
+        {props.appState.getAlerts().map(alert =>
+            <Alert
+                key={'alert-' + alert.get('id')}
+                className="alert alert-danger"
+                onDismiss={() => props.appState.dismissAlert(alert.get('id'))}>
+                <span dangerouslySetInnerHTML={{ __html: alert.get('text') }} />
+            </Alert>
+        )}
+    </div>;
 
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(<App appState={appState} />, document.getElementById('root'));

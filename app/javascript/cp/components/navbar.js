@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 
+import { Link } from 'react-router-dom';
 import {
     Navbar,
     Nav,
@@ -13,9 +14,28 @@ import {
     FormControl,
 } from 'react-bootstrap';
 
+import { routeConfig } from '../routeConfig.js';
 import { DdahAppendix } from './ddahAppendix.js';
 
 /*** Navbar components ***/
+
+const ViewTab = props =>
+    <li role="presentation" className={props.activeKey == props.id ? 'active' : ''}>
+        <Link to={props.route} className="navbar-link">
+            {props.label}
+        </Link>
+    </li>;
+
+const ViewTabs = props => {
+    let activeKey = props.appState.getSelectedNavTab();
+
+    return (
+        <ul className="nav navbar-nav navbar-left">
+            <ViewTab activeKey={activeKey} {...routeConfig.controlPanel} />
+            <ViewTab activeKey={activeKey} {...routeConfig.ddahs} />
+        </ul>
+    );
+};
 
 const Notifications = props => {
     let notifications = props.appState.getUnreadNotifications();
@@ -82,6 +102,8 @@ const NavbarInst = props =>
         <Navbar.Header>
             <Navbar.Brand>TAPP:CP</Navbar.Brand>
         </Navbar.Header>
+
+        {props.appState.getSelectedUserRole() == 'cp_admin' && <ViewTabs {...props} />}
 
         <Nav pullRight>
             {props.appState.getSelectedUserRole() == 'instructor' &&

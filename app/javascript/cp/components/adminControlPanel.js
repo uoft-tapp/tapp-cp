@@ -25,12 +25,26 @@ const getSelectedOffers = () =>
         .call(getCheckboxElements(), box => box.checked == true)
         .map(box => box.id);
 
-class ControlPanel extends React.Component {
+class AdminControlPanel extends React.Component {
     constructor(props) {
         super(props);
 
         // most recently-clicked checkbox, stored to allow range selection
         this.lastClicked = null;
+    }
+
+    selectThisTab() {
+        if (this.props.appState.getSelectedNavTab() != this.props.navKey) {
+            this.props.appState.selectNavTab(this.props.navKey);
+        }
+    }
+
+    componentWillMount() {
+        this.selectThisTab();
+    }
+
+    componentWillUpdate() {
+        this.selectThisTab();
     }
 
     render() {
@@ -404,4 +418,4 @@ const PrintButton = props =>
         Print contracts
     </Button>;
 
-export { ControlPanel };
+export { AdminControlPanel };
