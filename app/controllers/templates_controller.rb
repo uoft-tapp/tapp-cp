@@ -3,7 +3,9 @@ class TemplatesController < ApplicationController
   include DdahUpdater
   include Authorizer
   include Model
-  before_action :either_cp_admin_instructor, except: [:preview]
+  before_action except: [:preview] do
+    either_cp_admin_instructor(Template)
+  end
   before_action only: [:preview] do
     both_cp_admin_instructor(Template)
   end

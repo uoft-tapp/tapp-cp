@@ -27,7 +27,7 @@ module Authorizer
     access(expected_roles)
   end
 
-  def either_admin_instructor(hr_assistant = false)
+  def either_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
     if !params[:utorid]
       set_roles
       if hr_assistant
@@ -36,31 +36,46 @@ module Authorizer
         expected_roles = ["tapp_admin", "cp_admin"]
       end
       access(expected_roles)
+    else
+      expected_roles = ["instructor"]
+      if has_access
+        instructor = Instructor.find_by(utorid: session[:utorid])
+        correct_instructor(model, instructor, attr_name, array)
+      else
+        render status: 403, file: 'public/403.html'
+      end
     end
   end
 
-  def either_cp_admin_instructor(hr_assistant = false)
+  def either_cp_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
+    set_roles
     if !params[:utorid]
-      set_roles
       if hr_assistant
         expected_roles = ["cp_admin", "hr_assistant"]
       else
         expected_roles = ["cp_admin"]
       end
       access(expected_roles)
+    else
+      expected_roles = ["instructor"]
+      if has_access
+        instructor = Instructor.find_by(utorid: session[:utorid])
+        correct_instructor(model, instructor, attr_name, array)
+      else
+        render status: 403, file: 'public/403.html'
+      end
     end
   end
 
 
   def both_cp_admin_instructor(model, attr_name = :id, array = false)
     if ENV['RAILS_ENV'] == 'production'
-      Rails.logger.info("in both_cp_admin_instructor")
       set_roles
       expected_roles = ["cp_admin", "instructor"]
       if has_access(expected_roles)
         if !has_access(["cp_admin"])
           instructor = Instructor.find_by(utorid: session[:utorid])
-          correct_instructor(model, instructor[:id], attr_name, array)
+          correct_instructor(model, instructor, attr_name, array)
         end
       else
         render status: 403, file: 'public/403.html'
@@ -206,21 +221,34 @@ module Authorizer
   '''
    assumes that instructor_id is an attribute in the model
   '''
-  def correct_instructor(model, instructor_id, attr_name = :id, array = false)
-    if array
-      allowed = []
-      params[attr_name].each do |id|
-        model = model.find(id)
-        if model[:instructor_id] = instructor_id
-          allowed.push(id)
+  def correct_instructor(model, instructor, attr_name = :id, array = false)
+    if instructor
+      if array
+        allowed = []
+        params[attr_name].each do |id|
+          data = model.find(id)
+          if instructor_access(model, data, instructor)
+            allowed.push(id)
+          end
+        end
+        params[attr_name] = allowed
+      else
+        data = model.find(params[attr_name])
+        if instructor_access(model, data, instructor)
+          render status: 403, file: 'public/403.html'
         end
       end
-      params[attr_name] = allowed
     else
-      model = model.find(params[attr_name])
-      if model[:instructor_id] != instructor_id
-        render status: 403, file: 'public/403.html'
-      end
+      render status: 403, file: 'public/403.html'
+    end
+  end
+
+  def instructor_access(model, data, instructor)
+    case model
+    when Position
+      data.instructor_ids.include?instructor[:id]
+    else
+      data[:instructor_id] == instructor[:id]
     end
   end
 

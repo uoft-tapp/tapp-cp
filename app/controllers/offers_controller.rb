@@ -8,7 +8,7 @@ class OffersController < ApplicationController
    cp_admin(true)
   end
   before_action only: [:index, :show] do
-    either_cp_admin_instructor(true)
+    either_cp_admin_instructor(Offer, true)
   end
 
   def index
