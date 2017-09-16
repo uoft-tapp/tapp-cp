@@ -7,7 +7,7 @@ const routeConfig = {
         id: 'controlpanel',
     },
     ddahs: {
-        label: 'DDAH Form Menu',
+        label: 'DDAH Forms',
         route: '/ddahs',
         id: 'ddahs',
     },
