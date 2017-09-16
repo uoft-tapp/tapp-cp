@@ -65,7 +65,7 @@
       <h1>Session Ended.</h1>
       <p>To ensure your security, please close the browser if you are using a public machine.</p>
     </div>
-    <p>Please click <form method="post" action="/reenter-session"><input type="submit" value="here"/></form> to log in again.</p>
+    <p>Please click <a onclick="reenter_session()">here</a> to log in again.</p>
   </div>
   <script>
   function reenter_session(){
@@ -77,6 +77,8 @@
       method: 'POST',
       body: JSON.stringify(data),
       credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
+    }).then(function(res){
+      location.reload();
     });
   }
   </script>
