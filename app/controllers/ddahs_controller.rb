@@ -244,7 +244,7 @@ class DdahsController < ApplicationController
   end
 
   def student_accept
-    accept_ddah(params[:offer_id], params[:signature])
+    accept_ddah(params[:offer_id], true, params[:signature])
   end
 
   private
@@ -253,14 +253,14 @@ class DdahsController < ApplicationController
     send_data generator.render, filename: "ddah.pdf", disposition: "inline"
   end
 
-  def accept_ddah(offer_id, signature = nil)
+  def accept_ddah(offer_id, student = false, signature = nil)
     offer = Offer.find(offer_id)
     if offer[:ddah_status] == "Accepted"
       render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
     else
       ddah = Ddah.find_by(offer_id: offer_id)
       if ddah
-        if signature
+        if student
           accept_student_ddah(ddah, offer, signature, DateTime.now.to_date)
         else
           offer.update_attributes!(ddah_status: "Accepted")
