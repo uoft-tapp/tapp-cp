@@ -4,12 +4,11 @@ class DdahsController < ApplicationController
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
   before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
-  before_action :correct_instructor, only: [:can_finish_ddah, :finish_ddah]
   before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
   before_action  only: [:pdf, :separate_from_template, :new_template] do
     both_cp_admin_instructor(Ddah)
   end
-  before_action only: [:apply_template] do
+  before_action only: [:apply_template, :can_finish_ddah, :finish_ddah] do
     both_cp_admin_instructor(Ddah, :ddahs, true)
   end
 
@@ -195,7 +194,8 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      offer.update_attributes!(ddah_status: "Ready", supervisor_signature: params[:signature], supervisor_sign_date: Date.now)
+      offer.update_attributes!(ddah_status: "Ready")
+      ddah.update_attributes!(supervisor_signature: params[:signature], supervisor_sign_date: DateTime.now.to_date)
     end
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Ready'."}
   end
@@ -211,7 +211,8 @@ class DdahsController < ApplicationController
     params[:ddahs].each do |id|
       ddah = Ddah.find(id)
       offer = Offer.find(ddah[:offer_id])
-      offer.update_attributes!(ddah_status: "Approved", ta_coord_signature: params[:signature], ta_coord_sign_date: Date.now)
+      offer.update_attributes!(ddah_status: "Approved")
+      ddah.update_attributes!(ta_coord_signature: params[:signature], ta_coord_sign_date: DateTime.now.to_date)
     end
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
   end
@@ -243,7 +244,7 @@ class DdahsController < ApplicationController
   end
 
   def student_accept
-    accept_ddah(params[:offer_id], params[:signature], Date.now)
+    accept_ddah(params[:offer_id], params[:signature])
   end
 
   private
@@ -252,12 +253,30 @@ class DdahsController < ApplicationController
     send_data generator.render, filename: "ddah.pdf", disposition: "inline"
   end
 
-  def accept_ddah(offer_id, signature = nil, date = nil)
+  def accept_ddah(offer_id, signature = nil)
     offer = Offer.find(offer_id)
     if offer[:ddah_status] == "Accepted"
       render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
-    elsif offer[:ddah_status] == "Pending"
-      offer.update_attributes!(ddah_status: "Accepted", student_signature: signature, student_sign_date: date)
+    else
+      ddah = Ddah.find_by(offer_id: offer_id)
+      if ddah
+        if signature
+          accept_student_ddah(ddah, offer, signature, DateTime.now.to_date)
+        else
+          offer.update_attributes!(ddah_status: "Accepted")
+          ddah.update_attributes!(student_signature: signature, student_sign_date:  DateTime.now.to_date)
+          render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
+        end
+      else
+        render status: 404, json: {message: "Error: DDAH not found."}
+      end
+    end
+  end
+
+  def accept_student_ddah(ddah, offer, signature, date)
+    if offer[:ddah_status] == "Pending"
+      offer.update_attributes!(ddah_status: "Accepted")
+      ddah.update_attributes!(student_signature: signature, student_sign_date: date)
       render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
     else
       render status: 404, json: {message: "Error: You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
