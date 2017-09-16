@@ -809,13 +809,13 @@ class AppState {
         return this.get('trainings.list') == null;
     }
 
-    nagDdahs(offers) {
+    nagApplicantDdahs(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');
             return;
         }
 
-        fetch.nagDdahs(offers.map(offer => parseInt(offer)));
+        fetch.nagApplicantDdahs(offers.map(offer => parseInt(offer)));
     }
 
     nagOffers(offers) {
@@ -869,6 +869,19 @@ class AppState {
         }
 
         fetch.sendContracts(offers.map(offer => parseInt(offer)));
+    }
+
+    sendDdahs(offers) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
+        // map offers to ddah ids
+        let ddahs = offers.map(offer =>
+            this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer)
+        );
+        fetch.sendDdahs(ddahs);
     }
 
     setCategoriesList(list) {

@@ -50,6 +50,17 @@ function deleteHelper(URL) {
     });
 }
 
+function putHelper(URL, body) {
+    return fetchHelper(URL, {
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+        },
+        method: 'PUT',
+        body: JSON.stringify(body),
+        credentials: 'include',
+    });
+}
+
 function patchHelper(URL, body) {
     return fetchHelper(URL, {
         headers: {
@@ -466,7 +477,7 @@ function sendContracts(offers) {
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
                                 ' for ' +
-                                offersList.getIn([offer.toString(), 'position'])
+                                offersList.getIn([offer.toString(), 'course'])
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -513,7 +524,7 @@ function nagOffers(offers) {
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
                                 ' about ' +
-                                offersList.getIn([offer.toString(), 'position'])
+                                offersList.getIn([offer.toString(), 'course'])
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -560,7 +571,7 @@ function setHrProcessed(offers) {
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
                                 ' for ' +
-                                offersList.getIn([offer.toString(), 'position']) +
+                                offersList.getIn([offer.toString(), 'course']) +
                                 ' as HRIS processed'
                         );
                         // remove invalid offer(s) from offer list
@@ -613,7 +624,7 @@ function setDdahAccepted(offers) {
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
                                 ' for ' +
-                                offersList.getIn([offer.toString(), 'position']) +
+                                offersList.getIn([offer.toString(), 'course']) +
                                 ' as DDAH accepted'
                         );
                         // remove invalid offer(s) from offer list
@@ -639,14 +650,14 @@ function setDdahAccepted(offers) {
             appState.setFetchingDataList('ddahs', true);
             appState.setFetchingDataList('offers', true);
 
-            getDdahs(user)
+            getDdahs()
                 .then(ddahs => {
                     appState.setDdahsList(fromJS(ddahs));
                     appState.setFetchingDataList('ddahs', false, true);
                 })
                 .catch(() => appState.setFetchingDataList('ddahs', false));
 
-            getOffers(user)
+            getOffers()
                 .then(offers => {
                     appState.setOffersList(fromJS(offers));
                     appState.setFetchingDataList('offers', false, true);
@@ -722,7 +733,7 @@ function print(offers) {
                     res.invalid_offers.forEach(offer => {
                         appState.alert(
                             '<b>Error</b>: Cannot print ' +
-                                offersList.getIn([offer.toString(), 'position']) +
+                                offersList.getIn([offer.toString(), 'course']) +
                                 ' contract for ' +
                                 offersList.getIn([offer.toString(), 'lastName']) +
                                 ', ' +
@@ -820,7 +831,7 @@ function clearHrStatus(offers) {
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
                                 ' for ' +
-                                offersList.getIn([offer.toString(), 'position'])
+                                offersList.getIn([offer.toString(), 'course'])
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -1028,7 +1039,7 @@ function previewDdah(ddah) {
 }
 
 // nag applicants about ddahs
-function nagDdahs(offers) {
+function nagApplicantDdahs(offers) {
     let validOffers = offers;
 
     // check which applicants can be nagged
@@ -1046,7 +1057,7 @@ function nagDdahs(offers) {
                                 ', ' +
                                 offersList.getIn([offer.toString(), 'firstName']) +
                                 ' about OFFER form for ' +
-                                offersList.getIn([offer.toString(), 'position'])
+                                offersList.getIn([offer.toString(), 'course'])
                         );
                         // remove invalid offer(s) from offer list
                         validOffers.splice(validOffers.indexOf(offer), 1);
@@ -1070,6 +1081,56 @@ function nagDdahs(offers) {
 
             return postHelper('/ddahs/send-nag-student', { ddahs: validDdahs });
         })
+        .then(() => {
+            appState.setFetchingDataList('ddahs', true);
+            getDdahs()
+                .then(ddahs => {
+                    appState.setDdahsList(fromJS(ddahs));
+                    appState.setFetchingDataList('ddahs', false, true);
+                })
+                .catch(() => appState.setFetchingDataList('ddahs', false));
+        });
+}
+
+// send ddah forms
+function sendDdahs(ddahs) {
+    let validDdahs = ddahs;
+
+    // check which ddahs can be sent
+    postHelper('/ddahs/can-send-ddahs', { ddahs: ddahs })
+        .then(resp => {
+            if (resp.status == 404) {
+                // some ddahs cannot be sent
+                let ddahsList = appState.getDdahsList();
+                let offersList = appState.getOffersList();
+
+                return resp.json().then(res => {
+                    res.invalid_offers.forEach(ddah => {
+                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+
+                        appState.alert(
+                            '<b>Error</b>: Cannot send DDAH form to ' +
+                                offersList.getIn([offer, 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer, 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer, 'course'])
+                        );
+                        // remove invalid ddah(s) from ddah list
+                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
+                    });
+
+                    if (validDdahs.length == 0) {
+                        return Promise.reject();
+                    }
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
+            }
+        })
+        // send contracts for valid ddahs
+        .then(() => postHelper('/ddahs/send-ddahs', { ddahs: validDdahs }))
         .then(() => {
             appState.setFetchingDataList('ddahs', true);
             getDdahs()
@@ -1130,6 +1191,7 @@ export {
     updateDdah,
     submitDdah,
     previewDdah,
-    nagDdahs,
+    nagApplicantDdahs,
+    sendDdahs,
     fetchAuth,
 };

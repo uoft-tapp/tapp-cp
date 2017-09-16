@@ -240,11 +240,7 @@ const SessionsDropdown = props =>
 
 const DdahsMenu = props =>
     <DropdownButton bsStyle="primary" title="Update DDAH forms" id="ddahs-dropdown">
-        <MenuItem
-            onClick={() =>
-                props.appState.alert(
-                    '<b>Send DDAH forms</b> This functionality is not currently supported.'
-                )}>
+        <MenuItem onClick={() => props.appState.sendDdahs(getSelectedOffers())}>
             Send DDAH form(s)
         </MenuItem>
         <MenuItem divider />
@@ -270,7 +266,7 @@ const CommMenu = props =>
             Email&ensp;[DDAH form]
         </MenuItem>
         <MenuItem divider />
-        <MenuItem onClick={() => props.appState.nagDdahs(getSelectedOffers())}>
+        <MenuItem onClick={() => props.appState.nagApplicantDdahs(getSelectedOffers())}>
             Nag applicant
         </MenuItem>
         <MenuItem
