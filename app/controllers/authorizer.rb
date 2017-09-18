@@ -104,6 +104,7 @@ module Authorizer
   end
 
   def access(expected_roles)
+    set_roles
     if ENV['RAILS_ENV'] == 'production'
       if !has_role(expected_roles)
         render status: 403, file: 'public/403.html'
@@ -158,14 +159,8 @@ module Authorizer
     if request.env['HTTP_X_FORWARDED_USER']
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
       if session[:logged_in].nil?
-        Rails.logger.info("logged_in is nil")
-        Rails.logger.info("logged_in value is '#{session[:logged_in]}'")
         session[:logged_in]= true
-      else
-        Rails.logger.info("logged_in is already assigned")
-        Rails.logger.info("logged_in value is '#{session[:logged_in]}'")
       end
-      Rails.logger.info("user is #{session[:utorid]}")
       return session[:utorid]
     else
       return session[:utorid]
