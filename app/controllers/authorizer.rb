@@ -216,6 +216,7 @@ module Authorizer
         allowed = []
         params[attr_name].each do |id|
           data = model.find(id)
+          Rails.logger.info("instructor_access returns #{instructor_access(model, data, instructor)}")
           if instructor_access(model, data, instructor)
             allowed.push(id)
           end
@@ -223,6 +224,7 @@ module Authorizer
         params[attr_name] = allowed
       else
         data = model.find(params[attr_name])
+        Rails.logger.info("instructor_access returns #{instructor_access(model, data, instructor)}")
         if instructor_access(model, data, instructor)
           render status: 403, file: 'public/403.html'
         end
@@ -235,9 +237,11 @@ module Authorizer
   def instructor_access(model, data, instructor)
     case model
     when Position
-      data.instructor_ids.include?instructor[:id]
+      Rails.logger.info("reached Position access")
+      return data.instructor_ids.include?instructor[:id]
     else
-      data[:instructor_id] == instructor[:id]
+      Rails.logger.info("reached other model access")
+      return data[:instructor_id] == instructor[:id]
     end
   end
 
