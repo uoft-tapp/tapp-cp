@@ -98,8 +98,10 @@ module Authorizer
     if ENV['RAILS_ENV'] == 'production'
       set_roles
       if request.env['PATH_INFO'] != '/reenter-session' && !session[:logged_in]
+        Rails.logger.info("stopped at logged_in")
         render file: 'public/logout.html'
       end
+      Rails.logger.info("moved past logged_in")
     end
   end
 
@@ -114,6 +116,7 @@ module Authorizer
 
   def has_access(expected_roles)
     set_roles
+    Rails.logger.info("Reached has_access")
     return !has_role(expected_roles)
   end
 
