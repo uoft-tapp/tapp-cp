@@ -113,6 +113,7 @@ module Authorizer
   end
 
   def has_access(expected_roles)
+    set_roles
     return !has_role(expected_roles)
   end
 
