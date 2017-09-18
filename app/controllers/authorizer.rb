@@ -35,6 +35,7 @@ module Authorizer
       if ENV['RAILS_ENV'] == 'production'
         expected_roles = ["instructor"]
         if has_access(expected_roles)
+          Rails.logger.info("Has both admin instructor access")
           instructor = Instructor.find_by(utorid: session[:utorid])
           correct_instructor(model, instructor, attr_name, array)
         else
@@ -56,6 +57,7 @@ module Authorizer
       if ENV['RAILS_ENV'] == 'production'
         expected_roles = ["instructor"]
         if has_access(expected_roles)
+          Rails.logger.info("Has either cp admin instructor access")
           instructor = Instructor.find_by(utorid: session[:utorid])
           correct_instructor(model, instructor, attr_name, array)
         else
@@ -70,6 +72,7 @@ module Authorizer
     if ENV['RAILS_ENV'] == 'production'
       expected_roles = ["cp_admin", "instructor"]
       if has_access(expected_roles)
+        Rails.logger.info("Has both cp admin instructor access")
         if !has_access(["cp_admin"])
           instructor = Instructor.find_by(utorid: session[:utorid])
           correct_instructor(model, instructor, attr_name, array)
