@@ -3,9 +3,7 @@ class PositionsController < ApplicationController
   include Authorizer
   include Model
   before_action :tapp_admin, except: [:index, :show]
-  before_action only: [:index, :show] do
-    either_admin_instructor(Position)
-  end
+  before_action either_admin_instructor, only: [:index, :show]
 
   def index
     if params[:utorid]

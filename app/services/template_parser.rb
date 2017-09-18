@@ -101,6 +101,9 @@ class TemplateParser
         num+=1
       end
     end
+    if num == 0
+      num = 1
+    end
     return current_enrolment/num
   end
 

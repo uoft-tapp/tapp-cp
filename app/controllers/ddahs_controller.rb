@@ -11,9 +11,7 @@ class DdahsController < ApplicationController
   before_action only: [:apply_template, :can_finish_ddah, :finish_ddah] do
     both_cp_admin_instructor(Ddah, :ddahs, true)
   end
-  before_action only: [:index, :show, :create, :destroy, :update] do
-    either_cp_admin_instructor(Ddah)
-  end
+  before_action either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
 
   def index
     if params[:utorid]
@@ -69,20 +67,28 @@ class DdahsController < ApplicationController
 
   def destroy
     ddah = Ddah.find(params[:id])
-    ddah.allocations.each do |allocation|
-      allocation.destroy!
+    if can_modify(params[:utorid], ddah)
+      ddah.allocations.each do |allocation|
+        allocation.destroy!
+      end
+      ddah.destroy!
+    else
+      render status: 403, file: 'public/403.html'
     end
-    ddah.destroy!
   end
 
   def update
     ddah = Ddah.find(params[:id])
-    ddah.update_attributes!(ddah_params)
-    if !ddah[:template_id]
-      update_form(ddah, params)
-      render status: 200, json: {message: "DDAH was updated successfully."}
+    if can_modify(params[:utorid], ddah)
+        ddah.update_attributes!(ddah_params)
+      if !ddah[:template_id]
+        update_form(ddah, params)
+        render status: 200, json: {message: "DDAH was updated successfully."}
+      else
+        render status: 404, json: {message: "Error: This DDAH is currently using a template. You need to either update the template or separate this DDAH from the current template."}
+      end
     else
-      render status: 404, json: {message: "Error: This DDAH is currently using a template. You need to either update the template or separate this DDAH from the current template."}
+      render status: 403, file: 'public/403.html'
     end
   end
 
@@ -252,6 +258,11 @@ class DdahsController < ApplicationController
   end
 
   private
+  def can_modify(utorid, ddah)
+    instructor = Instructor.find_by(utorid: utorid)
+    return ddah[:instructor_id] == instructor[:id]
+  end
+
   def get_ddah_pdf(ddah)
     generator = DdahGenerator.new(ddah.format)
     send_data generator.render, filename: "ddah.pdf", disposition: "inline"

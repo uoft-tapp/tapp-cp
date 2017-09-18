@@ -23,7 +23,7 @@ module Authorizer
     access(expected_roles)
   end
 
-  def either_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
+  def either_admin_instructor(hr_assistant = false)
     if !params[:utorid]
       if hr_assistant
         expected_roles = ["tapp_admin", "cp_admin", "hr_assistant"]
@@ -35,9 +35,9 @@ module Authorizer
       if ENV['RAILS_ENV'] == 'production'
         expected_roles = ["instructor"]
         if has_access(expected_roles)
-          Rails.logger.info("Has both admin instructor access")
-          instructor = Instructor.find_by(utorid: session[:utorid])
-          correct_instructor(model, instructor, attr_name, array)
+          if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
+	    render status: 403, file: 'public/403.html'
+          end
         else
           render status: 403, file: 'public/403.html'
         end
@@ -45,7 +45,7 @@ module Authorizer
     end
   end
 
-  def either_cp_admin_instructor(model, hr_assistant = false, attr_name = :id, array = false)
+  def either_cp_admin_instructor(hr_assistant = false)
     if !params[:utorid]
       if hr_assistant
         expected_roles = ["cp_admin", "hr_assistant"]
@@ -57,9 +57,9 @@ module Authorizer
       if ENV['RAILS_ENV'] == 'production'
         expected_roles = ["instructor"]
         if has_access(expected_roles)
-          Rails.logger.info("Has either cp admin instructor access")
-          instructor = Instructor.find_by(utorid: session[:utorid])
-          correct_instructor(model, instructor, attr_name, array)
+          if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
+            render status: 403, file: 'public/403.html'
+          end
         else
           render status: 403, file: 'public/403.html'
         end
@@ -72,10 +72,9 @@ module Authorizer
     if ENV['RAILS_ENV'] == 'production'
       expected_roles = ["cp_admin", "instructor"]
       if has_access(expected_roles)
-        Rails.logger.info("Has both cp admin instructor access")
         if !has_access(["cp_admin"])
           instructor = Instructor.find_by(utorid: session[:utorid])
-          correct_instructor(model, instructor, attr_name, array)
+          correct_instructor(model, instructor, params[attr_name], array)
         end
       else
         render status: 403, file: 'public/403.html'
@@ -101,10 +100,8 @@ module Authorizer
     if ENV['RAILS_ENV'] == 'production'
       set_roles
       if request.env['PATH_INFO'] != '/reenter-session' && !session[:logged_in]
-        Rails.logger.info("stopped at logged_in")
-        render file: 'public/logout.html'
+       render file: 'public/logout.html'
       end
-      Rails.logger.info("moved past logged_in")
     end
   end
 
@@ -119,9 +116,7 @@ module Authorizer
 
   def has_access(expected_roles)
     set_roles
-    Rails.logger.info("Reached has_access")
-    Rails.logger.info("has_access result: #{!has_role(expected_roles)}")
-    return !has_role(expected_roles)
+    return has_role(expected_roles)
   end
 
   def has_role(expected_roles)
@@ -214,22 +209,20 @@ module Authorizer
   '''
    assumes that instructor_id is an attribute in the model
   '''
-  def correct_instructor(model, instructor, attr_name = :id, array = false)
+  def correct_instructor(model, instructor, inputs, array)
     if instructor
       if array
         allowed = []
-        params[attr_name].each do |id|
+        inputs.each do |id|
           data = model.find(id)
-          Rails.logger.info("instructor_access returns #{instructor_access(model, data, instructor)}")
-          if instructor_access(model, data, instructor)
+           if instructor_access(model, data, instructor)
             allowed.push(id)
           end
         end
-        params[attr_name] = allowed
+        inputs = allowed
       else
-        data = model.find(params[attr_name])
-        Rails.logger.info("instructor_access returns #{instructor_access(model, data, instructor)}")
-        if instructor_access(model, data, instructor)
+        data = model.find(inputs)
+         if instructor_access(model, data, instructor)
           render status: 403, file: 'public/403.html'
         end
       end
@@ -241,11 +234,9 @@ module Authorizer
   def instructor_access(model, data, instructor)
     case model
     when Position
-      Rails.logger.info("reached Position access")
       return data.instructor_ids.include?instructor[:id]
     else
-      Rails.logger.info("reached other model access")
-      return data[:instructor_id] == instructor[:id]
+       return data[:instructor_id] == instructor[:id]
     end
   end
 

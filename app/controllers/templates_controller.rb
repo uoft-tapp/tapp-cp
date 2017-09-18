@@ -3,9 +3,7 @@ class TemplatesController < ApplicationController
   include DdahUpdater
   include Authorizer
   include Model
-  before_action except: [:preview] do
-    either_cp_admin_instructor(Template)
-  end
+  before_action either_cp_admin_instructor, except: [:preview]
   before_action only: [:preview] do
     both_cp_admin_instructor(Template)
   end
@@ -51,16 +49,24 @@ class TemplatesController < ApplicationController
 
   def destroy
     template = Template.find(params[:id])
-    template.allocations.each do |allocation|
-      allocation.destroy!
+    if can_modify(params[:utorid], template)
+      template.allocations.each do |allocation|
+        allocation.destroy!
+      end
+      template.destroy!
+    else
+      render status: 403, file: 'public/403.html'
     end
-    template.destroy!
   end
 
   def update
     template = Template.find(params[:id])
-    update_form(template, params)
-    template.update_attributes!(template_params)
+    if can_modify(params[:utorid], template)
+      update_form(template, params)
+      template.update_attributes!(template_params)
+    else
+      render status: 403, file: 'public/403.html'
+    end
   end
 
   def preview
@@ -70,6 +76,11 @@ class TemplatesController < ApplicationController
   end
 
   private
+  def can_modify(utorid, template)
+    instructor = Instructor.find_by(utorid: utorid)
+    return template[:instructor_id] == instructor[:id]
+  end
+
   def template_params
     params.permit(:name, :optional, :scaling_learning)
   end
