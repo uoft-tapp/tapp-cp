@@ -120,6 +120,7 @@ module Authorizer
   def has_access(expected_roles)
     set_roles
     Rails.logger.info("Reached has_access")
+    Rails.logger.info("has_access result: #{!has_role(expected_roles)}")
     return !has_role(expected_roles)
   end
 
