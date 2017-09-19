@@ -1,5 +1,16 @@
 version: '2'
 services:
+  nginx:
+    image: nginx
+    build: 
+      context: ./
+      dockerfile: nginx/Dockerfile
+    networks:
+      - default
+    ports:
+      - "80:80"
+    links:
+      - rails-app
 
   rails-app:
     build:
