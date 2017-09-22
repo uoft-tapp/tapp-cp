@@ -223,11 +223,37 @@ class AppState {
     }
 
     getDdahApprovedSignature(offers){
-      let signature = window.prompt('Please enter your initial for approving DDAH\'s:');
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+            let signature = window.prompt('Please enter your initial for approving DDAH\'s:');
 
-      if (signature && signature.trim()) {
-         this.setDdahApproved(offers, signature.trim());
-      }
+            if (signature && signature.trim()) {
+                 fetch.setDdahApproved(ddahs, signature.trim());
+            }
+        }
+    }
+
+    getDdahsFromOffers(offers){
+      let ddahs = []
+      let allOffers = this.getOffersList();
+      offers.forEach(offer => {
+          let ddah = (this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer));
+          if (ddah == null){
+              this.alert('<b>Error</b>: There is no DDAH form of '+
+                  allOffers.getIn([offer, 'lastName']) + ', '+
+                  allOffers.getIn([offer, 'firstName']) + ' for '+
+                  allOffers.getIn([offer, 'course'])
+              );
+          }
+          else{
+            ddahs.push(ddah);
+          }
+      });
+      return ddahs;
     }
 
     // compute total ddah hours
@@ -837,11 +863,10 @@ class AppState {
             return;
         }
 
-        // map offers to ddah ids
-        let ddahs = offers.map(offer =>
-            this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer)
-        );
-        fetch.nagApplicantDdahs(ddahs);
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+            fetch.nagApplicantDdahs(ddahs);
+        }
     }
 
     nagInstructors(offers) {
@@ -912,11 +937,10 @@ class AppState {
             return;
         }
 
-        // map offers to ddah ids
-        let ddahs = offers.map(offer =>
-            this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer)
-        );
-        fetch.sendDdahs(ddahs);
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+            fetch.sendDdahs(ddahs);
+        }
     }
 
     setCategoriesList(list) {
@@ -932,21 +956,10 @@ class AppState {
             this.alert('<b>Error</b>: No offer selected');
             return;
         }
-
-        fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
-    }
-
-    setDdahApproved(offers, signature) {
-        if (offers.length == 0) {
-            this.alert('<b>Error</b>: No offer selected');
-            return;
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+          fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
         }
-
-        // map offers to ddah ids
-        let ddahs = offers.map(offer =>
-            this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer)
-        );
-        fetch.setDdahApproved(ddahs, signature);
     }
 
     setDdahsList(list) {
