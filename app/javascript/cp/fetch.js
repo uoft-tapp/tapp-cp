@@ -1048,7 +1048,7 @@ function previewDdah(ddah) {
 }
 
 // nag applicants about ddahs
-function nagApplicantDdahs(offers) {
+function nagApplicantDdahs(ddahs) {
     let validDdahs = ddahs;
 
     // check which ddahs can be sent
