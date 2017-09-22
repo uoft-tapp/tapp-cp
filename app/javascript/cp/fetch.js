@@ -706,23 +706,23 @@ function setDdahApproved(ddahs, signature) {
       // send contracts for valid ddahs
       .then(() => postHelper('/ddahs/status/approve', { ddahs: validDdahs, signature: signature }))
       .then(() => {
-        appState.setFetchingDataList('ddahs', true);
-        appState.setFetchingDataList('offers', true);
+          appState.setFetchingDataList('ddahs', true);
+          appState.setFetchingDataList('offers', true);
 
-        getDdahs()
-            .then(ddahs => {
-                appState.setDdahsList(fromJS(ddahs));
-                appState.setFetchingDataList('ddahs', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('ddahs', false));
+          getDdahs()
+              .then(ddahs => {
+                  appState.setDdahsList(fromJS(ddahs));
+                  appState.setFetchingDataList('ddahs', false, true);
+              })
+              .catch(() => appState.setFetchingDataList('ddahs', false));
 
-        getOffers()
-            .then(offers => {
-                appState.setOffersList(fromJS(offers));
-                appState.setFetchingDataList('offers', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('offers', false));
-      });
+          getOffers()
+              .then(offers => {
+                  appState.setOffersList(fromJS(offers));
+                  appState.setFetchingDataList('offers', false, true);
+              })
+              .catch(() => appState.setFetchingDataList('offers', false));
+        });
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
