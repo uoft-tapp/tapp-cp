@@ -634,24 +634,27 @@ class AppState {
         }
 
         let offer = this.getOffersList().get(offers[0]);
-
-        let ddah = this.get('ddahs.list').find(ddah => ddah.get('offer') == offers[0]);
-        if (!ddah.get('link')) {
-            // ddah does not have a ddah link
-            this.alert(
-                '<b>Error:</b> Offer to ' +
-                    offer.get('lastName') +
-                    ', ' +
-                    offer.get('firstName') +
-                    ' does not have an associated DDAH form'
-            );
-            return;
+        let ddah = this.getDdahsFromOffers(offers);
+        if (ddah.length == 1) {
+            let allDdahs = this.getDdahsList();
+            if (allDdahs.getIn([ddah, 'link'])==null){
+              // ddah does not have a ddah link
+              this.alert(
+                  '<b>Error:</b> Offer to ' +
+                      offer.get('lastName') +
+                      ', ' +
+                      offer.get('firstName') +
+                      ' does not have an associated DDAH form'
+              );
+              return;
+            }
+            else{
+                var a = document.createElement('a');
+                a.href =
+                    'mailto:' + offer.get('email') + '?body=Link%20to%20DDAH%20form:%20' + allDdahs.getIn([ddah, 'link']);
+                a.click();
+            }
         }
-
-        var a = document.createElement('a');
-        a.href =
-            'mailto:' + offer.get('email') + '?body=Link%20to%20DDAH%20form:%20' + ddah.get('link');
-        a.click();
     }
 
     // export offers to CSV
