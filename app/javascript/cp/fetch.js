@@ -192,7 +192,7 @@ function onFetchDdahsSuccess(resp) {
 
 function onFetchDutiesSuccess(resp) {
     let duties = {};
-
+ddah
     resp.forEach(duty => {
         duties[duty.id] = duty.name;
     });
@@ -216,6 +216,8 @@ function onFetchOffersSuccess(resp) {
             session: offer.session ? offer.session.id : undefined,
             hours: offer.hours,
             nagCount: offer.nag_count,
+            InstructorNagCount: offer.ddah_nag_count,
+            ddahNagCount: offer.ddah_applicant_nag_count,
             status: offer.status,
             hrStatus: offer.hr_status,
             ddahStatus: offer.ddah_status,

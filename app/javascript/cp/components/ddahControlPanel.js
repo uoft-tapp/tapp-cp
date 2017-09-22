@@ -170,6 +170,18 @@ class DdahControlPanel extends React.Component {
                     )
                 ),
             },
+            {
+                header: 'Instructor Nag Count',
+                data: p => (p.offer.get('InstructorNagCount')? p.offer.get('InstructorNagCount'): '-'),
+                sortData: p => (p.get('InstructorNagCount')? p.get('InstructorNagCount'): '-'),
+                style: { width: 0.1 },
+            },
+            {
+                header: 'Applicant Nag Count',
+                data: p => (p.offer.get('ddahNagCount')? p.offer.get('ddahNagCount'): '-'),
+                sortData: p => (p.get('ddahNagCount')? p.get('ddahNagCount'): '-'),
+                style: { width: 0.1 },
+            }
         ];
 
         return (
