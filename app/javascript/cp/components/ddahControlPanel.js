@@ -245,10 +245,7 @@ const DdahsMenu = props =>
         </MenuItem>
         <MenuItem divider />
         <MenuItem
-            onClick={() =>
-                props.appState.alert(
-                    '<b>Approve DDAH forms</b> This functionality is not currently supported.'
-                )}>
+            onClick={() =>  props.appState.getDdahApprovedSignature(getSelectedOffers())}>
             Approve DDAH form(s)
         </MenuItem>
         <MenuItem divider />

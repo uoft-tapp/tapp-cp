@@ -222,6 +222,14 @@ class AppState {
         return this.get('nav.roles');
     }
 
+    getDdahApprovedSignature(offers){
+      let signature = window.prompt('Please enter your initial for approving DDAH\'s:');
+
+      if (signature && signature.trim()) {
+         this.setDdahApproved(offers, signature.trim());
+      }
+    }
+
     // compute total ddah hours
     getDdahWorksheetTotal() {
         let total = this.get('ddahWorksheet.allocations').reduce(
@@ -917,6 +925,19 @@ class AppState {
         }
 
         fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
+    }
+
+    setDdahApproved(offers, signature) {
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+
+        // map offers to ddah ids
+        let ddahs = offers.map(offer =>
+            this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer)
+        );
+        fetch.setDdahApproved(ddahs, signature);
     }
 
     setDdahsList(list) {

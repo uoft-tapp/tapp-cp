@@ -666,6 +666,65 @@ function setDdahAccepted(offers) {
         });
 }
 
+// mark contracts as ddah_approved
+function setDdahApproved(ddahs, signature) {
+  let validDdahs = ddahs;
+
+  // check which ddahs can be sent
+  postHelper('/ddahs/status/can-approve', { ddahs: ddahs })
+      .then(resp => {
+          if (resp.status == 404) {
+              // some ddahs cannot be sent
+              let ddahsList = appState.getDdahsList();
+              let offersList = appState.getOffersList();
+
+              return resp.json().then(res => {
+                  res.invalid_offers.forEach(ddah => {
+                      var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+
+                      appState.alert(
+                          '<b>Error</b>: Cannot approve the DDAH form of ' +
+                              offersList.getIn([offer, 'lastName']) +
+                              ', ' +
+                              offersList.getIn([offer, 'firstName']) +
+                              ' for ' +
+                              offersList.getIn([offer, 'course'])
+                      );
+                      // remove invalid ddah(s) from ddah list
+                      validDdahs.splice(validDdahs.indexOf(ddah), 1);
+                  });
+
+                  if (validDdahs.length == 0) {
+                      return Promise.reject();
+                  }
+              }, msgFailure);
+          } else if (!resp.ok) {
+              // request failed
+              return respFailure(resp);
+          }
+      })
+      // send contracts for valid ddahs
+      .then(() => postHelper('/ddahs/status/approve', { ddahs: validDdahs, signature: signature }))
+      .then(() => {
+        appState.setFetchingDataList('ddahs', true);
+        appState.setFetchingDataList('offers', true);
+
+        getDdahs()
+            .then(ddahs => {
+                appState.setDdahsList(fromJS(ddahs));
+                appState.setFetchingDataList('ddahs', false, true);
+            })
+            .catch(() => appState.setFetchingDataList('ddahs', false));
+
+        getOffers()
+            .then(offers => {
+                appState.setOffersList(fromJS(offers));
+                appState.setFetchingDataList('offers', false, true);
+            })
+            .catch(() => appState.setFetchingDataList('offers', false));
+      });
+}
+
 // show the contract for this offer in a new window, as an applicant would see it
 function showContractApplicant(offer) {
     window.open('/offers/' + offer + '/pdf');
@@ -1179,6 +1238,7 @@ export {
     nagOffers,
     setHrProcessed,
     setDdahAccepted,
+    setDdahApproved,
     showContractApplicant,
     showContractHr,
     withdrawOffers,
