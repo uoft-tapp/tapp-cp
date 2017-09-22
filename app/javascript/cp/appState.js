@@ -844,6 +844,15 @@ class AppState {
         fetch.nagApplicantDdahs(ddahs);
     }
 
+    nagInstructors(offers) {
+      if (offers.length == 0) {
+          this.alert('<b>Error</b>: No offer selected');
+          return;
+      }
+
+      fetch.nagInstructors(offers.map(offer => parseInt(offer)));
+    }
+
     nagOffers(offers) {
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');

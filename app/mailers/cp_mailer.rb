@@ -32,7 +32,7 @@ class CpMailer < ApplicationMailer
     mail(to: email, subject: "DDAH Form: TAship of #{ddah[:position][:position]}")
   end
 
-  def ddah_instructor_nag_email(offer, instructor)
+  def instructor_nag_email(offer, instructor)
     email = get_email(instructor[:email])
     @offer = offer
     @instructor = instructor

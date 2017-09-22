@@ -106,17 +106,29 @@ class OffersController < ApplicationController
     Nag Mails (admin)
   '''
   def can_nag_instructor
-    check_ddah_status(params[:offers], :ddah_status, ["None", "Created"])
+    invalid = []
+    params[:offers].each do |offer_id|
+      offer = Offer.find(offer_id)
+      instructors = offer.format[:instructors]
+      if !(["None", "Created"].include? offer[:ddah_status]) || instructors.length == 0
+        invalid.push(offer[:id])
+      end
+    end
+    if invalid.length > 0
+      render status: 404, json: {invalid_offers: invalid}
+    end
   end
 
   def send_nag_instructor
-    instructor =
     params[:offers].each do |id|
-      offer = Offer.find(ddah[:id])
+      offer = Offer.find(id)
+      instructors = offer.format[:instructors]
+      offer.increment!(:ddah_nag_count, 1)
       if ENV['RAILS_ENV'] != 'test'
-        CPMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+        instructors.each do |instructor|
+          CpMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+        end
       end
-      offer.update_attributes!({ddah_status: "Pending", send_date: DateTime.now.to_s})
     end
     render status: 200, json: {message: "You've successfully sent out all the nag emails."}
   end

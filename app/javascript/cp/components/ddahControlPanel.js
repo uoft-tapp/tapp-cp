@@ -267,10 +267,7 @@ const CommMenu = props =>
             Nag applicant
         </MenuItem>
         <MenuItem
-            onClick={() =>
-                props.appState.alert(
-                    '<b>Nag instructors</b> This functionality is not currently supported.'
-                )}>
+            onClick={() => props.appState.nagInstructors(getSelectedOffers())}>
             Nag instructor(s)
         </MenuItem>
     </DropdownButton>;

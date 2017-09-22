@@ -1156,6 +1156,62 @@ function nagApplicantDdahs(ddahs) {
         });
 }
 
+function nagInstructors(offers) {
+  let validOffers = offers;
+
+  // check which applicants can be nagged
+  postHelper('/offers/can-nag-instructor', { offers: offers })
+      .then(resp => {
+          if (resp.status == 404) {
+              // some applicants cannot be nagged
+              let offersList = appState.getOffersList();
+
+              return resp.json().then(res => {
+                  res.invalid_offers.forEach(offer => {
+                      appState.alert(
+                          '<b>Error</b>: Cannot nag Instructor for ' +
+                          offersList.getIn([offer.toString(), 'lastName']) +
+                          ', ' +
+                          offersList.getIn([offer.toString(), 'firstName']) +
+                          ' about ' +
+                          offersList.getIn([offer.toString(), 'course']) +
+                          '. Check if this position has an instructor.'
+                      );
+                      // remove invalid offer(s) from offer list
+                      validOffers.splice(validOffers.indexOf(offer), 1);
+                  });
+
+                  if (validOffers.length == 0) {
+                      return Promise.reject();
+                  }
+              }, msgFailure);
+          } else if (!resp.ok) {
+              // request failed
+              return respFailure(resp);
+          }
+      })
+      // nag valid offers
+      .then(() => postHelper('/offers/send-nag-instructor', { offers: validOffers }))
+      .then(() => {
+        appState.setFetchingDataList('ddahs', true);
+        appState.setFetchingDataList('offers', true);
+
+        getDdahs()
+            .then(ddahs => {
+                appState.setDdahsList(fromJS(ddahs));
+                appState.setFetchingDataList('ddahs', false, true);
+            })
+            .catch(() => appState.setFetchingDataList('ddahs', false));
+
+        getOffers()
+            .then(offers => {
+                appState.setOffersList(fromJS(offers));
+                appState.setFetchingDataList('offers', false, true);
+            })
+            .catch(() => appState.setFetchingDataList('offers', false));
+      });
+}
+
 // send ddah forms
 function sendDdahs(ddahs) {
     let validDdahs = ddahs;
@@ -1257,6 +1313,7 @@ export {
     submitDdah,
     previewDdah,
     nagApplicantDdahs,
+    nagInstructors,
     sendDdahs,
     fetchAuth,
 };
