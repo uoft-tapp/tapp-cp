@@ -192,7 +192,7 @@ function onFetchDdahsSuccess(resp) {
 
 function onFetchDutiesSuccess(resp) {
     let duties = {};
-
+ddah
     resp.forEach(duty => {
         duties[duty.id] = duty.name;
     });
@@ -216,6 +216,8 @@ function onFetchOffersSuccess(resp) {
             session: offer.session ? offer.session.id : undefined,
             hours: offer.hours,
             nagCount: offer.nag_count,
+            InstructorNagCount: offer.ddah_nag_count,
+            ddahNagCount: offer.ddah_applicant_nag_count,
             status: offer.status,
             hrStatus: offer.hr_status,
             ddahStatus: offer.ddah_status,
@@ -666,6 +668,65 @@ function setDdahAccepted(offers) {
         });
 }
 
+// mark contracts as ddah_approved
+function setDdahApproved(ddahs, signature) {
+  let validDdahs = ddahs;
+
+  // check which ddahs can be sent
+  postHelper('/ddahs/status/can-approve', { ddahs: ddahs })
+      .then(resp => {
+          if (resp.status == 404) {
+              // some ddahs cannot be sent
+              let ddahsList = appState.getDdahsList();
+              let offersList = appState.getOffersList();
+
+              return resp.json().then(res => {
+                  res.invalid_offers.forEach(ddah => {
+                      var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+
+                      appState.alert(
+                          '<b>Error</b>: Cannot approve the DDAH form of ' +
+                              offersList.getIn([offer, 'lastName']) +
+                              ', ' +
+                              offersList.getIn([offer, 'firstName']) +
+                              ' for ' +
+                              offersList.getIn([offer, 'course'])
+                      );
+                      // remove invalid ddah(s) from ddah list
+                      validDdahs.splice(validDdahs.indexOf(ddah), 1);
+                  });
+
+                  if (validDdahs.length == 0) {
+                      return Promise.reject();
+                  }
+              }, msgFailure);
+          } else if (!resp.ok) {
+              // request failed
+              return respFailure(resp);
+          }
+      })
+      // send contracts for valid ddahs
+      .then(() => postHelper('/ddahs/status/approve', { ddahs: validDdahs, signature: signature }))
+      .then(() => {
+          appState.setFetchingDataList('ddahs', true);
+          appState.setFetchingDataList('offers', true);
+
+          getDdahs()
+              .then(ddahs => {
+                  appState.setDdahsList(fromJS(ddahs));
+                  appState.setFetchingDataList('ddahs', false, true);
+              })
+              .catch(() => appState.setFetchingDataList('ddahs', false));
+
+          getOffers()
+              .then(offers => {
+                  appState.setOffersList(fromJS(offers));
+                  appState.setFetchingDataList('offers', false, true);
+              })
+              .catch(() => appState.setFetchingDataList('offers', false));
+        });
+}
+
 // show the contract for this offer in a new window, as an applicant would see it
 function showContractApplicant(offer) {
     window.open('/offers/' + offer + '/pdf');
@@ -863,7 +924,10 @@ function setOfferAccepted(offer) {
     postHelper('/offers/' + offer + '/accept', {})
         .then(resp => {
             if (resp.status == 404) {
-                return resp.json().then(resp => appState.alert(resp.message)).then(Promise.reject);
+                return resp
+                    .json()
+                    .then(resp => appState.alert(resp.message))
+                    .then(Promise.reject);
             } else if (!resp.ok) {
                 return respFailure(resp);
             }
@@ -909,7 +973,10 @@ function createTemplate(name, position) {
                 return resp.json().catch(msgFailure);
             }
             if (resp.status == 404) {
-                return resp.json().catch(msgFailure).then(res => msgFailure(res.message));
+                return resp
+                    .json()
+                    .catch(msgFailure)
+                    .then(res => msgFailure(res.message));
             }
             return respFailure(resp);
         })
@@ -971,7 +1038,10 @@ function createDdah(offer) {
                 return resp.json().catch(msgFailure);
             }
             if (resp.status == 404) {
-                return resp.json().catch(msgFailure).then(res => msgFailure(res.message));
+                return resp
+                    .json()
+                    .catch(msgFailure)
+                    .then(res => msgFailure(res.message));
             }
             return respFailure(resp);
         })
@@ -1039,31 +1109,34 @@ function previewDdah(ddah) {
 }
 
 // nag applicants about ddahs
-function nagApplicantDdahs(offers) {
-    let validOffers = offers;
+function nagApplicantDdahs(ddahs) {
+    let validDdahs = ddahs;
 
-    // check which applicants can be nagged
-    postHelper('/ddahs/can-nag-student', { offers: offers })
+    // check which ddahs can be sent
+    postHelper('/ddahs/can-nag-student', { ddahs: ddahs })
         .then(resp => {
             if (resp.status == 404) {
-                // some applicants cannot be nagged
+                // some ddahs cannot be sent
+                let ddahsList = appState.getDdahsList();
                 let offersList = appState.getOffersList();
 
                 return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
+                    res.invalid_offers.forEach(ddah => {
+                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+
                         appState.alert(
-                            '<b>Error</b>: Cannot nag ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
+                            '<b>Error</b>: Cannot send DDAH form to ' +
+                                offersList.getIn([offer, 'lastName']) +
                                 ', ' +
-                                offersList.getIn([offer.toString(), 'firstName']) +
-                                ' about DDAH form for ' +
-                                offersList.getIn([offer.toString(), 'course'])
+                                offersList.getIn([offer, 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer, 'course'])
                         );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
+                        // remove invalid ddah(s) from ddah list
+                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
                     });
 
-                    if (validOffers.length == 0) {
+                    if (validDdahs.length == 0) {
                         return Promise.reject();
                     }
                 }, msgFailure);
@@ -1072,15 +1145,8 @@ function nagApplicantDdahs(offers) {
                 return respFailure(resp);
             }
         })
-        // nag valid ddahs
-        .then(() => {
-            // map valid offers to ddah ids
-            let validDdahs = validOffers.map(offer =>
-                appState.getDdahsList().findKey(ddah => ddah.get('offer') == offer)
-            );
-
-            return postHelper('/ddahs/send-nag-student', { ddahs: validDdahs });
-        })
+        // send contracts for valid ddahs
+        .then(() => postHelper('/ddahs/send-nag-student', { ddahs: validDdahs }))
         .then(() => {
             appState.setFetchingDataList('ddahs', true);
             getDdahs()
@@ -1090,6 +1156,62 @@ function nagApplicantDdahs(offers) {
                 })
                 .catch(() => appState.setFetchingDataList('ddahs', false));
         });
+}
+
+function nagInstructors(offers) {
+  let validOffers = offers;
+
+  // check which applicants can be nagged
+  postHelper('/offers/can-nag-instructor', { offers: offers })
+      .then(resp => {
+          if (resp.status == 404) {
+              // some applicants cannot be nagged
+              let offersList = appState.getOffersList();
+
+              return resp.json().then(res => {
+                  res.invalid_offers.forEach(offer => {
+                      appState.alert(
+                          '<b>Error</b>: Cannot nag Instructor for ' +
+                          offersList.getIn([offer.toString(), 'lastName']) +
+                          ', ' +
+                          offersList.getIn([offer.toString(), 'firstName']) +
+                          ' about ' +
+                          offersList.getIn([offer.toString(), 'course']) +
+                          '. Check if this position has an instructor.'
+                      );
+                      // remove invalid offer(s) from offer list
+                      validOffers.splice(validOffers.indexOf(offer), 1);
+                  });
+
+                  if (validOffers.length == 0) {
+                      return Promise.reject();
+                  }
+              }, msgFailure);
+          } else if (!resp.ok) {
+              // request failed
+              return respFailure(resp);
+          }
+      })
+      // nag valid offers
+      .then(() => postHelper('/offers/send-nag-instructor', { offers: validOffers }))
+      .then(() => {
+        appState.setFetchingDataList('ddahs', true);
+        appState.setFetchingDataList('offers', true);
+
+        getDdahs()
+            .then(ddahs => {
+                appState.setDdahsList(fromJS(ddahs));
+                appState.setFetchingDataList('ddahs', false, true);
+            })
+            .catch(() => appState.setFetchingDataList('ddahs', false));
+
+        getOffers()
+            .then(offers => {
+                appState.setOffersList(fromJS(offers));
+                appState.setFetchingDataList('offers', false, true);
+            })
+            .catch(() => appState.setFetchingDataList('offers', false));
+      });
 }
 
 // send ddah forms
@@ -1174,6 +1296,7 @@ export {
     nagOffers,
     setHrProcessed,
     setDdahAccepted,
+    setDdahApproved,
     showContractApplicant,
     showContractHr,
     withdrawOffers,
@@ -1192,6 +1315,7 @@ export {
     submitDdah,
     previewDdah,
     nagApplicantDdahs,
+    nagInstructors,
     sendDdahs,
     fetchAuth,
 };

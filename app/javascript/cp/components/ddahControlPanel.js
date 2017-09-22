@@ -170,6 +170,18 @@ class DdahControlPanel extends React.Component {
                     )
                 ),
             },
+            {
+                header: 'Instructor Nag Count',
+                data: p => (p.offer.get('InstructorNagCount')? p.offer.get('InstructorNagCount'): '-'),
+                sortData: p => (p.get('InstructorNagCount')? p.get('InstructorNagCount'): '-'),
+                style: { width: 0.1 },
+            },
+            {
+                header: 'Applicant Nag Count',
+                data: p => (p.offer.get('ddahNagCount')? p.offer.get('ddahNagCount'): '-'),
+                sortData: p => (p.get('ddahNagCount')? p.get('ddahNagCount'): '-'),
+                style: { width: 0.1 },
+            }
         ];
 
         return (
@@ -245,10 +257,7 @@ const DdahsMenu = props =>
         </MenuItem>
         <MenuItem divider />
         <MenuItem
-            onClick={() =>
-                props.appState.alert(
-                    '<b>Approve DDAH forms</b> This functionality is not currently supported.'
-                )}>
+            onClick={() =>  props.appState.getDdahApprovedSignature(getSelectedOffers())}>
             Approve DDAH form(s)
         </MenuItem>
         <MenuItem divider />
@@ -270,10 +279,7 @@ const CommMenu = props =>
             Nag applicant
         </MenuItem>
         <MenuItem
-            onClick={() =>
-                props.appState.alert(
-                    '<b>Nag instructors</b> This functionality is not currently supported.'
-                )}>
+            onClick={() => props.appState.nagInstructors(getSelectedOffers())}>
             Nag instructor(s)
         </MenuItem>
     </DropdownButton>;

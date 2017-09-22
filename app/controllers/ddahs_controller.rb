@@ -177,7 +177,7 @@ class DdahsController < ApplicationController
 
 
   def can_nag_student
-    check_ddah_status(params[:offers], ["Pending"])
+    check_ddah_status(params[:ddahs], ["Pending"])
   end
 
   def send_nag_student

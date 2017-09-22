@@ -169,7 +169,9 @@ class AppState {
         // replace the values in the current ddah with the values in the template
         this.set(
             'ddahWorksheet',
-            this.get('ddahWorksheet').merge(this.createDdahWorksheet(template)).set('changed', true)
+            this.get('ddahWorksheet')
+                .merge(this.createDdahWorksheet(template))
+                .set('changed', true)
         );
     }
 
@@ -218,6 +220,40 @@ class AppState {
 
     getCurrentUserRoles() {
         return this.get('nav.roles');
+    }
+
+    getDdahApprovedSignature(offers){
+        if (offers.length == 0) {
+            this.alert('<b>Error</b>: No offer selected');
+            return;
+        }
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+            let signature = window.prompt('Please enter your initial for approving DDAH\'s:');
+
+            if (signature && signature.trim()) {
+                 fetch.setDdahApproved(ddahs, signature.trim());
+            }
+        }
+    }
+
+    getDdahsFromOffers(offers){
+      let ddahs = []
+      let allOffers = this.getOffersList();
+      offers.forEach(offer => {
+          let ddah = (this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer));
+          if (ddah == null){
+              this.alert('<b>Error</b>: There is no DDAH form of '+
+                  allOffers.getIn([offer, 'lastName']) + ', '+
+                  allOffers.getIn([offer, 'firstName']) + ' for '+
+                  allOffers.getIn([offer, 'course'])
+              );
+          }
+          else{
+            ddahs.push(ddah);
+          }
+      });
+      return ddahs;
     }
 
     // compute total ddah hours
@@ -521,7 +557,14 @@ class AppState {
             // we don't associate templates with positions in the front-end model, so we pick a position id
             // without caring which
             fetch
-                .createTemplate(name, parseInt(this.get('courses.list').keySeq().first()))
+                .createTemplate(
+                    name,
+                    parseInt(
+                        this.get('courses.list')
+                            .keySeq()
+                            .first()
+                    )
+                )
                 // when the request succeeds, display the new template
                 .then(template => this.toggleSelectedTemplate(template));
         }
@@ -591,24 +634,27 @@ class AppState {
         }
 
         let offer = this.getOffersList().get(offers[0]);
-
-        let ddah = this.get('ddahs.list').find(ddah => ddah.get('offer') == offers[0]);
-        if (!ddah.get('link')) {
-            // ddah does not have a ddah link
-            this.alert(
-                '<b>Error:</b> Offer to ' +
-                    offer.get('lastName') +
-                    ', ' +
-                    offer.get('firstName') +
-                    ' does not have an associated DDAH form'
-            );
-            return;
+        let ddah = this.getDdahsFromOffers(offers);
+        if (ddah.length == 1) {
+            let allDdahs = this.getDdahsList();
+            if (allDdahs.getIn([ddah, 'link'])==null){
+              // ddah does not have a ddah link
+              this.alert(
+                  '<b>Error:</b> Offer to ' +
+                      offer.get('lastName') +
+                      ', ' +
+                      offer.get('firstName') +
+                      ' does not have an associated DDAH form'
+              );
+              return;
+            }
+            else{
+                var a = document.createElement('a');
+                a.href =
+                    'mailto:' + offer.get('email') + '?body=Link%20to%20DDAH%20form:%20' + allDdahs.getIn([ddah, 'link']);
+                a.click();
+            }
         }
-
-        var a = document.createElement('a');
-        a.href =
-            'mailto:' + offer.get('email') + '?body=Link%20to%20DDAH%20form:%20' + ddah.get('link');
-        a.click();
     }
 
     // export offers to CSV
@@ -702,7 +748,12 @@ class AppState {
         let offers = this.getOffersList();
 
         if (offers) {
-            return offers.map(offer => offer.get('course')).flip().keySeq().sort().toJS();
+            return offers
+                .map(offer => offer.get('course'))
+                .flip()
+                .keySeq()
+                .sort()
+                .toJS();
         }
         return [];
     }
@@ -815,7 +866,19 @@ class AppState {
             return;
         }
 
-        fetch.nagApplicantDdahs(offers.map(offer => parseInt(offer)));
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+            fetch.nagApplicantDdahs(ddahs);
+        }
+    }
+
+    nagInstructors(offers) {
+      if (offers.length == 0) {
+          this.alert('<b>Error</b>: No offer selected');
+          return;
+      }
+
+      fetch.nagInstructors(offers.map(offer => parseInt(offer)));
     }
 
     nagOffers(offers) {
@@ -877,11 +940,10 @@ class AppState {
             return;
         }
 
-        // map offers to ddah ids
-        let ddahs = offers.map(offer =>
-            this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer)
-        );
-        fetch.sendDdahs(ddahs);
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+            fetch.sendDdahs(ddahs);
+        }
     }
 
     setCategoriesList(list) {
@@ -897,8 +959,10 @@ class AppState {
             this.alert('<b>Error</b>: No offer selected');
             return;
         }
-
-        fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
+        let ddahs = this.getDdahsFromOffers(offers);
+        if (ddahs.length > 0){
+          fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
+        }
     }
 
     setDdahsList(list) {
