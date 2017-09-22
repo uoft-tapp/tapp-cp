@@ -309,7 +309,7 @@ docker-compose up -d
 While the application is running,
 1. Back up the database and its content:
     ```
-    docker-compose exec postgres pg_dumpall -U postgres > filename
+    docker exec -t tappcp_postgres_1 pg_dumpall -U postgres > filename
     ```
 2. Stop & remove all running containers and erase their volumes:
     ```
