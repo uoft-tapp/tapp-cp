@@ -186,14 +186,14 @@
       }
       function setupPage(status){
         decision = document.getElementById("decision");
-        status = document.getElementById("status");
+        stats = document.getElementById("status");
         if (status == "Accepted"){
           decision.style.display = "none";
-          status.style.display = "block";
+          stats.style.display = "block";
         }
         else{
           decision.style.display = "block";
-          status.style.display = "none";
+          stats.style.display = "none";
         }
         fetchPdfData();
       }
