@@ -169,7 +169,9 @@ class AppState {
         // replace the values in the current ddah with the values in the template
         this.set(
             'ddahWorksheet',
-            this.get('ddahWorksheet').merge(this.createDdahWorksheet(template)).set('changed', true)
+            this.get('ddahWorksheet')
+                .merge(this.createDdahWorksheet(template))
+                .set('changed', true)
         );
     }
 
@@ -521,7 +523,14 @@ class AppState {
             // we don't associate templates with positions in the front-end model, so we pick a position id
             // without caring which
             fetch
-                .createTemplate(name, parseInt(this.get('courses.list').keySeq().first()))
+                .createTemplate(
+                    name,
+                    parseInt(
+                        this.get('courses.list')
+                            .keySeq()
+                            .first()
+                    )
+                )
                 // when the request succeeds, display the new template
                 .then(template => this.toggleSelectedTemplate(template));
         }
@@ -702,7 +711,12 @@ class AppState {
         let offers = this.getOffersList();
 
         if (offers) {
-            return offers.map(offer => offer.get('course')).flip().keySeq().sort().toJS();
+            return offers
+                .map(offer => offer.get('course'))
+                .flip()
+                .keySeq()
+                .sort()
+                .toJS();
         }
         return [];
     }
@@ -815,7 +829,11 @@ class AppState {
             return;
         }
 
-        fetch.nagApplicantDdahs(offers.map(offer => parseInt(offer)));
+        // map offers to ddah ids
+        let ddahs = offers.map(offer =>
+            this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer)
+        );
+        fetch.nagApplicantDdahs(ddahs);
     }
 
     nagOffers(offers) {

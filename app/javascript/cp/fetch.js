@@ -863,7 +863,10 @@ function setOfferAccepted(offer) {
     postHelper('/offers/' + offer + '/accept', {})
         .then(resp => {
             if (resp.status == 404) {
-                return resp.json().then(resp => appState.alert(resp.message)).then(Promise.reject);
+                return resp
+                    .json()
+                    .then(resp => appState.alert(resp.message))
+                    .then(Promise.reject);
             } else if (!resp.ok) {
                 return respFailure(resp);
             }
@@ -909,7 +912,10 @@ function createTemplate(name, position) {
                 return resp.json().catch(msgFailure);
             }
             if (resp.status == 404) {
-                return resp.json().catch(msgFailure).then(res => msgFailure(res.message));
+                return resp
+                    .json()
+                    .catch(msgFailure)
+                    .then(res => msgFailure(res.message));
             }
             return respFailure(resp);
         })
@@ -971,7 +977,10 @@ function createDdah(offer) {
                 return resp.json().catch(msgFailure);
             }
             if (resp.status == 404) {
-                return resp.json().catch(msgFailure).then(res => msgFailure(res.message));
+                return resp
+                    .json()
+                    .catch(msgFailure)
+                    .then(res => msgFailure(res.message));
             }
             return respFailure(resp);
         })
@@ -1040,30 +1049,33 @@ function previewDdah(ddah) {
 
 // nag applicants about ddahs
 function nagApplicantDdahs(offers) {
-    let validOffers = offers;
+    let validDdahs = ddahs;
 
-    // check which applicants can be nagged
-    postHelper('/ddahs/can-nag-student', { offers: offers })
+    // check which ddahs can be sent
+    postHelper('/ddahs/can-nag-student', { ddahs: ddahs })
         .then(resp => {
             if (resp.status == 404) {
-                // some applicants cannot be nagged
+                // some ddahs cannot be sent
+                let ddahsList = appState.getDdahsList();
                 let offersList = appState.getOffersList();
 
                 return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
+                    res.invalid_offers.forEach(ddah => {
+                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+
                         appState.alert(
-                            '<b>Error</b>: Cannot nag ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
+                            '<b>Error</b>: Cannot send DDAH form to ' +
+                                offersList.getIn([offer, 'lastName']) +
                                 ', ' +
-                                offersList.getIn([offer.toString(), 'firstName']) +
-                                ' about DDAH form for ' +
-                                offersList.getIn([offer.toString(), 'course'])
+                                offersList.getIn([offer, 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer, 'course'])
                         );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
+                        // remove invalid ddah(s) from ddah list
+                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
                     });
 
-                    if (validOffers.length == 0) {
+                    if (validDdahs.length == 0) {
                         return Promise.reject();
                     }
                 }, msgFailure);
@@ -1072,15 +1084,8 @@ function nagApplicantDdahs(offers) {
                 return respFailure(resp);
             }
         })
-        // nag valid ddahs
-        .then(() => {
-            // map valid offers to ddah ids
-            let validDdahs = validOffers.map(offer =>
-                appState.getDdahsList().findKey(ddah => ddah.get('offer') == offer)
-            );
-
-            return postHelper('/ddahs/send-nag-student', { ddahs: validDdahs });
-        })
+        // send contracts for valid ddahs
+        .then(() => postHelper('/ddahs/send-nag-student', { ddahs: validDdahs }))
         .then(() => {
             appState.setFetchingDataList('ddahs', true);
             getDdahs()
