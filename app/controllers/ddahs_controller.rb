@@ -6,10 +6,10 @@ class DdahsController < ApplicationController
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
   before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
   before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
-  before_action  only: [:pdf, :separate_from_template, :new_template] do
+  before_action  only: [:pdf, :new_template] do
     both_cp_admin_instructor(Ddah)
   end
-  before_action only: [:apply_template, :can_finish_ddah, :finish_ddah] do
+  before_action only: [:can_finish_ddah, :finish_ddah] do
     both_cp_admin_instructor(Ddah, :ddahs, true)
   end
 
@@ -41,23 +41,11 @@ class DdahsController < ApplicationController
     instructor = Instructor.find_by!(utorid: params[:utorid])
     ddah = Ddah.find_by(offer_id: offer[:id])
     if !ddah
-      if params[:use_template]
-        if template_match_offer(params[:template_id], offer)
-          Ddah.create!(
-            offer_id: offer[:id],
-            template_id: params[:template_id],
-            instructor_id: instructor[:id],
-          )
-        else
-          render status: 404, json: {message: "Error: Mismatched Position. Operation Aborted."}
-        end
-      else
-        ddah = Ddah.create!(
-          offer_id: offer[:id],
-          instructor_id: instructor[:id],
-          optional: true,
-        )
-      end
+      ddah = Ddah.create!(
+        offer_id: offer[:id],
+        instructor_id: instructor[:id],
+        optional: true,
+      )
       offer.update_attributes!(ddah_status: "Created")
       render status: 201, json: ddah.to_json
     else
@@ -80,79 +68,33 @@ class DdahsController < ApplicationController
   def update
     ddah = Ddah.find(params[:id])
     if can_modify(params[:utorid], ddah)
-        ddah.update_attributes!(ddah_params)
-      if !ddah[:template_id]
-        update_form(ddah, params)
-        render status: 200, json: {message: "DDAH was updated successfully."}
-      else
-        render status: 404, json: {message: "Error: This DDAH is currently using a template. You need to either update the template or separate this DDAH from the current template."}
-      end
+      ddah.update_attributes!(ddah_params)
+      update_form(ddah, params)
+      render status: 200, json: {message: "DDAH was updated successfully."}
     else
       render status: 403, file: 'public/403.html'
     end
   end
 
-  '''
-    Template DDAH (instructor)
-  '''
-  def apply_template
-    params[:ddahs].each do |id|
-      ddah = Ddah.find(id)
-      if ddah[:template_id]
-        clear_ddah(ddah)
-        ddah.update_attributes!(template_id: params[:template_id])
-      else
-        ddah.update_attributes!(template_id: params[:template_id])
-      end
-    end
-    render status: 200, json: {message: "Batch template apply success."}
-  end
-
   def new_template
     ddah = Ddah.find(params[:ddah_id])
-    if !ddah[:template_id]
-      offer = Offer.find(ddah[:offer_id])
-      position = Position.find(offer[:position_id])
-      data = {
-        name: params[:name],
-        optional: ddah[:optional],
-        instructor_id: ddah[:instructor_id],
-        tutorial_category: ddah[:tutorial_category],
-        department: ddah[:department],
-        scaling_learning: ddah[:scaling_learning],
-        position_id: position[:id],
-      }
-      template = Template.create!(data)
-      copy_allocations(template, ddah.allocations, :ddah_id, :template_id)
-      template.training_ids = ddah.training_ids
-      template.category_ids = ddah.category_ids
-      render status: 200, json: {message: "A new template was successfully created."}
-    else
-      render status: 404, json: {message: "Error: A new template cannot be created from a DDAH that is already using a template."}
-    end
+    offer = Offer.find(ddah[:offer_id])
+    position = Position.find(offer[:position_id])
+    data = {
+      name: params[:name],
+      optional: ddah[:optional],
+      instructor_id: ddah[:instructor_id],
+      tutorial_category: ddah[:tutorial_category],
+      department: ddah[:department],
+      scaling_learning: ddah[:scaling_learning],
+      position_id: position[:id],
+    }
+    template = Template.create!(data)
+    copy_allocations(template, ddah.allocations, :ddah_id, :template_id)
+    template.training_ids = ddah.training_ids
+    template.category_ids = ddah.category_ids
+    render status: 200, json: {message: "A new template was successfully created."}
   end
-
-  def separate_from_template
-    ddah = Ddah.find(params[:ddah_id])
-    if ddah[:template_id]
-      template = Template.find(ddah[:template_id])
-      data = {
-        optional: template[:optional],
-        instructor_id: template[:instructor_id],
-        tutorial_category: template[:tutorial_category],
-        department: template[:department],
-        scaling_learning: template[:scaling_learning],
-      }
-      ddah.update_attributes!(data)
-      copy_allocations(ddah, template.allocations, :template_id, :ddah_id)
-      ddah.trainings = template.training_ids
-      ddah.categories = template.category_ids
-      render status: 200, json: {message: "The DDAH was successfully separated from its template."}
-    else
-      render status: 404, json: {message: "Error: A DDAH cannot be separated if it does not have a template."}
-    end
-  end
-
 
   '''
     Send Mails (admin)
@@ -359,12 +301,6 @@ class DdahsController < ApplicationController
       allocation = Allocation.create!(val)
       model.allocations.push(allocation)
     end
-  end
-
-  def template_match_offer(template_id, offer)
-    position_id = offer[:position_id]
-    template = Template.find(template_id)
-    return position_id == template[:position_id]
   end
 
   def set_domain

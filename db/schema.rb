@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170912174100) do
+ActiveRecord::Schema.define(version: 20170923043351) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -97,7 +97,6 @@ ActiveRecord::Schema.define(version: 20170912174100) do
   create_table "ddahs", force: :cascade do |t|
     t.boolean "optional"
     t.bigint "offer_id"
-    t.bigint "template_id"
     t.bigint "instructor_id"
     t.string "tutorial_category", default: "Classroom TA"
     t.string "department", default: "Computer Science"
@@ -119,7 +118,6 @@ ActiveRecord::Schema.define(version: 20170912174100) do
     t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
     t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
     t.index ["offer_id"], name: "index_ddahs_on_offer_id"
-    t.index ["template_id"], name: "index_ddahs_on_template_id"
   end
 
   create_table "ddahs_trainings", id: false, force: :cascade do |t|
@@ -219,7 +217,6 @@ ActiveRecord::Schema.define(version: 20170912174100) do
   create_table "templates", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "optional", default: true
-    t.bigint "position_id"
     t.bigint "instructor_id"
     t.string "tutorial_category", default: "Classroom TA"
     t.string "department", default: "Computer Science"
@@ -228,7 +225,6 @@ ActiveRecord::Schema.define(version: 20170912174100) do
     t.boolean "scaling_learning", default: false
     t.index ["instructor_id"], name: "index_templates_on_instructor_id"
     t.index ["name", "instructor_id", "id"], name: "index_templates_on_name_and_instructor_id_and_id", unique: true
-    t.index ["position_id"], name: "index_templates_on_position_id"
   end
 
   create_table "templates_trainings", id: false, force: :cascade do |t|
@@ -251,10 +247,8 @@ ActiveRecord::Schema.define(version: 20170912174100) do
   add_foreign_key "assignments", "positions"
   add_foreign_key "ddahs", "instructors"
   add_foreign_key "ddahs", "offers"
-  add_foreign_key "ddahs", "templates"
   add_foreign_key "positions", "sessions"
   add_foreign_key "preferences", "applications"
   add_foreign_key "preferences", "positions"
   add_foreign_key "templates", "instructors"
-  add_foreign_key "templates", "positions"
 end
