@@ -9,24 +9,25 @@
     <%= javascript_pack_tag 'cp' %>
     <%= stylesheet_pack_tag 'cp' %>
 
-    <% if ENV['RAILS_ENV'] == 'development' %>
-      <!-- For development in Windows -->
-      <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
-      <script src="<%= @pack_url %>cp.js"></script>
-      <link rel="stylesheet" media="screen" href="<%= @pack_url %>cp.css">
-    <% end %>
-
     <% @polyfills = [
           "fetch",
           "Promise",
           "Symbol",
           "Object.entries",
           "Array.prototype.map",
+          "Array.prototype.forEach",
           "Array.prototype.@@iterator",
-          "default",
+          "Symbol.iterator",
         ]
       %>
     <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
+
+    <% if ENV['RAILS_ENV'] == 'development' %>
+      <!-- For development in Windows -->
+      <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
+      <script src="<%= @pack_url %>cp.js?v=<%= DateTime.now %>"></script>
+      <link rel="stylesheet" media="screen" href="<%= @pack_url %>cp.css?v=<%= DateTime.now %>">
+    <% end %>
 
     <!-- FA icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
