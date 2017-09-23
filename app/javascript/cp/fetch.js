@@ -192,7 +192,7 @@ function onFetchDdahsSuccess(resp) {
 
 function onFetchDutiesSuccess(resp) {
     let duties = {};
-ddah
+
     resp.forEach(duty => {
         duties[duty.id] = duty.name;
     });
