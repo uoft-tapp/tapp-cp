@@ -38,10 +38,4 @@ class Ddah < ApplicationRecord
     return ddah.merge(data)
   end
 
-  private
-  def overwrite(ddah, template, attributes)
-    attributes.each do |attr|
-      ddah[attr] = template[attr]
-    end
-  end
 end
