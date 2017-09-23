@@ -556,15 +556,7 @@ class AppState {
             // the route to create a new template expects a position with which to associate the template
             // we don't associate templates with positions in the front-end model, so we pick a position id
             // without caring which
-            fetch
-                .createTemplate(
-                    name,
-                    parseInt(
-                        this.get('courses.list')
-                            .keySeq()
-                            .first()
-                    )
-                )
+            fetch.createTemplate(name)
                 // when the request succeeds, display the new template
                 .then(template => this.toggleSelectedTemplate(template));
         }

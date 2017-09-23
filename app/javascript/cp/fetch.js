@@ -964,10 +964,10 @@ function exportOffers(session) {
 }
 
 // create a new, empty template with this name
-function createTemplate(name, position) {
+function createTemplate(name) {
     let user = appState.getCurrentUserName();
 
-    return postHelper('/instructors/' + user + '/templates', { name: name, position_id: position })
+    return postHelper('/instructors/' + user + '/templates', { name: name })
         .then(resp => {
             if (resp.ok) {
                 return resp.json().catch(msgFailure);
