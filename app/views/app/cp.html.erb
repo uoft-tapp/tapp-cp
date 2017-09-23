@@ -19,13 +19,14 @@
     <% @polyfills = [
           "fetch",
           "Promise",
+          "Symbol",
           "Object.entries",
           "Array.prototype.map",
+          "Array.prototype.@@iterator",
+          "default",
         ]
       %>
-    <% @polyfills.each do |polyfill| %>
-    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= polyfill %>"></script>
-    <% end %>
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
 
     <!-- FA icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">

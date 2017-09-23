@@ -8,9 +8,7 @@
           "Object.entries",
         ]
       %>
-    <% @polyfills.each do |polyfill| %>
-    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= polyfill %>"></script>
-    <% end %>
+      <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
   </head>
   <style>
     body, h1, div, form, p, label, input, button{
