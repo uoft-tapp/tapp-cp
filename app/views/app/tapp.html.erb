@@ -10,13 +10,25 @@
     <% if ENV['RAILS_ENV'] == 'development' %>
       <!-- For development in Windows -->
       <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
-      <script src="<%= @pack_url %>tapp.js"></script>
-      <link rel="stylesheet" media="screen" href="<%= @pack_url %>tapp.css">
+      <script src="<%= @pack_url %>tapp.js?v=<%= DateTime.now %>"></script>
+      <link rel="stylesheet" media="screen" href="<%= @pack_url %>tapp.css?v=<%= DateTime.now %>">
     <% end %>
 
-    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=fetch"></script>
-    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=Object.entries"></script>
-
+    <% @polyfills = [
+          "fetch",
+          "Promise",
+          "Symbol",
+          "Object.entries",
+          "Object.assign",
+          "Array.prototype.includes",
+          "String.prototype.includes",
+          "Array.prototype.map",
+          "Array.prototype.@@iterator",
+        ]
+      %>
+    <% @polyfills.each do |polyfill| %>
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= polyfill %>"></script>
+    <% end %>
 
     <!-- FA icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
