@@ -262,7 +262,7 @@ class AppState {
             (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
             0
         );
-        return isNaN(total) ? 0 : total / 60;
+        return isNaN(total) ? 0 : total / 60.0;
     }
 
     getDdahWorksheet() {
@@ -281,7 +281,7 @@ class AppState {
             ) {
                 summary = summary.update(
                     allocation.get('duty').toString(),
-                    time => time + allocation.get('units') * allocation.get('time') / 60
+                    time => time + allocation.get('units') * allocation.get('time') / 60.0
                 );
             }
         });
@@ -817,10 +817,21 @@ class AppState {
                 .reduce(
                     (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
                     0
-                ) / 60;
-        if (isNaN(totalHours) || totalHours != expectedHours) {
-            alerts.push('<b>Error</b>: Total time is not equal to the expected number of hours.');
+                ) / 60.0;
+	if (isNan(totalHours)) {
+            alerts.push('<b>Error</b>: HACK Total time is Nan.');
+	    console.log('HACK Total time is Nan.');
+
+	} else {
+    
+	    console.log("totalhours=" + totalHours + " expectedHours=" + expectedHours);
+	    if ( Math.abs(totalHours - expectedHours) < 1.0/60.0 ){
+		totalHours = expectedHours;
+	    }
+            if ( Math.abs(totalHours - expectedHours) < 1.0/60.0) {
+            alerts.push('<b>Error</b>: HACK abs thing Total time is not equal to the expected number of hours.');
         }
+	   }
 
         let allocations = ddah.get('allocations');
         if (
