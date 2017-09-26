@@ -273,7 +273,7 @@ const Allocations = props =>
                         />
                     </td>
                     <td>
-                        {(row.get('units') * row.get('time') / 60).toFixed(1)}
+                        {(row.get('units') * row.get('time') / 60).toFixed(2)}
                         <i
                             className="fa fa-minus-circle delete-button"
                             title="Delete row"
@@ -302,7 +302,7 @@ const Allocations = props =>
                 <td />
                 <td />
                 <td>
-                    {props.appState.getDdahWorksheetTotal().toFixed(1)}
+                    {props.appState.getDdahWorksheetTotal().toFixed(2)}
                 </td>
             </tr>
         </tbody>
@@ -402,7 +402,7 @@ const Summary = props => {
                             {duties.get(i)}
                         </td>
                         <td>
-                            {duty.toFixed(1)}
+                            {duty.toFixed(2)}
                         </td>
                     </tr>
                 )}
@@ -411,7 +411,7 @@ const Summary = props => {
                         <b>Total</b>
                         {props.appState.isOfferSelected() &&
                             <span style={{ float: 'right', color: 'blue' }}>
-                                Expected: {props.hours.toFixed(1)}
+                                Expected: {props.hours.toFixed(2)}
                             </span>}
                     </td>
                     <td>
