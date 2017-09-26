@@ -803,15 +803,21 @@ class AppState {
             alerts.push('<b>Error</b>: Must select at least one tutorial category.');
         }
 
-        let totalHours =
+        let totalMin =
             ddah
-                .get('allocations')
-                .reduce(
-                    (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
-                    0
-                ) / 60;
-        if (isNaN(totalHours) || totalHours != expectedHours) {
-            alerts.push('<b>Error</b>: Total time is not equal to the expected number of hours.');
+			    .get('allocations')
+			    .reduce(
+                   (sum, allocation) => sum + allocation.get('units') * allocation.get('time'),
+                   0.0
+               );
+        if (isNaN(totalMin)) {
+            alerts.push('<b>Error</b>:Total time (NaN) is not equal to the expected number of hours.');
+        } else {
+			//if the calculated total is within a minute of the TA's allocation then close enough
+            if (Math.abs(totalMin - expectedHours*60) < 1.0) {
+            } else {
+                alerts.push('<b>Error</b>: abs thing Total time is not equal to the expected number of hours.');
+            }
         }
 
         let allocations = ddah.get('allocations');
