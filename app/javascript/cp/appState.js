@@ -891,11 +891,11 @@ class AppState {
                     sum + allocation.get('units') * allocation.get('time'),
                 0.0
             );
-        if (isNaN(totalMinutes)) {
+        if (isNaN(totalMin)) {
             alerts.push('<b>Error</b>:Total time (NaN) is not equal to the expected number of hours.');
         } else {
 			//if the calculated total is within a minute of the TA's allocation then close enough
-            if (Math.abs(totalMinutes - expectedHours*60) < 1.0) {
+            if (Math.abs(totalMin - expectedHours*60) < 1.0) {
             } else {
                 alerts.push('<b>Error</b>: abs thing Total time is not equal to the expected number of hours.');
             }
