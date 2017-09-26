@@ -415,7 +415,7 @@ const Summary = props => {
                             </span>}
                     </td>
                     <td>
-                        {props.appState.getDdahWorksheetTotal().toFixed(1)}
+                        {props.appState.getDdahWorksheetTotal().toFixed(2)}
                     </td>
                 </tr>
             </tbody>

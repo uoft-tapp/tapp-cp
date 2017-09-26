@@ -288,12 +288,6 @@ class AppState {
                 sumMin + allocation.get('units') * allocation.get('time'),
             0
         );
-        console.log('HACK: getDdahWorksheetTotal total=' + totalMin);
-        console.log('HACK: getDdahWorksheetTotal total/60=' + totalMin / 60);
-        console.log(
-            'HACK: getDdahWorksheetTotal total/60.0=' + totalMin / 60.0
-        );
-        console.log('HACK: getDdahWorksheetTotal 1.0/60.0=' + 1.0 / 60.0);
         return isNaN(totalMin) ? 0 : totalMin / 60.0;
     }
 
@@ -891,30 +885,19 @@ class AppState {
             );
         }
 
-        let totalHours =
+        let totalMin =
             ddah.get('allocations').reduce(
                 (sum, allocation) =>
-                    sum + allocation.get('units') * allocation.get('time'), //does this do double calculation?
+                    sum + allocation.get('units') * allocation.get('time'),
                 0.0
-            ) / 60.0;
-        if (isNaN(totalHours)) {
-            console.log('HACK Total time is NaN???');
-            alerts.push('<b>Error</b>: HACK Total time is NaN.');
-        } else {
-            console.log(
-                'HACK: totalhours=' +
-                    totalHours +
-                    ' expectedHours=' +
-                    expectedHours
             );
-            let oneMinute = 1.0 / 60.0;
-            if (Math.abs(totalHours - expectedHours) < oneMinute) {
-                console.log('HACK: close enough?');
-                totalHours = expectedHours;
+        if (isNaN(totalMinutes)) {
+            alerts.push('<b>Error</b>:Total time (NaN) is not equal to the expected number of hours.');
+        } else {
+			//if the calculated total is within a minute of the TA's allocation then close enough
+            if (Math.abs(totalMinutes - expectedHours*60) < 1.0) {
             } else {
-                alerts.push(
-                    '<b>Error</b>: HACK abs thing Total time is not equal to the expected number of hours.'
-                );
+                alerts.push('<b>Error</b>: abs thing Total time is not equal to the expected number of hours.');
             }
         }
 
