@@ -283,12 +283,18 @@ class AppState {
 
     // compute total ddah hours
     getDdahWorksheetTotal() {
-        let total = this.get('ddahWorksheet.allocations').reduce(
-            (sum, allocation) =>
-                sum + allocation.get('units') * allocation.get('time'),
+        let totalMin = this.get('ddahWorksheet.allocations').reduce(
+            (sumMin, allocation) =>
+                sumMin + allocation.get('units') * allocation.get('time'),
             0
         );
-        return isNaN(total) ? 0 : total / 60.0;
+        console.log('HACK: getDdahWorksheetTotal total=' + totalMin);
+        console.log('HACK: getDdahWorksheetTotal total/60=' + totalMin / 60);
+        console.log(
+            'HACK: getDdahWorksheetTotal total/60.0=' + totalMin / 60.0
+        );
+        console.log('HACK: getDdahWorksheetTotal 1.0/60.0=' + 1.0 / 60.0);
+        return isNaN(totalMin) ? 0 : totalMin / 60.0;
     }
 
     getDdahWorksheet() {
@@ -891,16 +897,21 @@ class AppState {
                     sum + allocation.get('units') * allocation.get('time'), //does this do double calculation?
                 0.0
             ) / 60.0;
-        if (isNan(totalHours)) {
-            alerts.push('<b>Error</b>: HACK Total time is Nan.');
-            //console.log('HACK Total time is Nan???');
+        if (isNaN(totalHours)) {
+            console.log('HACK Total time is NaN???');
+            alerts.push('<b>Error</b>: HACK Total time is NaN.');
         } else {
-            //console.log('HACK: totalhours=' + totalHours + ' expectedHours=' +expectedHours);
-            if (Math.abs(totalHours - expectedHours) < 1.0 / 60.0) {
-                //console.log("HACK: close enough");
+            console.log(
+                'HACK: totalhours=' +
+                    totalHours +
+                    ' expectedHours=' +
+                    expectedHours
+            );
+            let oneMinute = 1.0 / 60.0;
+            if (Math.abs(totalHours - expectedHours) < oneMinute) {
+                console.log('HACK: close enough?');
                 totalHours = expectedHours;
-            }
-            if (Math.abs(totalHours - expectedHours) < 1.0 / 60.0) {
+            } else {
                 alerts.push(
                     '<b>Error</b>: HACK abs thing Total time is not equal to the expected number of hours.'
                 );
