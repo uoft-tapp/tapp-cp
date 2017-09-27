@@ -816,7 +816,7 @@ class AppState {
 			//if the calculated total is within a minute of the TA's allocation then close enough
             if (Math.abs(totalMin - expectedHours*60) < 1.0) {
             } else {
-                alerts.push('<b>Error</b>: abs thing Total time is not equal to the expected number of hours.');
+                alerts.push('<b>Error</b>: Total time is not equal to the expected number of hours.');
             }
         }
 
