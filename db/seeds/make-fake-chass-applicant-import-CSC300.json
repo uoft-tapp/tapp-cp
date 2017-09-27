@@ -35,6 +35,32 @@
     ],
     "applicants": [
         {
+            "app_id": "46",
+            "utorid": "amatunil",
+            "first_name": "Levon",
+            "last_name": "Amatuni",
+            "email": "levon.amatuni@mail.utoronto.ca",
+            "phone": "yy",
+            "student_no": "1011111114",
+            "address": null,
+            "ta_training": "Y",
+            "access_acad_history": "Y",
+            "dept": "Computer Science",
+            "program_id": "8UG",
+            "full_time": "N",
+            "yip": "4",
+            "course_preferences": "CSC300",
+            "ta_experience": "Fall 2016, Winter 2017: CSC209, Systems Programming, St. George",
+            "academic_qualifications": "CSC108, CSC148, CSC207, CSC209, CSC236, CSC263, CSC300, CSC301, CSC309, CSC324, CSC343, CSC369",
+            "technical_skills": "Java, C, Python, Racket, web programming (HTML/CSS/Javascript/Jquery, NodeJS/Express), Unix, Databases (SQL, Mongo), OS, systems programming",
+            "availability": "Mon-Fri, 9:30-5:30",
+            "other_info": "",
+            "special_needs": "",
+            "last_updated": "2017-07-04 23:43:08",
+            "courses": [
+                "CSC300"
+            ]
+        },        {
             "app_id": "45",
             "utorid": "monfar14",
             "first_name": "Gazelle",
