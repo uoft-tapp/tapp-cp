@@ -1,0 +1,145 @@
+{
+    "courses": [
+        {
+            "course_id": "CSC300",
+            "course_name": "Computers and Society",
+            "round_id": "110",
+            "enrolment": "170",
+            "n_positions": "5",
+            "n_hours": "60",
+            "dates": "September 1, 2017 to December 31, 2017",
+            "tutorials": "W5, W8",
+            "qualifications": "Must have taken this course or similar one. Strong writing skills. Desired: Knowledge of current events related to technology. Experience with facilitating group discussions. Video creation or editing experience is a plus. ",
+            "duties": "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted. ",
+            "total_hours": "0",
+            "start_posting": null,
+            "end_posting": null,
+            "status": "1",
+            "end_nominations": null,
+            "last_updated": "2017-08-03 17:17:22",
+            "instructor": [
+                {
+                    "utorid": "easterb2",
+                    "first_name": "Stephen",
+                    "last_name": "Easterbrook",
+                    "email": "sme@cs.toronto.edu"
+                },
+                {
+                    "utorid": "zaleskim",
+                    "first_name": "Mathew",
+                    "last_name": "Zaleski",
+                    "email": "matz@cs.toronto.edu"
+                }
+            ]
+        }
+    ],
+    "applicants": [
+        {
+            "app_id": "45",
+            "utorid": "monfar14",
+            "first_name": "Gazelle",
+            "last_name": "Saniee-Monfared",
+            "email": "aditya@cs.toronto.edu",
+            "phone": "yy",
+            "student_no": "1011111113",
+            "address": null,
+            "ta_training": "Y",
+            "access_acad_history": "Y",
+            "dept": "Computer Science",
+            "program_id": "8UG",
+            "full_time": "N",
+            "yip": "4",
+            "course_preferences": "CSC300",
+            "ta_experience": "Fall 2016, Winter 2017: CSC209, Systems Programming, St. George",
+            "academic_qualifications": "CSC108, CSC148, CSC207, CSC209, CSC236, CSC263, CSC300, CSC301, CSC309, CSC324, CSC343, CSC369",
+            "technical_skills": "Java, C, Python, Racket, web programming (HTML/CSS/Javascript/Jquery, NodeJS/Express), Unix, Databases (SQL, Mongo), OS, systems programming",
+            "availability": "Mon-Fri, 9:30-5:30",
+            "other_info": "",
+            "special_needs": "",
+            "last_updated": "2017-07-04 23:43:08",
+            "courses": [
+                "CSC300"
+            ]
+        },        {
+            "app_id": "44",
+            "utorid": "bharga12",
+            "first_name": "Aditya",
+            "last_name": "Bhargava",
+            "email": "aditya@cs.toronto.edu",
+            "phone": "yy",
+            "student_no": "1011111113",
+            "address": null,
+            "ta_training": "Y",
+            "access_acad_history": "Y",
+            "dept": "Computer Science",
+            "program_id": "8UG",
+            "full_time": "N",
+            "yip": "4",
+            "course_preferences": "CSC300",
+            "ta_experience": "Fall 2016, Winter 2017: CSC209, Systems Programming, St. George",
+            "academic_qualifications": "CSC108, CSC148, CSC207, CSC209, CSC236, CSC263, CSC300, CSC301, CSC309, CSC324, CSC343, CSC369",
+            "technical_skills": "Java, C, Python, Racket, web programming (HTML/CSS/Javascript/Jquery, NodeJS/Express), Unix, Databases (SQL, Mongo), OS, systems programming",
+            "availability": "Mon-Fri, 9:30-5:30",
+            "other_info": "",
+            "special_needs": "",
+            "last_updated": "2017-07-04 23:43:08",
+            "courses": [
+                "CSC300"
+            ]
+        },
+        {
+            "app_id": "43",
+            "utorid": "liaqatam",
+            "first_name": "Amna",
+            "last_name": "Liaqatam",
+            "email": "aliaqat@cs.toronto.edu",
+            "phone": "yy",
+            "student_no": "1011111112",
+            "address": null,
+            "ta_training": "Y",
+            "access_acad_history": "Y",
+            "dept": "Computer Science",
+            "program_id": "8UG",
+            "full_time": "N",
+            "yip": "4",
+            "course_preferences": "CSC300",
+            "ta_experience": "Fall 2016, Winter 2017: CSC209, Systems Programming, St. George",
+            "academic_qualifications": "CSC108, CSC148, CSC207, CSC209, CSC236, CSC263, CSC300, CSC301, CSC309, CSC324, CSC343, CSC369",
+            "technical_skills": "Java, C, Python, Racket, web programming (HTML/CSS/Javascript/Jquery, NodeJS/Express), Unix, Databases (SQL, Mongo), OS, systems programming",
+            "availability": "Mon-Fri, 9:30-5:30",
+            "other_info": "",
+            "special_needs": "",
+            "last_updated": "2017-07-04 23:43:08",
+            "courses": [
+                "CSC300"
+            ]
+        },
+        {
+            "app_id": "42",
+            "utorid": "barret69",
+            "first_name": "ben",
+            "last_name": "barrett",
+            "email": "b@benbarrett.ca",
+            "phone": "yy",
+            "student_no": "1011111111",
+            "address": null,
+            "ta_training": "Y",
+            "access_acad_history": "Y",
+            "dept": "Computer Science",
+            "program_id": "8UG",
+            "full_time": "N",
+            "yip": "4",
+            "course_preferences": "CSC300",
+            "ta_experience": "Fall 2016, Winter 2017: CSC209, Systems Programming, St. George",
+            "academic_qualifications": "CSC108, CSC148, CSC207, CSC209, CSC236, CSC263, CSC300, CSC301, CSC309, CSC324, CSC343, CSC369",
+            "technical_skills": "Java, C, Python, Racket, web programming (HTML/CSS/Javascript/Jquery, NodeJS/Express), Unix, Databases (SQL, Mongo), OS, systems programming",
+            "availability": "Mon-Fri, 9:30-5:30",
+            "other_info": "",
+            "special_needs": "",
+            "last_updated": "2017-07-04 23:43:08",
+            "courses": [
+                "CSC300"
+            ]
+        }
+    ]
+}
