@@ -1,0 +1,16 @@
+{
+  "instructors": [
+    {
+        "email": "mcraig@cs.toronto.edu",
+        "last_name": "Craig",
+        "first_name": "Michelle",
+        "utorid": "craigmic"
+    },
+    {
+        "email": "random@example.com",
+        "last_name": "last_name",
+        "first_name": "first_name",
+        "utorid": "utorid"
+    }
+  ]
+}
