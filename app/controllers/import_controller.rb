@@ -42,7 +42,7 @@ class ImportController < ApplicationController
 
   def instructors
     importer = InstructorImporter.new
-    importer.import_instructors(params[:instructors])
+    importer.import_instructors(params[:instructor_data])
     render json: {message: "Instructors successfully imported."}
   end
 
