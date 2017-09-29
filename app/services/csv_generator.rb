@@ -38,7 +38,6 @@ class CSVGenerator
         "student_number",
         "familyname",
         "givenname",
-        "utorid",
         "student_status",
         "student_department",
         "email_address",
@@ -75,6 +74,7 @@ class CSVGenerator
       attributes = [
         "last_name",
         "first_name",
+        "utorid",
         "email",
         "student_number",
         "position",
@@ -137,7 +137,6 @@ class CSVGenerator
           applicant[:student_number].to_s,
           applicant[:last_name],
           applicant[:first_name],
-          applicant[:utorid],
           get_status(applicant[:program_id]),
           applicant[:dept],
           applicant[:email],
@@ -195,6 +194,7 @@ class CSVGenerator
         csv << [
           offer[:applicant][:last_name],
           offer[:applicant][:first_name],
+          offer[:applicant][:utorid],
           offer[:applicant][:email],
           offer[:applicant][:student_number],
           offer[:position],
