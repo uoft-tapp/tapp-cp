@@ -900,6 +900,10 @@ class AppState {
         fetch.importChass(data, year, semester);
     }
 
+    importInstructors(data) {
+        fetch.importInstructors(data);
+    }
+
     importEnrolment(data) {
         fetch.importEnrolment(data);
     }

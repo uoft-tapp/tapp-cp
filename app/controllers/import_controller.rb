@@ -2,7 +2,7 @@ class ImportController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
   before_action :cp_access, only: [:import_offers, :import_locked_assignments]
-  before_action :tapp_admin, only: [:chass, :enrolment]
+  before_action :tapp_admin, only: [:chass, :enrolment, :instructors]
 
   def import_offers
     importer = OfferImporter.new
@@ -38,6 +38,12 @@ class ImportController < ApplicationController
     else
       render status: 404, json: {message: status[:message]}
     end
+  end
+
+  def instructors
+    importer = InstructorImporter.new
+    importer.import_instructors(params[:instructor_data])
+    render json: {message: "Instructors successfully imported."}
   end
 
 end

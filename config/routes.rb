@@ -56,6 +56,7 @@ Rails.application.routes.draw do
   post "/import/chass", to: "import#chass"
   get "/export/cp-offers/:session_id", to: "export#cp_offers"
   post "/import/enrolment", to: "import#enrolment"
+  post "/import/instructors", to: "import#instructors"
 
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"

@@ -11,41 +11,10 @@ import {
 // form for importing data from a file and persisting it to the database
 class ImportForm extends React.Component {
     uploadFile() {
-        let importFunc,
-            files = this.files.files;
+        let importFunc, files = this.files.files;
 
         if (files.length > 0) {
-            if (this.data.value == 'chass') {
-                // uploading a CHASS file
-                if (files[0].type != 'application/json') {
-                    this.props.alert('<b>Error:</b> The file you uploaded is not a JSON.');
-                    return;
-                }
-
-                importFunc = data => {
-                    try {
-                        data = JSON.parse(data);
-
-                        if (data['courses'] !== undefined && data['applicants'] !== undefined) {
-                            this.props.importChass(data, this.year.value, this.semester.value);
-                        } else {
-                            this.props.alert('<b>Error:</b> This is not a CHASS JSON.');
-                        }
-                    } catch (err) {
-                        this.props.alert('<b>Error:</b> ' + err);
-                    }
-                };
-            } else {
-                // uploading an enrolment data file
-                importFunc = data => {
-                    try {
-                        this.props.importEnrolment(data);
-                    } catch (err) {
-                        this.props.alert('<b>Error:</b> ' + err);
-                    }
-                };
-            }
-
+            importFunc = this.importChoices(files, this.data.value);
             if (
                 confirm(
                     'Are you sure you want to import "' + files[0].name + '" into the database?'
@@ -60,18 +29,81 @@ class ImportForm extends React.Component {
         }
     }
 
+    importChoices(files, choice){
+        switch (choice) {
+          case "chass":
+              if (files[0].type != 'application/json') {
+                  this.props.alert('<b>Error:</b> The file you uploaded is not a JSON.');
+                  return;
+              }
+              return data => {
+                  try {
+                      data = JSON.parse(data);
+
+                      if (data['courses'] !== undefined && data['applicants'] !== undefined) {
+                          this.props.importChass(data, this.year.value, this.semester.value);
+                      } else {
+                          this.props.alert('<b>Error:</b> This is not a CHASS JSON.');
+                      }
+                  } catch (err) {
+                      this.props.alert('<b>Error:</b> ' + err);
+                  }
+              };
+          case "enrol":
+              return data => {
+                  try {
+                      this.props.importEnrolment(data);
+                  } catch (err) {
+                      this.props.alert('<b>Error:</b> ' + err);
+                  }
+              };
+          case "instructor":
+              if (files[0].type != 'application/json') {
+                  this.props.alert('<b>Error:</b> The file you uploaded is not a JSON.');
+                  return;
+              }
+              return data => {
+                  try {
+                      data = JSON.parse(data);
+
+                      if (data['instructors'] !== undefined) {
+                          this.props.importInstructors(data);
+                      } else {
+                          this.props.alert('<b>Error:</b> This is not an instructor JSON.');
+                      }
+                  } catch (err) {
+                      this.props.alert('<b>Error:</b> ' + err);
+                  }
+              };
+        }
+
+    }
+
+    detectChoice(){
+      let options = document.getElementById("chassOptions");
+      if (this.data.value=="chass")
+          options.style.display = "block";
+      else
+          options.style.display = "none";
+    }
+
+    setChassOption(visible){
+    }
+
     render() {
         return (
             <Form inline id="import">
-                <FormGroup>
+                <FormGroup >
+                  <span  style={{float: "left"}}>
                     <ControlLabel>Import&ensp;</ControlLabel>
-                    <FormControl
+                    <FormControl onChange={()=>this.detectChoice()}
                         componentClass="select"
                         inputRef={ref => {
                             this.data = ref;
                         }}>
-                        <option value="enrol">Enrolment</option>
                         <option value="chass">Courses/Applicants</option>
+                        <option value="instructor">Instructors</option>
+                        <option value="enrol">Enrolment</option>
                     </FormControl>
                     <ControlLabel>
                         &ensp;<i
@@ -83,6 +115,8 @@ class ImportForm extends React.Component {
                         <ChassDialog />
                         <EnrolDialog />
                     </ControlLabel>
+                    </span>
+                    <span id="chassOptions" style={{float: "left"}}>
                     <ControlLabel>&ensp;for&ensp;</ControlLabel>
                     <FormControl
                         componentClass="select"
@@ -103,6 +137,7 @@ class ImportForm extends React.Component {
                             this.year = ref;
                         }}
                     />
+                    </span>
                     <FormControl.Static style={{ verticalAlign: 'middle' }}>
                         &emsp;&emsp;{this.props.importing()
                             ? <i
