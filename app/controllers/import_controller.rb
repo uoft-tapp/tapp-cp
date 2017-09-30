@@ -42,11 +42,13 @@ class ImportController < ApplicationController
   def ddahs
     importer = DdahImporter.new
     status = importer.import_ddahs(params[:ddah_data])
+    import_helper(status)
   end
 
   def templates
     importer = DdahImporter.new
     status = importer.import_template(params[:ddah_data])
+    import_helper(status)
   end
 
   private

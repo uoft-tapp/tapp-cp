@@ -505,22 +505,21 @@ function importDdahs(data) {
                 appState.setFetchingDataList('ddahs', true);
                 appState.setFetchingDataList('offers', true);
 
-                getDdahs()
-                    .then(ddahs => {
-                        appState.setDdahsList(fromJS(ddahs));
-                        appState.setFetchingDataList('ddahs', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('ddahs', false));
-
                 getOffers()
                     .then(offers => {
                         appState.setOffersList(fromJS(offers));
                         appState.setFetchingDataList('offers', false, true);
                     })
                     .catch(() => appState.setFetchingDataList('offers', false));
-            },
-            () => appState.setImporting(false)
-        );
+
+                getDdahs()
+                    .then(ddahs => {
+                        appState.setDdahsList(fromJS(ddahs));
+                        appState.setFetchingDataList('ddahs', false, true);
+                    })
+                    .catch(() => appState.setFetchingDataList('ddahs', false));
+            }
+        ).then(() => appState.setImporting(false));
 }
 
 
