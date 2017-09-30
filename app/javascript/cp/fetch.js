@@ -1265,6 +1265,59 @@ function sendDdahs(ddahs) {
         });
 }
 
+// send ddah forms
+function previewDdahs(ddahs) {
+    let validDdahs = ddahs;
+    let filename = "";
+
+    // check which ddahs can be sent
+    postHelper('/ddahs/can-preview', { ddahs: ddahs })
+        .then(resp => {
+            if (resp.status == 404) {
+                // some ddahs cannot be sent
+                let ddahsList = appState.getDdahsList();
+                let offersList = appState.getOffersList();
+
+                return resp.json().then(res => {
+                    res.invalid_offers.forEach(ddah => {
+                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+
+                        appState.alert(
+                            '<b>Error</b>: Cannot send DDAH form to ' +
+                                offersList.getIn([offer, 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer, 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer, 'course'])
+                        );
+                        // remove invalid ddah(s) from ddah list
+                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
+                    });
+
+                    if (validDdahs.length == 0) {
+                        return Promise.reject();
+                    }
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
+            }
+        })
+        // preview pdf for valid ddahs
+        .then(() => postHelper('/ddahs/preview', { ddahs: validDdahs }))
+        .then(resp => {
+            // extract the filename from the response headers
+            filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
+            // parse the response body as a blob
+            return resp.blob();
+        })
+        // create a URL for the object body of the response
+        .then(blob => URL.createObjectURL(blob))
+        .then(url => {
+            window.open(url);
+        });
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -1317,6 +1370,7 @@ export {
     updateDdah,
     submitDdah,
     previewDdah,
+    previewDdahs,
     nagApplicantDdahs,
     nagInstructors,
     sendDdahs,

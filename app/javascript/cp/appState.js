@@ -954,6 +954,18 @@ class AppState {
         }
     }
 
+    previewDdahs(offers){
+      if (offers.length == 0) {
+          this.alert('<b>Error</b>: No offer selected');
+          return;
+      }
+
+      let ddahs = this.getDdahsFromOffers(offers);
+      if (ddahs.length > 0){
+          fetch.previewDdahs(ddahs);
+      }
+    }
+
     setCategoriesList(list) {
         this.set('categories.list', list);
     }

@@ -311,10 +311,7 @@ const CommMenu = props =>
 const PreviewButton = props =>
     <Button
         bsStyle="primary"
-        onClick={() =>
-            props.appState.alert(
-                '<b>Preview DDAH forms</b> This functionality is not currently supported.'
-            )}>
+        onClick={() => props.appState.previewDdahs(getSelectedOffers())}>
         Preview DDAH forms
     </Button>;
 
