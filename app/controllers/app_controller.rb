@@ -19,9 +19,9 @@ class AppController < ApplicationController
 
   def roles
     if ENV['RAILS_ENV'] == 'production'
-      render json: {development: false, utorid: session[:utorid], roles: session[:roles]}
+      render json: {development: false, ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
     else
-      render json: {development: true, utorid: "development", roles: session[:roles]}
+      render json: {development: true,  ta_coord: ENV["TA_COORD"], utorid: "development", roles: session[:roles]}
     end
   end
 

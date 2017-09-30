@@ -1276,6 +1276,7 @@ function fetchAuth() {
                 // default to cp_admin as selected user role
                 appState.selectUserRole('cp_admin');
                 appState.setCurrentUserName('DEV');
+                appState.setTaCoordinator(resp.ta_coord);
             } else {
                 // filter out roles not relevant to this application
                 let roles = resp.roles.filter(role =>
@@ -1284,6 +1285,7 @@ function fetchAuth() {
                 appState.setCurrentUserRoles(roles);
                 appState.selectUserRole(roles[0]);
                 appState.setCurrentUserName(resp.utorid);
+                appState.setTaCoordinator(resp.ta_coord);
             }
         });
 }

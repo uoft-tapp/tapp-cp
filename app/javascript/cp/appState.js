@@ -224,6 +224,10 @@ class AppState {
         return this.get('nav.roles');
     }
 
+    getTaCoordinator() {
+        return this.get('taCoordinator');
+    }
+
     getDdahApprovedSignature(offers){
         if (offers.length == 0) {
             this.alert('<b>Error</b>: No offer selected');
@@ -386,6 +390,10 @@ class AppState {
 
     setCurrentUserRoles(roles) {
         this.set('nav.roles', roles);
+    }
+
+    setTaCoordinator(coordinator){
+        this.set('taCoordinator', coordinator);
     }
 
     setDdahWorksheet(ddah) {

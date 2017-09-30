@@ -477,7 +477,12 @@ const Signatures = props => {
 
                 <tr>
                     <td>
-                        <input type="text" readOnly />
+                        <input type="text" readOnly
+                        value={
+                            props.appState.getTaCoordinator()
+                                ? props.appState.getTaCoordinator()
+                                : ''
+                        }/>
                         <br />
                         <span className="input-label">
                             &ensp;Prepared by <i>(Chair/Designated Authority)</i>
