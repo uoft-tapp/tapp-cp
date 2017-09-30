@@ -68,7 +68,6 @@ class DdahsController < ApplicationController
   def update
     ddah = Ddah.find(params[:id])
     if can_modify(params[:utorid], ddah)
-      ddah.update_attributes!(ddah_params)
       update_form(ddah, params)
       render status: 200, json: {message: "DDAH was updated successfully."}
     else
@@ -238,10 +237,6 @@ class DdahsController < ApplicationController
     else
       render status: 404, json: {message: "Error: You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
     end
-  end
-
-  def ddah_params
-    params.permit(:optional, :scaling_learning)
   end
 
   def get_all_ddahs(ddahs)

@@ -73,8 +73,8 @@ const Header = props =>
                             props.appState.updateDdahWorksheet('supervisor', event.target.value)}>
                         <option />
                         {props.course &&
-                            props.course.get('instructors').map(instructor =>
-                                <option>
+                            props.course.get('instructors').map((instructor, key) =>
+                                <option value={key}>
                                     {instructor}
                                 </option>
                             )}

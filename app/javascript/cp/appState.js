@@ -1087,6 +1087,7 @@ class AppState {
         // process ddah for format
         let ddah = this.get('ddahWorksheet');
         let updates = {
+            instructor_id: ddah.get('supervisor'),
             optional: ddah.get('optional'),
             categories: ddah.get('categories').toJS(),
             trainings: ddah.get('trainings').toJS(),

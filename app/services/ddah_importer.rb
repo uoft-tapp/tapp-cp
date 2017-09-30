@@ -1,6 +1,7 @@
 class DdahImporter
   include Importer
   include DdahUpdater
+  require 'csv'
 
   def import_csv_ddahs(data)
     exceptions = []
@@ -100,13 +101,12 @@ class DdahImporter
   end
 
   def parse_to_cell_json(data)
-    lines = data.split(/\n/)
-    cells = {num_line: lines.length}
-    lines.each_with_index do |line, index|
+    csv = CSV.parse(data)
+    cells = {num_line: csv.length}
+    csv.each_with_index do |line, index|
       row = index+1
       cells[row] = {}
-      items = line.split(/,/)
-      items.each_with_index do |item, column|
+      line.each_with_index do |item, column|
         column = num_to_alpha(column+1).upcase.to_sym
         cells[row][column] = item
       end
@@ -129,15 +129,16 @@ class DdahImporter
     if applicant
       offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
       if offer
-        data = {
+        ddah = {
           offer_id: offer[:id],
-          trainings: data[line+1][:D].strip,
-          categories: data[line+3][:E].strip,
+          optional: true,
+          trainings: get_data_attribute(data, line, :D, false, 1),
+          categories: get_data_attribute(data, line, :D, false, 3),
           allocations: get_allocations(data, line),
         }
-        data[:trainings] = get_array(data[:trainings])
-        data[:categories] = get_array(data[:categories])
-        return data
+        ddah[:trainings] = get_array(ddah[:trainings])
+        ddah[:categories] = get_array(ddah[:categories])
+        return ddah
       else
         exceptions.push("Error: No offer of #{data[line+1][:A]} for #{position[:position]} exists in the system.")
         return nil
@@ -150,7 +151,7 @@ class DdahImporter
 
   def get_array(array)
     data = []
-    if array.length>0
+    if array
       array.split("").each do |item|
         data.push(to_i(item))
       end
@@ -164,11 +165,11 @@ class DdahImporter
       column = num_to_alpha(index + 6).upcase.to_sym
       next_column = num_to_alpha(index + 7).upcase.to_sym
       allocation = {
-        id: get_allocation_attribute(data, line, column, true),
-        num_units: get_allocation_attribute(data, line, column, true, 1),
-        unit_name: get_allocation_attribute(data, line, column,false, 2),
-        duty_id: get_allocation_attribute(data, line, next_column, false, 3),
-        minutes: get_allocation_attribute(data, line, column,true, 4),
+        id: get_data_attribute(data, line, column, true),
+        num_unit: get_data_attribute(data, line, column, true, 1),
+        unit_name: get_data_attribute(data, line, column,false, 2),
+        duty_id: get_data_attribute(data, line, column, false, 3),
+        minutes: get_data_attribute(data, line, column,true, 4),
       }
       if !empty_allocation(allocation)
         allocation[:duty_id] = to_i(allocation[:duty_id])
@@ -178,7 +179,7 @@ class DdahImporter
     return allocations
   end
 
-  def get_allocation_attribute(data, line, column, integer, increment=0)
+  def get_data_attribute(data, line, column, integer, increment=0)
     if integer
       data[line+increment][column]? data[line+increment][column].strip.to_i : nil
     else
@@ -187,13 +188,13 @@ class DdahImporter
   end
 
   def empty_allocation(allocation)
-    checks = [:num_units, :unit_name, :duty_id, :minutes]
+    checks = [:num_unit, :unit_name, :duty_id, :minutes]
     checks.each do |attr|
-      if !allocation[attr]
-        return true
+      if allocation[attr]
+        return false
       end
     end
-    return false
+    return true
   end
 
   def valid_ddah(data)

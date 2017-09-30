@@ -164,7 +164,7 @@ function onFetchDdahsSuccess(resp) {
             offer: ddah.offer_id,
             position: ddah.position.id,
             department: ddah.department,
-            supervisor: ddah.supervisor,
+            supervisor: ddah.instructor_id,
             tutCategory: ddah.tutorial_category,
             optional: ddah.optional,
             requiresTraining: ddah.scaling_learning,
