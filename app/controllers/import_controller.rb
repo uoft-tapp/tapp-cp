@@ -3,6 +3,7 @@ class ImportController < ApplicationController
   include Authorizer
   before_action :cp_access, only: [:import_offers, :import_locked_assignments]
   before_action :tapp_admin, only: [:chass, :enrolment, :instructors]
+  before_action :cp_admin, only: [:ddahs, :templates]
 
   def import_offers
     importer = OfferImporter.new
