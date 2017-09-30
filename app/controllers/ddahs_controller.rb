@@ -4,7 +4,7 @@ class DdahsController < ApplicationController
   include DdahUpdater
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
-  before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
+  before_action :cp_admin, only: [:can_preview, :preview, :accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
   before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
   before_action  only: [:pdf, :new_template] do
     both_cp_admin_instructor(Ddah)
@@ -68,7 +68,6 @@ class DdahsController < ApplicationController
   def update
     ddah = Ddah.find(params[:id])
     if can_modify(params[:utorid], ddah)
-      ddah.update_attributes!(ddah_params)
       update_form(ddah, params)
       render status: 200, json: {message: "DDAH was updated successfully."}
     else
@@ -169,6 +168,20 @@ class DdahsController < ApplicationController
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
   end
 
+  def can_preview
+    check_ddah_status(params[:ddahs], ["Created", "Ready", "Approved", "Pending", "Accepted"])
+  end
+
+  def preview
+    ddahs = []
+    params[:ddahs].each do |id|
+      ddah = Ddah.find(id).format
+      ddahs.push(ddah)
+    end
+    generator = DdahGenerator.new(ddahs)
+    send_data generator.render, filename: "ddahs.pdf", disposition: "inline"
+  end
+
   def pdf
     ddah = Ddah.find(params[:ddah_id])
     if ddah
@@ -206,7 +219,7 @@ class DdahsController < ApplicationController
   end
 
   def get_ddah_pdf(ddah)
-    generator = DdahGenerator.new(ddah.format)
+    generator = DdahGenerator.new([ddah.format])
     send_data generator.render, filename: "ddah.pdf", disposition: "inline"
   end
 
@@ -238,10 +251,6 @@ class DdahsController < ApplicationController
     else
       render status: 404, json: {message: "Error: You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
     end
-  end
-
-  def ddah_params
-    params.permit(:optional, :scaling_learning)
   end
 
   def get_all_ddahs(ddahs)

@@ -69,11 +69,12 @@ class CSVGenerator
     set_all_offer_in_session(session_id)
     if @offers.size == 0
       return {generated: false,
-        msg: "Warning: There are currenly no offers in the system. Operation aborted"}
+        msg: "Warning: There are currenly no offers for this session. Operation aborted"}
     else
       attributes = [
         "last_name",
         "first_name",
+        "utorid",
         "email",
         "student_number",
         "position",
@@ -90,14 +91,34 @@ class CSVGenerator
     end
   end
 
+  def generate_ddahs(position_id)
+    position = Position.find_by(id: position_id)
+    if position
+      set_all_offer_in_session(position[:session_id], position)
+      if @offers.size == 0
+        return {generated: false,
+          msg: "Warning: There are currenly no offers for this position. Operation aborted"}
+      else
+        data = get_ddahs(position)
+        return {generated: true, data: data, file: "#{position[:position]}_ddahs.csv", type: "text/csv"}
+      end
+    else
+      return {generated: false, msg: "Warning: There is no such position"}
+    end
+  end
+
   private
-  def set_all_offer_in_session(session_id)
+  def set_all_offer_in_session(session_id, position = nil)
     session = Session.find(session_id)
     @offers = []
     Offer.all.each do |offer|
       offer = offer.format
       if offer[:session] == session
-        @offers.push(offer)
+        if !position
+          @offers.push(offer)
+        elsif offer[:position] == position[:position]
+          @offers.push(offer)
+        end
       end
     end
   end
@@ -193,6 +214,7 @@ class CSVGenerator
         csv << [
           offer[:applicant][:last_name],
           offer[:applicant][:first_name],
+          offer[:applicant][:utorid],
           offer[:applicant][:email],
           offer[:applicant][:student_number],
           offer[:position],
@@ -207,5 +229,144 @@ class CSVGenerator
       end
     end
     return data
+  end
+
+  def get_ddahs(position)
+    setup = [
+      ["supervisor_utorid",get_supervisor],
+      ["course_name", position[:position]],
+      ["round_id", position[:round_id]],
+      [],
+      ["duties_list", "", "", "trainings_list", "", "", "categories_list"],
+    ]
+    setup = setup + get_ddah_legends + [[""]]
+    data = CSV.generate do |csv|
+      setup.each do |line|
+        csv << line
+      end
+      @offers.each_with_index do |offer,index|
+        ddah_setup = get_ddah_setup(offer,index)
+        ddah_setup.each do |line|
+          csv << line
+        end
+      end
+    end
+  end
+
+  def get_supervisor
+    @offers.each_with_index do |offer,index|
+      ddah = get_ddah(offer)
+      if ddah
+        if ddah[:instructor_id]
+          instructor = Instructor.find(ddah[:instructor_id])
+          return instructor[:utorid]
+        end
+      end
+    end
+    return ""
+  end
+
+  def get_ddah_legends
+    duties = Duty.all
+    trainings = Training.all
+    categories = Category.all
+    legends = []
+    duties.each_with_index do |duty, index|
+      legends.push([duty[:name], num_to_alpha(duty[:id]).upcase, "", "", "", "", ""])
+      if index < trainings.length
+        legends[index][3] = trainings[index][:name]
+        legends[index][4] = num_to_alpha(trainings[index][:id]).upcase
+      end
+      if index < categories.length
+        legends[index][6] = categories[index][:name]
+        legends[index][7] = num_to_alpha(categories[index][:id]).upcase
+      end
+    end
+    return legends
+  end
+
+  def get_ddah_setup(offer, index)
+    ddah = get_ddah(offer)
+    allocations = get_ddah_attribute(ddah, :allocations)
+    trainings = id_to_alpha(get_ddah_attribute(ddah, :trainings))
+    categories = id_to_alpha(get_ddah_attribute(ddah, :categories))
+    curr = 13+(index*6)
+    setup = [
+      ["applicant_name", "utorid", "required hours", "trainings", "allocations", "id(generated)"],
+      ["#{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}", offer[:applicant][:utorid], offer[:hours], trainings, "", "num_units"],
+      ["", "", "total_hours (generated)", "categories", "", "unit_name"],
+      ["", "", "=TEXT(SUM(G#{curr+5}:AE#{curr+5}), \"0.00\")", categories, "", "duty_id"],
+      ["", "", "", "", "", "minutes"],
+      ["", "", "", "", "", "hours (generated)"],
+    ]
+    setup.each_with_index do |line, index|
+      for num in 1..25
+        num = num + 6
+        if index == (setup.length - 1)
+          line.push("=(#{num_to_alpha(num)}#{curr+1}*#{num_to_alpha(num)}#{curr+4})/60")
+        else
+          line.push(get_allocation_data(allocations, num-7, index))
+        end
+      end
+    end
+    return setup
+  end
+
+  def get_allocation_data(allocations, index, row)
+    if index <= allocations.length-1
+      allocation = allocations[index]
+      case row
+      when 0
+        return allocation[:id]
+      when 1
+        return allocation[:num_unit]
+      when 2
+        return allocation[:unit_name]
+      when 3
+        return allocation[:duty_id]
+      when 4
+        return allocation[:minutes]
+      end
+    else
+      return ""
+    end
+  end
+
+  def get_ddah(offer)
+    ddah = Ddah.find_by(offer_id: offer[:id])
+    if ddah
+      return ddah
+    else
+      return nil
+    end
+  end
+
+  def get_ddah_attribute(ddah, attr)
+    if ddah
+      ddah = ddah.format
+      return ddah[attr]
+    else
+      return []
+    end
+  end
+
+  def id_to_alpha(ids)
+    alpha = ""
+    ids.each do |id|
+      alpha+= num_to_alpha(id).upcase
+    end
+    return alpha
+  end
+
+  def num_to_alpha(num)
+    alpha26 = ("a".."z").to_a
+    return "" if num < 1
+    s, q = "", num
+    loop do
+      q, r = (q - 1).divmod(26)
+      s.prepend(alpha26[r])
+      break if q.zero?
+    end
+    s
   end
 end

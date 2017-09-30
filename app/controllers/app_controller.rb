@@ -5,7 +5,6 @@ class AppController < ApplicationController
   before_action :cp_access, only: [:cp]
   before_action :app_access, only: [:roles]
   before_action :correct_applicant, only: [:student_view, :ddah_view]
-  before_action :cp_admin, only: [:test]
 
   ''' TAPP functions '''
   def tapp
@@ -19,9 +18,9 @@ class AppController < ApplicationController
 
   def roles
     if ENV['RAILS_ENV'] == 'production'
-      render json: {development: false, utorid: session[:utorid], roles: session[:roles]}
+      render json: {development: false, ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
     else
-      render json: {development: true, utorid: "development", roles: session[:roles]}
+      render json: {development: true,  ta_coord: ENV["TA_COORD"], utorid: "development", roles: session[:roles]}
     end
   end
 
@@ -62,14 +61,6 @@ class AppController < ApplicationController
 
   def reenter_session
     session[:logged_in] = true
-  end
-
-  def test
-    @instructors = []
-    Instructor.all.each do |instructor|
-      @instructors.push(instructor[:utorid].to_s)
-    end
-    render :test, layout: false
   end
 
 end

@@ -73,7 +73,12 @@ Rails.application.routes.draw do
   post "/offers/send-nag-instructor" => "offers#send_nag_instructor"
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
+  post "/import/ddahs", to: "import#ddahs"
+  post "/import/templates", to: "import#templates"
+  get "/export/ddahs/:position_id", to: "export#ddahs"
 
+  post "/ddahs/preview" => "ddahs#preview"
+  post "/ddahs/can-preview" => "ddahs#can_preview"
   post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
   post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
   post "/ddahs/can-nag-student" => "ddahs#can_nag_student"
@@ -94,5 +99,4 @@ Rails.application.routes.draw do
   get "/pb/ddah/:offer_id/pdf" => "ddahs#student_pdf"
   post "/pb/ddah/:offer_id/accept" => "ddahs#student_accept"
 
-  get "/test" => "app#test"
 end

@@ -9,10 +9,12 @@ import {
     DropdownButton,
     MenuItem,
     Button,
+    ButtonGroup,
 } from 'react-bootstrap';
 
 import { TableMenu } from './tableMenu.js';
 import { Table } from './table.js';
+import { ImportButton } from './importButton.js';
 
 const getCheckboxElements = () => document.getElementsByClassName('offer-checkbox');
 
@@ -49,7 +51,8 @@ class DdahControlPanel extends React.Component {
         let nullCheck =
             this.props.appState.isOffersListNull() ||
             this.props.appState.isSessionsListNull() ||
-            this.props.appState.isDdahsListNull();
+            this.props.appState.isDdahsListNull()||
+            this.props.appState.isCoursesListNull();
         if (nullCheck) {
             return <div id="loader" />;
         }
@@ -57,7 +60,8 @@ class DdahControlPanel extends React.Component {
         let fetchCheck =
             this.props.appState.fetchingOffers() ||
             this.props.appState.fetchingSessions() ||
-            this.props.appState.fetchingDdahs();
+            this.props.appState.fetchingDdahs()||
+            this.props.appState.fetchingCourses();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         this.config = [
@@ -171,6 +175,12 @@ class DdahControlPanel extends React.Component {
                 ),
             },
             {
+                header: 'Send Date',
+                data: p => (p.offer.get('ddahSendDate')? p.offer.get('ddahSendDate'): '-'),
+                sortData: p => (p.get('ddahSendDate')? p.get('ddahSendDate'): '-'),
+                style: { width: 0.1 },
+            },
+            {
                 header: 'Instructor Nag Count',
                 data: p => (p.offer.get('InstructorNagCount')? p.offer.get('InstructorNagCount'): '-'),
                 sortData: p => (p.get('InstructorNagCount')? p.get('InstructorNagCount'): '-'),
@@ -187,11 +197,13 @@ class DdahControlPanel extends React.Component {
         return (
             <Grid fluid id="ddahs-grid" style={cursorStyle}>
                 <ButtonToolbar id="dropdown-menu">
+                    <ImportButton {...this.props}/>
                     <SessionsDropdown {...this.props} />
+                    <ExportForm {...this.props} />
 
                     <DdahsMenu {...this.props} />
                     <CommMenu {...this.props} />
-                    <PrintButton {...this.props} />
+                    <PreviewButton {...this.props} />
 
                     <TableMenu
                         config={this.config}
@@ -227,6 +239,7 @@ class DdahControlPanel extends React.Component {
     }
 }
 
+
 // session selector
 const SessionsDropdown = props =>
     <Form inline id="sessions">
@@ -237,6 +250,7 @@ const SessionsDropdown = props =>
                 componentClass="select"
                 onChange={event => {
                     props.appState.selectSession(event.target.value);
+                    props.appState.getSessionCourse();
                 }}>
                 <option value="" key="session-all">
                     all
@@ -266,6 +280,36 @@ const DdahsMenu = props =>
         </MenuItem>
     </DropdownButton>;
 
+const ExportForm = props =>
+    <Form inline>
+        <FormGroup style={{float: "left"}}>
+            <ControlLabel>Course:</ControlLabel>&ensp;
+            <FormControl
+                id="course"
+                componentClass="select"
+                onChange={event => {
+                    props.appState.selectCourse(event.target.value);
+                }}>
+                <option value="" key="course-all">
+                    Choose a course
+                </option>
+                {props.appState.getSessionCourse().map((course, courseId) =>
+                    <option value={courseId} key={courseId}>
+                        {course.get('code')}
+                    </option>
+                )}
+            </FormControl>
+        </FormGroup>
+        <ButtonGroup>
+            <Button style={{display: "none"}}></Button>
+            <Button style={{marginRight: "5px"}}
+                bsStyle="primary"
+                onClick={() => props.appState.exportDdahs()}>
+                Export
+            </Button>
+        </ButtonGroup>
+    </Form>;
+
 const CommMenu = props =>
     <DropdownButton bsStyle="primary" title="Communicate" id="comm-dropdown">
         <MenuItem onClick={() => props.appState.email(getSelectedOffers())}>
@@ -284,14 +328,11 @@ const CommMenu = props =>
         </MenuItem>
     </DropdownButton>;
 
-const PrintButton = props =>
+const PreviewButton = props =>
     <Button
         bsStyle="primary"
-        onClick={() =>
-            props.appState.alert(
-                '<b>Print DDAH forms</b> This functionality is not currently supported.'
-            )}>
-        Print DDAH forms
+        onClick={() => props.appState.previewDdahs(getSelectedOffers())}>
+        Preview DDAH forms
     </Button>;
 
 export { DdahControlPanel };

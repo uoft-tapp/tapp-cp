@@ -27,6 +27,7 @@ const initialState = {
 
     ddahWorksheet: {
         supervisor: null,
+        supervisorId: null,
         optional: null,
         requiresTraining: false,
         allocations: [{ id: null, units: null, duty: null, type: null, time: null }],
@@ -189,6 +190,7 @@ class AppState {
     // return ddahData in the ddah worksheet format
     createDdahWorksheet(ddahData) {
         let worksheet = {
+            supervisorId: ddahData.get('supervisorId'),
             supervisor: ddahData.get('supervisor'),
             tutCategory: ddahData.get('tutCategory'),
             optional: ddahData.get('optional'),
@@ -220,6 +222,10 @@ class AppState {
 
     getCurrentUserRoles() {
         return this.get('nav.roles');
+    }
+
+    getTaCoordinator() {
+        return this.get('taCoordinator');
     }
 
     getDdahApprovedSignature(offers){
@@ -305,6 +311,10 @@ class AppState {
         return this.get('selectedSession');
     }
 
+    getSelectedCourse() {
+        return this.get('selectedCourse');
+    }
+
     getSelectedNavTab() {
         return this.get('nav.selectedTab');
     }
@@ -374,6 +384,10 @@ class AppState {
         this.set('selectedSession', session);
     }
 
+    selectCourse(course) {
+        this.set('selectedCourse', course);
+    }
+
     selectUserRole(role) {
         this.set('nav.selectedRole', role);
     }
@@ -384,6 +398,10 @@ class AppState {
 
     setCurrentUserRoles(roles) {
         this.set('nav.roles', roles);
+    }
+
+    setTaCoordinator(coordinator){
+        this.set('taCoordinator', coordinator);
     }
 
     setDdahWorksheet(ddah) {
@@ -662,6 +680,19 @@ class AppState {
         fetch.exportOffers(session);
     }
 
+    // export offers to CSV
+    exportDdahs() {
+        let course = this.getSelectedCourse();
+        if (!course) {
+            this.alert(
+                '<b>Export offers from all sessions</b> This functionality is not currently supported. Please select a course.'
+            );
+            return;
+        }
+
+        fetch.exportDdahs(course);
+    }
+
     fetchAll() {
         let role = this.getSelectedUserRole();
         if (role == 'cp_admin' || role == 'hr_assistant') {
@@ -719,6 +750,22 @@ class AppState {
         return this.get('courses.list');
     }
 
+    getSessionCourse(){
+        let session = this.getSelectedSession();
+        let courses = this.getCoursesList();
+        if (session == ''){
+          return courses;
+        }
+        else{
+          let selected = [];
+          courses.forEach(function(course){
+            if (course.get("session")==session)
+                selected.push(course);
+          });
+          return selected;
+        }
+    }
+
     getDdahsList() {
         return this.get('ddahs.list');
     }
@@ -768,6 +815,10 @@ class AppState {
 
     importOffers(data) {
         fetch.importOffers(data);
+    }
+
+    importDdahs(data) {
+        fetch.importDdahs(data);
     }
 
     importing() {
@@ -944,6 +995,18 @@ class AppState {
         }
     }
 
+    previewDdahs(offers){
+      if (offers.length == 0) {
+          this.alert('<b>Error</b>: No offer selected');
+          return;
+      }
+
+      let ddahs = this.getDdahsFromOffers(offers);
+      if (ddahs.length > 0){
+          fetch.previewDdahs(ddahs);
+      }
+    }
+
     setCategoriesList(list) {
         this.set('categories.list', list);
     }
@@ -1087,6 +1150,7 @@ class AppState {
         // process ddah for format
         let ddah = this.get('ddahWorksheet');
         let updates = {
+            instructor_id: ddah.get('supervisorId'),
             optional: ddah.get('optional'),
             categories: ddah.get('categories').toJS(),
             trainings: ddah.get('trainings').toJS(),

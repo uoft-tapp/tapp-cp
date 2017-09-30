@@ -64,17 +64,17 @@ const Header = props =>
                 <td>
                     <select
                         value={
-                            props.ddahData.get('supervisor') != null
-                                ? props.ddahData.get('supervisor')
+                            props.ddahData.get('supervisorId') != null
+                                ? props.ddahData.get('supervisorId')
                                 : ''
                         }
                         disabled={props.appState.isTemplateSelected()}
                         onChange={event =>
-                            props.appState.updateDdahWorksheet('supervisor', event.target.value)}>
+                            props.appState.updateDdahWorksheet('supervisorId', event.target.value)}>
                         <option />
                         {props.course &&
-                            props.course.get('instructors').map(instructor =>
-                                <option>
+                            props.course.get('instructors').map((instructor, key) =>
+                                <option value={key}>
                                     {instructor}
                                 </option>
                             )}
@@ -477,7 +477,12 @@ const Signatures = props => {
 
                 <tr>
                     <td>
-                        <input type="text" readOnly />
+                        <input type="text" readOnly
+                        value={
+                            props.appState.getTaCoordinator()
+                                ? props.appState.getTaCoordinator()
+                                : ''
+                        }/>
                         <br />
                         <span className="input-label">
                             &ensp;Prepared by <i>(Chair/Designated Authority)</i>

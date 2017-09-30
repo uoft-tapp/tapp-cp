@@ -61,7 +61,6 @@ class TemplatesController < ApplicationController
     template = Template.find(params[:id])
     if can_modify(params[:utorid], template)
       update_form(template, params)
-      template.update_attributes!(template_params)
     else
       render status: 403, file: 'public/403.html'
     end
@@ -69,7 +68,7 @@ class TemplatesController < ApplicationController
 
   def preview
     template = Template.find(params[:template_id])
-    generator = DdahGenerator.new(template.format, true)
+    generator = DdahGenerator.new([template.format], true)
     send_data generator.render, filename: "ddah_template.pdf", disposition: "inline"
   end
 
@@ -77,10 +76,6 @@ class TemplatesController < ApplicationController
   def can_modify(utorid, template)
     instructor = Instructor.find_by(utorid: utorid)
     return template[:instructor_id] == instructor[:id]
-  end
-
-  def template_params
-    params.permit(:name, :optional, :scaling_learning)
   end
 
   def get_all_templates(templates)

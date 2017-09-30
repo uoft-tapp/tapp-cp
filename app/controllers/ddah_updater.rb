@@ -1,5 +1,6 @@
 module DdahUpdater
   def update_form(form, params)
+    form.update_attributes!(get_params(params))
     if params[:categories]
       form.category_ids = params[:categories]
     end
@@ -9,6 +10,18 @@ module DdahUpdater
     if params[:allocations]
       update_allocations(form, params[:allocations])
     end
+  end
+
+  private
+  def get_params(params)
+    checks = [:optional, :scaling_learning, :instructor_id]
+    update = {}
+    checks.each do |check|
+      if params[check]
+        update[check] = params[check]
+      end
+    end
+    return update
   end
 
   def update_allocations(form, allocations)
@@ -24,7 +37,7 @@ module DdahUpdater
         if entry[:duty_id]
           data[:duty_id] = entry[:duty_id]
         end
-        allocation.update_attributes(data)
+        allocation.update_attributes!(data)
       else
         data = {
           num_unit: entry[:num_unit],

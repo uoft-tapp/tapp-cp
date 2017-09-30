@@ -79,10 +79,16 @@ const getCategories = () =>
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchCategoriesSuccess);
 
-const getCourses = user =>
-    getHelper('/instructors/' + user + '/positions')
+const getCourses = ((user = null) =>{
+    let url = "";
+    if (user != null)
+        url = '/instructors/' + user + '/positions';
+    else
+        url = '/positions';
+    return getHelper(url)
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchCoursesSuccess);
+});
 
 const getDdahs = user =>
     getHelper(user ? '/instructors/' + user + '/ddahs' : '/ddahs')
@@ -165,6 +171,7 @@ function onFetchDdahsSuccess(resp) {
             position: ddah.position.id,
             department: ddah.department,
             supervisor: ddah.supervisor,
+            supervisorId: ddah.instructor_id,
             tutCategory: ddah.tutorial_category,
             optional: ddah.optional,
             requiresTraining: ddah.scaling_learning,
@@ -225,6 +232,7 @@ function onFetchOffersSuccess(resp) {
             printedAt: offer.print_time,
             link: offer.link,
             note: offer.commentary,
+            ddahSendDate: offer.ddah_send_date,
         };
     });
 
@@ -284,6 +292,7 @@ function adminFetchAll() {
     appState.setFetchingDataList('ddahs', true);
     appState.setFetchingDataList('offers', true);
     appState.setFetchingDataList('sessions', true);
+    appState.setFetchingDataList('courses', true);
 
     // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
     getDdahs()
@@ -308,6 +317,14 @@ function adminFetchAll() {
             appState.setFetchingDataList('sessions', false, true);
         })
         .catch(() => appState.setFetchingDataList('sessions', false));
+
+    // when courses are successfully fetched, update the courses list; set fetching flag to false either way
+    getCourses()
+        .then(courses => {
+            appState.setCoursesList(fromJS(courses));
+            appState.setFetchingDataList('courses', false, true);
+        })
+        .catch(() => appState.setFetchingDataList('courses', false));
 }
 
 function instructorFetchAll() {
@@ -459,6 +476,52 @@ function importOffers(data) {
             () => appState.setImporting(false)
         );
 }
+
+function importDdahs(data) {
+    appState.setImporting(true);
+
+    postHelper('/import/ddahs', { ddah_data: data })
+        .then(resp => {
+            if (resp.ok) {
+                return resp.json().then(resp => {
+                    // import succeeded with errors
+                    if (resp.errors) {
+                        return resp.message.forEach(message => appState.alert(message));
+                    }
+                    return Promise.resolve();
+                });
+            }
+            // import failed with errors
+            if (resp.status == 404) {
+                return resp
+                    .json()
+                    .then(resp => resp.message.forEach(message => appState.alert(message)))
+                    .then(Promise.reject);
+            }
+            return respFailure(resp);
+        })
+        .then(
+            () => {
+                appState.setFetchingDataList('ddahs', true);
+                appState.setFetchingDataList('offers', true);
+
+                getOffers()
+                    .then(offers => {
+                        appState.setOffersList(fromJS(offers));
+                        appState.setFetchingDataList('offers', false, true);
+                    })
+                    .catch(() => appState.setFetchingDataList('offers', false));
+
+                getDdahs()
+                    .then(ddahs => {
+                        appState.setDdahsList(fromJS(ddahs));
+                        appState.setFetchingDataList('ddahs', false, true);
+                    })
+                    .catch(() => appState.setFetchingDataList('ddahs', false));
+            }
+        ).then(() => appState.setImporting(false));
+}
+
 
 // send contracts
 function sendContracts(offers) {
@@ -963,6 +1026,10 @@ function exportOffers(session) {
     window.open('/export/cp-offers/' + session);
 }
 
+function exportDdahs(course){
+    window.open('/export/ddahs/' + course);
+}
+
 // create a new, empty template with this name
 function createTemplate(name) {
     let user = appState.getCurrentUserName();
@@ -1264,6 +1331,59 @@ function sendDdahs(ddahs) {
         });
 }
 
+// send ddah forms
+function previewDdahs(ddahs) {
+    let validDdahs = ddahs;
+    let filename = "";
+
+    // check which ddahs can be sent
+    postHelper('/ddahs/can-preview', { ddahs: ddahs })
+        .then(resp => {
+            if (resp.status == 404) {
+                // some ddahs cannot be sent
+                let ddahsList = appState.getDdahsList();
+                let offersList = appState.getOffersList();
+
+                return resp.json().then(res => {
+                    res.invalid_offers.forEach(ddah => {
+                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+
+                        appState.alert(
+                            '<b>Error</b>: Cannot send DDAH form to ' +
+                                offersList.getIn([offer, 'lastName']) +
+                                ', ' +
+                                offersList.getIn([offer, 'firstName']) +
+                                ' for ' +
+                                offersList.getIn([offer, 'course'])
+                        );
+                        // remove invalid ddah(s) from ddah list
+                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
+                    });
+
+                    if (validDdahs.length == 0) {
+                        return Promise.reject();
+                    }
+                }, msgFailure);
+            } else if (!resp.ok) {
+                // request failed
+                return respFailure(resp);
+            }
+        })
+        // preview pdf for valid ddahs
+        .then(() => postHelper('/ddahs/preview', { ddahs: validDdahs }))
+        .then(resp => {
+            // extract the filename from the response headers
+            filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
+            // parse the response body as a blob
+            return resp.blob();
+        })
+        // create a URL for the object body of the response
+        .then(blob => URL.createObjectURL(blob))
+        .then(url => {
+            window.open(url);
+        });
+}
+
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 function fetchAuth() {
@@ -1274,7 +1394,8 @@ function fetchAuth() {
                 appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
                 // default to cp_admin as selected user role
                 appState.selectUserRole('cp_admin');
-                appState.setCurrentUserName('DEV');
+                appState.setCurrentUserName('zaleskim');
+                appState.setTaCoordinator(resp.ta_coord);
             } else {
                 // filter out roles not relevant to this application
                 let roles = resp.roles.filter(role =>
@@ -1283,6 +1404,7 @@ function fetchAuth() {
                 appState.setCurrentUserRoles(roles);
                 appState.selectUserRole(roles[0]);
                 appState.setCurrentUserName(resp.utorid);
+                appState.setTaCoordinator(resp.ta_coord);
             }
         });
 }
@@ -1292,6 +1414,7 @@ export {
     instructorFetchAll,
     importOffers,
     importAssignments,
+    importDdahs,
     sendContracts,
     nagOffers,
     setHrProcessed,
@@ -1304,6 +1427,7 @@ export {
     updateSessionPay,
     noteOffer,
     exportOffers,
+    exportDdahs,
     clearHrStatus,
     setOfferAccepted,
     resetOffer,
@@ -1314,6 +1438,7 @@ export {
     updateDdah,
     submitDdah,
     previewDdah,
+    previewDdahs,
     nagApplicantDdahs,
     nagInstructors,
     sendDdahs,
