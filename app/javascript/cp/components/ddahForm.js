@@ -64,13 +64,13 @@ const Header = props =>
                 <td>
                     <select
                         value={
-                            props.ddahData.get('supervisor') != null
-                                ? props.ddahData.get('supervisor')
+                            props.ddahData.get('supervisorId') != null
+                                ? props.ddahData.get('supervisorId')
                                 : ''
                         }
                         disabled={props.appState.isTemplateSelected()}
                         onChange={event =>
-                            props.appState.updateDdahWorksheet('supervisor', event.target.value)}>
+                            props.appState.updateDdahWorksheet('supervisorId', event.target.value)}>
                         <option />
                         {props.course &&
                             props.course.get('instructors').map((instructor, key) =>

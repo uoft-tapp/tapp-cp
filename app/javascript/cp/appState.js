@@ -27,6 +27,7 @@ const initialState = {
 
     ddahWorksheet: {
         supervisor: null,
+        supervisorId: null,
         optional: null,
         requiresTraining: false,
         allocations: [{ id: null, units: null, duty: null, type: null, time: null }],
@@ -189,6 +190,7 @@ class AppState {
     // return ddahData in the ddah worksheet format
     createDdahWorksheet(ddahData) {
         let worksheet = {
+            supervisorId: ddahData.get('supervisorId'),
             supervisor: ddahData.get('supervisor'),
             tutCategory: ddahData.get('tutCategory'),
             optional: ddahData.get('optional'),
@@ -1087,7 +1089,7 @@ class AppState {
         // process ddah for format
         let ddah = this.get('ddahWorksheet');
         let updates = {
-            instructor_id: ddah.get('supervisor'),
+            instructor_id: ddah.get('supervisorId'),
             optional: ddah.get('optional'),
             categories: ddah.get('categories').toJS(),
             trainings: ddah.get('trainings').toJS(),
