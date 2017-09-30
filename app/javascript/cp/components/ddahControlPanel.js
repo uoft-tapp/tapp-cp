@@ -9,6 +9,7 @@ import {
     DropdownButton,
     MenuItem,
     Button,
+    ButtonGroup,
 } from 'react-bootstrap';
 
 import { TableMenu } from './tableMenu.js';
@@ -49,7 +50,8 @@ class DdahControlPanel extends React.Component {
         let nullCheck =
             this.props.appState.isOffersListNull() ||
             this.props.appState.isSessionsListNull() ||
-            this.props.appState.isDdahsListNull();
+            this.props.appState.isDdahsListNull()||
+            this.props.appState.isCoursesListNull();
         if (nullCheck) {
             return <div id="loader" />;
         }
@@ -57,7 +59,8 @@ class DdahControlPanel extends React.Component {
         let fetchCheck =
             this.props.appState.fetchingOffers() ||
             this.props.appState.fetchingSessions() ||
-            this.props.appState.fetchingDdahs();
+            this.props.appState.fetchingDdahs()||
+            this.props.appState.fetchingCourses();
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         this.config = [
@@ -238,6 +241,7 @@ const SessionsDropdown = props =>
                 componentClass="select"
                 onChange={event => {
                     props.appState.selectSession(event.target.value);
+                    props.appState.getSessionCourse();
                 }}>
                 <option value="" key="session-all">
                     all
@@ -273,21 +277,28 @@ const ExportForm = props =>
             <ControlLabel>Course:</ControlLabel>&ensp;
             <FormControl
                 id="course"
-                componentClass="select">
+                componentClass="select"
+                onChange={event => {
+                    props.appState.selectCourse(event.target.value);
+                }}>
                 <option value="" key="course-all">
                     Choose a course
                 </option>
-
+                {props.appState.getSessionCourse().map((course, courseId) =>
+                    <option value={courseId} key={courseId}>
+                        {course.get('code')}
+                    </option>
+                )}
             </FormControl>
         </FormGroup>
-        <Button  style={{marginLeft: "3px"}}
-            bsStyle="primary"
-            onClick={() =>
-                props.appState.alert(
-                    '<b>Export DDAH Forms</b> This functionality is not currently supported.'
-                )}>
-            Export DDAH Forms
-        </Button>
+        <ButtonGroup>
+            <Button style={{display: "none"}}></Button>
+            <Button style={{marginRight: "5px"}}
+                bsStyle="primary"
+                onClick={() => props.appState.exportDdahs()}>
+                Export
+            </Button>
+        </ButtonGroup>
     </Form>;
 
 const CommMenu = props =>

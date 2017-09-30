@@ -311,6 +311,10 @@ class AppState {
         return this.get('selectedSession');
     }
 
+    getSelectedCourse() {
+        return this.get('selectedCourse');
+    }
+
     getSelectedNavTab() {
         return this.get('nav.selectedTab');
     }
@@ -378,6 +382,10 @@ class AppState {
 
     selectSession(session) {
         this.set('selectedSession', session);
+    }
+
+    selectCourse(course) {
+        this.set('selectedCourse', course);
     }
 
     selectUserRole(role) {
@@ -672,6 +680,19 @@ class AppState {
         fetch.exportOffers(session);
     }
 
+    // export offers to CSV
+    exportDdahs() {
+        let course = this.getSelectedCourse();
+        if (!course) {
+            this.alert(
+                '<b>Export offers from all sessions</b> This functionality is not currently supported. Please select a course.'
+            );
+            return;
+        }
+
+        fetch.exportDdahs(course);
+    }
+
     fetchAll() {
         let role = this.getSelectedUserRole();
         if (role == 'cp_admin' || role == 'hr_assistant') {
@@ -727,6 +748,22 @@ class AppState {
 
     getCoursesList() {
         return this.get('courses.list');
+    }
+
+    getSessionCourse(){
+        let session = this.getSelectedSession();
+        let courses = this.getCoursesList();
+        if (session == ''){
+          return courses;
+        }
+        else{
+          let selected = [];
+          courses.forEach(function(course){
+            if (course.get("session")==session)
+                selected.push(course);
+          });
+          return selected;
+        }
     }
 
     getDdahsList() {

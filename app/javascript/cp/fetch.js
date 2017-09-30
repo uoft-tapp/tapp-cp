@@ -79,10 +79,16 @@ const getCategories = () =>
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchCategoriesSuccess);
 
-const getCourses = user =>
-    getHelper('/instructors/' + user + '/positions')
+const getCourses = ((user = null) =>{
+    let url = "";
+    if (user != null)
+        url = '/instructors/' + user + '/positions';
+    else
+        url = '/positions';
+    return getHelper(url)
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchCoursesSuccess);
+});
 
 const getDdahs = user =>
     getHelper(user ? '/instructors/' + user + '/ddahs' : '/ddahs')
@@ -285,6 +291,7 @@ function adminFetchAll() {
     appState.setFetchingDataList('ddahs', true);
     appState.setFetchingDataList('offers', true);
     appState.setFetchingDataList('sessions', true);
+    appState.setFetchingDataList('courses', true);
 
     // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
     getDdahs()
@@ -309,6 +316,14 @@ function adminFetchAll() {
             appState.setFetchingDataList('sessions', false, true);
         })
         .catch(() => appState.setFetchingDataList('sessions', false));
+
+    // when courses are successfully fetched, update the courses list; set fetching flag to false either way
+    getCourses()
+        .then(courses => {
+            appState.setCoursesList(fromJS(courses));
+            appState.setFetchingDataList('courses', false, true);
+        })
+        .catch(() => appState.setFetchingDataList('courses', false));
 }
 
 function instructorFetchAll() {
@@ -964,6 +979,10 @@ function exportOffers(session) {
     window.open('/export/cp-offers/' + session);
 }
 
+function exportDdahs(course){
+    window.open('/export/ddahs/' + course);
+}
+
 // create a new, empty template with this name
 function createTemplate(name) {
     let user = appState.getCurrentUserName();
@@ -1360,6 +1379,7 @@ export {
     updateSessionPay,
     noteOffer,
     exportOffers,
+    exportDdahs,
     clearHrStatus,
     setOfferAccepted,
     resetOffer,
