@@ -188,6 +188,7 @@ class DdahControlPanel extends React.Component {
             <Grid fluid id="ddahs-grid" style={cursorStyle}>
                 <ButtonToolbar id="dropdown-menu">
                     <SessionsDropdown {...this.props} />
+                    <ExportForm {...this.props} />
 
                     <DdahsMenu {...this.props} />
                     <CommMenu {...this.props} />
@@ -265,6 +266,29 @@ const DdahsMenu = props =>
             Set DDAH status to <i>Accepted</i>
         </MenuItem>
     </DropdownButton>;
+
+const ExportForm = props =>
+    <Form inline>
+        <FormGroup style={{float: "left"}}>
+            <ControlLabel>Course:</ControlLabel>&ensp;
+            <FormControl
+                id="course"
+                componentClass="select">
+                <option value="" key="course-all">
+                    Choose a course
+                </option>
+                
+            </FormControl>
+        </FormGroup>
+        <Button  style={{marginLeft: "3px"}}
+            bsStyle="primary"
+            onClick={() =>
+                props.appState.alert(
+                    '<b>Export DDAH Forms</b> This functionality is not currently supported.'
+                )}>
+            Export DDAH Forms
+        </Button>
+    </Form>;
 
 const CommMenu = props =>
     <DropdownButton bsStyle="primary" title="Communicate" id="comm-dropdown">

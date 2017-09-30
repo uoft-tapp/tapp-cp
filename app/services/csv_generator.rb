@@ -91,10 +91,10 @@ class CSVGenerator
     end
   end
 
-  def generate_ddahs(session_id, position_id)
-    position = Position.find(position_id)
+  def generate_ddahs(position_id)
+    position = Position.find_by(id: position_id)
     if position
-      set_all_offer_in_session(session_id, position)
+      set_all_offer_in_session(position[:session_id], position)
       if @offers.size == 0
         return {generated: false,
           msg: "Warning: There are currenly no offers for this position. Operation aborted"}
@@ -260,8 +260,8 @@ class CSVGenerator
     categories = Category.all
     legends = []
     duties.each_with_index do |duty, index|
-      legends.push([duty[:name], index, "", "", "", "", ""])
       num = index+1
+      legends.push([duty[:name], num, "", "", "", "", ""])
       if index < trainings.length
         legends[index][3] = trainings[index][:name]
         legends[index][4] = num_to_alpha(num)
@@ -281,12 +281,12 @@ class CSVGenerator
       ["applicant_name", "utorid", "required hours", "trainings", "allocations", "id(generated)"],
       ["#{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}", offer[:applicant][:utorid], offer[:hours], "", "", "num_units"],
       ["", "", "total_hours (generated)", "categories", "", "unit_name"],
-      ["", "", "=TEXT(SUM(G#{curr+5}:AD#{curr+5}), \"0.00\")", "", "", "duty_id"],
+      ["", "", "=TEXT(SUM(G#{curr+5}:AE#{curr+5}), \"0.00\")", "", "", "duty_id"],
       ["", "", "", "", "", "minutes"],
       ["", "", "", "", "", "hours (generated)"],
     ]
     setup.each_with_index do |line, index|
-      for num in 1..24
+      for num in 1..25
         num = num + 6
         if index == (setup.length - 1)
           line.push("=(#{num_to_alpha(num)}#{curr+1}*#{num_to_alpha(num)}#{curr+4})/60")

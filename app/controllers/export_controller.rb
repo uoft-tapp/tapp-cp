@@ -38,7 +38,7 @@ class ExportController < ApplicationController
 
   def ddahs
     generator = CSVGenerator.new
-    response = generator.generate_ddahs(params[:session_id], params[:position_id])
+    response = generator.generate_ddahs(params[:position_id])
     render_helper(response)
   end
 
