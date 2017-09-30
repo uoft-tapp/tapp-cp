@@ -16,11 +16,11 @@ class OfferImporter
       end
     end
     if exceptions.length == file[:offers].length
-      return {imported: false, errors: true, message: exceptions}
+      return {success: false, errors: true, message: exceptions}
     elsif exceptions.length > 0
-      return {imported: true, errors: true, message: exceptions}
+      return {success: true, errors: true, message: exceptions}
     else
-      return {imported: true, errors: false, message: ["Offers import was successful."]}
+      return {success: true, errors: false, message: ["Offers import was successful."]}
     end
   end
 
@@ -49,5 +49,5 @@ class OfferImporter
       year: year,
     }
   end
-  
+
 end

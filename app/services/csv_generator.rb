@@ -237,7 +237,7 @@ class CSVGenerator
       ["course_name", position[:position]],
       ["round_id", position[:round_id]],
       [],
-      ["duties_list", "", "", "traingings_list", "", "", "categories_list"],
+      ["duties_list", "", "", "trainings_list", "", "", "categories_list"],
     ]
     setup = setup + get_ddah_legends + [[""]]
     data = CSV.generate do |csv|
