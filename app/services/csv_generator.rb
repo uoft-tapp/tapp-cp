@@ -233,7 +233,7 @@ class CSVGenerator
 
   def get_ddahs(position)
     setup = [
-      ["supervisor_utorid",""],
+      ["supervisor_utorid",get_supervisor],
       ["course_name", position[:position]],
       ["round_id", position[:round_id]],
       [],
@@ -253,13 +253,26 @@ class CSVGenerator
     end
   end
 
+  def get_supervisor
+    @offers.each_with_index do |offer,index|
+      ddah = get_ddah(offer)
+      if ddah
+        if ddah[:instructor_id]
+          instructor = Instructor.find(ddah[:instructor_id])
+          return instructor[:utorid]
+        end
+      end
+    end
+    return ""
+  end
+
   def get_ddah_legends
     duties = Duty.all
     trainings = Training.all
     categories = Category.all
     legends = []
     duties.each_with_index do |duty, index|
-      legends.push([duty[:name], duty[:id], "", "", "", "", ""])
+      legends.push([duty[:name], num_to_alpha(duty[:id]).upcase, "", "", "", "", ""])
       if index < trainings.length
         legends[index][3] = trainings[index][:name]
         legends[index][4] = num_to_alpha(trainings[index][:id]).upcase
