@@ -14,6 +14,7 @@ import {
 
 import { TableMenu } from './tableMenu.js';
 import { Table } from './table.js';
+import { ImportButton } from './importButton.js';
 
 const getCheckboxElements = () => document.getElementsByClassName('offer-checkbox');
 
@@ -190,6 +191,7 @@ class DdahControlPanel extends React.Component {
         return (
             <Grid fluid id="ddahs-grid" style={cursorStyle}>
                 <ButtonToolbar id="dropdown-menu">
+                    <ImportButton {...this.props}/>
                     <SessionsDropdown {...this.props} />
                     <ExportForm {...this.props} />
 
@@ -230,6 +232,7 @@ class DdahControlPanel extends React.Component {
         );
     }
 }
+
 
 // session selector
 const SessionsDropdown = props =>

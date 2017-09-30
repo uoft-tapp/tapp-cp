@@ -476,6 +476,53 @@ function importOffers(data) {
         );
 }
 
+function importDdahs(data) {
+    appState.setImporting(true);
+
+    postHelper('/import/csv-ddahs', { ddah_data: data })
+        .then(resp => {
+            if (resp.ok) {
+                return resp.json().then(resp => {
+                    // import succeeded with errors
+                    if (resp.errors) {
+                        return resp.message.forEach(message => appState.alert(message));
+                    }
+                    return Promise.resolve();
+                });
+            }
+            // import failed with errors
+            if (resp.status == 404) {
+                return resp
+                    .json()
+                    .then(resp => resp.message.forEach(message => appState.alert(message)))
+                    .then(Promise.reject);
+            }
+            return respFailure(resp);
+        })
+        .then(
+            () => {
+                appState.setFetchingDataList('ddahs', true);
+                appState.setFetchingDataList('offers', true);
+
+                getDdahs()
+                    .then(ddahs => {
+                        appState.setDdahsList(fromJS(ddahs));
+                        appState.setFetchingDataList('ddahs', false, true);
+                    })
+                    .catch(() => appState.setFetchingDataList('ddahs', false));
+
+                getOffers()
+                    .then(offers => {
+                        appState.setOffersList(fromJS(offers));
+                        appState.setFetchingDataList('offers', false, true);
+                    })
+                    .catch(() => appState.setFetchingDataList('offers', false));
+            },
+            () => appState.setImporting(false)
+        );
+}
+
+
 // send contracts
 function sendContracts(offers) {
     let validOffers = offers;
@@ -1367,6 +1414,7 @@ export {
     instructorFetchAll,
     importOffers,
     importAssignments,
+    importDdahs,
     sendContracts,
     nagOffers,
     setHrProcessed,

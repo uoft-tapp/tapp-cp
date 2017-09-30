@@ -817,6 +817,10 @@ class AppState {
         fetch.importOffers(data);
     }
 
+    importDdahs(data) {
+        fetch.importDdahs(data);
+    }
+
     importing() {
         return this.get('importing') > 0;
     }
