@@ -1,9 +1,8 @@
 class DdahImporter
-  include Importer
   include DdahUpdater
   require 'csv'
 
-  def import_csv_ddahs(data)
+  def import_ddahs(data)
     exceptions = []
     data = parse_to_cell_json(data)
     if valid_ddah(data)
@@ -40,35 +39,9 @@ class DdahImporter
     return get_status(exceptions, "DDAH")
   end
 
-  def import_csv_template(data)
+  def import_template(data)
     exceptions = []
     return get_status(exceptions, "DDAH Templates")
-  end
-
-  def import_json_ddahs(data)
-    exceptions = []
-    data["ddahs"].each do |ddah|
-      applicant = Applicant.find_by(utorid: ddah["utorid"])
-      instructor = Instructor.find_by(utorid: ddah["supervisor"])
-      position = Position.find_by(position: ddah["course_name"], round_id: ddah["round_id"])
-
-      get_allocations_data(ddah["allocations"])
-      trainings = get_trainings_categories(Training, ddah["trainings"], "Training")
-      categories = get_trainings_categories(Category, ddah["categories"], "Categories")
-    end
-    return get_status(exceptions, "DDAH")
-  end
-
-  def import_json_templates(data)
-    exceptions = []
-    data["templates"].each do |template|
-      instructor = Instructor.find_by(utorid: ddah["instructor"])
-
-      get_allocations_data(ddah["allocations"])
-      trainings = get_trainings_categories(Training, ddah["trainings"], "Training")
-      categories = get_trainings_categories(Category, ddah["categories"], "Categories")
-    end
-    return get_status(exceptions, "DDAH Template")
   end
 
   private
@@ -242,33 +215,4 @@ class DdahImporter
     return data[:num_line]>=18
   end
 
-  def get_allocations_data(allocations)
-    data = []
-    allocations.each_with_index do |allocation, index|
-      duty = Duty.find_by(name: allocation["duty"])
-      if duty
-        data.push({
-          num_units: allocation["num_units"],
-          unit_name: allocation["unit_name"],
-          minutes: allocation["minutes"],
-          duty_id: duty[:id],
-        })
-      else
-        exceptions.push("Allocation at index #{index} is a non-existent duty type. Check your spelling.")
-      end
-    end
-    return data
-  end
-
-  def get_trainings_categories(model, items, type, exceptions)
-    data = []
-    items.each do |item|
-      temp = model.find_by(name: item)
-      if temp
-        data.push(temp[:id])
-      else
-        exceptions.push("#{type} at index #{index} is a non-existent #{type.downcase}. Check your spelling.")
-      end
-    end
-  end
 end

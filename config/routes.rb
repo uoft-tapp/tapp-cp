@@ -73,10 +73,8 @@ Rails.application.routes.draw do
   post "/offers/send-nag-instructor" => "offers#send_nag_instructor"
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
-  post "/import/json-ddahs", to: "import#json_ddahs"
-  post "/import/json-templates", to: "import#json_templates"
-  post "/import/csv-ddahs", to: "import#csv_ddahs"
-  post "/import/csv-templates", to: "import#csv_templates"
+  post "/import/ddahs", to: "import#ddahs"
+  post "/import/templates", to: "import#templates"
   get "/export/ddahs/:position_id", to: "export#ddahs"
 
   post "/ddahs/preview" => "ddahs#preview"

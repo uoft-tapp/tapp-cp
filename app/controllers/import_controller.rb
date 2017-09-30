@@ -38,26 +38,14 @@ class ImportController < ApplicationController
     render json: {message: "Instructors successfully imported."}
   end
 
-  def json_ddahs
+  def ddahs
     importer = DdahImporter.new
-    status = importer.import_json_ddahs(params[:ddah_data])
-    import_helper(status)
+    status = importer.import_ddahs(params[:ddah_data])
   end
 
-  def json_templates
-    importer = InstructorImporter.new
-    status = importer.import_json_templates(params[:template_data])
-    import_helper(status)
-  end
-
-  def csv_ddahs
+  def templates
     importer = DdahImporter.new
-    status = importer.import_csv_ddahs(params[:ddah_data])
-  end
-
-  def csv_templates
-    importer = DdahImporter.new
-    status = importer.import_csv_template(params[:ddah_data])
+    status = importer.import_template(params[:ddah_data])
   end
 
   private

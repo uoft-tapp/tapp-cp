@@ -479,7 +479,7 @@ function importOffers(data) {
 function importDdahs(data) {
     appState.setImporting(true);
 
-    postHelper('/import/csv-ddahs', { ddah_data: data })
+    postHelper('/import/ddahs', { ddah_data: data })
         .then(resp => {
             if (resp.ok) {
                 return resp.json().then(resp => {
