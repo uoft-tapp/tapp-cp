@@ -46,4 +46,25 @@ class ImportController < ApplicationController
     render json: {message: "Instructors successfully imported."}
   end
 
+  def ddahs
+    importer = DdahImporter.new
+    status = importer.import_ddahs(params[:ddah_data])
+    if status[:success]
+      render json: {message: status[:message], errors: status[:errors]}
+    else
+      render status: 404, json: {message: status[:message], errors: status[:errors]}
+    end
+  end
+
+  def templates
+    importer = InstructorImporter.new
+    status = importer.import_templates(params[:template_data])
+    if status[:success]
+      render json: {message: status[:message], errors: status[:errors]}
+    else
+      render status: 404, json: {message: status[:message], errors: status[:errors]}
+    end
+  end
+
+
 end

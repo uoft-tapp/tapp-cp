@@ -73,6 +73,9 @@ Rails.application.routes.draw do
   post "/offers/send-nag-instructor" => "offers#send_nag_instructor"
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
+  post "/import/ddahs", to: "import#ddahs"
+  post "/import/templates", to: "import#templates"
+  get "/export/ddahs/:session_id/:position_id", to: "export#ddahs"
 
   post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
   post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
