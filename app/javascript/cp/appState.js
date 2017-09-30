@@ -166,7 +166,10 @@ class AppState {
 
     applyTemplate(templateId) {
         let template = this.get('templates.list.' + templateId);
-
+        template.get('allocations').forEach(function(allocation, key){
+          let allocations = template.get("allocations").set(key, allocation.remove("id"));
+          template = template.set("allocations", allocations);
+        });
         // replace the values in the current ddah with the values in the template
         this.set(
             'ddahWorksheet',
