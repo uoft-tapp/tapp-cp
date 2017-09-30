@@ -99,5 +99,4 @@ Rails.application.routes.draw do
   get "/pb/ddah/:offer_id/pdf" => "ddahs#student_pdf"
   post "/pb/ddah/:offer_id/accept" => "ddahs#student_accept"
 
-  get "/test" => "app#test"
 end
