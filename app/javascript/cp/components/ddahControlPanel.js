@@ -150,6 +150,21 @@ class DdahControlPanel extends React.Component {
                 style: { width: 0.1 },
             },
             {
+                header: 'Offer Status',
+                data: p => (p.offer.get('status')? p.offer.get('status'): '-'),
+                sortData: p => (p.get('status')? p.get('status'): '-'),
+                style: { width: 0.05 },
+                filterLabel: 'Offer Status',
+                filterCategories: ['Unsent', 'Pending', 'Accepted', 'Rejected', 'Withdrawn'],
+                filterFuncs: [
+                    'Unsent',
+                    'Pending',
+                    'Accepted',
+                    'Rejected',
+                    'Withdrawn',
+                ].map(status => p => p.get('status') == status)
+            },
+            {
                 header: 'DDAH Status',
                 data: p =>
                     p.offer.get('ddahStatus')
