@@ -175,6 +175,12 @@ class DdahControlPanel extends React.Component {
                 ),
             },
             {
+                header: 'Send Date',
+                data: p => (p.offer.get('ddahSendDate')? p.offer.get('ddahSendDate'): '-'),
+                sortData: p => (p.get('ddahSendDate')? p.get('ddahSendDate'): '-'),
+                style: { width: 0.1 },
+            },
+            {
                 header: 'Instructor Nag Count',
                 data: p => (p.offer.get('InstructorNagCount')? p.offer.get('InstructorNagCount'): '-'),
                 sortData: p => (p.get('InstructorNagCount')? p.get('InstructorNagCount'): '-'),

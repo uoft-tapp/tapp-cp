@@ -232,6 +232,7 @@ function onFetchOffersSuccess(resp) {
             printedAt: offer.print_time,
             link: offer.link,
             note: offer.commentary,
+            ddahSendDate: offer.ddah_send_date,
         };
     });
 
@@ -1394,7 +1395,7 @@ function fetchAuth() {
                 appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
                 // default to cp_admin as selected user role
                 appState.selectUserRole('cp_admin');
-                appState.setCurrentUserName('DEV');
+                appState.setCurrentUserName('zaleskim');
                 appState.setTaCoordinator(resp.ta_coord);
             } else {
                 // filter out roles not relevant to this application

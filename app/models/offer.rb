@@ -35,6 +35,7 @@ class Offer < ApplicationRecord
     end
     if ddah
       data[:ddah_applicant_nag_count] = ddah[:nag_count]
+      data[:ddah_send_date] = ddah[:send_date]
     end
     instructors.each do |instructor|
       data[:instructors].push(instructor)
