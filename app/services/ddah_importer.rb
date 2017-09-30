@@ -16,7 +16,9 @@ class DdahImporter
             offer = Offer.find(data[:offer_id])
             if ddah
               update_form(ddah, data)
-              offer.update_attributes!(ddah_status: "Created")
+              if offer[:ddah_status] =="None" || !offer[:ddah_status]
+                offer.update_attributes!(ddah_status: "Created")
+              end
             else
               ddah = Ddah.create!(
                 offer_id: data[:offer_id],
