@@ -245,7 +245,6 @@ class CSVGenerator
         csv << line
       end
       @offers.each_with_index do |offer,index|
-        ddah = Ddah.find_by(offer_id: offer[:id])
         ddah_setup = get_ddah_setup(offer,index)
         ddah_setup.each do |line|
           csv << line
@@ -260,28 +259,30 @@ class CSVGenerator
     categories = Category.all
     legends = []
     duties.each_with_index do |duty, index|
-      num = index+1
-      legends.push([duty[:name], num, "", "", "", "", ""])
+      legends.push([duty[:name], duty[:id], "", "", "", "", ""])
       if index < trainings.length
         legends[index][3] = trainings[index][:name]
-        legends[index][4] = num_to_alpha(num)
+        legends[index][4] = num_to_alpha(trainings[index][:id]).upcase
       end
       if index < categories.length
         legends[index][6] = categories[index][:name]
-        legends[index][7] = num_to_alpha(num)
+        legends[index][7] = num_to_alpha(categories[index][:id]).upcase
       end
     end
     return legends
   end
 
   def get_ddah_setup(offer, index)
-    ddah = Ddah.find_by(offer_id: offer[:id])
+    ddah = get_ddah(offer)
+    allocations = get_ddah_attribute(ddah, :allocations)
+    trainings = id_to_alpha(get_ddah_attribute(ddah, :trainings))
+    categories = id_to_alpha(get_ddah_attribute(ddah, :categories))
     curr = 13+(index*6)
     setup = [
       ["applicant_name", "utorid", "required hours", "trainings", "allocations", "id(generated)"],
-      ["#{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}", offer[:applicant][:utorid], offer[:hours], "", "", "num_units"],
+      ["#{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}", offer[:applicant][:utorid], offer[:hours], trainings, "", "num_units"],
       ["", "", "total_hours (generated)", "categories", "", "unit_name"],
-      ["", "", "=TEXT(SUM(G#{curr+5}:AE#{curr+5}), \"0.00\")", "", "", "duty_id"],
+      ["", "", "=TEXT(SUM(G#{curr+5}:AE#{curr+5}), \"0.00\")", categories, "", "duty_id"],
       ["", "", "", "", "", "minutes"],
       ["", "", "", "", "", "hours (generated)"],
     ]
@@ -291,11 +292,57 @@ class CSVGenerator
         if index == (setup.length - 1)
           line.push("=(#{num_to_alpha(num)}#{curr+1}*#{num_to_alpha(num)}#{curr+4})/60")
         else
-          line.push("")
+          line.push(get_allocation_data(allocations, num-7, index))
         end
       end
     end
     return setup
+  end
+
+  def get_allocation_data(allocations, index, row)
+    if index <= allocations.length-1
+      allocation = allocations[index]
+      case row
+      when 0
+        return allocation[:id]
+      when 1
+        return allocation[:num_unit]
+      when 2
+        return allocation[:unit_name]
+      when 3
+        return allocation[:duty_id]
+      when 4
+        return allocation[:minutes]
+      end
+    else
+      return ""
+    end
+  end
+
+  def get_ddah(offer)
+    ddah = Ddah.find_by(offer_id: offer[:id])
+    if ddah
+      return ddah
+    else
+      return nil
+    end
+  end
+
+  def get_ddah_attribute(ddah, attr)
+    if ddah
+      ddah = ddah.format
+      return ddah[attr]
+    else
+      return []
+    end
+  end
+
+  def id_to_alpha(ids)
+    alpha = ""
+    ids.each do |id|
+      alpha+= num_to_alpha(id).upcase
+    end
+    return alpha
   end
 
   def num_to_alpha(num)
