@@ -1,10 +1,11 @@
 require 'erb'
 class TemplateParser
 
-  def initialize(files, data, type)
+  def initialize(files, data, type, template = false)
     if type == "offer"
       @offer = data
     elsif type== "ddah"
+      @template = template
       @ddah = data
     end
     @data = {}
@@ -91,7 +92,10 @@ class TemplateParser
     end
   end
 
-  def get_est_enrol_per_ta(position_id, current_enrolment)
+  def get_est_enrol_per_ta(position_id, current_enrolment, template)
+    if template
+      return ""
+    end
     if !current_enrolment
       current_enrolment = 0
     end

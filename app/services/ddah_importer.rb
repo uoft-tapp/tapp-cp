@@ -14,8 +14,10 @@ class DdahImporter
           ddahs = get_all_ddahs(data, instructor, position, exceptions)
           ddahs.each do |data|
             ddah = Ddah.find_by(offer_id: data[:offer_id])
+            offer = Offer.find(data[:offer_id])
             if ddah
               update_form(ddah, data)
+              offer.update_attributes!(ddah_status: "Created")
             else
               ddah = Ddah.create!(
                 offer_id: data[:offer_id],
@@ -23,6 +25,7 @@ class DdahImporter
                 optional: data[:optional],
               )
               update_form(ddah, data)
+              offer.update_attributes!(ddah_status: "Created")
             end
           end
         else

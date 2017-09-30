@@ -68,7 +68,7 @@ class TemplatesController < ApplicationController
 
   def preview
     template = Template.find(params[:template_id])
-    generator = DdahGenerator.new(template.format, true)
+    generator = DdahGenerator.new([template.format], true)
     send_data generator.render, filename: "ddah_template.pdf", disposition: "inline"
   end
 

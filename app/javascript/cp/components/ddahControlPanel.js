@@ -192,7 +192,7 @@ class DdahControlPanel extends React.Component {
 
                     <DdahsMenu {...this.props} />
                     <CommMenu {...this.props} />
-                    <PrintButton {...this.props} />
+                    <PreviewButton {...this.props} />
 
                     <TableMenu
                         config={this.config}
@@ -277,7 +277,7 @@ const ExportForm = props =>
                 <option value="" key="course-all">
                     Choose a course
                 </option>
-                
+
             </FormControl>
         </FormGroup>
         <Button  style={{marginLeft: "3px"}}
@@ -308,14 +308,14 @@ const CommMenu = props =>
         </MenuItem>
     </DropdownButton>;
 
-const PrintButton = props =>
+const PreviewButton = props =>
     <Button
         bsStyle="primary"
         onClick={() =>
             props.appState.alert(
-                '<b>Print DDAH forms</b> This functionality is not currently supported.'
+                '<b>Preview DDAH forms</b> This functionality is not currently supported.'
             )}>
-        Print DDAH forms
+        Preview DDAH forms
     </Button>;
 
 export { DdahControlPanel };

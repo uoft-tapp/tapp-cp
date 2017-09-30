@@ -168,6 +168,20 @@ class DdahsController < ApplicationController
     render status: 200, json: {message: "The selected DDAH's have been signed and set to status 'Approved'."}
   end
 
+  def can_preview
+    check_ddah_status(params[:ddahs], ["Created", "Ready", "Approved", "Pending", "Accepted"])
+  end
+
+  def preview
+    ddahs = []
+    params[:ddahs].each do |id|
+      ddah = Ddah.find(id).format
+      ddahs.push(ddah)
+    end
+    generator = DdahGenerator.new(ddahs)
+    send_data generator.render, filename: "ddahs.pdf", disposition: "inline"
+  end
+
   def pdf
     ddah = Ddah.find(params[:ddah_id])
     if ddah
@@ -205,7 +219,7 @@ class DdahsController < ApplicationController
   end
 
   def get_ddah_pdf(ddah)
-    generator = DdahGenerator.new(ddah.format)
+    generator = DdahGenerator.new([ddah.format])
     send_data generator.render, filename: "ddah.pdf", disposition: "inline"
   end
 

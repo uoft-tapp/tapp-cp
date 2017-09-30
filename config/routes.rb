@@ -79,6 +79,8 @@ Rails.application.routes.draw do
   post "/import/csv-templates", to: "import#csv_templates"
   get "/export/ddahs/:position_id", to: "export#ddahs"
 
+  post "/ddahs/preview" => "ddahs#preview"
+  post "/ddahs/can-preview" => "ddahs#can_preview"
   post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
   post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
   post "/ddahs/can-nag-student" => "ddahs#can_nag_student"
