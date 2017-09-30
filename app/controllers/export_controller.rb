@@ -5,6 +5,7 @@ class ExportController < ApplicationController
   before_action only: [:cp_offers] do
     cp_admin(true)
   end
+  before_action :cp_admin, only: [:ddahs]
 
   def chass
     exporter = ChassExporter.new
