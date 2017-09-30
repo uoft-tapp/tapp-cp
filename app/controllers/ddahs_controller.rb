@@ -4,7 +4,7 @@ class DdahsController < ApplicationController
   include DdahUpdater
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
-  before_action :cp_admin, only: [:accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
+  before_action :cp_admin, only: [:can_preview, :preview, :accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
   before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
   before_action  only: [:pdf, :new_template] do
     both_cp_admin_instructor(Ddah)
