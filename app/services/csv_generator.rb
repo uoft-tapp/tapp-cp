@@ -323,7 +323,7 @@ class CSVGenerator
       when 2
         return allocation[:unit_name]
       when 3
-        return allocation[:duty_id]
+        return num_to_alpha(allocation[:duty_id])
       when 4
         return allocation[:minutes]
       end
