@@ -295,7 +295,7 @@ class CSVGenerator
       ["applicant_name", "utorid", "required hours", "trainings", "allocations", "id(generated)"],
       ["#{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}", offer[:applicant][:utorid], offer[:hours], trainings, "", "num_units"],
       ["", "", "total_hours (generated)", "categories", "", "unit_name"],
-      ["", "", "=TEXT(SUM(G#{curr+5}:AE#{curr+5}), \"0.00\")", categories, "", "duty_id"],
+      ["", "", "=TEXT(SUM(G#{curr+4}:AE#{curr+4}), \"0.00\")", categories, "", "duty_id"],
       ["", "", "", "", "", "minutes"],
       ["", "", "", "", "", "hours (generated)"],
     ]
@@ -303,7 +303,7 @@ class CSVGenerator
       for num in 1..25
         num = num + 6
         if index == (setup.length - 1)
-          line.push("=(#{num_to_alpha(num)}#{curr+1}*#{num_to_alpha(num)}#{curr+4})/60")
+          line.push("=(#{num_to_alpha(num)}#{curr}*#{num_to_alpha(num)}#{curr+3})/60")
         else
           line.push(get_allocation_data(allocations, num-7, index))
         end
@@ -323,10 +323,10 @@ class CSVGenerator
       when 2
         return allocation[:unit_name]
       when 3
-        return num_to_alpha(allocation[:duty_id])
+        return num_to_alpha(allocation[:duty_id]).upcase
       when 4
         return allocation[:minutes]
-      end
+        end
     else
       return ""
     end

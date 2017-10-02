@@ -10,6 +10,8 @@ class DdahImporter
       if instructor
         position = Position.find_by(position: data[2][:B], round_id: data[3][:B])
         if position
+          puts("if position data=")
+          puts(data)
           ddahs = get_all_ddahs(data, instructor, position)
           ddahs.each do |data|
             ddah = Ddah.find_by(offer_id: data[:offer_id])
@@ -68,6 +70,7 @@ class DdahImporter
   end
 
   def to_i(alpha)
+    puts(alpha)
     alpha26 = ("a".."z").to_a
     result = 0
     alpha = alpha.downcase
@@ -95,14 +98,21 @@ class DdahImporter
   def get_all_ddahs(data, instructor, position)
     ddahs = []
     (13..data[:num_line]).step(6) do |line|
-      data = get_ddah(data, line, position)
-      data[:instructor_id] = instructor[:id]
-      ddahs.push(data)
+      puts(line)
+      tmp = get_ddah(data, line, position)
+      puts(instructor)
+      puts(instructor[:id])
+      puts((instructor ? instructor[:id] : nil))
+      if tmp
+        tmp[:instructor_id] = (instructor ? instructor[:id] : nil)
+        ddahs.push(tmp)
+      end
     end
     return ddahs
   end
 
   def get_ddah(data, line, position)
+    puts(data[line+1][:B].strip)
     applicant = Applicant.find_by(utorid: data[line+1][:B].strip)
     if applicant
       offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
