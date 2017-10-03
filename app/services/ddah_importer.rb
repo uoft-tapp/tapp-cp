@@ -13,6 +13,7 @@ class DdahImporter
           puts("if position data=")
           puts(data)
           ddahs = get_all_ddahs(data, instructor, position)
+          puts(ddahs)
           ddahs.each do |data|
             ddah = Ddah.find_by(offer_id: data[:offer_id])
             offer = Offer.find(data[:offer_id])
@@ -97,7 +98,7 @@ class DdahImporter
 
   def get_all_ddahs(data, instructor, position)
     ddahs = []
-    (13..data[:num_line]).step(6) do |line|
+    (12..data[:num_line]).step(6) do |line|
       puts(line)
       tmp = get_ddah(data, line, position)
       puts(instructor)
@@ -168,10 +169,11 @@ class DdahImporter
   end
 
   def get_data_attribute(data, line, column, integer, increment=0)
+    p(data[line+increment][column])
     if integer
-      data[line+increment][column]? data[line+increment][column].strip.to_i : nil
+      (data[line+increment][column] != '') && (data[line+increment][column]) ? data[line+increment][column].strip.to_i : nil
     else
-      data[line+increment][column]? data[line+increment][column].strip : nil
+      (data[line+increment][column] != '') && (data[line+increment][column] ) ? data[line+increment][column].strip : nil
     end
   end
 
@@ -203,17 +205,17 @@ class DdahImporter
         content: "round_id",
       },
       {
-        row: 5,
+        row: 4,
         index: :A,
         content: "duties_list",
       },
       {
-        row: 5,
+        row: 4,
         index: :D,
         content: "trainings_list",
       },
       {
-        row: 5,
+        row: 4,
         index: :G,
         content: "categories_list",
       },
@@ -221,6 +223,8 @@ class DdahImporter
     valid = true
     checks.each do |check|
       if data[check[:row]][check[:index]] != check[:content]
+        puts('check failed')
+        puts(data[check[:row]][check[:index]])
         return false
       end
     end
