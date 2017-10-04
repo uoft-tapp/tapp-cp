@@ -10,10 +10,7 @@ class DdahImporter
       if instructor
         position = Position.find_by(position: data[2][:B], round_id: data[3][:B])
         if position
-          puts("if position data=")
-          puts(data)
           ddahs = get_all_ddahs(data, instructor, position)
-          puts(ddahs)
           ddahs.each do |data|
             ddah = Ddah.find_by(offer_id: data[:offer_id])
             offer = Offer.find(data[:offer_id])
@@ -71,7 +68,6 @@ class DdahImporter
   end
 
   def to_i(alpha)
-    puts(alpha)
     alpha26 = ("a".."z").to_a
     result = 0
     alpha = alpha.downcase
@@ -99,11 +95,7 @@ class DdahImporter
   def get_all_ddahs(data, instructor, position)
     ddahs = []
     (12..data[:num_line]).step(6) do |line|
-      puts(line)
       tmp = get_ddah(data, line, position)
-      puts(instructor)
-      puts(instructor[:id])
-      puts((instructor ? instructor[:id] : nil))
       if tmp
         tmp[:instructor_id] = (instructor ? instructor[:id] : nil)
         ddahs.push(tmp)
@@ -113,7 +105,6 @@ class DdahImporter
   end
 
   def get_ddah(data, line, position)
-    puts(data[line+1][:B].strip)
     applicant = Applicant.find_by(utorid: data[line+1][:B].strip)
     if applicant
       offer = Offer.find_by(applicant_id: applicant[:id], position_id: position[:id])
@@ -169,7 +160,6 @@ class DdahImporter
   end
 
   def get_data_attribute(data, line, column, integer, increment=0)
-    p(data[line+increment][column])
     if integer
       (data[line+increment][column] != '') && (data[line+increment][column]) ? data[line+increment][column].strip.to_i : nil
     else
@@ -223,8 +213,6 @@ class DdahImporter
     valid = true
     checks.each do |check|
       if data[check[:row]][check[:index]] != check[:content]
-        puts('check failed')
-        puts(data[check[:row]][check[:index]])
         return false
       end
     end
