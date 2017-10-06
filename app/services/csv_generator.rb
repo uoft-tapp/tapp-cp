@@ -236,7 +236,6 @@ class CSVGenerator
       ["supervisor_utorid",get_supervisor],
       ["course_name", position[:position]],
       ["round_id", position[:round_id]],
-      [],
       ["duties_list", "", "", "trainings_list", "", "", "categories_list"],
     ]
     setup = setup + get_ddah_legends + [[""]]
