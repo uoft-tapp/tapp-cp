@@ -4,9 +4,6 @@
     <title>TAPP</title>
     <%= csrf_meta_tags %>
 
-    <%= javascript_pack_tag 'tapp' %>
-    <%= stylesheet_pack_tag 'tapp' %>
-
     <% @polyfills = [
           "fetch",
           "Promise",
@@ -20,7 +17,9 @@
           "Symbol.iterator",
         ]
       %>
-      <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
+    <%= javascript_pack_tag 'tapp' %>
+    <%= stylesheet_pack_tag 'tapp' %>
 
     <% if ENV['RAILS_ENV'] == 'development' %>
       <!-- For development in Windows -->
