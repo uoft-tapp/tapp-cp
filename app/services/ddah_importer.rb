@@ -94,10 +94,12 @@ class DdahImporter
 
   def get_all_ddahs(data, instructor, position)
     ddahs = []
-    (13..data[:num_line]).step(6) do |line|
-      data = get_ddah(data, line, position)
-      data[:instructor_id] = instructor[:id]
-      ddahs.push(data)
+    (12..data[:num_line]).step(6) do |line|
+      tmp = get_ddah(data, line, position)
+      if tmp
+        tmp[:instructor_id] = (instructor ? instructor[:id] : nil)
+        ddahs.push(tmp)
+      end
     end
     return ddahs
   end
@@ -159,9 +161,9 @@ class DdahImporter
 
   def get_data_attribute(data, line, column, integer, increment=0)
     if integer
-      data[line+increment][column]? data[line+increment][column].strip.to_i : nil
+      (data[line+increment][column] != '') && (data[line+increment][column]) ? data[line+increment][column].strip.to_i : nil
     else
-      data[line+increment][column]? data[line+increment][column].strip : nil
+      (data[line+increment][column] != '') && (data[line+increment][column] ) ? data[line+increment][column].strip : nil
     end
   end
 
@@ -193,17 +195,17 @@ class DdahImporter
         content: "round_id",
       },
       {
-        row: 5,
+        row: 4,
         index: :A,
         content: "duties_list",
       },
       {
-        row: 5,
+        row: 4,
         index: :D,
         content: "trainings_list",
       },
       {
-        row: 5,
+        row: 4,
         index: :G,
         content: "categories_list",
       },
