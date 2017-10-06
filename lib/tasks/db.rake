@@ -27,3 +27,32 @@ namespace :email do
     end
   end
 end
+
+namespace :ddah do
+  task :export, [:position, :round_id] => [:environment] do |t, args|
+    position = Position.find_by(position: args[:position], round_id: args[:round_id])
+    if position
+      generator = CSVGenerator.new
+      response = generator.generate_ddahs(position[:id])
+      if response[:generated]
+        puts response[:data]
+      else
+        puts "Error: File wasn't generated"
+      end      
+    else
+      puts "Error: Position #{args[:position]} cannot be found for round #{round_id}"
+    end    
+  end
+  task :import, [:file] => [:environment] do |t, args|
+    importer = DdahImporter.new
+    file = File.open("#{Rails.root}#{args[:file]}", "rb")
+    if file
+      content = file.read
+      status = importer.import_template(content)
+      puts(status)
+    else
+      puts "Error: no such file #{args[:file]}"
+    end
+  end
+end
+
