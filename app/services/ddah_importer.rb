@@ -213,10 +213,12 @@ class DdahImporter
     valid = true
     checks.each do |check|
       if data[check[:row]][check[:index]] != check[:content]
+        puts('check failed')
+        puts("#{check[:row]} #{check[:index]} xx #{data[check[:row]][check[:index]]}")
         return false
       end
     end
-    return data[:num_line]>=18
+    return data[:num_line]>=17
   end
 
 end
