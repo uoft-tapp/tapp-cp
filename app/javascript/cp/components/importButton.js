@@ -48,7 +48,7 @@ class ImportButton extends React.Component {
           <input
               id="file-input"
               type="file"
-              accept="application/json"
+              accept="text/csv"
               style={{ display: 'none' }}
               onChange={() => this.uploadFile()}
           />
