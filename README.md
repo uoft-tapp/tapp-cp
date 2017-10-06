@@ -328,7 +328,7 @@ While the application is running,
 
 5. Restore backup:
   ```
-  cat filename | docker exec -i tapp_postgres_1 psql -U postgres
+  cat filename | docker exec -i tappcp_postgres_1 psql -U postgres
   ```
 
 #### peeking at backups
