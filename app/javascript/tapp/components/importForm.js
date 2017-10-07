@@ -14,7 +14,7 @@ class ImportForm extends React.Component {
         let importFunc, files = this.files.files;
 
         if (files.length > 0) {
-            importFunc = this.importChoices(files, this.data.value);
+            importFunc = this.importChoices(files[0], this.data.value);
             if (
                 confirm(
                     'Are you sure you want to import "' + files[0].name + '" into the database?'
@@ -29,10 +29,10 @@ class ImportForm extends React.Component {
         }
     }
 
-    importChoices(files, choice){
+    importChoices(file, choice){
         switch (choice) {
           case "chass":
-              if (files[0].type != 'application/json') {
+              if (this.getFileType(file) != 'application/json') {
                   this.props.alert('<b>Error:</b> The file you uploaded is not a JSON.');
                   return;
               }
@@ -58,7 +58,7 @@ class ImportForm extends React.Component {
                   }
               };
           case "instructor":
-              if (files[0].type != 'application/json') {
+              if (this.getFileType(file) != 'application/json') {
                   this.props.alert('<b>Error:</b> The file you uploaded is not a JSON.');
                   return;
               }
@@ -77,6 +77,22 @@ class ImportForm extends React.Component {
               };
         }
 
+    }
+
+    getFileType(file){
+        let type = file.type;
+        if (type != ""){
+          return type;
+        }
+        else{
+          let name = file.name.split(".");
+          if (name[name.length-1]=="json"){
+            return "application/json";
+          }
+          else{
+            return "";
+          }
+        }
     }
 
     detectChoice(){
