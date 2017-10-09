@@ -7,6 +7,10 @@ import {
     Button,
     OverlayTrigger,
     Popover,
+    Form,
+    FormGroup,
+    ControlLabel,
+    FormControl,
 } from 'react-bootstrap';
 
 import { TableMenu } from './tableMenu.js';
@@ -21,7 +25,7 @@ const getSelectedOffers = () =>
         .call(getCheckboxElements(), box => box.checked == true)
         .map(box => box.id);
 
-class ControlPanel extends React.Component {
+class AdminControlPanel extends React.Component {
     constructor(props) {
         super(props);
 
@@ -29,21 +33,33 @@ class ControlPanel extends React.Component {
         this.lastClicked = null;
     }
 
+    selectThisTab() {
+        if (this.props.appState.getSelectedNavTab() != this.props.navKey) {
+            this.props.appState.selectNavTab(this.props.navKey);
+        }
+    }
+
+    componentWillMount() {
+        this.selectThisTab();
+    }
+
+    componentWillUpdate() {
+        this.selectThisTab();
+    }
+
     render() {
         const role = this.props.appState.getSelectedUserRole();
 
         let nullCheck =
-            role == 'cp_admin'
-                ? this.props.appState.anyNull()
-                : this.props.appState.isOffersListNull();
+            this.props.appState.isOffersListNull() ||
+            (role == 'cp_admin' && this.props.appState.isSessionsListNull());
         if (nullCheck) {
             return <div id="loader" />;
         }
 
         let fetchCheck =
-            role == 'cp_admin'
-                ? this.props.appState.anyFetching()
-                : this.props.appState.fetchingOffers();
+            this.props.appState.fetchingOffers() ||
+            (role == 'cp_admin' && this.props.appState.fetchingSessions());
         let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
 
         this.config = [
@@ -126,15 +142,15 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'Position',
-                data: p => p.offer.get('position'),
-                sortData: p => p.get('position'),
+                data: p => p.offer.get('course'),
+                sortData: p => p.get('course'),
 
                 filterLabel: 'Position',
                 filterCategories: this.props.appState.getPositions(),
                 // filter out offers not to that position
                 filterFuncs: this.props.appState
                     .getPositions()
-                    .map(position => p => p.get('position') == position),
+                    .map(position => p => p.get('course') == position),
 
                 style: { width: 0.1 },
             },
@@ -258,13 +274,25 @@ class ControlPanel extends React.Component {
             },
             {
                 header: 'DDAH Status',
-                data: p => (p.offer.get('ddahStatus') ? p.offer.get('ddahStatus') : '-'),
+                data: p =>
+                    p.offer.get('ddahStatus')
+                        ? <span>
+                              {p.offer.get('ddahStatus')}&nbsp;
+                              {!['None', 'Created'].includes(p.offer.get('ddahStatus')) &&
+                                  <i
+                                      className="fa fa-search"
+                                      style={{ fontSize: '16px', cursor: 'pointer' }}
+                                      title="PDF preview"
+                                      onClick={() => this.props.appState.previewDdah(p.offerId)}
+                                  />}
+                          </span>
+                        : '-',
                 sortData: p => (p.get('ddahStatus') ? p.get('ddahStatus') : ''),
 
                 filterLabel: 'DDAH Status',
-                filterCategories: ['-', 'Accepted', 'Pending', 'Signed'],
+                filterCategories: ['-', 'Created', 'Ready', 'Approved', 'Pending', 'Accepted'],
                 filterFuncs: [p => p.get('ddahStatus') == undefined].concat(
-                    ['Accepted', 'Pending', 'Signed'].map(status => p =>
+                    ['Created', 'Ready', 'Approved', 'Pending', 'Accepted'].map(status => p =>
                         p.get('ddahStatus') == status
                     )
                 ),
@@ -272,11 +300,12 @@ class ControlPanel extends React.Component {
         ];
 
         return (
-            <Grid fluid id="offers-grid">
+            <Grid fluid id="offers-grid" style={cursorStyle}>
                 {role == 'cp_admin' && <SessionsForm {...this.props} />}
 
                 <ButtonToolbar id="dropdown-menu">
                     {role == 'cp_admin' && <ImportMenu {...this.props} />}
+                    {role == 'hr_assistant' && <SessionsDropdown {...this.props} />}
                     <ExportButton {...this.props} />
                     {role == 'cp_admin' && <OffersMenu {...this.props} />}
                     {role == 'cp_admin' && <CommMenu {...this.props} />}
@@ -315,6 +344,29 @@ class ControlPanel extends React.Component {
         );
     }
 }
+
+// session selector used by hr_assistant
+const SessionsDropdown = props =>
+    <Form inline id="sessions">
+        <FormGroup>
+            <ControlLabel>Session:</ControlLabel>&ensp;
+            <FormControl
+                id="session"
+                componentClass="select"
+                onChange={event => {
+                    props.appState.selectSession(event.target.value);
+                }}>
+                <option value="" key="session-all">
+                    all
+                </option>
+                {props.appState.getSessionsList().map((session, sessionId) =>
+                    <option value={sessionId}>
+                        {session.get('semester')}&nbsp;{session.get('year')}
+                    </option>
+                )}
+            </FormControl>
+        </FormGroup>
+    </Form>;
 
 const ExportButton = props =>
     <Button bsStyle="primary" onClick={() => props.appState.exportOffers()}>
@@ -358,7 +410,7 @@ const CommMenu = props =>
             Email&ensp;[contract]
         </MenuItem>
         <MenuItem divider />
-        <MenuItem onClick={() => props.appState.nag(getSelectedOffers())}>Nag</MenuItem>
+        <MenuItem onClick={() => props.appState.nagOffers(getSelectedOffers())}>Nag</MenuItem>
     </DropdownButton>;
 
 const PrintButton = props =>
@@ -366,4 +418,4 @@ const PrintButton = props =>
         Print contracts
     </Button>;
 
-export { ControlPanel };
+export { AdminControlPanel };

@@ -1,4 +1,5 @@
 class OfferImporter
+  include Importer
 
   def import_json(file)
     exceptions = []
@@ -15,11 +16,11 @@ class OfferImporter
       end
     end
     if exceptions.length == file[:offers].length
-      return {imported: false, errors: true, message: exceptions}
+      return {success: false, errors: true, message: exceptions}
     elsif exceptions.length > 0
-      return {imported: true, errors: true, message: exceptions}
+      return {success: true, errors: true, message: exceptions}
     else
-      return {imported: true, errors: false, message: ["Offers import was successful."]}
+      return {success: true, errors: false, message: ["Offers import was successful."]}
     end
   end
 
@@ -47,23 +48,6 @@ class OfferImporter
       session: session,
       year: year,
     }
-  end
-
-  def insertion_helper(model, data, ident, exists)
-    unless model.where(ident).exists?
-      db_model = model.create(data)
-      Rails.logger.debug "new #{JSON.pretty_generate(db_model.as_json)}\n\n"
-      db_model.save!
-      return db_model
-    else
-      Rails.logger.debug "#{exists}"
-      db_model = model.find_by(ident)
-      Rails.logger.debug "existing model #{JSON.pretty_generate(db_model.as_json)}\n"
-      db_model.update_attributes(data)
-      Rails.logger.debug "update model #{exists}\nupdate to #{JSON.pretty_generate(db_model.as_json)}\n\n"
-      db_model.save!
-      return db_model
-    end
   end
 
 end

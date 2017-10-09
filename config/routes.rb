@@ -37,11 +37,16 @@ Rails.application.routes.draw do
   scope 'instructors/:utorid' do
     resources :offers, only: [:index, :show]
     resources :positions, only: [:index, :show]
-    resources :ddahs, only: [:index, :show, :create]
-    resources :templates, only: [:index, :show, :create]
+    resources :ddahs, only: [:index, :show, :create, :destroy, :update]
+    resources :templates, only: [:index, :show, :create, :destroy, :update]
   end
-  resources :ddahs
-  resources :templates
+  resources :ddahs, only: [:index, :show, :create, :destroy, :update]
+  scope 'ddahs/:ddah_id' do
+    post "new-template" => "ddahs#new_template"
+    get "pdf", to: "ddahs#pdf"
+    post "accept", to: "ddahs#accept"
+  end
+  resources :templates, only: [:index, :show, :create, :destroy, :update]
 
   # TAPP routes
   get "/export/chass/:round_id", to: "export#chass"
@@ -51,6 +56,7 @@ Rails.application.routes.draw do
   post "/import/chass", to: "import#chass"
   get "/export/cp-offers/:session_id", to: "export#cp_offers"
   post "/import/enrolment", to: "import#enrolment"
+  post "/import/instructors", to: "import#instructors"
 
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"
@@ -67,10 +73,12 @@ Rails.application.routes.draw do
   post "/offers/send-nag-instructor" => "offers#send_nag_instructor"
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
+  post "/import/ddahs", to: "import#ddahs"
+  post "/import/templates", to: "import#templates"
+  get "/export/ddahs/:position_id", to: "export#ddahs"
 
-  post "/ddahs/:ddah_id/new-template" => "ddahs#new_template"
-  post "/ddahs/:ddah_id/separate-from-template" => "ddahs#separate_from_template"
-  post "/ddahs/apply-template" => "ddahs#apply_template"
+  post "/ddahs/preview" => "ddahs#preview"
+  post "/ddahs/can-preview" => "ddahs#can_preview"
   post "/ddahs/can-send-ddahs" => "ddahs#can_send_ddahs"
   post "/ddahs/send-ddahs" => "ddahs#send_ddahs"
   post "/ddahs/can-nag-student" => "ddahs#can_nag_student"
@@ -88,8 +96,7 @@ Rails.application.routes.draw do
 
   # student-facing for ddah
   get "/pb/ddah/:offer_id" => "app#ddah_view"
-  get "/pb/ddah/:offer_id/pdf" => "ddahs#get_ddah_pdf"
-  post "/pb/ddah/:offer_id/accept" => "ddahs#accept_ddah"
+  get "/pb/ddah/:offer_id/pdf" => "ddahs#student_pdf"
+  post "/pb/ddah/:offer_id/accept" => "ddahs#student_accept"
 
-  get "/test" => "app#test"
 end

@@ -17,6 +17,7 @@ class Offer < ApplicationRecord
     applicant = Applicant.find(self[:applicant_id])
     instructors = position.instructors
     session = Session.find(position[:session_id])
+    ddah = Ddah.find_by(offer_id: offer[:id])
     if offer[:link]
       offer[:link]= "#{ENV["domain"]}#{offer[:link]}"
     end
@@ -31,6 +32,10 @@ class Offer < ApplicationRecord
     }
     if offer[:send_date]
       data[:deadline] = self.get_deadline
+    end
+    if ddah
+      data[:ddah_applicant_nag_count] = ddah[:nag_count]
+      data[:ddah_send_date] = ddah[:send_date]
     end
     instructors.each do |instructor|
       data[:instructors].push(instructor)

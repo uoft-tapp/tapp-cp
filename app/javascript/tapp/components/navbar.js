@@ -196,12 +196,6 @@ const Auth = props => {
                     var form = document.createElement('form');
                     form.action = '/logout';
                     form.method = 'post';
-
-                    var currPage = document.createElement('input');
-                    currPage.name = 'current_page';
-                    currPage.value = document.location.pathname;
-
-                    form.appendChild(currPage);
                     document.body.append(form);
                     form.submit();
                 }}>

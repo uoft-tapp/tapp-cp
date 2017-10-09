@@ -14,20 +14,25 @@ class DdahGenerator
   RADIOBUTTON = "\u25CB"
   FILLED_RADIOBUTTON = "\u29BF"
 
-  def initialize(ddah, template = false)
-    @ddah = ddah
-    @whitespace = Prawn::Text::NBSP * 5
-    @tab = Prawn::Text::NBSP * 10
-    define_grid(columns: 75, rows: 100, gutter: 0)
-    templates = ["ddah_header", "allocations"]
-    @parser = TemplateParser.new(templates, @ddah, "ddah")
-    header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"))
-    set_allocation_table(HEADER_X_COORD, header_end, @parser.get_data("allocations"))
-    start_new_page
-    training_end = set_training(HEADER_Y_COORD)
-    summary_end = set_summary(training_end)
-    signature_end = set_signature(template, summary_end)
-    set_review_box(signature_end)
+  def initialize(ddahs, template = false)
+    ddahs.each_with_index do |ddah, index|
+      if index > 0
+        start_new_page
+      end
+      @ddah = ddah
+      @whitespace = Prawn::Text::NBSP * 5
+      @tab = Prawn::Text::NBSP * 10
+      define_grid(columns: 75, rows: 100, gutter: 0)
+      templates = ["ddah_header", "allocations"]
+      @parser = TemplateParser.new(templates, @ddah, "ddah", template)
+      header_end = set_header(HEADER_X_COORD, HEADER_Y_COORD, @parser.get_data("ddah_header"), template)
+      set_allocation_table(HEADER_X_COORD, header_end, @parser.get_data("allocations"))
+      start_new_page
+      training_end = set_training(HEADER_Y_COORD)
+      summary_end = set_summary(training_end)
+      signature_end = set_signature(template, summary_end)
+      set_review_box(signature_end)
+    end
   end
 
   private
@@ -155,7 +160,7 @@ class DdahGenerator
     end
   end
 
-  def set_header(x, y, header_data)
+  def set_header(x, y, header_data, template)
     set_logo(get_grids(x, y-0.1, 1.8, 0.9))
     set_text(get_grids(x, y-0.1, 7.5, 0.4), get_style(TITLE, header_data[0]))
     draw_box(get_grids(0.5, y+0.35, 7.5, 1.3), true)

@@ -2,7 +2,10 @@ class ExportController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
   before_action :tapp_admin, except: [:cp_offers]
-  before_action :cp_access, only: [:cp_offers]
+  before_action only: [:cp_offers] do
+    cp_admin(true)
+  end
+  before_action :cp_admin, only: [:ddahs]
 
   def chass
     exporter = ChassExporter.new
@@ -31,6 +34,12 @@ class ExportController < ApplicationController
   def cp_offers
     generator = CSVGenerator.new
     response = generator.generate_cp_offers(params[:session_id])
+    render_helper(response)
+  end
+
+  def ddahs
+    generator = CSVGenerator.new
+    response = generator.generate_ddahs(params[:position_id])
     render_helper(response)
   end
 

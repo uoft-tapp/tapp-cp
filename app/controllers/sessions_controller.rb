@@ -1,7 +1,8 @@
 class SessionsController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
-  before_action :cp_access
+  before_action :cp_access, except: [:update]
+  before_action :cp_admin, only: [:update]
 
   def index
     render json: Session.all.to_json

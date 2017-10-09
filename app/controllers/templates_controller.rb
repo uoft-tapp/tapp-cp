@@ -3,7 +3,10 @@ class TemplatesController < ApplicationController
   include DdahUpdater
   include Authorizer
   include Model
-  before_action :cp_access
+  before_action :either_cp_admin_instructor, except: [:preview]
+  before_action only: [:preview] do
+    both_cp_admin_instructor(Template)
+  end
 
   def index
     if params[:utorid]
@@ -29,16 +32,14 @@ class TemplatesController < ApplicationController
   end
 
   def create
-    position = Position.find(params[:position_id])
     instructor = Instructor.find_by!(utorid: params[:utorid])
-    template = Template.find_by(name: params[:name], position_id: position[:id])
+    template = Template.find_by(name: params[:name], instructor_id: instructor[:id])
     if !template
-      Template.create!(
-        position_id: position[:id],
+      template = Template.create!(
         name: params[:name],
         instructor_id: instructor[:id],
       )
-      render status: 200, json: {message: "A Template has been successfully created."}
+      render status: 201, json: template.to_json
     else
       render status: 404, json: {message: "Error: A template with the same name already exists."}
     end
@@ -46,27 +47,35 @@ class TemplatesController < ApplicationController
 
   def destroy
     template = Template.find(params[:id])
-    template.allocations.each do |allocation|
-      allocation.destroy!
+    if can_modify(params[:utorid], template)
+      template.allocations.each do |allocation|
+        allocation.destroy!
+      end
+      template.destroy!
+    else
+      render status: 403, file: 'public/403.html'
     end
-    template.destroy!
   end
 
   def update
     template = Template.find(params[:id])
-    update_form(template, params)
-    template.update_attributes!(template_params)
+    if can_modify(params[:utorid], template)
+      update_form(template, params)
+    else
+      render status: 403, file: 'public/403.html'
+    end
   end
 
   def preview
     template = Template.find(params[:template_id])
-    generator = DdahGenerator.new(template.format, true)
+    generator = DdahGenerator.new([template.format], true)
     send_data generator.render, filename: "ddah_template.pdf", disposition: "inline"
   end
 
   private
-  def template_params
-    params.permit(:name, :optional, :scaling_learning)
+  def can_modify(utorid, template)
+    instructor = Instructor.find_by(utorid: utorid)
+    return template[:instructor_id] == instructor[:id]
   end
 
   def get_all_templates(templates)
@@ -77,12 +86,10 @@ class TemplatesController < ApplicationController
 
   def get_all_templates_for_utorid(utorid)
     templates = []
+    instructor = Instructor.find_by(utorid: utorid)
     Template.all.each do |template|
-      position = Position.find(template[:position_id])
-      position.instructors.each do |instructor|
-        if instructor[:utorid] == utorid
-          templates.push(template)
-        end
+      if template[:instructor_id] == instructor[:id]
+        templates.push(template)
       end
     end
     return templates

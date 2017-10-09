@@ -2,7 +2,8 @@ class PositionsController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
   include Model
-  before_action :tapp_admin
+  before_action :tapp_admin, except: [:index, :show]
+  before_action :either_admin_instructor, only: [:index, :show]
 
   def index
     if params[:utorid]

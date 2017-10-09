@@ -1,0 +1,45 @@
+{
+    "offers": [
+    {
+        "course_id": "CSC300",
+        "round_id": 110,
+        "utorid": "amatunil",
+        "hours": 60,
+        "session": "Winter",
+        "year": 2017
+    },    {
+        "course_id": "CSC300",
+        "round_id": 110,
+        "utorid": "monfar14",
+        "hours": 60,
+        "session": "Winter",
+        "year": 2017
+    },
+    {
+        "course_id": "CSC300",
+        "round_id": 110,
+        "utorid": "liaqatam",
+        "hours": 60,
+        "session": "Winter",
+        "year": 2017
+    },
+    {
+        "course_id": "CSC300",
+        "round_id": 110,
+        "utorid": "bharga12",
+        "hours": 60,
+        "session": "Winter",
+        "year": 2017
+    },		
+    {
+        "course_id": "CSC300",
+        "round_id": 110,
+        "utorid": "barret69",
+        "hours": 60,
+        "session": "Winter",
+        "year": 2017
+    }
+
+		
+	]
+}

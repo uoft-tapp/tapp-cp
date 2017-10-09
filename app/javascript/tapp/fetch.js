@@ -409,6 +409,31 @@ function importChass(data, year, semester) {
 }
 
 // send enrolment data
+function importInstructors(data) {
+    appState.setImporting(true);
+
+    postHelper('/import/instructors', { instructor_data: data })
+        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
+        .then(
+            () => {
+                appState.setImporting(false, true);
+
+                appState.setFetchingDataList('instructors', true);
+                getInstructors()
+                    .then(instructors => {
+                        appState.setInstructorsList(instructors);
+                        appState.setFetchingDataList('instructors', false, true);
+                    })
+                    .catch(() => appState.setFetchingDataList('instructors', false));
+            },
+            resp => {
+                appState.setImporting(false);
+                resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
+            }
+        );
+}
+
+// send enrolment data
 function importEnrolment(data) {
     appState.setImporting(true);
 
@@ -517,6 +542,7 @@ export {
     noteApplicant,
     importChass,
     importEnrolment,
+    importInstructors,
     unlockAssignment,
     exportOffers,
     fetchAuth,

@@ -2,8 +2,14 @@ class OffersController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :set_domain
   include Authorizer
-  before_action :cp_access, except: [:get_contract_student, :set_status_student]
+  before_action :cp_admin, except: [:index, :show, :get_contract_student, :set_status_student, :can_print, :combine_contracts_print]
   before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
+  before_action only: [:get_contract_pdf, :get_contract, :can_print, :combine_contracts_print] do
+   cp_admin(true)
+  end
+  before_action only: [:index, :show] do
+    either_cp_admin_instructor(true)
+  end
 
   def index
     if params[:utorid]
@@ -100,17 +106,29 @@ class OffersController < ApplicationController
     Nag Mails (admin)
   '''
   def can_nag_instructor
-    check_ddah_status(params[:offers], :ddah_status, ["None", "Created"])
+    invalid = []
+    params[:offers].each do |offer_id|
+      offer = Offer.find(offer_id)
+      instructors = offer.format[:instructors]
+      if !(["None", "Created"].include? offer[:ddah_status]) || instructors.length == 0
+        invalid.push(offer[:id])
+      end
+    end
+    if invalid.length > 0
+      render status: 404, json: {invalid_offers: invalid}
+    end
   end
 
   def send_nag_instructor
-    instructor =
     params[:offers].each do |id|
-      offer = Offer.find(ddah[:id])
+      offer = Offer.find(id)
+      instructors = offer.format[:instructors]
+      offer.increment!(:ddah_nag_count, 1)
       if ENV['RAILS_ENV'] != 'test'
-        CPMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+        instructors.each do |instructor|
+          CpMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+        end
       end
-      offer.update_attributes!({ddah_status: "Pending", send_date: DateTime.now.to_s})
     end
     render status: 200, json: {message: "You've successfully sent out all the nag emails."}
   end

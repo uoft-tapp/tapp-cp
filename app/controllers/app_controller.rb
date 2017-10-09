@@ -18,9 +18,9 @@ class AppController < ApplicationController
 
   def roles
     if ENV['RAILS_ENV'] == 'production'
-      render json: {development: false, utorid: session[:utorid], roles: session[:roles]}
+      render json: {development: false, ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
     else
-      render json: {development: true, utorid: "development", roles: session[:roles]}
+      render json: {development: true,  ta_coord: ENV["TA_COORD"], utorid: "development", roles: session[:roles]}
     end
   end
 
@@ -42,7 +42,7 @@ class AppController < ApplicationController
     ddah = Ddah.find_by(offer_id: params[:offer_id])
     if ddah
       offer = Offer.find(params[:offer_id])
-      if offer[:ddah_status]== "Pending" || offer[:ddah_status]== "Accepted" 
+      if offer[:ddah_status]== "Pending" || offer[:ddah_status]== "Accepted"
         @ddah = ddah.format
         @offer = offer.format
         render :ddah, layout: false
@@ -55,21 +55,12 @@ class AppController < ApplicationController
   end
 
   def logout
-    @url = params[:current_page]
-    session[:logged_out] = false
-    render file: 'public/logout.html'
+    session[:logged_in] = false
+    redirect_back(fallback_location: request.referrer)
   end
 
   def reenter_session
     session[:logged_in] = true
-  end
-
-  def test
-    @instructors = []
-    Instructor.all.each do |instructor|
-      @instructors.push(instructor[:utorid].to_s)
-    end
-    render :test, layout: false
   end
 
 end

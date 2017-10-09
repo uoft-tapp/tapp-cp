@@ -1,14 +1,29 @@
 module DdahUpdater
   def update_form(form, params)
+    form.update_attributes!(get_params(params))
     if params[:categories]
       form.category_ids = params[:categories]
     end
     if params[:trainings]
       form.training_ids = params[:trainings]
     end
+    puts("params[:allocations]")
+    puts(params[:allocations])
     if params[:allocations]
       update_allocations(form, params[:allocations])
     end
+  end
+
+  private
+  def get_params(params)
+    checks = [:optional, :scaling_learning, :instructor_id]
+    update = {}
+    checks.each do |check|
+      if params[check]
+        update[check] = params[check]
+      end
+    end
+    return update
   end
 
   def update_allocations(form, allocations)
@@ -16,32 +31,47 @@ module DdahUpdater
     allocations.each do |entry|
       if entry[:id]
         allocation = Allocation.find(entry[:id])
-        allocation.update_attributes(
+        data = {
           num_unit: entry[:num_unit],
           unit_name: entry[:unit_name],
           minutes: entry[:minutes],
-          duty_id: entry[:duty_id],
-        )
+        }
+        if entry[:duty_id]
+          data[:duty_id] = entry[:duty_id]
+        end
+        allocation.update_attributes!(data)
       else
-        duty = Duty.find(entry[:duty_id])
-        form.allocations.create!(
+        data = {
           num_unit: entry[:num_unit],
           unit_name: entry[:unit_name],
           minutes: entry[:minutes],
-          duty_id: duty[:id],
-        )
+        }
+        if entry[:duty_id]
+          duty = Duty.find(entry[:duty_id])
+          data[:duty_id] = duty[:id]
+        end
+        form.allocations.create!(data)
       end
     end
   end
 
   def delete_missing_allocations(form, allocations)
+    puts("allocations")
+    puts(allocations)
     allocation_ids = get_allocation_ids(allocations)
     deleted_allocations = get_deleted_allocations(form.allocation_ids, allocation_ids)
     deleted_allocations.each do |id|
+      puts("delete_missing_allocations:id")
+      puts(id)
       allocation = Allocation.find(id)
       allocation.destroy!
     end
+    puts("delete_missing_allocations")
+    p(allocation_ids)
+    p(form)
+    p(form.allocation_ids)
     form.allocation_ids = allocation_ids
+    puts("return from delete_missing_allocations")    
   end
 
   def get_allocation_ids(allocations)
@@ -51,6 +81,8 @@ module DdahUpdater
         entries.push(allocation[:id])
       end
     end
+    puts("entries")
+    puts(entries)
     return entries
   end
 

@@ -1,10 +1,10 @@
-<b>Description of Duties and Allocation of Hours form</b>
+<b>Description of Duties and Allocation of Hours Form</b>
 
-<b>Departments</b>: <%= @ddah[:department]%>:<b>Supervising Professor</b>: <%= @ddah[:supervisor]%>:
+<b>Department</b>: <%= @ddah[:department]%>:<b>Supervising Professor</b>: <%= @ddah[:supervisor]%>:
 
-<b>Course Code</b>: <%= @ddah[:position][:position]%>:<b>Est. Enrolment / TA</b>: <%= @ddah[:position][:current_enrolment]? @ddah[:position][:current_enrolment]:0%>:
+<b>Course Code</b>: <%= @template?"":@ddah[:position][:position]%>:<b>Est. Enrolment / TA</b>: <%= get_est_enrol_per_ta(@ddah[:position][:id], @ddah[:position][:current_enrolment], @template) %>:
 
-<b>Course Title</b>: <%= @ddah[:position][:course_name]%>:<b>Expected Enrolment</b>: <%= @ddah[:position][:cap_enrolment]? @ddah[:position][:cap_enrolment]:0 %>:
+<b>Course Title</b>: <%= @template?"":@ddah[:position][:course_name]%>:<b>Expected Enrolment</b>: <%= (@template? nil: @ddah[:position][:current_enrolment])? @ddah[:position][:current_enrolment]:0 %>:
 
 <b>Tutorial Category</b>: <%= @ddah[:tutorial_category]%>: :
 

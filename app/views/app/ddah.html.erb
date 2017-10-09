@@ -84,7 +84,6 @@
     <header>
       <form id="logout" action="/logout" method="post">
         <p>User: <b><%=@offer[:applicant][:utorid]%></b></p>
-        <input type="hidden" value="pb/ddah/<%= @offer[:id] %>" name="current_page"/>
         <input value="Logout" type="submit" />
       </form>
       <div>
@@ -106,7 +105,7 @@
       <p>You have accepted the DDAH conditions of this TAship.</p>
     </div>
     <div class='admonishment'>
-      <p><b>Important:</b> TO-DO</p>
+      <p><b>Important:</b> If you have any concerns with the allocations of duties, please contact the course instructor as soon as possible.</p>
     </div>
 
     <script>
@@ -187,14 +186,14 @@
       }
       function setupPage(status){
         decision = document.getElementById("decision");
-        status = document.getElementById("status");
+        stats = document.getElementById("status");
         if (status == "Accepted"){
           decision.style.display = "none";
-          status.style.display = "block";
+          stats.style.display = "block";
         }
         else{
           decision.style.display = "block";
-          status.style.display = "none";
+          stats.style.display = "none";
         }
         fetchPdfData();
       }
