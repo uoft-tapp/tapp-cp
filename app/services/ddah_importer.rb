@@ -17,7 +17,8 @@ class DdahImporter
             if ddah
               update_form(ddah, data)
               if offer[:ddah_status] =="None" || !offer[:ddah_status]
-                offer.update_attributes!(ddah_status: "Created")
+                offer.update_attributes!(ddah_status: "Ready")
+                ddah.update_attributes!(supervisor_signature: "imported by TA coord. for #{instructor[:name]}",supervisor_sign_date: DateTime.now.to_date)
               end
             else
               ddah = Ddah.create!(
@@ -26,7 +27,8 @@ class DdahImporter
                 optional: data[:optional],
               )
               update_form(ddah, data)
-              offer.update_attributes!(ddah_status: "Created")
+              offer.update_attributes!(ddah_status: "Ready")
+              ddah.update_attributes!(supervisor_signature: "imported by TA coord. for #{instructor[:name]}",supervisor_sign_date: DateTime.now.to_date)
             end
           end
         else
