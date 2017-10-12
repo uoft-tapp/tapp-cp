@@ -16,10 +16,10 @@ class DdahImporter
             offer = Offer.find(data[:offer_id])
             if ddah
               update_form(ddah, data)
-              if offer[:ddah_status] =="None" || !offer[:ddah_status]
+              if contains_requirement(offer, :ddah_status, [nil, "None", "Created"])
                 offer.update_attributes!(ddah_status: "Ready")
-                ddah.update_attributes!(supervisor_signature: "imported by TA coord. for #{instructor[:name]}",supervisor_sign_date: DateTime.now.to_date)
               end
+              ddah.update_attributes!(supervisor_signature: "imported by TA coord. for #{instructor[:name]}", supervisor_sign_date: DateTime.now.to_date)
             else
               ddah = Ddah.create!(
                 offer_id: data[:offer_id],
@@ -28,7 +28,7 @@ class DdahImporter
               )
               update_form(ddah, data)
               offer.update_attributes!(ddah_status: "Ready")
-              ddah.update_attributes!(supervisor_signature: "imported by TA coord. for #{instructor[:name]}",supervisor_sign_date: DateTime.now.to_date)
+              ddah.update_attributes!(supervisor_signature: "imported by TA coord. for #{instructor[:name]}", supervisor_sign_date: DateTime.now.to_date)
             end
           end
         else
@@ -55,6 +55,15 @@ class DdahImporter
     else
       return {success: true, errors: false, message: ["#{type} import was successful."]}
     end
+  end
+
+  def contains_requirement(model, attr, requirements)
+    requirements.each do |item|
+      if model[attr] == item
+        return true
+      end
+    end
+    return false
   end
 
   def num_to_alpha(num)
