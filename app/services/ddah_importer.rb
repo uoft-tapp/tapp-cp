@@ -26,7 +26,7 @@ class DdahImporter
                 optional: data[:optional],
               )
               update_form(ddah, data)
-              offer.update_attributes!(ddah_status: "Created")
+              offer.update_attributes!(ddah_status: "Ready", supervisor_signature: "imported by TA coord.",supervisor_sign_date: DateTime.now.to_date)
             end
           end
         else
