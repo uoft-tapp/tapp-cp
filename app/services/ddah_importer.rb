@@ -17,7 +17,7 @@ class DdahImporter
             if ddah
               update_form(ddah, data)
               if offer[:ddah_status] =="None" || !offer[:ddah_status]
-                offer.update_attributes!(ddah_status: "Created")
+                offer.update_attributes!(ddah_status: "Ready", supervisor_sign_date: instructor[:name])
               end
             else
               ddah = Ddah.create!(
