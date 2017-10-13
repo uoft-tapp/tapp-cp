@@ -57,6 +57,9 @@ class DdahImporter
     end
   end
 
+  '''
+    checks model[attr] to see if the value equals one of the items in the array requirements
+  '''
   def contains_requirement(model, attr, requirements)
     requirements.each do |item|
       if model[attr] == item
