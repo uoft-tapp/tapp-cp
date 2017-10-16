@@ -8,10 +8,12 @@ services:
     networks:
       - default
     ports:
-      - "80:80"
+      - 80:80
+      - 443:443 
     links:
       - rails-app
 
+#no ports! that's done by nginx above
   rails-app:
     build:
       context: .
@@ -34,8 +36,6 @@ services:
       HR_ASSISTANTS: ${HR_ASSISTANTS}
     networks:
       - default
-    ports:
-      - "3000:3000"
     links:
       - postgres
 
