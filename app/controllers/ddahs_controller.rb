@@ -63,7 +63,7 @@ class DdahsController < ApplicationController
 
   def destroy
     ddah = Ddah.find(params[:id])
-    if can_modify(params[:utorid], ddah)
+    if can_modify(params[:utorid], ddah)||params[:utorid]==nil
       ddah.allocations.each do |allocation|
         allocation.destroy!
       end
@@ -75,7 +75,7 @@ class DdahsController < ApplicationController
 
   def update
     ddah = Ddah.find(params[:id])
-    if can_modify(params[:utorid], ddah)
+    if can_modify(params[:utorid], ddah)||params[:utorid]==nil
       update_form(ddah, params)
       render status: 200, json: {message: "DDAH was updated successfully."}
     else
@@ -231,7 +231,11 @@ class DdahsController < ApplicationController
   private
   def can_modify(utorid, ddah)
     instructor = Instructor.find_by(utorid: utorid)
-    return ddah[:instructor_id] == instructor[:id]
+    if instructor
+      return ddah[:instructor_id] == instructor[:id]
+    else
+      return false
+    end
   end
 
   def get_ddah_pdf(ddah)
