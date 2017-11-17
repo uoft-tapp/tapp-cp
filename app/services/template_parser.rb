@@ -95,20 +95,21 @@ class TemplateParser
   def get_est_enrol_per_ta(position_id, current_enrolment, template)
     if template
       return ""
-    end
-    if !current_enrolment
-      current_enrolment = 0
-    end
-    num = 0
-    Assignment.all.each do |assignment|
-      if assignment[:position_id] == position_id
-        num+=1
+    else
+      if !current_enrolment
+        current_enrolment = 0
       end
+      num = 0
+      Assignment.all.each do |assignment|
+        if assignment[:position_id] == position_id
+          num+=1
+        end
+      end
+      if num == 0
+        num = 1
+      end
+      return current_enrolment/num
     end
-    if num == 0
-      num = 1
-    end
-    return current_enrolment/num
   end
 
   def list_instructors(instructors)
