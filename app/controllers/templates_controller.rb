@@ -19,9 +19,9 @@ class TemplatesController < ApplicationController
   def show
     if params[:utorid]
       templates = id_array(get_all_templates_for_utorid(params[:utorid]))
-      if templates.include?(params[:id])
+      if templates.include?(params[:id].to_i)
         template = Template.find(params[:id])
-        render json: template.format
+        render status: 200, json: template.format
       else
         render status: 404, json: {status: 404}
       end
@@ -75,7 +75,11 @@ class TemplatesController < ApplicationController
   private
   def can_modify(utorid, template)
     instructor = Instructor.find_by(utorid: utorid)
-    return template[:instructor_id] == instructor[:id]
+    if instructor
+      return template[:instructor_id].to_i == instructor[:id]
+    else
+      return false
+    end
   end
 
   def get_all_templates(templates)
@@ -87,9 +91,11 @@ class TemplatesController < ApplicationController
   def get_all_templates_for_utorid(utorid)
     templates = []
     instructor = Instructor.find_by(utorid: utorid)
-    Template.all.each do |template|
-      if template[:instructor_id] == instructor[:id]
-        templates.push(template)
+    if instructor
+      Template.all.each do |template|
+        if template[:instructor_id] == instructor[:id]
+          templates.push(template)
+        end
       end
     end
     return templates
