@@ -89,7 +89,7 @@ RSpec.describe TemplatesController, type: :controller do
 
       context "when :utorid of an instructor with no templates is used" do
         it "returns an empty array" do
-          get :index, params: {utorid: "poop"}
+          get :index, params: {utorid: instructor2[:utorid]}
           expect(response.status).to eq(200)
           expect(response.body).to eq([].to_json)
         end
