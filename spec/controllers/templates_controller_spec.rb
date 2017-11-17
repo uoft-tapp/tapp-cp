@@ -188,7 +188,7 @@ RSpec.describe TemplatesController, type: :controller do
       end
       context "when :id is invalid" do
         it "throws a 404 error" do
-          patch :update, params: {utorid: instructor1[:utorid], id: "poop", }
+          patch :update, params: {utorid: instructor1[:utorid], id: "poop"}
           expect(response.status).to eq(404)
         end
       end
@@ -197,6 +197,46 @@ RSpec.describe TemplatesController, type: :controller do
     context "when :utorid is invalid" do
       it "throws a 403 error" do
         patch :update, params: {utorid: "poop", id: template[:id]}
+        expect(response.status).to eq(403)
+      end
+    end
+  end
+
+  describe "DELETE /templates/:id" do
+    context "when :id is valid" do
+      it "deletes the template with :id" do
+        delete :destroy, params: {id: template[:id]}
+        templates = Template.all
+        expect(templates).to be_empty
+      end
+    end
+    context "when :id is invalid" do
+      it "throws a 404 error" do
+        delete :destroy, params: {id: "poop"}
+        expect(response.status).to eq(404)
+      end
+    end
+  end
+
+  describe "DELETE /instructors/:utorid/templates/:id" do
+    context "when :utorid is valid" do
+      context "when :id is valid" do
+        it "deletes the template with :id" do
+          delete :destroy, params: {utorid: instructor1[:utorid], id: template[:id]}
+          templates = Template.all
+          expect(templates).to be_empty
+        end
+      end
+      context "when :id is invalid" do
+        it "throws a 404 error" do
+          delete :destroy, params: {utorid: instructor1[:utorid], id: "poop"}
+          expect(response.status).to eq(404)
+        end
+      end
+    end
+    context "when :utorid is invalid" do
+      it "throws a 403 error" do
+        delete :destroy, params: {utorid: "poop", id: template[:id]}
         expect(response.status).to eq(403)
       end
     end

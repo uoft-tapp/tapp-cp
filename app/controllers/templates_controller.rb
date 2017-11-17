@@ -49,7 +49,7 @@ class TemplatesController < ApplicationController
 
   def destroy
     template = Template.find(params[:id])
-    if can_modify(params[:utorid], template)
+    if can_modify(params[:utorid], template)||params[:utorid]==nil
       template.allocations.each do |allocation|
         allocation.destroy!
       end
@@ -61,7 +61,7 @@ class TemplatesController < ApplicationController
 
   def update
     template = Template.find(params[:id])
-    if can_modify(params[:utorid], template)
+    if can_modify(params[:utorid], template)||params[:utorid]==nil
       update_form(template, params)
     else
       render status: 403, file: 'public/403.html'
