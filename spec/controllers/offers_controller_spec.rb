@@ -514,4 +514,25 @@ RSpec.describe OffersController, type: :controller do
 
   end
 
+  describe "POST /offers/can-clear-hris-status" do
+
+  end
+  describe "/offers/clear-hris-status" do
+
+  end
+  describe "POST /offers/can-nag-instructor" do
+
+  end
+  describe "POST /offers/send-nag-instructor" do
+
+  end
+  describe "GET /offers/:offer_id/pdf" do
+
+  end
+  describe "POST /offers/:offer_id/accept" do
+
+  end
+  describe "POST /offers/:offer_id/reset" do
+
+  end
 end

@@ -690,4 +690,41 @@ RSpec.describe DdahsController, type: :controller do
     end
   end
 
+  describe "batch actions" do
+    describe "POST /ddahs/preview" do
+
+    end
+    describe "POST /ddahs/send-ddahs" do
+
+    end
+    describe "POST /ddahs/send-nag-student" do
+
+    end
+    describe "POST /ddahs/status/finish" do
+
+    end
+    describe "POST /ddahs/status/approve" do
+
+    end
+  end
+
+  describe "POST /ddahs/:ddah_id/new-template" do
+
+  end
+
+  describe "GET /ddahs/:ddah_id/pdf" do
+
+  end
+
+  describe "POST /ddahs/:ddah_id/accept" do
+
+  end
+
+  describe "POST /pb/ddah/:offer_id/accept" do
+
+  end
+
+  describe "GET /pb/ddah/:offer_id/pdf" do
+    
+  end
 end
