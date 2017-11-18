@@ -155,7 +155,7 @@ class DdahsController < ApplicationController
     Set DDAH status to "Ready" (instructor)
   '''
   def can_finish_ddah
-    check_ddah_status(params[:ddahs], [nil, "None", "Created"])
+    check_ddah_status(params[:ddahs], ["Created"])
   end
 
   def finish_ddah
