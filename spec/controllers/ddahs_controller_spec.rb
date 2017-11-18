@@ -105,6 +105,34 @@ RSpec.describe DdahsController, type: :controller do
     phone: "4165558888",
     address: "100 Jameson Ave Toronto, ON M65-48H")
   end
+  let(:applicant_5) do
+    Applicant.create!(
+    utorid: "cookie225",
+    app_id: "16",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+  let(:applicant_6) do
+    Applicant.create!(
+    utorid: "cookie226",
+    app_id: "16",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
 
   let(:attached_offer) do
     Offer.create!(
@@ -112,6 +140,29 @@ RSpec.describe DdahsController, type: :controller do
         applicant_id: applicant_1[:id],
         hours: 60,
         link: "mangled-link",
+        ddah_status: "Created",
+    )
+  end
+  let(:ready_offer) do
+    Offer.create!(
+        position_id: position[:id],
+        applicant_id: applicant_5[:id],
+        hours: 60,
+        status: "Pending",
+        send_date: DateTime.now,
+        link: "mangled-link",
+        ddah_status: "Ready",
+    )
+  end
+  let(:approved_offer) do
+    Offer.create!(
+        position_id: position[:id],
+        applicant_id: applicant_6[:id],
+        hours: 60,
+        status: "Pending",
+        send_date: DateTime.now,
+        link: "mangled-link",
+        ddah_status: "Approved",
     )
   end
   let(:sent_offer) do
@@ -122,6 +173,7 @@ RSpec.describe DdahsController, type: :controller do
         status: "Pending",
         send_date: DateTime.now,
         link: "mangled-link",
+        ddah_status: "Pending",
     )
   end
   let(:accepted_offer) do
@@ -132,6 +184,7 @@ RSpec.describe DdahsController, type: :controller do
         status: "Accepted",
         send_date: DateTime.now,
         link: "mangled-link",
+        ddah_status: "Accepted",
     )
   end
   let(:unattached_offer) do
@@ -146,6 +199,22 @@ RSpec.describe DdahsController, type: :controller do
   let(:ddah) do
     Ddah.create!(
       offer_id: attached_offer[:id],
+      instructor_id: instructor3[:id],
+      optional: true,
+    )
+  end
+
+  let(:ready_ddah) do
+    Ddah.create!(
+      offer_id: ready_offer[:id],
+      instructor_id: instructor3[:id],
+      optional: true,
+    )
+  end
+
+  let(:approved_ddah) do
+    Ddah.create!(
+      offer_id: approved_offer[:id],
       instructor_id: instructor3[:id],
       optional: true,
     )
@@ -378,6 +447,246 @@ RSpec.describe DdahsController, type: :controller do
       it "throws a 403 error" do
         delete :destroy, params: {utorid: "poop", id: ddah[:id]}
         expect(response.status).to eq(403)
+      end
+    end
+  end
+
+  describe "can actions" do
+    describe "POST /ddahs/can-preview" do
+      context "contains status = None/nil" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_preview, params: {ddahs: ["poop"]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: ["poop"]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Created" do
+        it "throws status 204" do
+          post :can_preview, params: {ddahs: [ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Ready" do
+        it "throws status 204" do
+          post :can_preview, params: {ddahs: [ready_ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Approved" do
+        it "throws status 204" do
+          post :can_preview, params: {ddahs: [approved_ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Pending" do
+        it "throws status 204" do
+          post :can_preview, params: {ddahs: [sent_ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Accepted" do
+        it "throws status 204" do
+          post :can_preview, params: {ddahs: [accepted_ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+    end
+
+    describe "POST /ddahs/can-send-ddah" do
+      context "contains status = None/nil" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_send_ddahs, params: {ddahs: ["poop"]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: ["poop"]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Created" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_send_ddahs, params: {ddahs: [ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Ready" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_send_ddahs, params: {ddahs: [ready_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [ready_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Approved" do
+        it "throws status 204" do
+          post :can_send_ddahs, params: {ddahs: [approved_ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Pending" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_send_ddahs, params: {ddahs: [sent_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [sent_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Accepted" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_send_ddahs, params: {ddahs: [accepted_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [accepted_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+    end
+
+    describe "POST /ddahs/can-nag-student" do
+      context "contains status = None/nil" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_nag_student, params: {ddahs: ["poop"]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: ["poop"]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Created" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_nag_student, params: {ddahs: [ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Ready" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_nag_student, params: {ddahs: [ready_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [ready_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Approved" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_nag_student, params: {ddahs: [approved_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [approved_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Pending" do
+        it "throws status 204" do
+          post :can_nag_student, params: {ddahs: [sent_ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Accepted" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_nag_student, params: {ddahs: [accepted_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [accepted_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+    end
+
+    describe "POST /ddahs/status/can-finish" do
+      context "contains status = None/nil" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_finish_ddah, params: {ddahs: ["poop"]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: ["poop"]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Created" do
+        it "throws status 204" do
+          post :can_finish_ddah, params: {ddahs: [ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Ready" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_finish_ddah, params: {ddahs: [ready_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [ready_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Approved" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_finish_ddah, params: {ddahs: [approved_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [approved_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Pending" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_finish_ddah, params: {ddahs: [sent_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [sent_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Accepted" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_finish_ddah, params: {ddahs: [accepted_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [accepted_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+
+    end
+
+    describe "/ddahs/status/can-approve" do
+      context "contains status = None/nil" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_approve_ddah, params: {ddahs: ["poop"]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: ["poop"]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Created" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_approve_ddah, params: {ddahs: [ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Ready" do
+        it "throws status 204" do
+          post :can_approve_ddah, params: {ddahs: [ready_ddah[:id]]}
+          expect(response.status).to eq (204)
+        end
+      end
+      context "contains status = Approved" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_approve_ddah, params: {ddahs: [approved_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [approved_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Pending" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_approve_ddah, params: {ddahs: [sent_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [sent_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
+      end
+      context "contains status = Accepted" do
+        it "throws status 404 with invalid ddahs" do
+          post :can_approve_ddah, params: {ddahs: [accepted_ddah[:id]]}
+          expect(response.status).to eq(404)
+          message = {invalid_offers: [accepted_ddah[:id]]}
+          expect(response.body).to eq(message.to_json)
+        end
       end
     end
   end

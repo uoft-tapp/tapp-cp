@@ -298,10 +298,14 @@ class DdahsController < ApplicationController
   def check_ddah_status(ddahs, status)
     invalid = []
     ddahs.each do |ddah_id|
-      ddah = Ddah.find(ddah_id)
-      offer = Offer.find(ddah[:offer_id])
-      if !(status.include? offer[:ddah_status])
-        invalid.push(ddah[:id])
+      ddah = Ddah.find_by(id: ddah_id)
+      if ddah
+        offer = Offer.find(ddah[:offer_id])
+        if !(status.include? offer[:ddah_status])
+          invalid.push(ddah[:id])
+        end
+      else
+        invalid.push(ddah_id)
       end
     end
     if invalid.length > 0
