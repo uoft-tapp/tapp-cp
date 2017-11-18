@@ -169,6 +169,9 @@ RSpec.describe TemplatesController, type: :controller do
           }
           patch :update, params: update_data
           template.reload
+          Allocation.all.each do |allocation|
+            allocation.reload
+          end
           template_data = template.format
           allocations = []
           template_data[:allocations].each do |allocation|
