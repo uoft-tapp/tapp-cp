@@ -25,6 +25,10 @@ RSpec.describe TemplatesController, type: :controller do
     )
   end
 
+  before(:each) do
+    template.reload
+  end
+
   describe "GET /templates/" do
     context "when expected" do
       it "lists all templates" do
@@ -55,7 +59,6 @@ RSpec.describe TemplatesController, type: :controller do
       context "when :utorid is valid" do
         context "when :id is valid" do
           it "returns a json of the template" do
-            template.reload
             get :show, params: {utorid: instructor1[:utorid], id: template[:id]}
             expect(response.status).to eq(200)
             expect(response.body).not_to be_empty
@@ -80,7 +83,6 @@ RSpec.describe TemplatesController, type: :controller do
     context "when utorid is valid" do
       context "when :utorid of an instructor with templates is used" do
         it "lists all templates for instructor of utorid" do
-          template.reload
           get :index, params: {utorid: instructor1[:utorid]}
           expect(response.status).to eq(200)
           expect(response.body).not_to eq([].to_json)

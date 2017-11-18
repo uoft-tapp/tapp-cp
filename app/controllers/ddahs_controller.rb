@@ -1,6 +1,7 @@
 class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :set_domain
+  include Model
   include DdahUpdater
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
@@ -32,9 +33,9 @@ class DdahsController < ApplicationController
   def show
     if params[:utorid]
       ddahs = id_array(get_all_ddah_for_utorid(params[:utorid]))
-      if ddahs.include?(params[:id])
+      if ddahs.include?(params[:id].to_i)
         ddah = Ddah.find(params[:id])
-        render json: ddah.format
+        render status: 200, json: ddah.format
       else
         render status: 404, json: {status: 404}
       end
