@@ -377,9 +377,8 @@ RSpec.describe DdahsController, type: :controller do
           }
           patch :update, params: update_data
           ddah.reload
-          ddah_data = ddah.format
           allocations = []
-          ddah_data[:allocations].each do |allocation|
+          ddah.allocations.each do |allocation|
             data = {
                 num_unit: allocation[:num_unit],
                 unit_name: allocation[:unit_name],
@@ -391,9 +390,9 @@ RSpec.describe DdahsController, type: :controller do
             allocations.push(data)
           end
           expect(allocations).to eq(update_data[:allocations])
-          expect(ddah_data[:trainings]).to eq(update_data[:trainings])
-          expect(ddah_data[:categories]).to eq(update_data[:categories])
-          expect(ddah_data[:scaling_learning]).to eq(update_data[:scaling_learning])
+          expect(ddah.training_ids).to eq(update_data[:trainings])
+          expect(ddah.category_ids).to eq(update_data[:categories])
+          expect(ddah[:scaling_learning]).to eq(update_data[:scaling_learning])
         end
       end
       context "when :id is invalid" do
