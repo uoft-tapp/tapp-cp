@@ -169,12 +169,8 @@ RSpec.describe TemplatesController, type: :controller do
           }
           patch :update, params: update_data
           template.reload
-          Allocation.all.each do |allocation|
-            allocation.reload
-          end
-          template_data = template.format
           allocations = []
-          template_data[:allocations].each do |allocation|
+          template.allocations.each do |allocation|
             data = {
                 num_unit: allocation[:num_unit],
                 unit_name: allocation[:unit_name],
@@ -186,9 +182,9 @@ RSpec.describe TemplatesController, type: :controller do
             allocations.push(data)
           end
           expect(allocations).to eq(update_data[:allocations])
-          expect(template_data[:trainings]).to eq(update_data[:trainings])
-          expect(template_data[:categories]).to eq(update_data[:categories])
-          expect(template_data[:scaling_learning]).to eq(update_data[:scaling_learning])
+          expect(template.training_ids).to eq(update_data[:trainings])
+          expect(template.category_ids).to eq(update_data[:categories])
+          expect(template[:scaling_learning]).to eq(update_data[:scaling_learning])
         end
       end
       context "when :id is invalid" do
