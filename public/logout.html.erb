@@ -2,6 +2,13 @@
 <html>
 <head>
   <title>Session Ended</title>
+  <% @polyfills = [
+        "fetch",
+        "Promise",
+        "Object.entries",
+      ]
+    %>
+  <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
   .rails-default-error-page {

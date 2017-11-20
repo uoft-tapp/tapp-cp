@@ -10,7 +10,7 @@ class ImportMenu extends React.Component {
 
         if (files.length > 0) {
             // uploading a CHASS offers file
-            if (files[0].type != 'application/json') {
+            if (this.getFileType(files[0]) != 'application/json') {
                 this.props.appState.alert('<b>Error:</b> The file you selected is not a JSON.');
                 return;
             }
@@ -35,6 +35,22 @@ class ImportMenu extends React.Component {
             }
 
             fileInput.value = '';
+        }
+    }
+
+    getFileType(file){
+        let type = file.type;
+        if (type != ""){
+          return type;
+        }
+        else{
+          let name = file.name.split(".");
+          if (name[name.length-1]=="json"){
+            return "application/json";
+          }
+          else{
+            return "";
+          }
         }
     }
 

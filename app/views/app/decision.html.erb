@@ -2,6 +2,14 @@
 <html>
   <head>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+    <%= csrf_meta_tags %>
+    <% @polyfills = [
+          "fetch",
+          "Promise",
+          "Object.entries",
+        ]
+    %>
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
   </head>
   <style>
     body, h1, div, form, p, label, input, button{
@@ -21,10 +29,15 @@
       padding: 5px;
       font-size: 14px;
     }
-    #pdf_view_port{
-      width: 100vw;
+    #view_port{
+      width: 100vw !important;
       height: calc(100vh - 200px);
+      background: #DDD;
       border-bottom: 1px #333 solid;
+    }
+    #pdf_view_port{
+      width: 100%;
+      height: 100%;
     }
     #acceptForm{
       opacity: 0;
@@ -90,7 +103,9 @@
         <h1>Offer for Teaching Assistantship of <%=@offer[:position]%></h1>
       </div>
     </header>
-    <embed id="pdf_view_port" type='application/pdf' name="contract.pdf"/>
+    <div id="view_port">
+      <embed id="pdf_view_port" type='application/pdf' name="contract.pdf" src="/pb/<%= @offer[:id] %>/pdf"/>
+    </div>
     <form id='decision'>
       <p>I hereby accept the Teaching Assistantship position offered here:</p>
       <p>
@@ -112,9 +127,7 @@
     </div>
 
     <script>
-      function setupPage(offer_status, fetch=false){
-        if (fetch)
-          fetchPdfData();
+      function setupPage(offer_status){
         let status = document.getElementById('status');
         let decision = document.getElementById('decision');
         if (offer_status == 'pending'){
@@ -124,24 +137,19 @@
         else{
           status.style.display='block';
           decision.style.display='none';
-          status.innerHTML = `<h2>Status: </h2>
-          <p>This offer has been `+offer_status+'.</p>';
+          status.innerHTML = '<h2>Status: </h2>'+
+          '<p>This offer has been '+offer_status+'.</p>';
         }
       }
       // helper factoring out frequently used code around a fetch
-      function fetchHelper(url, init, action, blob=false){
+      function fetchHelper(url, init, action){
         fetch(url, init).then(function(response) {
-          if (blob){
-            return response.blob();
-          }
-          else{
-            return response.json();
-          }
+          return response.json();
         }).then(function(response){
             action(response);
         });
       }
-      function postHelper(url, data, action, blob=false){
+      function postHelper(url, data, action){
         let init = {
             headers: {
                 Accept: 'application/json',
@@ -151,25 +159,7 @@
             body: JSON.stringify(data),
             credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
         };
-        fetchHelper(url, init, action, blob);
-      }
-      function getHelper(url, action, blob=false){
-        let init = {
-            headers: {
-                Accept: 'application/json',
-            },
-            method: 'GET',
-            credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
-        };
-        fetchHelper(url, init, action, blob);
-      }
-      function fetchPdfData(){
-        getHelper("/pb/<%= @offer[:id] %>/pdf", setPdfViewPort, true);
-      }
-      function setPdfViewPort(response){
-        let fileURL = URL.createObjectURL(response);
-        let viewPort= document.getElementById("pdf_view_port");
-        viewPort.setAttribute("src", fileURL);
+        fetchHelper(url, init, action);
       }
       function showAcceptForm(){
         let acceptForm= document.getElementById('acceptForm');
@@ -184,10 +174,10 @@
       function getDecision(){
         let decision = document.getElementsByName('decision');
         let selected = null;
-        decision.forEach(function(item, index){
-          if (item.checked)
-            selected = item;
-        });
+        for (let i = 0; i< decision.length; i++){
+          if (decision[i].checked)
+            selected = decision[i];
+        }
         return selected;
       }
       function submitDecision(){
@@ -203,14 +193,14 @@
             }
           }
           else if (decision.value=='reject'){
-            postStatus(decision.value);
+            postStatus(decision.value, null);
           }
         }
         else{
           alert("Error: you haven't chosen whether to accept or reject.")
         }
       }
-      function postStatus(status, signature = null){
+      function postStatus(status, signature){
         let res = confirm("Are you sure you want to "+status+" the TAship for this offer?");
         let data = {}
         if (signature!=null){
@@ -221,13 +211,19 @@
         }
       }
       function updateStatus(response){
-        fetchPdfData();
+        refreshPdf();
         alert(response.message);
         if (response.success){
           setupPage(response.status);
         }
       }
-      setupPage('<%= @offer[:status].downcase %>', true);
+      function refreshPdf(){
+        let viewport = document.getElementById("view_port");
+        let html = viewport.innerHTML;
+        viewport.innerHTML = '';
+        viewport.innerHTML = html;
+      }
+      setupPage('<%= @offer[:status].downcase %>');
     </script>
   </body>
 </html>

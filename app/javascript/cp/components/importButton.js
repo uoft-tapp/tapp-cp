@@ -14,7 +14,7 @@ class ImportButton extends React.Component {
       let files = fileInput.files;
 
       if (files.length > 0) {
-          if (files[0].type != 'text/csv') {
+          if (this.getFileType(files[0]) != 'text/csv') {
               this.props.appState.alert('<b>Error:</b> The file you selected is not a CSV.');
               return;
           }
@@ -35,6 +35,23 @@ class ImportButton extends React.Component {
           fileInput.value = '';
       }
   }
+
+  getFileType(file){
+      let type = file.type;
+      if (type == "application/vnd.ms-excel"){
+        let name = file.name.split(".");
+        if (name[name.length-1]=="csv"){
+          return "text/csv";
+        }
+        else{
+          return type;
+        }
+      }
+      else {
+        return type;
+      }
+  }
+
 
   render(){
       return (

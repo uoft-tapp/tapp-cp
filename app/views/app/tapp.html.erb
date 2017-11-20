@@ -4,8 +4,31 @@
     <title>TAPP</title>
     <%= csrf_meta_tags %>
 
+    <% @polyfills = [
+          "fetch",
+          "Promise",
+          "Symbol",
+          "Object.entries",
+          "Object.assign",
+          "Array.prototype.includes",
+          "String.prototype.includes",
+          "Array.prototype.map",
+          "Array.prototype.@@iterator",
+          "Symbol.iterator",
+        ]
+      %>
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
     <%= javascript_pack_tag 'tapp' %>
     <%= stylesheet_pack_tag 'tapp' %>
+    <%= javascript_pack_tag 'polyfill-css' %>
+
+    <% if ENV['RAILS_ENV'] == 'development' %>
+      <!-- For development in Windows -->
+      <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
+      <script src="<%= @pack_url %>tapp.js?v=<%= DateTime.now %>"></script>
+      <link rel="stylesheet" media="screen" href="<%= @pack_url %>tapp.css?v=<%= DateTime.now %>">
+      <script src="<%= @pack_url %>polyfill-css.js?v=<%= DateTime.now %>"></script>
+    <% end %>
 
     <!-- FA icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -16,7 +39,7 @@
 
     <footer>
       <div class="container-fluid">
-	<p class="text-muted">University of Toronto, 2017.</p>
+        <p class="text-muted">University of Toronto, 2017.</p>
       </div>
     </footer>
   </body>

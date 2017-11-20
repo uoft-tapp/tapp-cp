@@ -567,7 +567,7 @@ class AppState {
                         course,
                         fromJS({
                             selectedSortFields: [],
-                            selectedFilters: {},
+                            selectedFilters: {}
                         })
                     ),
                 map
