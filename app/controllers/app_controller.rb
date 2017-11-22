@@ -63,4 +63,14 @@ class AppController < ApplicationController
     session[:logged_in] = true
   end
 
+  def polyfill_css
+    response = CssPolyfillGenerator.new(params[:file])
+    if response
+      send_data response[:data], :filename => response[:file],
+      content_type: response[:type]
+    else
+      render status: 404, json: {message: "Can't polyfill this css file" }
+    end
+  end
+
 end
