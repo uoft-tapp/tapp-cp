@@ -3,7 +3,7 @@ class CssPolyfillGenerator
   def initialize(filename)
     type = tapp_or_cp(filename)
     if type
-      lines = get_lines()
+      lines = get_lines(type)
       return {
         data: get_polyfill(lines),
         filename: "polyfill.css",
