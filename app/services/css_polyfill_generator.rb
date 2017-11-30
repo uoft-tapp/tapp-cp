@@ -6,7 +6,7 @@ class CssPolyfillGenerator
       lines = get_lines(file_data)
       return set_data_type(get_polyfill(lines))
     else
-      return set_data_type(file_data.join("\n"))
+      return set_data_type("")
     end
   end
 
@@ -87,15 +87,10 @@ class CssPolyfillGenerator
             key: parts[0].strip,
             value: value,
           }
-        else
-          return nil
         end
-      else
-        return nil
       end
-    else
-      return nil
     end
+    return nil
   end
 
 end

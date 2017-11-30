@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
   get '/cp/(*z)', to: "app#cp"
   get '/roles', to: "app#roles"
-  get '/polyfill', to: 'app#polyfill_css'
+  get '/polyfill/:file', to: 'app#polyfill_css'
 
   post '/logout', to: "app#logout"
   post '/reenter-session', to: "app#reenter_session"

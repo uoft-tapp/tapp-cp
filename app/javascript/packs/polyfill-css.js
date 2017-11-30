@@ -7,70 +7,21 @@ function cssPolyfill(){
       if (!url.includes("http://0.0.0.0:8080")){
         let parts = url.split("/");
         let file = parts[parts.length-1].split("?")[0];
-        setCSS(file, links[index]);
+        setPolyfill(file, links[index]);
       }
     }
   }
 }
-function setCSS(url, link){
-  getHelper("/polyfill?file="+url).then(res=>{
-    if(res.ok)
-      return res.text();
-    else
-      return "";
-  }).then(res =>{
-    setPolyfill(res, link);
-  });
-}
-function setPolyfill(css_data, link){
+function setPolyfill(file, link){
   let head = document.getElementsByTagName('head')[0];
-  /*let style = document.createElement('style');
-  style.type = 'text/css';
-  if (style.styleSheet){
-    style.styleSheet.cssText = css_data;
-  } else {
-    style.appendChild(document.createTextNode(css_data));
-  }
-  //style.innerHTML = css_data;
+  let full_url = window.location.href;
+  let domain = full_url.replace(window.location.pathname, "");
+  let style = document.createElement("link");
+  console.log("link: "+domain+"/polyfill/"+file);
+  style.setAttribute("href", domain+"/polyfill/"+file);
+  style.setAttribute('type', 'text/css');
+  style.setAttribute('rel', 'stylesheet');
   head.appendChild(style);
-  head.removeChild(link);*/
-  file = buildBlob(css_data, 'text/css');
-  url = window.URL.createObjectURL(file);
-  link.setAttribute("href", url);
-  document.getElementsByTagName('head')[0].appendChild(link);
-}
-function buildBlob(data, type){
-  var file;
-  try{
-    file = new Blob([data], {type: type});
-  }
-  catch(e){
-    window.BlobBuilder = window.BlobBuilder ||
-      window.WebKitBlobBuilder ||
-      window.MozBlobBuilder ||
-      window.MSBlobBuilder;
-    if(e.name == 'TypeError' && window.BlobBuilder){
-      var bb = new BlobBuilder();
-      bb.append(data);
-      file = bb.getBlob(type);
-    }
-    else if(e.name == "InvalidStateError"){
-      file = new Blob([data], {type: type});
-    }
-    else{
-      console.log("No Blob building supported.");
-    }
-  }
-  return file;
-}
-function getHelper(url) {
-  return fetch(url, {
-    headers: {
-      Accept: 'charset=utf-8',
-      },
-      method: 'GET',
-      credentials: 'include',
-  });
 }
 function isPolyFillTarget(){
   let browser = getBrowser();
