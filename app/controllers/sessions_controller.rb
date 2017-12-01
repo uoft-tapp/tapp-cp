@@ -5,12 +5,12 @@ class SessionsController < ApplicationController
   before_action :cp_admin, only: [:update]
 
   def index
-    render json: Session.all.to_json
+    render json: format_all_session
   end
 
   def show
     session = Session.find(params[:id])
-    render json: session.to_json
+    render json: session.format
   end
 
   def update
@@ -21,5 +21,13 @@ class SessionsController < ApplicationController
   private
   def update_session
     params.permit(:pay)
+  end
+
+  def format_all_session
+    sessions = []
+    Session.all.each do |session|
+      sessions.push(session.format)
+    end
+    return sessions
   end
 end
