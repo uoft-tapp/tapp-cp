@@ -876,10 +876,11 @@ class AppState {
         return this.getCoursesList().map(course => course.get('code')).flip().keySeq().sort();
     }
 
-    getCourseCodeById(course) {
+    getCourseCodeById(id) {
         // Note: toString() is a hack because our components think that course IDs are numbers but Immutable
         // thinks they are strings
-        return this.getCoursesList().get(course.toString()).get('code');
+        let course = this.getCoursesList().get(id.toString());
+        return course? course.get('code'):null;
     }
 
     getSessionById(session) {
