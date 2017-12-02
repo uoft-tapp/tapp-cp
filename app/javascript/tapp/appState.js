@@ -915,11 +915,11 @@ class AppState {
         } else {
             // all rounds displayed and/or no courses exist
             if (session){
-              let rounds = session.get('rounds');
+              let rounds = session.get('rounds')? session.get('rounds'): [];
               return courses.filter(course => rounds.includes(course.get('round')));
             }
             else {
-              return courses;
+              return [];
             }
         }
     }
