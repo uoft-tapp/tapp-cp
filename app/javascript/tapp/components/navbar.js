@@ -123,7 +123,8 @@ const Round = props => {
 
     let selectedSessionId = props.getSelectedSession()?
         props.getSelectedSession():props.getLatestSession();
-    let rounds = props.getSessionRoundsById(selectedSessionId);
+    let rounds = props.getSessionRoundsById(selectedSessionId)?
+        props.getSessionRoundsById(selectedSessionId): [];
     let selectedRound = props.getSelectedRound();
 
     // add round-based colour rules to a new stylesheet
