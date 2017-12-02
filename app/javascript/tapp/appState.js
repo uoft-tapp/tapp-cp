@@ -26,6 +26,9 @@ const initialState = {
     // application round to display
     selectedRound: null,
 
+    // session to display
+    selectedSession: null,
+
     // ABC view
     abcView: {
         selectedCourses: [],
@@ -65,6 +68,7 @@ const initialState = {
     assignments: { fetching: 0, list: null },
     courses: { fetching: 0, list: null },
     instructors: { fetching: 0, list: null },
+    sessions: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -286,6 +290,10 @@ class AppState {
         return this.get('selectedRound');
     }
 
+    getSelectedSession(){
+        return this.get('selectedSession');
+    }
+
     getSelectedUserRole() {
         return this.get('nav.selectedRole');
     }
@@ -389,6 +397,13 @@ class AppState {
     // select a round to display
     selectRound(round) {
         this.set('selectedRound', round);
+    }
+
+    // select a session to display
+    selectSession(session){
+        let sessionId = this.getSessionIdByName(session);
+        this.set('selectedSession', sessionId);
+        this.selectRound(null);
     }
 
     selectSingleCourse(course) {
@@ -597,6 +612,7 @@ class AppState {
             this.get('applicants.fetching'),
             this.get('applications.fetching'),
             this.get('assignments.fetching'),
+            this.get('sessions.fetching'),
         ].some(val => val > 0);
     }
 
@@ -608,6 +624,7 @@ class AppState {
             this.get('applicants.list'),
             this.get('applications.list'),
             this.get('assignments.list'),
+            this.get('sessions.list'),
         ].some(val => val == null);
     }
 
@@ -650,6 +667,12 @@ class AppState {
     fetchingInstructors() {
         return this.get('instructors.fetching') > 0;
     }
+
+    // check if sessions are being fetched
+    fetchingSessions() {
+        return this.get('sessions.fetching') > 0;
+    }
+
 
     // get applicants who are assigned to course; returns a list of [applicantID, applicantData]
     getApplicantsAssignedToCourse(course) {
@@ -859,15 +882,45 @@ class AppState {
         return this.getCoursesList().get(course.toString()).get('code');
     }
 
+    getSessionById(session) {
+        return this.getSessionsList().get(session.toString());
+    }
+
+    getSessionRoundsById(session) {
+        return this.getSessionsList().get(session.toString()).get('rounds');
+    }
+
+    getSessionNameById(session) {
+        return this.getSessionsList().get(session.toString()).get('session');
+    }
+
+    getSessionIdByName(name){
+        let sessions = this.getSessionsList();
+        let selected = null;
+        sessions.forEach((session, id) => {
+          if (session.get('session')==name){
+            selected = id;
+          }
+        });
+        return selected;
+    }
+
     getCoursesInSelectedRound() {
         let round = this.get('selectedRound'),
-            courses = this.get('courses.list');
+            courses = this.get('courses.list'),
+            session = this.getSessionById(this.getSelectedSession());
 
         if (round && courses) {
             return courses.filter(course => course.get('round') == round);
         } else {
             // all rounds displayed and/or no courses exist
-            return courses;
+            if (session){
+              let rounds = session.get('rounds');
+              return courses.filter(course => rounds.includes(course.get('round')));
+            }
+            else {
+              return courses;
+            }
         }
     }
 
@@ -879,9 +932,30 @@ class AppState {
         return this.get('instructors.list');
     }
 
+    getSessionsList() {
+        return this.get('sessions.list');
+    }
+
     // get a list of all rounds for all courses
     getRounds() {
         return this.get('courses.list').map(course => course.get('round')).flip().keySeq();
+    }
+
+    getSessions() {
+        return this.get('sessions.list').map(session =>session.get('session')).flip().keySeq();
+    }
+
+    getLatestSession() {
+        let sessions = this.get('sessions.list'),
+            latest = null;
+        sessions.forEach((session, id) =>{
+          if (latest == null || latest < id){
+            latest = id;
+          }
+        });
+        latest = latest.toString();
+        this.set('selectedSession', latest);
+        return latest;
     }
 
     // get all applicants who have not been assigned to a course; returns a list of [applicantID, applicantData]
@@ -1012,6 +1086,10 @@ class AppState {
 
     setInstructorsList(list) {
         this.set('instructors.list', list);
+    }
+
+    setSessionsList(list) {
+        this.set('sessions.list', list);
     }
 
     updateAssignment(applicant, assignment, hours) {
