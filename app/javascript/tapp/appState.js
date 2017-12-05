@@ -695,16 +695,10 @@ class AppState {
     }
 
     getApplicantsInSelectedRound() {
-        let round = this.get('selectedRound'),
-            applicants = this.get('applicants.list'),
+        let applicants = this.get('applicants.list'),
             applications = this.getApplicationsInSelectedRound();
 
-        if (round && applicants) {
-            return applicants.filter((_, id) => applications.has(id));
-        } else {
-            // all rounds displayed and/or no applicants exist
-            return applicants;
-        }
+        return applicants.filter((_, id) => applications.has(id));
     }
 
     getApplicantsList() {
@@ -764,32 +758,26 @@ class AppState {
     }
 
     getApplicationsInSelectedRound() {
-        let round = this.get('selectedRound'),
-            applications = this.get('applications.list'),
+        let applications = this.get('applications.list'),
             courses = this.getCoursesInSelectedRound();
 
-        if (round && applications) {
-            return (
-                applications
-                    .map(applicant =>
-                        applicant.filter(
-                            // filter out applications where at least one course was applied for, and the first course
-                            // applied to is in the selected round
-                            // note: this assumes that, if all courses in the application are in the same round
-                            application =>
-                                application.get('prefs').size == 0 ||
-                                courses.has(
-                                    application.get('prefs').first().get('positionId').toString()
-                                )
-                        )
+        return (
+            applications
+                .map(applicant =>
+                    applicant.filter(
+                        // filter out applications where at least one course was applied for, and the first course
+                        // applied to is in the selected round
+                        // note: this assumes that, if all courses in the application are in the same round
+                        application =>
+                            application.get('prefs').size == 0 ||
+                            courses.has(
+                                application.get('prefs').first().get('positionId').toString()
+                            )
                     )
-                    // filter out applicants who have no applications in the selected round
-                    .filter(applicant => applicant.size > 0)
-            );
-        } else {
-            // all rounds displayed and/or no applications exist
-            return applications;
-        }
+                )
+                // filter out applicants who have no applications in the selected round
+                .filter(applicant => applicant.size > 0)
+        );
     }
 
     getApplicationsList() {
@@ -833,25 +821,20 @@ class AppState {
             assignments = this.get('assignments.list'),
             courses = this.getCoursesInSelectedRound();
 
-        if (round && assignments) {
-            return (
-                assignments
-                    .map(
-                        // filter out assignments where the course is in the selected round
-                        // Note: toString() is a hack because our components think that course IDs are
-                        // numbers but Immutable thinks they are strings
-                        applicant =>
-                            applicant.filter(assignment =>
-                                courses.has(assignment.get('positionId').toString())
-                            )
-                    )
-                    // filter out applicants who have no assignments to course(s) in the selected round
-                    .filter(applicant => applicant.size > 0)
-            );
-        } else {
-            // all rounds displayed and/or no assignments exist
-            return assignments;
-        }
+        return (
+            assignments
+                .map(
+                    // filter out assignments where the course is in the selected round
+                    // Note: toString() is a hack because our components think that course IDs are
+                    // numbers but Immutable thinks they are strings
+                    applicant =>
+                        applicant.filter(assignment =>
+                            courses.has(assignment.get('positionId').toString())
+                        )
+                )
+                // filter out applicants who have no assignments to course(s) in the selected round
+                .filter(applicant => applicant.size > 0)
+        );
     }
 
     getAssignmentsList() {
