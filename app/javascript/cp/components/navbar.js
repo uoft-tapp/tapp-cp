@@ -99,8 +99,14 @@ const Auth = props => {
 
 const NavbarInst = props =>
     <Navbar fixedTop fluid>
-        <Navbar.Header>
-            <Navbar.Brand>TAPP:CP</Navbar.Brand>
+        <Navbar.Header id ="app-drop-down">
+          <Navbar.Brand>
+            <NavDropdown title={<span>CP:TAPP</span>} noCaret >
+              <MenuItem href="/tapp">
+                TAPP
+              </MenuItem>
+            </NavDropdown>
+          </Navbar.Brand>
         </Navbar.Header>
 
         {props.appState.getSelectedUserRole() == 'cp_admin' && <ViewTabs {...props} />}
