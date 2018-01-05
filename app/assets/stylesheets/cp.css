@@ -517,3 +517,9 @@ footer div p {
     display: inline-block;
     margin: 0 5px;
 }
+
+#app-drop-down, #app-drop-down li a{
+  list-style: none;
+  text-decoration: none;
+  color: #555;
+}

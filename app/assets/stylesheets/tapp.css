@@ -511,3 +511,9 @@ footer div p {
 #help .arrow::after {
     border-right-color: #f7f7f7 !important;
 }
+
+#app-drop-down, #app-drop-down li a{
+  list-style: none;
+  text-decoration: none;
+  color: #555;
+}
