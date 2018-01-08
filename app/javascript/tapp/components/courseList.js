@@ -7,8 +7,13 @@ class CourseList extends React.Component {
             <Panel className="course-list-panel" header="Courses">
                 <ListGroup className="course-list-group" fill>
                     {this.props.courses.map(([key, course]) =>
-                        <ListGroupItem key={key} href={'#' + key} title={course.code}>
-                            {course.code}
+                        <ListGroupItem key={key} title={course.code}>
+                            <a href={'#' + key} style={{width: '100%', float: 'left'}}>
+                              {course.code}
+                            </a>
+                            <a onClick={()=>(alert('heelo'))} style={{style: 'right', border: 'red 1px solid'}}>
+                              <i className="fa fa-envelope-o"></i>
+                            </a>
                         </ListGroupItem>
                     )}
                 </ListGroup>
