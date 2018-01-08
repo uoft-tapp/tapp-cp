@@ -80,7 +80,11 @@ class CpMailer < ApplicationMailer
     if ENV['RAILS_ENV'] == 'development'
       return ENV['RECIPIENT']
     elsif ENV['RAILS_ENV'] == 'production'
-      return email
+      if ENV['domain'].include?('tapp')
+        return email
+      else
+        return ENV['RECIPIENT']
+      end
     end
   end
 
