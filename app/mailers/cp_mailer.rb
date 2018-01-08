@@ -50,6 +50,17 @@ class CpMailer < ApplicationMailer
     mail(to: email, subject: "Reminder for TA Position: #{@ddah[:position][:position]}")
   end
 
+  def assignment_email(position, instructors, applicants)
+    instructors.each do |instructor|
+      @applicants = applicant
+      @instructor = instructor
+      @position = position[:position]
+      session = Session.find(position[:session_id])
+      @session = "#{session[:semester]} #{session[:year]}"
+      mail(to: instructor[:email],
+        subject: "#{@session[:semester]} #{@position} Tentative TA Assignments")
+    end
+  end
 
   private
   def get_nag_suffix(nag_count)

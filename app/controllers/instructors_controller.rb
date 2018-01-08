@@ -4,8 +4,17 @@ class InstructorsController < ApplicationController
   before_action :tapp_admin
 
   def index
-    instructors = Instructor.all
-    render json: instructors.to_json
+    if params[:position_id]
+      position = Position.find(params[:position_id])
+      if position
+        render json: position.instructors
+      else
+        render json: []
+      end
+    else
+      instructors = Instructor.all
+      render json: instructors.to_json
+    end
   end
 
   def show

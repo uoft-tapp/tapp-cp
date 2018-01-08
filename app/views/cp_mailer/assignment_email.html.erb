@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <p>Dear <%= @instructor[:name] %>,</p>
+    <p>The following are the tentative TA assignments for <%= @position %> <%= @session %>:</p>
+    <br/>
+    <p><b>Last Name, First Name, Hours, Email</b></p>
+    <% @applicants.each do |applicant| %>
+    <p><%= applicant[:last_name] %>, <%= applicant[:first_name] %>, <%= applicant[:hours] %>, <%= applicant[:email] %></p>
+    <% end %>
+  </body>
+</html>
