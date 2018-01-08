@@ -1,21 +1,12 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
-  </head>
-  <body>
-    <p>Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>,</p>
-    <p>
-      We would like to offer you a position as a TA for <%= @offer[:position] %>.
-    </p>
-    <p>
-      Please click the link below to view your offer and accept or reject it:<br/>
-      <%= @url %>.
-    </p>
-    <p>Have a great day!</p>
-    <p>PS. we've noticed that some browsers don't display the contract
-    properly. Please try using chrome. If you have any troubles please
-    contact tacoord@cs.toronto.edu. Sorry for any inconvenience.</p>
-    
-  </body>
-</html>
+<p>Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %>,</p>
+<p>
+  We would like to offer you a position as a TA for <%= @offer[:position] %>.
+</p>
+<p>
+  Please click the link below to view your offer and accept or reject it:<br/>
+  <%= @url %>.
+</p>
+<p>Have a great day!</p>
+<p>PS. we've noticed that some browsers don't display the contract
+properly. Please try using chrome. If you have any troubles please
+contact tacoord@cs.toronto.edu. Sorry for any inconvenience.</p>

@@ -57,8 +57,7 @@ Rails.application.routes.draw do
   get "/export/cp-offers/:session_id", to: "export#cp_offers"
   post "/import/enrolment", to: "import#enrolment"
   post "/import/instructors", to: "import#instructors"
-  post '/email_assignmets', to: "assignments#email_assignmets"
-  get "/position/:position_id/instructors", to: "instructors#index"
+  post '/email-assignments', to: "assignments#email_assignments"
 
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"

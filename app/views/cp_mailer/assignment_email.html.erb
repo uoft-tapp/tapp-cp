@@ -1,15 +1,26 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
-  </head>
-  <body>
-    <p>Dear <%= @instructor[:name] %>,</p>
-    <p>The following are the tentative TA assignments for <%= @position %> <%= @session %>:</p>
-    <br/>
-    <p><b>Last Name, First Name, Hours, Email</b></p>
-    <% @applicants.each do |applicant| %>
-    <p><%= applicant[:last_name] %>, <%= applicant[:first_name] %>, <%= applicant[:hours] %>, <%= applicant[:email] %></p>
-    <% end %>
-  </body>
-</html>
+<p>Dear <%= @instructor[:name] %>,</p>
+<p>The following are the tentative TA assignments for <%= @position %>:</p>
+<table style="text-align:left;">
+  <tr>
+    <th><b>
+      Last Name
+    </b></th>
+    <th><b>
+      First Name
+    </b></th>
+    <th><b>
+      Hours
+    </b></th>
+    <th><b>
+      Email
+    </b></th>
+  </tr>
+  <% @applicants.each do |applicant| %>
+  <tr>
+    <td><%= applicant[:last_name] %></td>
+    <td><%= applicant[:first_name] %></td>
+    <td><%= applicant[:hours] %></td>
+    <td><%= applicant[:email] %></td>
+  </tr>
+  <% end %>
+</table>

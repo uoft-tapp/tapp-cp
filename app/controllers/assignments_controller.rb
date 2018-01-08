@@ -92,18 +92,20 @@ class AssignmentsController < ApplicationController
     @assignment.destroy!
   end
 
-  def email_assignmets
-    instructors = get_instructors(params[:instructors])
+  def email_assignments
     position = Position.find_by(position: params[:position], round_id: params[:round_id])
     if position
       applicants = get_position_applicants(position)
       if applicants.length != 0
-        CpMailer.assignment_email(position, instructors, applicants).deliver_now!
+        position.instructors.each do |instructor|
+          CpMailer.assignment_email(position, instructor, applicants).deliver_now
+        end
+        render status: 200, json: {message: "Assignment Email Sent."}
       else
-        render status: 404, {message: "Error: #{params[:position]} current has no assignments."}
+        render status: 404, json: {message: "Error: #{params[:position]} current has no assignments."}
       end
     else
-      render status: 404, {message: "Error: #{params[:position]} doesn't exist."}
+      render status: 404, json: {message: "Error: #{params[:position]} doesn't exist."}
     end
   end
 
@@ -116,17 +118,6 @@ class AssignmentsController < ApplicationController
       params.permit(:hours, :export_date)
     end
 
-    def get_instructors(instructor_ids)
-      instructors = []
-      instructor_ids.each do |id|
-        instructor = Instructor.find(id)
-        if instructor
-          instructors.push(instructor)
-        end
-      end
-      return instructors
-    end
-
     def get_position_applicants(position)
       applicants = []
       Assignment.all.each do |assignment|
@@ -137,7 +128,7 @@ class AssignmentsController < ApplicationController
               last_name: applicant[:last_name],
               first_name: applicant[:first_name],
               hours: assignment[:hours],
-              email: applicants[:email]
+              email: applicant[:email]
             })
           end
         end
