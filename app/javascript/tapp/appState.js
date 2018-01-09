@@ -1055,6 +1055,22 @@ class AppState {
         }
         fetch.updateCourse(courseId, data);
     }
+
+    emailAssignments(code, round, key){
+        let email = document.getElementById("email-"+key);
+        let spinner = document.getElementById("spinner-"+key);
+        email.style.display = "none";
+        spinner.style.display = "block";
+        fetch.emailAssignments(code, round, key);
+    }
+
+    stopEmailSpinner(key){
+        let email = document.getElementById("email-"+key);
+        let spinner = document.getElementById("spinner-"+key);
+        email.style.display = "block";
+        spinner.style.display = "none";
+    }
+
 }
 
 let appStateInst = new AppState(),

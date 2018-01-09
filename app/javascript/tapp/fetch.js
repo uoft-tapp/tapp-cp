@@ -533,6 +533,29 @@ function fetchAuth() {
         });
 }
 
+function emailAssignments(code, round, key){
+    postHelper('/email-assignments', {
+        position: code,
+        round_id: round,
+    }).then(resp => {
+      if (resp.ok) {
+        return resp.json()
+            .then(resp => (appState.stopEmailSpinner(key)));
+      }
+      else if (resp.status == 404) {
+          return resp.json()
+            .then(resp => {
+                appState.alert(resp.message);
+                appState.stopEmailSpinner(key);
+            });
+      }
+      else{
+          appState.stopEmailSpinner(key);
+          return respFailure(resp);
+      }
+    });
+}
+
 export {
     fetchAll,
     postAssignment,
@@ -546,4 +569,5 @@ export {
     unlockAssignment,
     exportOffers,
     fetchAuth,
+    emailAssignments,
 };
