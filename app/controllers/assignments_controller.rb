@@ -101,7 +101,7 @@ class AssignmentsController < ApplicationController
         instructors = position.instructors
         if instructors.size > 0
           position.instructors.each do |instructor|
-            CpMailer.assignment_email(position, instructor, applicants).deliver_now
+            TappMailer.assignment_email(position, instructor, applicants).deliver_now
           end
           render status: 200, json: {message: "Assignment Email Sent."}
         else
