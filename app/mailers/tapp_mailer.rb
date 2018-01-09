@@ -1,7 +1,7 @@
 class TappMailer < ApplicationMailer
   default from: ENV['EMAIL_USER']
   layout "mailer"
-  include Mailer
+  include AppMailer
 
   def assignment_email(position, instructor, applicants)
     @applicants = applicants

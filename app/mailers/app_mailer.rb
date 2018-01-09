@@ -1,10 +1,9 @@
-module Mailer
+module AppMailer
   def mail_to(email, subject)
     email = get_email(email)
     mail(to: email, subject: subject)
   end
 
-  private
   def get_email(email)
     if ENV['RAILS_ENV'] == 'development'
       return ENV['RECIPIENT']

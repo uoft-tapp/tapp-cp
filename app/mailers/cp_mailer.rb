@@ -1,7 +1,7 @@
 class CpMailer < ApplicationMailer
   default from: ENV['EMAIL_USER']
   layout "mailer"
-  include Mailer
+  include AppMailer
 
   def contract_email(offer, link)
     @offer = offer
