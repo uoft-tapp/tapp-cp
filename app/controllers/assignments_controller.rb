@@ -1,6 +1,7 @@
 class AssignmentsController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
+  before_action :set_domain
   before_action :tapp_admin
 
  '''
@@ -139,6 +140,10 @@ class AssignmentsController < ApplicationController
         end
       end
       return applicants
+    end
+
+    def set_domain
+      ENV["domain"] = request.base_url
     end
 
 end
