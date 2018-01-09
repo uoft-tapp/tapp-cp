@@ -97,12 +97,17 @@ class AssignmentsController < ApplicationController
     if position
       applicants = get_position_applicants(position)
       if applicants.length != 0
-        position.instructors.each do |instructor|
-          CpMailer.assignment_email(position, instructor, applicants).deliver_now
+        instructors = position.instructors
+        if instructors.size > 0
+          position.instructors.each do |instructor|
+            CpMailer.assignment_email(position, instructor, applicants).deliver_now
+          end
+          render status: 200, json: {message: "Assignment Email Sent."}
+        else
+          render status: 404, json: {message: "Error: #{params[:position]} currently has no instructors."}
         end
-        render status: 200, json: {message: "Assignment Email Sent."}
       else
-        render status: 404, json: {message: "Error: #{params[:position]} current has no assignments."}
+        render status: 404, json: {message: "Error: #{params[:position]} currently has no assignments."}
       end
     else
       render status: 404, json: {message: "Error: #{params[:position]} doesn't exist."}
