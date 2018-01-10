@@ -33,7 +33,7 @@ class Courses extends React.Component {
 
         return (
             <Grid fluid id="courses-grid">
-                <CourseList courses={courses} />
+                <CourseList courses={courses}  {...this.props}/>
 
                 <Panel id="course-form">
                     <ListGroup fill>

@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
-  </head>
-  <body>
-    <p>Dear <%= @ddah[:applicant][:first_name] %> <%= @ddah[:applicant][:last_name] %>,</p>
-    <p>
-      We have shown you the DDAH for your TAship of <%= @ddah[:position][:position] %>, but we have not yet received notice of whether you plan to accept it.
-    </p>
-    <p>
-      Your deadline for accepting this DDAH is <%= @ddah[:deadline] %>. This is your <%= @ddah[:nag_count] %><%= @ddah[:nag_suffix] %> warning.
-    </p>
-    <p>
-      Follow the link below to accept your DDAH:<br/>
-      <%= @url %>
-    </p>
-  </body>
-</html>
+<p>Dear <%= @ddah[:applicant][:first_name] %> <%= @ddah[:applicant][:last_name] %>,</p>
+<p>
+  We have shown you the DDAH for your TAship of <%= @ddah[:position][:position] %>, but we have not yet received notice of whether you plan to accept it.
+</p>
+<p>
+  Your deadline for accepting this DDAH is <%= @ddah[:deadline] %>. This is your <%= @ddah[:nag_count] %><%= @ddah[:nag_suffix] %> warning.
+</p>
+<p>
+  Follow the link below to accept your DDAH:<br/>
+  <%= @url %>
+</p>

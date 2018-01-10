@@ -1,6 +1,7 @@
 class AssignmentsController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
+  before_action :set_domain
   before_action :tapp_admin
 
  '''
@@ -92,7 +93,27 @@ class AssignmentsController < ApplicationController
     @assignment.destroy!
   end
 
-
+  def email_assignments
+    position = Position.find_by(position: params[:position], round_id: params[:round_id])
+    if position
+      applicants = get_position_applicants(position)
+      if applicants.length != 0
+        instructors = position.instructors
+        if instructors.size > 0
+          position.instructors.each do |instructor|
+            TappMailer.assignment_email(position, instructor, applicants).deliver_now
+          end
+          render status: 200, json: {message: "Assignment Email Sent."}
+        else
+          render status: 404, json: {message: "Error: #{params[:position]} currently has no instructors."}
+        end
+      else
+        render status: 404, json: {message: "Error: #{params[:position]} currently has no assignments."}
+      end
+    else
+      render status: 404, json: {message: "Error: #{params[:position]} doesn't exist."}
+    end
+  end
 
   private
     def assignment_params
@@ -101,6 +122,28 @@ class AssignmentsController < ApplicationController
 
     def updateable_attributes
       params.permit(:hours, :export_date)
+    end
+
+    def get_position_applicants(position)
+      applicants = []
+      Assignment.all.each do |assignment|
+        if assignment[:position_id] == position[:id]
+          applicant = Applicant.find(assignment[:applicant_id])
+          if applicant
+            applicants.push({
+              last_name: applicant[:last_name],
+              first_name: applicant[:first_name],
+              hours: assignment[:hours],
+              email: applicant[:email]
+            })
+          end
+        end
+      end
+      return applicants
+    end
+
+    def set_domain
+      ENV["domain"] = request.base_url
     end
 
 end

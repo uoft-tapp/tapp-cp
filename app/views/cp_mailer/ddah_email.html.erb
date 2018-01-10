@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
-  </head>
-  <body>
-    <p>Dear <%= @ddah[:applicant][:first_name] %> <%= @ddah[:applicant][:last_name] %>,</p>
-    <p>
-      We would like to go over the DDAH for your TAship of <%= @ddah[:position][:position] %>.
-    </p>
-    <p>
-      Please click the link below to view your DDAH and accept it:<br/>
-      <%= @url %>.
-    </p>
-    <p>Have a great day!</p>
-  </body>
-</html>
+<p>Dear <%= @ddah[:applicant][:first_name] %> <%= @ddah[:applicant][:last_name] %>,</p>
+<p>
+  We would like to go over the DDAH for your TAship of <%= @ddah[:position][:position] %>.
+</p>
+<p>
+  Please click the link below to view your DDAH and accept it:<br/>
+  <%= @url %>.
+</p>
+<p>Have a great day!</p>
