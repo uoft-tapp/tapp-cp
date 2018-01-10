@@ -12,6 +12,7 @@ class CourseList extends React.Component {
                               {course.code}
                             </a>
                             <a id={"email-"+key}
+                              title="Send TA Assignment to Instructors"
                               className="email-icon"
                               onClick={()=>(this.props.emailAssignments(course.code, course.round, key))}>
                               <i className="fa fa-envelope-o"></i>

@@ -8,7 +8,7 @@ class TappMailer < ApplicationMailer
     @instructor = instructor
     session = Session.find(position[:session_id])
     @position = "#{session[:semester]} #{session[:year]} #{position[:position]}"
-    mail_to(instructor[:email], "#{@position} Tentative TA Assignments")
+    mail_to(instructor[:email], "#{@position} Current TA Assignments")
   end
 
 end
