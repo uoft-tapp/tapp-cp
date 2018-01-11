@@ -4,7 +4,7 @@ Dear <%= @instructor[:name] %>,
 
 The following are the current TA assignments for <%= @position %>:
 
-Last Name, First Name, Hours, Email
+Last Name, First Name, Hours, Utorid, Email
 <% @applicants.each do |applicant| %>
-<%= applicant[:last_name] %>, <%= applicant[:first_name] %>, <%= applicant[:hours] %>, <%= applicant[:email] %>
+<%= applicant[:last_name] %>, <%= applicant[:first_name] %>, <%= applicant[:hours] %>, <%= applicant[:utorid] %>, <%= applicant[:email] %>
 <% end %>

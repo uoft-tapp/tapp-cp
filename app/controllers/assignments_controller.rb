@@ -134,12 +134,13 @@ class AssignmentsController < ApplicationController
               last_name: applicant[:last_name],
               first_name: applicant[:first_name],
               hours: assignment[:hours],
+              utorid: applicant[:utorid],
               email: applicant[:email]
             })
           end
         end
       end
-      return applicants
+      return applicants.sort_by { |item| item[:last_name] }
     end
 
     def set_domain
