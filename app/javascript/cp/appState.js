@@ -1,5 +1,5 @@
 import React from 'react';
-import { fromJS, toJSON } from 'immutable';
+import { fromJS } from 'immutable';
 
 import * as fetch from './fetch.js';
 
