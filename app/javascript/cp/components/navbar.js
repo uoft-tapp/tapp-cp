@@ -101,7 +101,7 @@ const NavbarInst = props =>
     <Navbar fixedTop fluid>
         <Navbar.Header id ="app-drop-down">
           <Navbar.Brand>
-            <NavDropdown title={<span>CP:TAPP</span>} noCaret >
+            <NavDropdown title={<span>CP:TAPP</span>} noCaret id="app-drop-down">
               <MenuItem href="/tapp">
                 TAPP
               </MenuItem>

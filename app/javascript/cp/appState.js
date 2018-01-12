@@ -1,5 +1,5 @@
 import React from 'react';
-import { fromJS } from 'immutable';
+import { fromJS, toJSON } from 'immutable';
 
 import * as fetch from './fetch.js';
 
@@ -756,17 +756,34 @@ class AppState {
     getSessionCourse(){
         let session = this.getSelectedSession();
         let courses = this.getCoursesList();
+        let selected = [];
         if (session == ''){
-          return courses;
+          courses.forEach((course, key)=>{
+            selected.push({
+              id: key,
+              code: course.get('code'),
+            });
+          });
         }
         else{
-          let selected = [];
-          courses.forEach(function(course){
+          courses.forEach((course, key)=>{
             if (course.get("session")==session)
-                selected.push(course);
+              selected.push({
+                id: key,
+                code: course.get('code'),
+              });
           });
-          return selected;
         }
+        selected.sort((a, b)=>this.compareString(a, b, 'code'));
+        return selected;
+    }
+
+    compareString(a, b, attr){
+      a = a[attr];
+      b = b[attr];
+      if (a < b) return -1;
+      if (a > b) return 1;
+      return 0;
     }
 
     getDdahsList() {

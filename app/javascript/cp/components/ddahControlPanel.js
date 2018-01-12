@@ -303,14 +303,16 @@ const ExportForm = props =>
                 id="course"
                 componentClass="select"
                 onChange={event => {
-                    props.appState.selectCourse(event.target.value);
+                    let select = event.target;
+                    let value = select.options[select.selectedIndex].value;
+                    props.appState.selectCourse(value);
                 }}>
                 <option value="" key="course-all">
                     Choose a course
                 </option>
-                {props.appState.getSessionCourse().map((course, courseId) =>
-                    <option value={courseId} key={courseId}>
-                        {course.get('code')}
+                {props.appState.getSessionCourse().map((course, key) =>
+                    <option value={course['id']} key={key}>
+                        {course['code']}
                     </option>
                 )}
             </FormControl>
