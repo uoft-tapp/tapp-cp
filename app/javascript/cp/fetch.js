@@ -120,6 +120,35 @@ const getTrainings = () =>
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchTrainingsSuccess);
 
+const downloadFile = (route) =>{
+  let download = false;
+  let filename = '';
+  getHelper(route)
+  .then(resp=>{
+    if(resp.ok){
+      download = true;
+      filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
+      return resp.blob();
+    }
+    else{
+      return resp.json();
+    }
+  })
+  .then(resp => {
+    if(download){
+      let url = URL.createObjectURL(resp);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    else{
+      appState.alert(resp.message);
+    }
+  });
+}
+
 /* Success callbacks for resource GETters */
 
 function onFetchCategoriesSuccess(resp) {
@@ -1026,9 +1055,15 @@ function exportOffers(session) {
     window.open('/export/cp-offers/' + session);
 }
 
-function exportDdahs(course){
-    window.open('/export/ddahs/' + course);
+function exportDdahs(course, session){
+    if(!course){
+      downloadFile('/export/session-ddahs/'+ session);
+    }
+    else{
+      downloadFile('/export/ddahs/' + course);
+    }
 }
+
 
 // create a new, empty template with this name
 function createTemplate(name) {

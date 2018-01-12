@@ -307,9 +307,15 @@ const ExportForm = props =>
                     let value = select.options[select.selectedIndex].value;
                     props.appState.selectCourse(value);
                 }}>
-                <option value="" key="course-all">
+                {
+                  (props.appState.getSelectedSession()=='')?
+                  <option value='' key='course-all'>
                     Choose a course
-                </option>
+                  </option>:
+                  <option value='all' key='session-all'>
+                    All in Current Session
+                  </option>
+                }
                 {props.appState.getSessionCourse().map((course, key) =>
                     <option value={course['id']} key={key}>
                         {course['code']}

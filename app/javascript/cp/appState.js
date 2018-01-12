@@ -686,14 +686,14 @@ class AppState {
     // export offers to CSV
     exportDdahs() {
         let course = this.getSelectedCourse();
-        if (!course) {
+        let selectedSession = this.getSelectedSession();
+        if (!course && selectedSession=='') {
             this.alert(
-                '<b>Export offers from all sessions</b> This functionality is not currently supported. Please select a course.'
+                '<b>Export ddah from all sessions</b> This functionality is not currently supported. Please select a course or a session.'
             );
             return;
         }
-
-        fetch.exportDdahs(course);
+        fetch.exportDdahs(course, selectedSession);
     }
 
     fetchAll() {
