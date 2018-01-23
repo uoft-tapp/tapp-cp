@@ -679,7 +679,7 @@ function withdrawOffers(offers) {
             if (resp.type != 'error') {
                 // network error did not occur
                 if (resp.ok) {
-                  processFetch(getOffers,'offers');
+                  getOffers();
                 } else {
                     // request failed
                     resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
