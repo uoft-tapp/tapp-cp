@@ -64,17 +64,33 @@ function putHelper(URL, body) {
 
 /* Resource GETters */
 
-const getResource = (route, onSuccess) =>
+const getResource = (route, onSuccess, dataName) =>
   getHelper(route)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(onSuccess);
+      .then(data => {
+          appState.set(dataName+'.list', fromJS(data));
+          appState.setFetchingDataList(dataName, false, true);
+      })
+      .catch(() => appState.setFetchingDataList(dataName, false));
 
-const getSessions = () => getResource('/sessions', onFetchSessionsSuccess);
-const getApplicants = () => getResource('/applicants', onFetchApplicantsSuccess);
-const getApplications = () => getResource('/applications', onFetchApplicationsSuccess);
-const getCourses = () => getResource('/positions', onFetchCoursesSuccess);
-const getAssignments = () => getResource('/assignments', onFetchAssignmentsSuccess);
-const getInstructors = () => getResource('/instructors', onFetchInstructorsSuccess);
+const getSessions = () => getResource(
+  '/sessions', onFetchSessionsSuccess, 'sessions');
+
+const getApplicants = () => getResource(
+  '/applicants', onFetchApplicantsSuccess, 'applicants');
+
+const getApplications = () => getResource(
+  '/applications', onFetchApplicationsSuccess, 'applications');
+
+const getCourses = () => getResource(
+  '/positions', onFetchCoursesSuccess, 'positions');
+
+const getAssignments = () => getResource(
+  '/assignments', onFetchAssignmentsSuccess, 'assignments');
+
+const getInstructors = () => getResource(
+  '/instructors', onFetchInstructorsSuccess, 'instructors');
 
 /* Success callbacks for resource GETters */
 function onFetchSessionsSuccess(resp) {
@@ -240,23 +256,12 @@ function onFetchInstructorsSuccess(resp) {
 
 /* Function to GET all resources */
 
-const processFetch = (getData, setData, dataName) =>{
-  // when the data is successfully fetched, update the data list; set fetching flag to false either way
-  appState.setFetchingDataList(dataName, true);
-  getData()
-      .then(data => {
-          setData(data);
-          appState.setFetchingDataList(dataName, false, true);
-      })
-      .catch(() => appState.setFetchingDataList(dataName, false));
-}
-
 function fetchAll() {
-    processFetch(getApplicants, appState.setApplicantsList, 'applicants');
-    processFetch(getApplications, appState.setApplicationsList, 'applications');
-    processFetch(getAssignments, appState.setAssignmentsList, 'assignments');
-    processFetch(getCourses, appState.setCoursesList, 'courses');
-    processFetch(getInstructors, appState.setInstructorsList, 'instructors');
+    getApplicants();
+    getApplications();
+    getAssignments();
+    getCourses();
+    getInstructors();
 }
 
 /* Task-specific resource modifiers */
@@ -269,7 +274,7 @@ function postAssignment(applicant, course, hours) {
     })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-          processFetch(getAssignments, appState.setAssignmentsList, 'assignments');
+          getAssignments();
         });
 }
 
@@ -278,7 +283,7 @@ function deleteAssignment(applicant, assignment) {
     deleteHelper('/applicants/' + applicant + '/assignments/' + assignment)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-          processFetch(getAssignments, appState.setAssignmentsList, 'assignments');
+          getAssignments();
         });
 }
 
@@ -287,7 +292,7 @@ function noteApplicant(applicant, notes) {
     putHelper('/applicants/' + applicant, { commentary: notes })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-          processFetch(getApplicants, appState.setApplicantsList, 'applicants');
+          getApplicants();
         });
 }
 
@@ -298,7 +303,7 @@ function updateAssignmentHours(applicant, assignment, hours) {
     })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-          processFetch(getAssignments, appState.setAssignmentsList, 'assignments');
+          getAssignments();
         });
 }
 
@@ -307,7 +312,7 @@ function updateCourse(courseId, data) {
     putHelper('/positions/' + courseId, data)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-          processFetch(getCourses, appState.setCoursesList, 'courses');
+          getCourses();
         });
 }
 
@@ -406,7 +411,7 @@ function unlockAssignment(applicant, assignment) {
     })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-          processFetch(getAssignments, appState.setAssignmentsList, 'assignments');
+          getAssignments();
         });
 }
 
@@ -437,7 +442,7 @@ function exportOffers(round) {
         });
 
     exportPromise.then(() => {
-      processFetch(getAssignments, appState.setAssignmentsList, 'assignments');
+      getAssignments();
 
     });
 }
