@@ -73,52 +73,31 @@ function patchHelper(URL, body) {
 }
 
 /* Resource GETters */
+const getResource = (route, onSuccess) =>
+  getHelper(route)
+      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+      .then(onSuccess);
 
-const getCategories = () =>
-    getHelper('/categories')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchCategoriesSuccess);
+const getCategories = () => getResource('/categories', onFetchCategoriesSuccess);
 
-const getCourses = ((user = null) =>{
-    let url = "";
-    if (user != null)
-        url = '/instructors/' + user + '/positions';
-    else
-        url = '/positions';
-    return getHelper(url)
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchCoursesSuccess);
-});
+const getCourses = (user = null) => getResource(
+    ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
+    onFetchCoursesSuccess);
 
-const getDdahs = user =>
-    getHelper(user ? '/instructors/' + user + '/ddahs' : '/ddahs')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchDdahsSuccess);
+const getDdahs = user => getResource(
+    user ? '/instructors/' + user + '/ddahs' : '/ddahs', onFetchDdahsSuccess);
 
-const getDuties = () =>
-    getHelper('/duties')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchDutiesSuccess);
+const getDuties = () => getResource('/duties', onFetchDutiesSuccess);
 
-const getOffers = user =>
-    getHelper(user ? '/instructors/' + user + '/offers' : '/offers')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchOffersSuccess);
+const getOffers = user => getResource(
+    user ? '/instructors/' + user + '/offers' : '/offers', onFetchOffersSuccess);
 
-const getSessions = () =>
-    getHelper('/sessions')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchSessionsSuccess);
+const getSessions = () => getResource('/sessions', onFetchSessionsSuccess);
 
-const getTemplates = user =>
-    getHelper('/instructors/' + user + '/templates')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchTemplatesSuccess);
+const getTemplates = user => getResource(
+    '/instructors/' + user + '/templates', onFetchTemplatesSuccess);
 
-const getTrainings = () =>
-    getHelper('/trainings')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchTrainingsSuccess);
+const getTrainings = () => getResource('/trainings', onFetchTrainingsSuccess);
 
 const downloadFile = (route) =>{
   let download = false;
@@ -316,112 +295,44 @@ function onFetchTrainingsSuccess(resp) {
 }
 
 /* Function to GET all resources */
+function processFetch(getData, dataName, param=null){
+  // when the data is successfully fetched, update the data list; set fetching flag to false either way
+  appState.setFetchingDataList(dataName, true);
+  if (param!=null){
+    getData(param)
+        .then(data => {
+            appState.set(dataName+'.list', fromJS(data));
+            appState.setFetchingDataList(dataName, false, true);
+        })
+        .catch(() => appState.setFetchingDataList(dataName, false));
+  }
+  else{
+    getData()
+        .then(data => {
+            appState.set(dataName+'.list', fromJS(data));
+            appState.setFetchingDataList(dataName, false, true);
+        })
+        .catch(() => appState.setFetchingDataList(dataName, false));
+  }
+}
 
 function adminFetchAll() {
-    appState.setFetchingDataList('ddahs', true);
-    appState.setFetchingDataList('offers', true);
-    appState.setFetchingDataList('sessions', true);
-    appState.setFetchingDataList('courses', true);
-
-    // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
-    getDdahs()
-        .then(ddahs => {
-            appState.setDdahsList(fromJS(ddahs));
-            appState.setFetchingDataList('ddahs', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('ddahs', false));
-
-    // when offers are successfully fetched, update the offers list; set fetching flag to false either way
-    getOffers()
-        .then(offers => {
-            appState.setOffersList(fromJS(offers));
-            appState.setFetchingDataList('offers', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('offers', false));
-
-    // when sessions are successfully fetched, update the sessions list; set fetching flag to false either way
-    getSessions()
-        .then(sessions => {
-            appState.setSessionsList(fromJS(sessions));
-            appState.setFetchingDataList('sessions', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('sessions', false));
-
-    // when courses are successfully fetched, update the courses list; set fetching flag to false either way
-    getCourses()
-        .then(courses => {
-            appState.setCoursesList(fromJS(courses));
-            appState.setFetchingDataList('courses', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('courses', false));
+    processFetch(getDdahs,'ddahs');
+    processFetch(getOffers,'offers');
+    processFetch(getSessions,'sessions');
+    processFetch(getCourses,'courses');
 }
 
 function instructorFetchAll() {
     let user = appState.getCurrentUserName();
-
-    appState.setFetchingDataList('categories', true);
-    appState.setFetchingDataList('courses', true);
-    appState.setFetchingDataList('ddahs', true);
-    appState.setFetchingDataList('duties', true);
-    appState.setFetchingDataList('offers', true);
-    appState.setFetchingDataList('templates', true);
-    appState.setFetchingDataList('trainings', true);
-
-    // when categories are successfully fetched, update the categories list; set fetching flag to false either way
-    getCategories()
-        .then(categories => {
-            appState.setCategoriesList(fromJS(categories));
-            appState.setFetchingDataList('categories', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('categories', false));
-
-    // when courses are successfully fetched, update the courses list; set fetching flag to false either way
-    getCourses(user)
-        .then(courses => {
-            appState.setCoursesList(fromJS(courses));
-            appState.setFetchingDataList('courses', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('courses', false));
-
-    // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
-    getDdahs(user)
-        .then(ddahs => {
-            appState.setDdahsList(fromJS(ddahs));
-            appState.setFetchingDataList('ddahs', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('ddahs', false));
-
-    // when duties are successfully fetched, update the duties list; set fetching flag to false either way
-    getDuties()
-        .then(duties => {
-            appState.setDutiesList(fromJS(duties));
-            appState.setFetchingDataList('duties', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('duties', false));
-
-    // when offers are successfully fetched, update the offers list; set fetching flag to false either way
-    getOffers(user)
-        .then(offers => {
-            appState.setOffersList(fromJS(offers));
-            appState.setFetchingDataList('offers', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('offers', false));
-
-    // when templates are successfully fetched, update the templates list; set fetching flag to false either way
-    getTemplates(user)
-        .then(templates => {
-            appState.setTemplatesList(fromJS(templates));
-            appState.setFetchingDataList('templates', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('templates', false));
-
-    // when trainings are successfully fetched, update the trainings list; set fetching flag to false either way
-    getTrainings()
-        .then(trainings => {
-            appState.setTrainingsList(fromJS(trainings));
-            appState.setFetchingDataList('trainings', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('trainings', false));
+    processFetch(getSessions,'sessions');
+    processFetch(getCategories,'categories');
+    processFetch(getCourses,'courses', user);
+    processFetch(getDdahs,'ddahs', user);
+    processFetch(getDuties,'duties');
+    processFetch(getOffers,'offers',user);
+    processFetch(getTemplates,'templates');
+    processFetch(getTrainings,'trainings');
 }
 
 // import locked assignments from TAPP
@@ -452,14 +363,7 @@ function importAssignments() {
         .then(
             () => {
                 appState.setImporting(false, true);
-
-                appState.setFetchingDataList('offers', true);
-                getOffers()
-                    .then(offers => {
-                        appState.setOffersList(fromJS(offers));
-                        appState.setFetchingDataList('offers', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('offers', false));
+                processFetch(getOffers,'offers');
             },
             () => appState.setImporting(false)
         );
@@ -493,14 +397,7 @@ function importOffers(data) {
         .then(
             () => {
                 appState.setImporting(false, true);
-
-                appState.setFetchingDataList('offers', true);
-                getOffers()
-                    .then(offers => {
-                        appState.setOffersList(fromJS(offers));
-                        appState.setFetchingDataList('offers', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('offers', false));
+                processFetch(getOffers,'offers');
             },
             () => appState.setImporting(false)
         );
@@ -531,22 +428,8 @@ function importDdahs(data) {
         })
         .then(
             () => {
-                appState.setFetchingDataList('ddahs', true);
-                appState.setFetchingDataList('offers', true);
-
-                getOffers()
-                    .then(offers => {
-                        appState.setOffersList(fromJS(offers));
-                        appState.setFetchingDataList('offers', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('offers', false));
-
-                getDdahs()
-                    .then(ddahs => {
-                        appState.setDdahsList(fromJS(ddahs));
-                        appState.setFetchingDataList('ddahs', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('ddahs', false));
+                processFetch(getOffers,'offers');
+                processFetch(getDdahs,'ddahs');
             }
         ).then(() => appState.setImporting(false));
 }
@@ -589,13 +472,7 @@ function sendContracts(offers) {
         // send contracts for valid offers
         .then(() => postHelper('/offers/send-contracts', { offers: validOffers }))
         .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+          processFetch(getOffers,'offers');
         });
 }
 
@@ -636,13 +513,7 @@ function nagOffers(offers) {
         // nag valid offers
         .then(() => postHelper('/offers/nag', { contracts: validOffers }))
         .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+          processFetch(getOffers,'offers');
         });
 }
 
@@ -689,13 +560,7 @@ function setHrProcessed(offers) {
             })
         )
         .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+          processFetch(getOffers,'offers');
         });
 }
 
@@ -741,22 +606,8 @@ function setDdahAccepted(offers) {
             })
         )
         .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            appState.setFetchingDataList('offers', true);
-
-            getDdahs()
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+            processFetch(getDdahs,'ddahs');
+            processFetch(getOffers,'offers');
         });
 }
 
@@ -800,23 +651,9 @@ function setDdahApproved(ddahs, signature) {
       // send contracts for valid ddahs
       .then(() => postHelper('/ddahs/status/approve', { ddahs: validDdahs, signature: signature }))
       .then(() => {
-          appState.setFetchingDataList('ddahs', true);
-          appState.setFetchingDataList('offers', true);
-
-          getDdahs()
-              .then(ddahs => {
-                  appState.setDdahsList(fromJS(ddahs));
-                  appState.setFetchingDataList('ddahs', false, true);
-              })
-              .catch(() => appState.setFetchingDataList('ddahs', false));
-
-          getOffers()
-              .then(offers => {
-                  appState.setOffersList(fromJS(offers));
-                  appState.setFetchingDataList('offers', false, true);
-              })
-              .catch(() => appState.setFetchingDataList('offers', false));
-        });
+        processFetch(getDdahs,'ddahs');
+        processFetch(getOffers,'offers');
+      });
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
@@ -855,13 +692,7 @@ function withdrawOffers(offers) {
             if (resp.type != 'error') {
                 // network error did not occur
                 if (resp.ok) {
-                    appState.setFetchingDataList('offers', true);
-                    getOffers()
-                        .then(offers => {
-                            appState.setOffersList(fromJS(offers));
-                            appState.setFetchingDataList('offers', false, true);
-                        })
-                        .catch(() => appState.setFetchingDataList('offers', false));
+                  processFetch(getOffers,'offers');
                 } else {
                     // request failed
                     resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
@@ -922,13 +753,7 @@ function print(offers) {
     });
 
     printPromise.then(() => {
-        appState.setFetchingDataList('offers', true);
-        getOffers()
-            .then(offers => {
-                appState.setOffersList(fromJS(offers));
-                appState.setFetchingDataList('offers', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('offers', false));
+      processFetch(getOffers,'offers');
     });
 }
 
@@ -938,13 +763,7 @@ function updateSessionPay(session, pay) {
         .then(resp => (resp.ok ? resp : respFailure))
         .then(
             () => {
-                appState.setFetchingDataList('sessions', true);
-                getSessions()
-                    .then(sessions => {
-                        appState.setSessionsList(fromJS(sessions));
-                        appState.setFetchingDataList('sessions', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('sessions', false));
+              processFetch(getSessions,'sessions');
             },
             resp => resp.json().then(resp => appState.alert(resp.message)) // IS THIS REALLY WHAT WE EXPECT?
         );
@@ -955,13 +774,7 @@ function noteOffer(offer, note) {
     putHelper('/offers/' + offer, { commentary: note })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+          processFetch(getOffers,'offers');
         });
 }
 
@@ -1001,13 +814,7 @@ function clearHrStatus(offers) {
         // update valid offers
         .then(() => postHelper('/offers/clear-hris-status', { contracts: validOffers }))
         .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+          processFetch(getOffers,'offers');
         });
 }
 
@@ -1025,13 +832,7 @@ function setOfferAccepted(offer) {
             }
         })
         .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+          processFetch(getOffers,'offers');
         });
 }
 
@@ -1040,13 +841,7 @@ function resetOffer(offer) {
     postHelper('/offers/' + offer + '/reset', {})
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+          processFetch(getOffers,'offers');
         });
 }
 
@@ -1083,14 +878,7 @@ function createTemplate(name) {
             return respFailure(resp);
         })
         .then(resp => {
-            appState.setFetchingDataList('templates', true);
-            return getTemplates(user)
-                .then(templates => {
-                    appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingDataList('templates', false, true);
-                    return resp.id; // return the id of the newly-created template
-                })
-                .catch(() => appState.setFetchingDataList('templates', false));
+          processFetch(getTemplates,'templates');
         });
 }
 
@@ -1101,13 +889,7 @@ function updateTemplate(id, ddahData) {
     return patchHelper('/instructors/' + user + '/templates/' + id, ddahData)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingDataList('templates', true);
-            return getTemplates(user)
-                .then(templates => {
-                    appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingDataList('templates', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('templates', false));
+          processFetch(getTemplates,'templates');
         });
 }
 
@@ -1118,13 +900,7 @@ function createTemplateFromDdah(name, ddah) {
     postHelper('/ddahs/' + ddah + '/new-template', { name: name })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingDataList('templates', true);
-            getTemplates(user)
-                .then(templates => {
-                    appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingDataList('templates', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('templates', false));
+          processFetch(getTemplates,'templates');
         });
 }
 
@@ -1148,14 +924,7 @@ function createDdah(offer) {
             return respFailure(resp);
         })
         .then(resp => {
-            appState.setFetchingDataList('ddahs', true);
-            return getDdahs(user)
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                    return resp.id; // return the id of the newly-created ddah
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
+          processFetch(getDdahs,'ddahs', user);
         });
 }
 
@@ -1166,13 +935,7 @@ function updateDdah(id, ddahData) {
     return patchHelper('/instructors/' + user + '/ddahs/' + id, ddahData)
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            return getDdahs(user)
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
+          processFetch(getDdahs,'ddahs', user);
         });
 }
 
@@ -1186,22 +949,8 @@ function submitDdah(signature, ddah) {
     postHelper('/ddahs/status/finish', { signature: signature, ddahs: [ddah] })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            appState.setFetchingDataList('offers', true);
-
-            getDdahs(user)
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-
-            getOffers(user)
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
+            processFetch(getDdahs,'ddahs', user);
+            processFetch(getOffers,'offers',user);
         });
 }
 
@@ -1250,13 +999,7 @@ function nagApplicantDdahs(ddahs) {
         // send contracts for valid ddahs
         .then(() => postHelper('/ddahs/send-nag-student', { ddahs: validDdahs }))
         .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            getDdahs()
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
+          processFetch(getDdahs,'ddahs');
         });
 }
 
@@ -1297,22 +1040,8 @@ function nagInstructors(offers) {
       // nag valid offers
       .then(() => postHelper('/offers/send-nag-instructor', { offers: validOffers }))
       .then(() => {
-        appState.setFetchingDataList('ddahs', true);
-        appState.setFetchingDataList('offers', true);
-
-        getDdahs()
-            .then(ddahs => {
-                appState.setDdahsList(fromJS(ddahs));
-                appState.setFetchingDataList('ddahs', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('ddahs', false));
-
-        getOffers()
-            .then(offers => {
-                appState.setOffersList(fromJS(offers));
-                appState.setFetchingDataList('offers', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('offers', false));
+        processFetch(getDdahs,'ddahs');
+        processFetch(getOffers,'offers');
       });
 }
 
@@ -1356,13 +1085,7 @@ function sendDdahs(ddahs) {
         // send contracts for valid ddahs
         .then(() => postHelper('/ddahs/send-ddahs', { ddahs: validDdahs }))
         .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            getDdahs()
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
+          processFetch(getDdahs,'ddahs');
         });
 }
 

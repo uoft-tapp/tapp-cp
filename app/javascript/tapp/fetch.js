@@ -69,17 +69,11 @@ const getResource = (route, onSuccess) =>
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(onSuccess);
 
-
 const getSessions = () => getResource('/sessions', onFetchSessionsSuccess);
-
 const getApplicants = () => getResource('/applicants', onFetchApplicantsSuccess);
-
 const getApplications = () => getResource('/applications', onFetchApplicationsSuccess);
-
 const getCourses = () => getResource('/positions', onFetchCoursesSuccess);
-
 const getAssignments = () => getResource('/assignments', onFetchAssignmentsSuccess);
-
 const getInstructors = () => getResource('/instructors', onFetchInstructorsSuccess);
 
 /* Success callbacks for resource GETters */
