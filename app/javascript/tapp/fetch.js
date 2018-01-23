@@ -69,7 +69,7 @@ const getResource = (route, onSuccess, dataName) =>
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(onSuccess);
       .then(data => {
-          appState.set(dataName+'.list', fromJS(data));
+          appState.set(dataName+'.list', data);
           appState.setFetchingDataList(dataName, false, true);
       })
       .catch(() => appState.setFetchingDataList(dataName, false));
