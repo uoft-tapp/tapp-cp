@@ -365,14 +365,7 @@ function importInstructors(data) {
         .then(
             () => {
                 appState.setImporting(false, true);
-
-                appState.setFetchingDataList('instructors', true);
-                getInstructors()
-                    .then(instructors => {
-                        appState.setInstructorsList(instructors);
-                        appState.setFetchingDataList('instructors', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('instructors', false));
+                getInstructors();
             },
             resp => {
                 appState.setImporting(false);
@@ -390,14 +383,7 @@ function importEnrolment(data) {
         .then(
             () => {
                 appState.setImporting(false, true);
-
-                appState.setFetchingDataList('courses', true);
-                getCourses()
-                    .then(courses => {
-                        appState.setCoursesList(courses);
-                        appState.setFetchingDataList('courses', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('courses', false));
+                getCourses();
             },
             resp => {
                 appState.setImporting(false);
