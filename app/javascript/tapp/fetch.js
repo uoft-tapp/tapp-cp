@@ -64,33 +64,35 @@ function putHelper(URL, body) {
 
 /* Resource GETters */
 
-const getResource = (route, onSuccess, dataName) =>
+const getResource = (route, onSuccess, dataName, setData) =>
   getHelper(route)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-      .then(onSuccess);
+      .then(onSuccess)
       .then(data => {
-          appState.set(dataName+'.list', data);
+          setData(data);
           appState.setFetchingDataList(dataName, false, true);
       })
       .catch(() => appState.setFetchingDataList(dataName, false));
 
+
 const getSessions = () => getResource(
-  '/sessions', onFetchSessionsSuccess, 'sessions');
+  '/sessions', onFetchSessionsSuccess, 'sessions', appState.setSessionsList);
 
 const getApplicants = () => getResource(
-  '/applicants', onFetchApplicantsSuccess, 'applicants');
+  '/applicants', onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
 const getApplications = () => getResource(
-  '/applications', onFetchApplicationsSuccess, 'applications');
+  '/applications', onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
 
 const getCourses = () => getResource(
-  '/positions', onFetchCoursesSuccess, 'positions');
+  '/positions', onFetchCoursesSuccess, 'courses', appState.setCoursesList);
 
 const getAssignments = () => getResource(
-  '/assignments', onFetchAssignmentsSuccess, 'assignments');
+  '/assignments', onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
 const getInstructors = () => getResource(
-  '/instructors', onFetchInstructorsSuccess, 'instructors');
+  '/instructors', onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList);
+
 
 /* Success callbacks for resource GETters */
 function onFetchSessionsSuccess(resp) {
