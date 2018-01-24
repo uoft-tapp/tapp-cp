@@ -84,11 +84,12 @@ class ExportController < ApplicationController
       response = generator.generate_ddahs(position[:id])
       if response[:generated]
         files.push({
-          filename: response[:file],
+          filename: response[:file].gsub('/','-'),
           data: response[:data],
         })
       end
     end
+    puts files
     return files
   end
 
