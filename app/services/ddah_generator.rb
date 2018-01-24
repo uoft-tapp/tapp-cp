@@ -161,11 +161,11 @@ class DdahGenerator
   end
 
   def set_header(x, y, header_data, template)
-    set_logo(get_grids(x, y-0.1, 1.8, 0.9))
+    set_logo(get_grids(x, y-0.3, 1.8, 0.9))
     set_text(get_grids(x, y-0.1, 7.5, 0.4), get_style(TITLE, header_data[0]))
-    draw_box(get_grids(0.5, y+0.35, 7.5, 1.3), true)
-    y = y+ 0.4
-    y = set_header_helper(header_data, 1, y, 0.25)
+    draw_box(get_grids(0.5, y+0.15, 7.5, 1.6), true)
+    y = y+ 0.2
+    y = set_header_helper(header_data, 1, y, 0.35)
     set_table_data(4.45, [3.8], 0, y, 0.3, get_scaling_data(header_data), false, SMALL_LEFT_ALIGN)
     set_table_data(2, [1, 1], 0, y+0.2, 0.3, get_optional_data, false, SMALL_LEFT_ALIGN)
     return y+0.1
