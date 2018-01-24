@@ -6,7 +6,7 @@ RUN echo "Building with RAILS_ENV=${RAILS_ENV}"
 
 WORKDIR /srv/app
 
-RUN apk --update --upgrade add curl-dev build-base openssh \
+RUN apk --update --upgrade add curl-dev libcurl build-base openssh \
 	tzdata libxml2 libxml2-dev libxslt libxslt-dev postgresql-dev \
 	nodejs
 
