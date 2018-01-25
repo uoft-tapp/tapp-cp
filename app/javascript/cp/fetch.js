@@ -1,76 +1,16 @@
 import React from 'react';
 import { fromJS } from 'immutable';
 import { appState } from './appState.js';
+import * as fetchProc from '../fetchProc.js';
 
 /* General helpers */
+const msgFailure = (text) => fetchProc.msgFailure(text, appState);
+const respFailure = (resp) => fetchProc.respFailure(resp, appState);
 
-function msgFailure(text) {
-    appState.alert('<b>Action Failed:</b> ' + text);
-    return Promise.reject();
-}
-
-function respFailure(resp) {
-    appState.alert('<b>Action Failed</b> ' + resp.url + ': ' + resp.statusText);
-    return Promise.reject();
-}
-
-function fetchHelper(URL, init) {
-    return fetch(URL, init).catch(function(error) {
-        appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
-        return Promise.reject(error);
-    });
-}
-
-function getHelper(URL) {
-    return fetchHelper(URL, {
-        headers: {
-            Accept: 'application/json',
-        },
-        method: 'GET',
-        credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
-    });
-}
-
-function postHelper(URL, body) {
-    return fetchHelper(URL, {
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'POST',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    });
-}
-
-function deleteHelper(URL) {
-    return fetchHelper(URL, {
-        method: 'DELETE',
-        credentials: 'include',
-    });
-}
-
-function putHelper(URL, body) {
-    return fetchHelper(URL, {
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'PUT',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    });
-}
-
-function patchHelper(URL, body) {
-    return fetchHelper(URL, {
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'PATCH',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    });
-}
+const getHelper = (URL) => fetchProc.getHelper(URL, appState);
+const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
+const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
+const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
 
 /* Resource GETters */
 const getResource = (route, onSuccess, dataName) =>
@@ -83,29 +23,32 @@ const getResource = (route, onSuccess, dataName) =>
       })
       .catch(() => appState.setFetchingDataList(dataName, false));
 
-const getCategories = () => getResource(
-  '/categories', onFetchCategoriesSuccess, 'categories');
+const getCategories = () => getResource('/categories',
+    fetchProc.onFetchCategoriesSuccess, 'categories');
 
 const getCourses = (user = null) => getResource(
     ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
-    onFetchCoursesSuccess, 'courses');
+    fetchProc.onFetchCpCoursesSuccess, 'courses');
 
 const getDdahs = user => getResource(
     user ? '/instructors/' + user + '/ddahs' : '/ddahs',
-    onFetchDdahsSuccess, 'ddahs');
+    fetchProc.onFetchDdahsSuccess, 'ddahs');
 
-const getDuties = () => getResource('/duties', onFetchDutiesSuccess, 'duties');
+const getDuties = () => getResource('/duties',
+    fetchProc.onFetchDutiesSuccess, 'duties');
 
 const getOffers = user => getResource(
     user ? '/instructors/' + user + '/offers' : '/offers',
-    onFetchOffersSuccess, 'offers');
+    fetchProc.onFetchOffersSuccess, 'offers');
 
-const getSessions = () => getResource('/sessions', onFetchSessionsSuccess, 'sessions');
+const getSessions = () => getResource('/sessions',
+    fetchProc.onFetchSessionsSuccess, 'sessions');
 
-const getTemplates = user => getResource(
-    '/instructors/' + user + '/templates', onFetchTemplatesSuccess, 'templates');
+const getTemplates = user => getResource('/instructors/' + user + '/templates',
+    fetchProc.onFetchTemplatesSuccess, 'templates');
 
-const getTrainings = () => getResource('/trainings', onFetchTrainingsSuccess, 'trainings');
+const getTrainings = () => getResource('/trainings',
+    fetchProc.onFetchTrainingsSuccess, 'trainings');
 
 const downloadFile = (route) =>{
   let download = false;
@@ -136,181 +79,16 @@ const downloadFile = (route) =>{
   });
 }
 
-/* Success callbacks for resource GETters */
-
-function onFetchCategoriesSuccess(resp) {
-    let categories = {};
-
-    resp.forEach(category => {
-        categories[category.id] = category.name;
-    });
-
-    return categories;
-}
-
-function onFetchCoursesSuccess(resp) {
-    let courses = {};
-
-    resp.forEach(course => {
-        courses[course.id] = {
-            name: course.course_name,
-            code: course.position,
-            campus: (function(code) {
-                switch (code) {
-                    case 1:
-                        return 'St. George';
-                    case 3:
-                        return 'Scarborough';
-                    case 5:
-                        return 'Mississauga';
-                    default:
-                        return 'Other';
-                }
-            })(course.campus_code),
-            session: course.session_id,
-            estimatedEnrol: course.current_enrolment,
-            cap: course.cap_enrolment,
-            waitlist: course.num_waitlisted,
-            instructors: course.instructors,
-        };
-    });
-
-    return courses;
-}
-
-function onFetchDdahsSuccess(resp) {
-    let ddahs = {};
-
-    resp.forEach(ddah => {
-        ddahs[ddah.id] = {
-            offer: ddah.offer_id,
-            position: ddah.position.id,
-            department: ddah.department,
-            supervisor: ddah.supervisor,
-            supervisorId: ddah.instructor_id,
-            tutCategory: ddah.tutorial_category,
-            optional: ddah.optional,
-            requiresTraining: ddah.scaling_learning,
-            allocations: ddah.allocations.map(allocation => ({
-                id: allocation.id,
-                units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
-                time: allocation.minutes,
-            })),
-            trainings: ddah.trainings,
-            categories: ddah.categories,
-            superSignature: ddah.supervisor_signature,
-            superSignDate: ddah.supervisor_sign_date,
-            authSignature: ddah.ta_coord_signature,
-            authSignDate: ddah.ta_coord_sign_date,
-            studentSignature: ddah.student_signature,
-            studentSignDate: ddah.student_sign_date,
-            link: ddah.link,
-        };
-    });
-
-    return ddahs;
-}
-
-function onFetchDutiesSuccess(resp) {
-    let duties = {};
-
-    resp.forEach(duty => {
-        duties[duty.id] = duty.name;
-    });
-
-    return duties;
-}
-
-function onFetchOffersSuccess(resp) {
-    let offers = {};
-
-    resp.forEach(offer => {
-        offers[offer.id] = {
-            applicantId: offer.applicant_id,
-            firstName: offer.applicant.first_name,
-            lastName: offer.applicant.last_name,
-            studentNumber: offer.applicant.student_number,
-            email: offer.applicant.email,
-            utorid: offer.applicant.utorid,
-            course: offer.position,
-            position: offer.position_id,
-            session: offer.session ? offer.session.id : undefined,
-            hours: offer.hours,
-            nagCount: offer.nag_count,
-            InstructorNagCount: offer.ddah_nag_count,
-            ddahNagCount: offer.ddah_applicant_nag_count,
-            status: offer.status,
-            hrStatus: offer.hr_status,
-            ddahStatus: offer.ddah_status,
-            sentAt: offer.send_date,
-            printedAt: offer.print_time,
-            link: offer.link,
-            note: offer.commentary,
-            ddahSendDate: offer.ddah_send_date,
-        };
-    });
-
-    return offers;
-}
-
-function onFetchSessionsSuccess(resp) {
-    let sessions = {};
-
-    resp.forEach(session => {
-        sessions[session.id] = {
-            year: session.year,
-            semester: session.semester,
-            pay: session.pay,
-        };
-    });
-
-    return sessions;
-}
-
-function onFetchTemplatesSuccess(resp) {
-    let templates = {};
-
-    resp.forEach(template => {
-        templates[template.id] = {
-            name: template.name,
-            optional: template.optional,
-            requiresTraining: template.scaling_learning,
-            allocations: template.allocations.map(allocation => ({
-                id: allocation.id,
-                units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
-                time: allocation.minutes,
-            })),
-            trainings: template.trainings,
-            categories: template.trainings,
-        };
-    });
-
-    return templates;
-}
-
-function onFetchTrainingsSuccess(resp) {
-    let trainings = {};
-
-    resp.forEach(training => {
-        trainings[training.id] = training.name;
-    });
-
-    return trainings;
-}
 
 /* Function to GET all resources */
-function adminFetchAll() {
+export const adminFetchAll = () =>  {
     getDdahs();
     getOffers();
     getSessions();
     getCourses();
 }
 
-function instructorFetchAll() {
+export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
     getSessions();
     getCategories();
@@ -323,7 +101,7 @@ function instructorFetchAll() {
 }
 
 // import locked assignments from TAPP
-function importAssignments() {
+export const importAssignments = () => {
     appState.setImporting(true);
 
     postHelper('/import/locked-assignments', {})
@@ -357,7 +135,7 @@ function importAssignments() {
 }
 
 // send CHASS offers data
-function importOffers(data) {
+export const importOffers= (data) => {
     appState.setImporting(true);
 
     postHelper('/import/offers', { chass_offers: data })
@@ -390,7 +168,7 @@ function importOffers(data) {
         );
 }
 
-function importDdahs(data) {
+export const importDdahs = (data) => {
     appState.setImporting(true);
 
     postHelper('/import/ddahs', { ddah_data: data })
@@ -423,7 +201,7 @@ function importDdahs(data) {
 
 
 // send contracts
-function sendContracts(offers) {
+export const sendContracts = (offers) => {
     let validOffers = offers;
 
     // check which contracts can be sent
@@ -464,7 +242,7 @@ function sendContracts(offers) {
 }
 
 // nag applicants about offers
-function nagOffers(offers) {
+export const nagOffers = (offers) => {
     let validOffers = offers;
 
     // check which applicants can be nagged
@@ -505,7 +283,7 @@ function nagOffers(offers) {
 }
 
 // mark contracts as hr_processed
-function setHrProcessed(offers) {
+export const setHrProcessed = (offers) => {
     let validOffers = offers;
 
     // check which offers can be marked as hr_processed
@@ -552,7 +330,7 @@ function setHrProcessed(offers) {
 }
 
 // mark contracts as ddah_accepted
-function setDdahAccepted(offers) {
+export const setDdahAccepted = (offers) => {
     let validOffers = offers;
 
     // check which offers can be marked as ddah_accepted
@@ -599,7 +377,7 @@ function setDdahAccepted(offers) {
 }
 
 // mark contracts as ddah_approved
-function setDdahApproved(ddahs, signature) {
+export const setDdahApproved = (ddahs, signature) => {
   let validDdahs = ddahs;
 
   // check which ddahs can be sent
@@ -644,12 +422,12 @@ function setDdahApproved(ddahs, signature) {
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
-function showContractApplicant(offer) {
+export const showContractApplicant= (offer) => {
     window.open('/offers/' + offer + '/pdf');
 }
 
 // show the contract for this offer in a new window, as HR would see it
-function showContractHr(offer) {
+export const showContractHr=(offer) =>{
     postHelper('/offers/print', { contracts: [offer], update: false })
         .then(resp => (resp.ok ? resp.blob().catch(msgFailure) : respFailure))
         .then(blob => {
@@ -660,7 +438,7 @@ function showContractHr(offer) {
 }
 
 // withdraw offers
-function withdrawOffers(offers) {
+export const withdrawOffers=(offers) =>{
     // create an array of promises for each offer being withdrawn
     // force each promise to resolve so that we can see which failed.
     // foible of all is that it will reject as soon as any promise fails.
@@ -690,7 +468,7 @@ function withdrawOffers(offers) {
 }
 
 // print contracts
-function print(offers) {
+export const print=(offers)=>{
     let validOffers = offers;
 
     // check which contracts can be printed
@@ -745,7 +523,7 @@ function print(offers) {
 }
 
 // change session pay
-function updateSessionPay(session, pay) {
+export const updateSessionPay = (session, pay) =>{
     putHelper('/sessions/' + session, { pay: pay })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(
@@ -757,7 +535,7 @@ function updateSessionPay(session, pay) {
 }
 
 // add/update the note for a withdrawn offer
-function noteOffer(offer, note) {
+export const noteOffer = (offer, note) => {
     putHelper('/offers/' + offer, { commentary: note })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
@@ -766,7 +544,7 @@ function noteOffer(offer, note) {
 }
 
 // clear HR status
-function clearHrStatus(offers) {
+export const clearHrStatus = (offers) =>{
     let validOffers = offers;
 
     // check which offers can have their HR status cleared
@@ -806,7 +584,7 @@ function clearHrStatus(offers) {
 }
 
 // set status to accepted
-function setOfferAccepted(offer) {
+export const setOfferAccepted = (offer) => {
     postHelper('/offers/' + offer + '/accept', {})
         .then(resp => {
             if (resp.status == 404) {
@@ -824,7 +602,7 @@ function setOfferAccepted(offer) {
 }
 
 // set status to unsent and clear other information
-function resetOffer(offer) {
+export const resetOffer = (offer) => {
     postHelper('/offers/' + offer + '/reset', {})
         .then(resp => (resp.ok ? resp : respFailure))
         .then(() => {
@@ -833,7 +611,7 @@ function resetOffer(offer) {
 }
 
 // export all offers from the session to CSV
-function exportOffers(session) {
+export const exportOffers = (session) => {
     window.open('/export/cp-offers/' + session);
 }
 
@@ -848,7 +626,7 @@ function exportDdahs(course, session){
 
 
 // create a new, empty template with this name
-function createTemplate(name) {
+export const createTemplate = (name) => {
     let user = appState.getCurrentUserName();
 
     return postHelper('/instructors/' + user + '/templates', { name: name })
@@ -870,7 +648,7 @@ function createTemplate(name) {
 }
 
 // update an existing template
-function updateTemplate(id, ddahData) {
+export const updateTemplate = (id, ddahData) => {
     let user = appState.getCurrentUserName();
 
     return patchHelper('/instructors/' + user + '/templates/' + id, ddahData)
@@ -881,7 +659,7 @@ function updateTemplate(id, ddahData) {
 }
 
 // create a new template using data from an existing ddah
-function createTemplateFromDdah(name, ddah) {
+export const createTemplateFromDdah = (name, ddah) => {
     let user = appState.getCurrentUserName();
 
     postHelper('/ddahs/' + ddah + '/new-template', { name: name })
@@ -892,7 +670,7 @@ function createTemplateFromDdah(name, ddah) {
 }
 
 // create a new, empty ddah for this offer
-function createDdah(offer) {
+export const createDdah = (offer) => {
     let user = appState.getCurrentUserName();
 
     // although the template and ddah models have a relationship in the database, they do not have a
@@ -916,7 +694,7 @@ function createDdah(offer) {
 }
 
 // update an existing ddah
-function updateDdah(id, ddahData) {
+export const updateDdah = (id, ddahData) => {
     let user = appState.getCurrentUserName();
 
     return patchHelper('/instructors/' + user + '/ddahs/' + id, ddahData)
@@ -927,7 +705,7 @@ function updateDdah(id, ddahData) {
 }
 
 // submit an existing ddah for approval
-function submitDdah(signature, ddah) {
+export const submitDdah = (signature, ddah) => {
     let user = appState.getCurrentUserName();
 
     // this route expects to perform a batch transaction, where the validity of each transaction has
@@ -942,12 +720,12 @@ function submitDdah(signature, ddah) {
 }
 
 // open a PDF version of the ddah
-function previewDdah(ddah) {
+export const previewDdah = (ddah) => {
     window.open('/ddahs/' + ddah + '/pdf');
 }
 
 // nag applicants about ddahs
-function nagApplicantDdahs(ddahs) {
+export const nagApplicantDdahs = (ddahs) => {
     let validDdahs = ddahs;
 
     // check which ddahs can be sent
@@ -990,7 +768,7 @@ function nagApplicantDdahs(ddahs) {
         });
 }
 
-function nagInstructors(offers) {
+export const nagInstructors = (offers) => {
   let validOffers = offers;
 
   // check which applicants can be nagged
@@ -1033,7 +811,7 @@ function nagInstructors(offers) {
 }
 
 // send ddah forms
-function sendDdahs(ddahs) {
+export const sendDdahs = (ddahs) => {
     let validDdahs = ddahs;
 
     // check which ddahs can be sent
@@ -1077,7 +855,7 @@ function sendDdahs(ddahs) {
 }
 
 // send ddah forms
-function previewDdahs(ddahs) {
+export const previewDdahs = (ddahs) => {
     let validDdahs = ddahs;
     let filename = "";
 
@@ -1131,7 +909,7 @@ function previewDdahs(ddahs) {
 
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
-function fetchAuth() {
+export const fetchAuth = () => {
     return getHelper('/roles')
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(resp => {
@@ -1153,39 +931,3 @@ function fetchAuth() {
             }
         });
 }
-
-export {
-    adminFetchAll,
-    instructorFetchAll,
-    importOffers,
-    importAssignments,
-    importDdahs,
-    sendContracts,
-    nagOffers,
-    setHrProcessed,
-    setDdahAccepted,
-    setDdahApproved,
-    showContractApplicant,
-    showContractHr,
-    withdrawOffers,
-    print,
-    updateSessionPay,
-    noteOffer,
-    exportOffers,
-    exportDdahs,
-    clearHrStatus,
-    setOfferAccepted,
-    resetOffer,
-    createTemplate,
-    updateTemplate,
-    createTemplateFromDdah,
-    createDdah,
-    updateDdah,
-    submitDdah,
-    previewDdah,
-    previewDdahs,
-    nagApplicantDdahs,
-    nagInstructors,
-    sendDdahs,
-    fetchAuth,
-};
