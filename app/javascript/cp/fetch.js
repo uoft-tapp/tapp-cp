@@ -58,7 +58,7 @@ const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState
 
 const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra = null, put =false) =>
   fetchProc.batchOfferAction(canRoute, actionRoute, data, msg, fetch, extra, put, appState);
-  
+
 const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, put=false) =>
   fetchProc.batchDdahAction(canRoute, actionRoute, data, msg, fetch, extra, put, appState);
 
@@ -384,24 +384,5 @@ export const previewDdahs = (ddahs) => {
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-    return getHelper('/roles')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(resp => {
-            if (resp.development) {
-                appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
-                // default to cp_admin as selected user role
-                appState.selectUserRole('cp_admin');
-                appState.setCurrentUserName('zaleskim');
-                appState.setTaCoordinator(resp.ta_coord);
-            } else {
-                // filter out roles not relevant to this application
-                let roles = resp.roles.filter(role =>
-                    ['cp_admin', 'hr_assistant', 'instructor'].includes(role)
-                );
-                appState.setCurrentUserRoles(roles);
-                appState.selectUserRole(roles[0]);
-                appState.setCurrentUserName(resp.utorid);
-                appState.setTaCoordinator(resp.ta_coord);
-            }
-        });
+    return fetchProc.setRole(['cp_admin', 'hr_assistant', 'instructor'], true, appState);
 }

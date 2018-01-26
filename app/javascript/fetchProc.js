@@ -459,6 +459,23 @@ export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, 
       }
   });
 }
+export const setRole = (roles, cp, appState)=>{
+  return getHelper('/roles', appState)
+      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+      .then(resp => {
+          if (resp.development) {
+              appState.setCurrentUserRoles(roles);
+              appState.selectUserRole(roles[0]);
+              appState.setCurrentUserName('DEV');
+          } else {
+              roles = resp.roles.filter(role =>roles.includes(role));
+              appState.setCurrentUserRoles(roles);
+              appState.selectUserRole(roles[0]);
+              appState.setCurrentUserName(resp.utorid);
+          }
+          if(cp) appState.setTaCoordinator(resp.ta_coord);
+    });
+}
 function setBatchData(route, data, appState, succ, fail, extra, put){
   data = (extra!=null)?mergeJson(data,extra):data;
   if(put){

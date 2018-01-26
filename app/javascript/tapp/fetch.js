@@ -148,22 +148,7 @@ export const exportOffers = (round) => {
 // get current user role and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-    getHelper('/roles')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(resp => {
-            if (resp.development) {
-                appState.setCurrentUserRoles(['tapp_admin', 'instructor']);
-                // default to tapp_admin as selected user role
-                appState.selectUserRole('tapp_admin');
-                appState.setCurrentUserName('DEV');
-            } else {
-                // filter out roles not relevant to this application
-                let roles = resp.roles.filter(role => ['tapp_admin', 'instructor'].includes(role));
-                appState.setCurrentUserRoles(roles);
-                appState.selectUserRole(roles[0]);
-                appState.setCurrentUserName(resp.utorid);
-            }
-        });
+  fetchProc.setRole(['tapp_admin', 'instructor'], false, appState);
 }
 
 export const emailAssignments = (code, round, key) => {
