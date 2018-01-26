@@ -427,42 +427,46 @@ export const importData = (route, data, fetch, appState) =>{
         else appState.setImporting(false);
     });
 }
-export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, state) =>{
+export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
   let appState = state;
   let valid = data;
   return postData(canRoute, {offers: data}, null, state,
     ()=>{
       return setBatchData(actionRoute, {offers: data}, appState,
-        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
     },
     resp=>{
       filterOffer(resp, data, msg, appState);
       if(valid.length >0){
         return setBatchData(actionRoute, {offers: data}, appState,
-          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
       }
   });
 }
-export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, state) =>{
+export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
   let appState = state;
   let valid = data;
   return postData(canRoute, {offers: data}, null, state,
     ()=>{
       return setBatchData(actionRoute, {ddahs: data}, appState,
-        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
     },
     resp=>{
       filterDdah(resp, data, msg, appState);
       if(valid.length >0){
         return setBatchData(actionRoute, {ddahs: data}, appState,
-          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
       }
   });
 }
-function setBatchData(route, data, appState, succ, fail, extra){
-  return (extra!=null)?
-    putData(route, mergeJson(data,extra), succ, appState):
-    postData(route, data, null, appState, succ, fail);
+function setBatchData(route, data, appState, succ, fail, extra, put){
+  data = (extra!=null)?mergeJson(data,extra):data;
+  if(put){
+    return putData(route, data, succ, appState);
+  }
+  else{
+    return postData(route,data, null, appState, succ, fail);
+  }
 }
 function filterOffer(res, validOffers, msg, appState){
   let offersList = appState.getOffersList();

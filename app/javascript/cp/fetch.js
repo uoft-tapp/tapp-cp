@@ -55,8 +55,12 @@ const importData = (route, data, fetch) => fetchProc.importData(route, data, fet
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
 const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
 const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
-const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra = null) => fetchProc.batchOfferAction(canRoute, actionRoute, data, msg, fetch, extra, appState);
-const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null) => fetchProc.batchDdahAction(canRoute, actionRoute, data, msg, fetch, extra, appState);
+
+const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra = null, put =false) =>
+  fetchProc.batchOfferAction(canRoute, actionRoute, data, msg, fetch, extra, put, appState);
+  
+const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, put=false) =>
+  fetchProc.batchDdahAction(canRoute, actionRoute, data, msg, fetch, extra, put, appState);
 
 /* Function to GET all resources */
 export const adminFetchAll = () =>  {
@@ -120,7 +124,7 @@ export const setHrProcessed = (offers) => {
         getOffers();
     },{
       hr_status: 'Processed'
-    });
+    }, true);
 }
 
 // mark contracts as ddah_accepted
@@ -131,7 +135,7 @@ export const setDdahAccepted = (offers) => {
         getOffers();
     },{
       ddah_status: 'Accepted'
-    });
+    }, true);
 }
 
 // mark contracts as ddah_approved
@@ -193,55 +197,21 @@ export const withdrawOffers=(offers) =>{
 
 // print contracts
 export const print=(offers)=>{
-    let validOffers = offers;
-    // check which contracts can be printed
-    let printPromise = postHelper('/offers/can-print', { offers: offers })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some contracts cannot be printed
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot print ' +
-                                offersList.getIn([offer.toString(), 'course']) +
-                                ' contract for ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer.toString(), 'firstName'])
-                        );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
-                    });
-
-                    if (validOffers.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // print valid offers
-        .then(() =>
-            postHelper('/offers/print', {
-                offers: validOffers,
-                update: true,
-            })
-        )
-        .then(resp => (resp.ok ? resp.blob().catch(msgFailure) : respFailure));
-
-    printPromise.then(blob => {
-        let fileURL = URL.createObjectURL(blob);
-        let pdfWindow = window.open(fileURL);
-        pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
-        pdfWindow.document.onload = pdfWindow.print();
-    });
-
-    printPromise.then(() => {
-      getOffers();
+    batchOfferAction('/offers/can-print', '/offers/print',
+      offers, {start: 'print Contract for'}, resp => {
+        if(resp.ok){
+          return resp.blob().then(res=>{
+            getOffers();
+            let fileURL = URL.createObjectURL(blob);
+            let pdfWindow = window.open(fileURL);
+            pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
+            pdfWindow.document.onload = pdfWindow.print();
+          });
+        }
+        else return respFailure(resp);
+    },
+    {
+      update: true,
     });
 }
 
@@ -298,8 +268,8 @@ export const exportOffers = (session) => {
 
 export const exportDdahs = (course, session) => {
   (course!='all')?
-  downloadFile('/export/ddahs/' + course):
-  downloadFile('/export/session-ddahs/'+ session);
+    downloadFile('/export/ddahs/' + course):
+    downloadFile('/export/session-ddahs/'+ session);
 }
 
 // create a new, empty template with this name
@@ -402,12 +372,8 @@ export const sendDdahs = (ddahs) => {
 
 // send ddah forms
 export const previewDdahs = (ddahs) => {
-    let filename = "";
     batchDdahAction('/ddahs/can-preview', '/ddahs/preview',
       ddahs, {start: 'send DDAH form to'}, resp => {
-        // extract the filename from the response headers
-        filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
-        // parse the response body as a blob
         return resp.blob().then(blob=>{
           let url = URL.createObjectURL(blob);
           window.open(url);
