@@ -52,6 +52,7 @@ const getTrainings = () => getResource('/trainings',
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
+const postData = (route, data, fetch) => fetchProc.postData(route, data, fetch, appState);
 const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
 const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
 
@@ -495,11 +496,9 @@ export const setOfferAccepted = (offer) => {
 
 // set status to unsent and clear other information
 export const resetOffer = (offer) => {
-    postHelper('/offers/' + offer + '/reset', {})
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getOffers();
-        });
+    postData('/offers/' + offer + '/reset', {}, () => {
+      getOffers();
+    });
 }
 
 // export all offers from the session to CSV
@@ -546,12 +545,9 @@ export const updateTemplate = (id, ddahData) => {
 // create a new template using data from an existing ddah
 export const createTemplateFromDdah = (name, ddah) => {
     let user = appState.getCurrentUserName();
-
-    postHelper('/ddahs/' + ddah + '/new-template', { name: name })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getTemplates(user);
-        });
+    postData('/ddahs/' + ddah + '/new-template', { name: name }, () => {
+      getTemplates(user);
+    });
 }
 
 // create a new, empty ddah for this offer
@@ -593,12 +589,10 @@ export const submitDdah = (signature, ddah) => {
     // this route expects to perform a batch transaction, where the validity of each transaction has
     // already been verified with '/ddahs/status/can-finish'
     // however, in the current interface, only one ddah can be submitted at a time
-    postHelper('/ddahs/status/finish', { signature: signature, ddahs: [ddah] })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-            getDdahs(user);
-            getOffers(user);
-        });
+    postData('/ddahs/status/finish', { signature: signature, ddahs: [ddah] }, () => {
+        getDdahs(user);
+        getOffers(user);
+    });
 }
 
 // open a PDF version of the ddah

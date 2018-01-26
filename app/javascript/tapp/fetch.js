@@ -46,6 +46,7 @@ const getInstructors = () => getResource(
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
+const postData = (route, data, fetch) => fetchProc.postData(route, data, fetch, appState);
 const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
 const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
 
@@ -63,14 +64,12 @@ export const fetchAll = () => {
 
 // create a new assignment
 export const postAssignment = (applicant, course, hours) => {
-    postHelper('/applicants/' + applicant + '/assignments', {
+    postData('/applicants/' + applicant + '/assignments', {
         position_id: course,
         hours: hours,
-    })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getAssignments();
-        });
+    }), () => {
+      getAssignments();
+    });
 }
 
 // remove an assignment
