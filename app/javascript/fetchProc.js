@@ -338,21 +338,36 @@ export const onFetchTrainingsSuccess = (resp)=>{
 /*
   common fetch helper functions
 */
-function routeData(func, route, data, fetch, appState){
-  return func(route, data)
+export const putData = (route, data, fetch, appState) => {
+  return putHelper(route, data, appState)
     .then(resp => (resp.ok ? resp : respFailure(resp, appState)))
-    .then(() => {
-      fetch();
+    .then(res => {
+      fetch(res);
     });
 }
-export const putData = (route, data, fetch, appState) => {
-  return routeData(putHelper, route, data, fetch, appState);
-}
-export const posttData = (route, data, fetch, appState) => {
-  return routeData(postHelper, route, data, fetch, appState);
+export const postData = (route, data, fetch, appState, okay = null, error = null) => {
+  return postHelper(route, data, appState)
+    .then(resp => {
+      if(resp.okay){
+        return (okay!=null)?
+          resp.json().then(res=>okay(res)):
+          resp;
+      }
+      else if(resp.status == 404){
+        return (error!=null)?
+          resp.json().then(res=>error(res)):
+          respFailure(resp, appState);
+      }
+      else if(resp.status ==204) okay();
+      else return respFailure(resp, appState);
+    })
+    .then(() => {
+      if (fetch!=null)
+        return fetch();
+    });
 }
 export const deleteData = (route, fetch, appState) =>{
-  return deleteHelper(route)
+  return deleteHelper(route, appState)
     .then(resp => (resp.ok ? resp : respFailure(resp, appState)))
     .then(() => {
       fetch();
@@ -411,4 +426,74 @@ export const importData = (route, data, fetch, appState) =>{
         }
         else appState.setImporting(false);
     });
+}
+export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, state) =>{
+  let appState = state;
+  let valid = data;
+  return postData(canRoute, {offers: data}, null, state,
+    ()=>{
+      return setBatchData(actionRoute, {offers: data}, appState,
+        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+    },
+    resp=>{
+      filterOffer(resp, data, msg, appState);
+      if(valid.length >0){
+        return setBatchData(actionRoute, {offers: data}, appState,
+          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+      }
+  });
+}
+export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, state) =>{
+  let appState = state;
+  let valid = data;
+  return postData(canRoute, {offers: data}, null, state,
+    ()=>{
+      return setBatchData(actionRoute, {ddahs: data}, appState,
+        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+    },
+    resp=>{
+      filterDdah(resp, data, msg, appState);
+      if(valid.length >0){
+        return setBatchData(actionRoute, {ddahs: data}, appState,
+          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra);
+      }
+  });
+}
+function setBatchData(route, data, appState, succ, fail, extra){
+  return (extra!=null)?
+    putData(route, mergeJson(data,extra), succ, appState):
+    postData(route, data, null, appState, succ, fail);
+}
+function filterOffer(res, validOffers, msg, appState){
+  let offersList = appState.getOffersList();
+  res.invalid_offers.forEach(offer => {
+      appState.alert(
+          '<b>Error</b>: Cannot '+msg.start+' ' +
+          offersList.getIn([offer.toString(), 'lastName']) +
+          ', ' +
+          offersList.getIn([offer.toString(), 'firstName']) +
+          ' for ' +
+          offersList.getIn([offer.toString(), 'course']) +
+          ' '+((!msg.end)?'':msg.end)
+      );
+      validOffers.splice(validOffers.indexOf(offer), 1);
+  });
+}
+function filterDdahs(res, validDdahs, msg, appState){
+  let ddahsList = appState.getDdahsList();
+  let offersList = appState.getOffersList();
+  res.invalid_offers.forEach(ddah => {
+      var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
+      appState.alert(
+          '<b>Error</b>: Cannot '+msg.start+' ' +
+              offersList.getIn([offer, 'lastName']) +
+              ', ' +
+              offersList.getIn([offer, 'firstName']) +
+              ' for ' +
+              offersList.getIn([offer, 'course']) +
+              ' '+((msg.end!=null)?'':msg.end)
+      );
+      // remove invalid ddah(s) from ddah list
+      validDdahs.splice(validDdahs.indexOf(ddah), 1);
+  });
 }

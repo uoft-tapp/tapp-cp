@@ -100,10 +100,14 @@ class AssignmentsController < ApplicationController
       if applicants.length != 0
         instructors = position.instructors
         if instructors.size > 0
-          position.instructors.each do |instructor|
-            TappMailer.assignment_email(position, instructor, applicants).deliver_now
+          begin
+            position.instructors.each do |instructor|
+                TappMailer.assignment_email(position, instructor, applicants).deliver_now
+            end
+            render status: 200, json: {message: "Assignment Email Sent."}
+          rescue Errno::ECONNREFUSED
+            render status: 404, json: {message: "Connection Refused."}
           end
-          render status: 200, json: {message: "Assignment Email Sent."}
         else
           render status: 404, json: {message: "Error: #{params[:position]} currently has no instructors."}
         end

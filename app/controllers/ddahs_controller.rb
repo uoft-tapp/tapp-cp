@@ -103,17 +103,21 @@ class DdahsController < ApplicationController
   end
 
   def send_ddahs
-    params[:ddahs].each do |id|
-      ddah = Ddah.find(id)
-      offer = Offer.find(ddah[:offer_id])
-      if ENV['RAILS_ENV'] != 'test'
-        link = "#{ENV["domain"]}#{offer[:link]}".sub!("pb", "pb/ddah")
-        CpMailer.ddah_email(ddah.format,link).deliver_now!
+    begin
+      params[:ddahs].each do |id|
+        ddah = Ddah.find(id)
+        offer = Offer.find(ddah[:offer_id])
+        if ENV['RAILS_ENV'] != 'test'
+          link = "#{ENV["domain"]}#{offer[:link]}".sub!("pb", "pb/ddah")
+          CpMailer.ddah_email(ddah.format,link).deliver_now!
+        end
+        offer.update_attributes!(ddah_status: "Pending")
+        ddah.update_attributes!(send_date: DateTime.now.to_s)
       end
-      offer.update_attributes!(ddah_status: "Pending")
-      ddah.update_attributes!(send_date: DateTime.now.to_s)
+      render status: 200, json: {message: "You've successfully sent out all the DDAH's."}
+    rescue Errno::ECONNREFUSED
+      render status: 404, json: {message: "Connection Refused."}
     end
-    render status: 200, json: {message: "You've successfully sent out all the DDAH's."}
   end
 
 
@@ -122,16 +126,20 @@ class DdahsController < ApplicationController
   end
 
   def send_nag_student
-    params[:ddahs].each do |id|
-      ddah = Ddah.find(id)
-      offer = Offer.find(ddah[:offer_id])
-      if ENV['RAILS_ENV'] != 'test'
-        link = "#{ENV["domain"]}#{offer[:link]}".sub!("pb", "pb/ddah")
-        CpMailer.ddah_nag_email(ddah.format, link).deliver_now!
+    begin
+      params[:ddahs].each do |id|
+        ddah = Ddah.find(id)
+        offer = Offer.find(ddah[:offer_id])
+        if ENV['RAILS_ENV'] != 'test'
+          link = "#{ENV["domain"]}#{offer[:link]}".sub!("pb", "pb/ddah")
+          CpMailer.ddah_nag_email(ddah.format, link).deliver_now!
+        end
+        ddah.increment!(:nag_count, 1)
       end
-      ddah.increment!(:nag_count, 1)
+      render json: {message: "You've sent the nag emails."}
+    rescue Errno::ECONNREFUSED
+      render status: 404, json: {message: "Connection Refused."}
     end
-    render json: {message: "You've sent the nag emails."}
   end
 
   '''

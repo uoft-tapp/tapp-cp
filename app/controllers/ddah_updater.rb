@@ -7,8 +7,6 @@ module DdahUpdater
     if params[:trainings]
       form.training_ids = params[:trainings]
     end
-    puts("params[:allocations]")
-    puts(params[:allocations])
     if params[:allocations]
       update_allocations(form, params[:allocations])
     end
@@ -56,22 +54,13 @@ module DdahUpdater
   end
 
   def delete_missing_allocations(form, allocations)
-    puts("allocations")
-    puts(allocations)
     allocation_ids = get_allocation_ids(allocations)
     deleted_allocations = get_deleted_allocations(form.allocation_ids, allocation_ids)
     deleted_allocations.each do |id|
-      puts("delete_missing_allocations:id")
-      puts(id)
       allocation = Allocation.find(id)
       allocation.destroy!
     end
-    puts("delete_missing_allocations")
-    p(allocation_ids)
-    p(form)
-    p(form.allocation_ids)
     form.allocation_ids = allocation_ids
-    puts("return from delete_missing_allocations")    
   end
 
   def get_allocation_ids(allocations)
@@ -81,8 +70,6 @@ module DdahUpdater
         entries.push(allocation[:id])
       end
     end
-    puts("entries")
-    puts(entries)
     return entries
   end
 

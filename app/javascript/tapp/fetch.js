@@ -46,7 +46,7 @@ const getInstructors = () => getResource(
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
-const postData = (route, data, fetch) => fetchProc.postData(route, data, fetch, appState);
+const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
 const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
 const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
 
@@ -67,7 +67,7 @@ export const postAssignment = (applicant, course, hours) => {
     postData('/applicants/' + applicant + '/assignments', {
         position_id: course,
         hours: hours,
-    }), () => {
+    }, () => {
       getAssignments();
     });
 }
@@ -167,24 +167,13 @@ export const fetchAuth = () => {
 }
 
 export const emailAssignments = (code, round, key) => {
-    postHelper('/email-assignments', {
+    postData('/email-assignments', {
         position: code,
         round_id: round,
-    }).then(resp => {
-      if (resp.ok) {
-        return resp.json()
-            .then(resp => (appState.stopEmailSpinner(key)));
-      }
-      else if (resp.status == 404) {
-          return resp.json()
-            .then(resp => {
-                appState.alert(resp.message);
-                appState.stopEmailSpinner(key);
-            });
-      }
-      else{
-          appState.stopEmailSpinner(key);
-          return respFailure(resp);
-      }
+    }, null,
+    resp => appState.stopEmailSpinner(key),
+    resp => {
+        appState.alert("<b>Error</b>: "+resp.message);
+        appState.stopEmailSpinner(key);
     });
 }
