@@ -51,6 +51,9 @@ const getTrainings = () => getResource('/trainings',
     fetchProc.onFetchTrainingsSuccess, 'trainings');
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
+const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
+const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
+const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
 
 /* Function to GET all resources */
 export const adminFetchAll = () =>  {
@@ -74,103 +77,22 @@ export const instructorFetchAll = () => {
 
 // import locked assignments from TAPP
 export const importAssignments = () => {
-    appState.setImporting(true);
-
-    postHelper('/import/locked-assignments', {})
-        .then(resp => {
-            // import succeeded
-            if (resp.ok) {
-                return resp.json().then(resp => {
-                    // import succeeded with errors
-                    if (resp.errors) {
-                        return resp.message.forEach(message => appState.alert(message));
-                    }
-                    return Promise.resolve();
-                });
-            }
-            // import failed with errors
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => resp.message.forEach(message => appState.alert(message)))
-                    .then(Promise.reject);
-            }
-            return respFailure(resp);
-        })
-        .then(
-            () => {
-                appState.setImporting(false, true);
-                getOffers();
-            },
-            () => appState.setImporting(false)
-        );
+    importData('/import/locked-assignments', {}, () => {
+        getOffers();
+    });
 }
-
 // send CHASS offers data
 export const importOffers= (data) => {
-    appState.setImporting(true);
-
-    postHelper('/import/offers', { chass_offers: data })
-        .then(resp => {
-            // import succeeded
-            if (resp.ok) {
-                return resp.json().then(resp => {
-                    // import succeeded with errors
-                    if (resp.errors) {
-                        return resp.message.forEach(message => appState.alert(message));
-                    }
-                    return Promise.resolve();
-                });
-            }
-            // import failed with errors
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => resp.message.forEach(message => appState.alert(message)))
-                    .then(Promise.reject);
-            }
-            return respFailure(resp);
-        })
-        .then(
-            () => {
-                appState.setImporting(false, true);
-                getOffers();
-            },
-            () => appState.setImporting(false)
-        );
+    importData('/import/offers', { chass_offers: data }, () => {
+        getOffers();
+    });
 }
-
 export const importDdahs = (data) => {
-    appState.setImporting(true);
-
-    postHelper('/import/ddahs', { ddah_data: data })
-        .then(resp => {
-            if (resp.ok) {
-                return resp.json().then(resp => {
-                    // import succeeded with errors
-                    if (resp.errors) {
-                        return resp.message.forEach(message => appState.alert(message));
-                    }
-                    return Promise.resolve();
-                });
-            }
-            // import failed with errors
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => resp.message.forEach(message => appState.alert(message)))
-                    .then(Promise.reject);
-            }
-            return respFailure(resp);
-        })
-        .then(
-            () => {
-                getOffers();
-                getDdahs();
-            }
-        ).then(() => appState.setImporting(false));
+    importData('/import/ddahs', { ddah_data: data }, () => {
+        getOffers();
+        getDdahs();
+    });
 }
-
 
 // send contracts
 export const sendContracts = (offers) => {
@@ -496,7 +418,7 @@ export const print=(offers)=>{
 
 // change session pay
 export const updateSessionPay = (session, pay) =>{
-    putHelper('/sessions/' + session, { pay: pay })
+    putData('/sessions/' + session, { pay: pay })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(
             () => {
@@ -508,11 +430,9 @@ export const updateSessionPay = (session, pay) =>{
 
 // add/update the note for a withdrawn offer
 export const noteOffer = (offer, note) => {
-    putHelper('/offers/' + offer, { commentary: note })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getOffers();
-        });
+    putData('/offers/' + offer, { commentary: note },() => {
+      getOffers();
+    });
 }
 
 // clear HR status
@@ -618,12 +538,9 @@ export const createTemplate = (name) => {
 // update an existing template
 export const updateTemplate = (id, ddahData) => {
     let user = appState.getCurrentUserName();
-
-    return patchHelper('/instructors/' + user + '/templates/' + id, ddahData)
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getTemplates(user);
-        });
+    putData('/instructors/' + user + '/templates/' + id, ddahData, () => {
+      getTemplates(user);
+    });
 }
 
 // create a new template using data from an existing ddah
@@ -664,12 +581,9 @@ export const createDdah = (offer) => {
 // update an existing ddah
 export const updateDdah = (id, ddahData) => {
     let user = appState.getCurrentUserName();
-
-    return patchHelper('/instructors/' + user + '/ddahs/' + id, ddahData)
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getDdahs(user);
-        });
+    putData('/instructors/' + user + '/ddahs/' + id, ddahData, () => {
+      getDdahs(user);
+    });
 }
 
 // submit an existing ddah for approval

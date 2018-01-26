@@ -45,6 +45,9 @@ const getInstructors = () => getResource(
 
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
+const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
+const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
+const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
 
 /* Function to GET all resources */
 
@@ -72,125 +75,69 @@ export const postAssignment = (applicant, course, hours) => {
 
 // remove an assignment
 export const deleteAssignment = (applicant, assignment) => {
-    deleteHelper('/applicants/' + applicant + '/assignments/' + assignment)
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getAssignments();
-        });
+    deleteData('/applicants/' + applicant + '/assignments/' + assignment, () => {
+      getAssignments();
+    });
 }
 
 // add/update the notes for an applicant
 export const noteApplicant = (applicant, notes) => {
-    putHelper('/applicants/' + applicant, { commentary: notes })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getApplicants();
-        });
+    putData('/applicants/' + applicant, { commentary: notes }, () => {
+      getApplicants();
+    });
 }
 
 // update the number of hours for an assignment
 export const updateAssignmentHours = (applicant, assignment, hours) => {
-    putHelper('/applicants/' + applicant + '/assignments/' + assignment, {
+    putData('/applicants/' + applicant + '/assignments/' + assignment, {
         hours: hours,
-    })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getAssignments();
-        });
+    }, () => {
+      getAssignments();
+    });
 }
 
 // update attribute(s) of a course
 export const updateCourse = (courseId, data) => {
-    putHelper('/positions/' + courseId, data)
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getCourses();
-        });
+    putData('/positions/' + courseId, data, () => {
+      getCourses();
+    });
 }
 
 // send CHASS data
 export const importChass = (data, year, semester) => {
-    appState.setImporting(true);
-
-    postHelper('/import/chass', {
+    importData('/import/chass', {
         chass_json: data,
         year: year,
         semester: semester,
-    })
-        .then(resp => {
-            // import succeeded
-            if (resp.ok) {
-                return resp.json().then(resp => {
-                    // import succeeded with errors
-                    if (resp.errors) {
-                        return resp.message.forEach(message => appState.alert(message));
-                    }
-                    return Promise.resolve();
-                });
-            }
-            // import failed with errors
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => resp.message.forEach(message => appState.alert(message)))
-                    .then(Promise.reject);
-            }
-            return respFailure(resp);
-        })
-        .then(
-            () => {
-                appState.setImporting(false, true);
-                fetchAll();
-            },
-            () => appState.setImporting(false)
-        );
+    },
+    ()=>{
+      fetchAll();
+    });
 }
 
 // send enrolment data
 export const importInstructors = (data) => {
-    appState.setImporting(true);
-
-    postHelper('/import/instructors', { instructor_data: data })
-        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
-        .then(
-            () => {
-                appState.setImporting(false, true);
-                getInstructors();
-            },
-            resp => {
-                appState.setImporting(false);
-                resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
-            }
-        );
+    importData('/import/instructors', { instructor_data: data },
+    () => {
+        getInstructors();
+    });
 }
 
 // send enrolment data
 export const importEnrolment = (data) => {
-    appState.setImporting(true);
-
-    postHelper('/import/enrolment', { enrolment_data: data })
-        .then(resp => (resp.ok ? resp : Promise.reject(resp)))
-        .then(
-            () => {
-                appState.setImporting(false, true);
-                getCourses();
-            },
-            resp => {
-                appState.setImporting(false);
-                resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
-            }
-        );
+    importData('/import/enrolment', { enrolment_data: data },
+    () => {
+        getCourses();
+    });
 }
 
 // unlock a single assignment
 export const unlockAssignment = (applicant, assignment) => {
-    putHelper('/applicants/' + applicant + '/assignments/' + assignment, {
+    putData('/applicants/' + applicant + '/assignments/' + assignment, {
         export_date: null,
-    })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-          getAssignments();
-        });
+    }, () => {
+      getAssignments();
+    });
 }
 
 // export offers from CHASS (locking the corresponding assignments)

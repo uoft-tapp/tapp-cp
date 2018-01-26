@@ -338,6 +338,26 @@ export const onFetchTrainingsSuccess = (resp)=>{
 /*
   common fetch helper functions
 */
+function routeData(func, route, data, fetch, appState){
+  return func(route, data)
+    .then(resp => (resp.ok ? resp : respFailure(resp, appState)))
+    .then(() => {
+      fetch();
+    });
+}
+export const putData = (route, data, fetch, appState) => {
+  return routeData(putHelper, route, data, fetch, appState);
+}
+export const posttData = (route, data, fetch, appState) => {
+  return routeData(postHelper, route, data, fetch, appState);
+}
+export const deleteData = (route, fetch, appState) =>{
+  return deleteHelper(route)
+    .then(resp => (resp.ok ? resp : respFailure(resp, appState)))
+    .then(() => {
+      fetch();
+    });
+}
 export const downloadFile = (route, appState) =>{
   let download = false;
   let filename = '';
@@ -365,4 +385,30 @@ export const downloadFile = (route, appState) =>{
       appState.alert(resp.message);
     }
   });
+}
+
+export const importData = (route, data, fetch, appState) =>{
+  appState.setImporting(true);
+  let imported = true;
+  return postHelper(route, data, appState)
+    .then(resp => {
+        if (resp.ok)
+            return resp.json();
+        else if (resp.status == 404) {
+            imported = false;
+            return resp.json();
+        }
+        else return respFailure(resp, appState);
+    })
+    .then(resp =>{
+        if(!imported || resp.errors)
+            resp.message.forEach(message => appState.alert(message));
+    })
+    .then(() => {
+        if(imported){
+            fetch();
+            appState.setImporting(false, true);
+        }
+        else appState.setImporting(false);
+    });
 }

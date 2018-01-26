@@ -3,9 +3,9 @@ class EnrolmentUpdater
     lines = data.split("\n")
     if is_valid(lines)
       parse_lines(lines)
-      @status = {updated: true, message: "Enrolment update success."}
+      @status = {success: true, errors: false}
     else
-      @status = {updated: false, message: "Error: This file is not formatted correctly."}
+      @status = {success: false, errors: true, message: ["Error: This file is not formatted correctly."]}
     end
   end
 

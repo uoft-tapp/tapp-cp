@@ -51,9 +51,9 @@ class DdahImporter
   private
   def get_status(type)
     if @exceptions.length > 0
-      return {success: true, errors: true, message: @exceptions}
+      return {success: false, errors: true, message: @exceptions}
     else
-      return {success: true, errors: false, message: ["#{type} import was successful."]}
+      return {success: true, errors: false}
     end
   end
 
