@@ -44,7 +44,7 @@ const getInstructors = () => getResource(
   '/instructors', fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList);
 
 
-/* Success callbacks for resource GETters */
+const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 
 /* Function to GET all resources */
 
@@ -195,34 +195,8 @@ export const unlockAssignment = (applicant, assignment) => {
 
 // export offers from CHASS (locking the corresponding assignments)
 export const exportOffers = (round) => {
-    let filename;
-    let exportPromise = getHelper('/export/chass/' + round).then(
-        resp => (resp.ok ? resp : respFailure)
-    );
-
-    exportPromise
-        .then(resp => {
-            // extract the filename from the response headers
-            filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
-            // parse the response body as a blob
-            return resp.blob();
-        })
-        // create a URL for the object body of the response
-        .then(blob => URL.createObjectURL(blob))
-        .then(url => {
-            // associate the download with an anchor tag
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            // trigger a click -> download
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-    exportPromise.then(() => {
-      getAssignments();
-
-    });
+    downloadFile('/export/chass/' + round)
+    .then(() => getAssignments());
 }
 
 // get current user role and username

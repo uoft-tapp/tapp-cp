@@ -687,7 +687,7 @@ class AppState {
     exportDdahs() {
         let course = this.getSelectedCourse();
         let selectedSession = this.getSelectedSession();
-        if (!course && selectedSession=='') {
+        if (course!=null && selectedSession=='') {
             this.alert(
                 '<b>Export ddah from all sessions</b> This functionality is not currently supported. Please select a course or a session.'
             );

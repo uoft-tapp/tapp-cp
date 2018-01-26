@@ -588,7 +588,7 @@ export const exportOffers = (session) => {
 }
 
 export const exportDdahs = (course, session) => {
-  course?
+  (course!='all')?
   downloadFile('/export/ddahs/' + course):
   downloadFile('/export/session-ddahs/'+ session);
 }

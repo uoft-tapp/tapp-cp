@@ -341,7 +341,7 @@ export const onFetchTrainingsSuccess = (resp)=>{
 export const downloadFile = (route, appState) =>{
   let download = false;
   let filename = '';
-  getHelper(route, appState)
+  return getHelper(route, appState)
   .then(resp=>{
     if(resp.ok){
       download = true;
