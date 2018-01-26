@@ -50,35 +50,7 @@ const getTemplates = user => getResource('/instructors/' + user + '/templates',
 const getTrainings = () => getResource('/trainings',
     fetchProc.onFetchTrainingsSuccess, 'trainings');
 
-const downloadFile = (route) =>{
-  let download = false;
-  let filename = '';
-  getHelper(route)
-  .then(resp=>{
-    if(resp.ok){
-      download = true;
-      filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
-      return resp.blob();
-    }
-    else{
-      return resp.json();
-    }
-  })
-  .then(resp => {
-    if(download){
-      let url = URL.createObjectURL(resp);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-    else{
-      appState.alert(resp.message);
-    }
-  });
-}
-
+const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 
 /* Function to GET all resources */
 export const adminFetchAll = () =>  {
@@ -612,18 +584,14 @@ export const resetOffer = (offer) => {
 
 // export all offers from the session to CSV
 export const exportOffers = (session) => {
-    window.open('/export/cp-offers/' + session);
+    downloadFile('/export/cp-offers/' + session);
 }
 
-function exportDdahs(course, session){
-    if(!course){
-      downloadFile('/export/session-ddahs/'+ session);
-    }
-    else{
-      downloadFile('/export/ddahs/' + course);
-    }
+export const exportDdahs = (course, session) => {
+  course?
+  downloadFile('/export/ddahs/' + course):
+  downloadFile('/export/session-ddahs/'+ session);
 }
-
 
 // create a new, empty template with this name
 export const createTemplate = (name) => {

@@ -1,21 +1,30 @@
-export const msgFailure = (text, appState) => {
-    appState.alert('<b>Action Failed:</b> ' + text);
-    return Promise.reject();
+/*
+  non-export functions
+*/
+function mergeJson(json1, json2){
+  let keys = Object.keys(json2);
+  for(let i =0; i < keys.length; i++)
+    json1[keys[i]] = json2[keys[i]];
+  return json1;
 }
-
-// parse a response into an error message
-export const respFailure = (resp, appState) => {
-    appState.alert('<b>Action Failed</b> ' + resp.url + ': ' + resp.statusText);
-    return Promise.reject();
-}
-
 function fetchHelper(URL, init, appState) {
     return fetch(URL, init).catch(function(error) {
         appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
         return Promise.reject(error);
     });
 }
-
+/*
+  fetch core functions
+*/
+export const msgFailure = (text, appState) => {
+    appState.alert('<b>Action Failed:</b> ' + text);
+    return Promise.reject();
+}
+export const respFailure = (resp, appState) => {
+  // parse a response into an error message
+    appState.alert('<b>Action Failed</b> ' + resp.url + ': ' + resp.statusText);
+    return Promise.reject();
+}
 export const getHelper = (URL, appState) => {
     return fetchHelper(URL, {
         headers: {
@@ -25,7 +34,6 @@ export const getHelper = (URL, appState) => {
         credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
     }, appState);
 }
-
 export const postHelper = (URL, body, appState) => {
     return fetchHelper(URL, {
         headers: {
@@ -37,14 +45,12 @@ export const postHelper = (URL, body, appState) => {
         credentials: 'include',
     }, appState);
 }
-
 export const deleteHelper = (URL, appState) => {
     return fetchHelper(URL, {
         method: 'DELETE',
         credentials: 'include',
     }, appState);
 }
-
 export const putHelper = (URL, body, appState) => {
     return fetchHelper(URL, {
         headers: {
@@ -55,10 +61,11 @@ export const putHelper = (URL, body, appState) => {
         credentials: 'include',
     }, appState);
 }
-
+/*
+  On Fetch Success functions
+*/
 export const onFetchApplicantsSuccess = (resp) => {
     let applicants = {};
-
     resp.forEach(app => {
         applicants[app.id] = {
             lastName: app.last_name,
@@ -96,14 +103,12 @@ export const onFetchApplicantsSuccess = (resp) => {
             fullTime: app.full_time == 'Y',
         };
     });
-
     return applicants;
 }
 
 export const onFetchApplicationsSuccess = (resp) => {
     let applications = {},
         newApp;
-
     resp.forEach(app => {
         newApp = {
             taTraining: app.ta_training == 'Y',
@@ -122,14 +127,12 @@ export const onFetchApplicationsSuccess = (resp) => {
             other: app.other_info,
             specialNeeds: app.special_needs,
         };
-
         if (applications[app.applicant_id]) {
             applications[app.applicant_id].push(newApp);
         } else {
             applications[app.applicant_id] = [newApp];
         }
     });
-
     return applications;
 }
 
@@ -185,19 +188,11 @@ function getCourse(course, tapp){
   return mergeJson(data, extra);
 }
 
-function mergeJson(json1, json2){
-  let keys = Object.keys(json2);
-  for(let i =0; i < keys.length; i++)
-    json1[keys[i]] = json2[keys[i]];
-  return json1;
-}
-
 export const onFetchAssignmentsSuccess = (resp) => {
     let assignments = {},
         assignmentCounts = {},
         count,
         newAss;
-
     resp.forEach(ass => {
         newAss = {
             id: ass.id,
@@ -205,43 +200,33 @@ export const onFetchAssignmentsSuccess = (resp) => {
             hours: ass.hours,
             locked: ass.export_date != null,
         };
-
         if (assignments[ass.applicant_id]) {
             assignments[ass.applicant_id].push(newAss);
         } else {
             assignments[ass.applicant_id] = [newAss];
         }
     });
-
     return assignments;
 }
 
 export const onFetchInstructorsSuccess = (resp) => {
     let instructors = {};
-
     resp.forEach(instr => {
         instructors[instr.id] = instr.name;
     });
-
     return instructors;
 }
 
-
-
-
 export const onFetchCategoriesSuccess = (resp)=>{
     let categories = {};
-
     resp.forEach(category => {
         categories[category.id] = category.name;
     });
-
     return categories;
 }
 
 export const onFetchDdahsSuccess = (resp) => {
     let ddahs = {};
-
     resp.forEach(ddah => {
         ddahs[ddah.id] = {
             offer: ddah.offer_id,
@@ -270,23 +255,19 @@ export const onFetchDdahsSuccess = (resp) => {
             link: ddah.link,
         };
     });
-
     return ddahs;
 }
 
 export const onFetchDutiesSuccess = (resp)=>{
     let duties = {};
-
     resp.forEach(duty => {
         duties[duty.id] = duty.name;
     });
-
     return duties;
 }
 
 export const onFetchOffersSuccess = (resp) => {
     let offers = {};
-
     resp.forEach(offer => {
         offers[offer.id] = {
             applicantId: offer.applicant_id,
@@ -312,13 +293,11 @@ export const onFetchOffersSuccess = (resp) => {
             ddahSendDate: offer.ddah_send_date,
         };
     });
-
     return offers;
 }
 
 export const onFetchSessionsSuccess = (resp)=>{
     let sessions = {};
-
     resp.forEach(session => {
         sessions[session.id] = {
             year: session.year,
@@ -326,13 +305,11 @@ export const onFetchSessionsSuccess = (resp)=>{
             pay: session.pay,
         };
     });
-
     return sessions;
 }
 
 export const onFetchTemplatesSuccess = (resp)=> {
     let templates = {};
-
     resp.forEach(template => {
         templates[template.id] = {
             name: template.name,
@@ -349,16 +326,43 @@ export const onFetchTemplatesSuccess = (resp)=> {
             categories: template.trainings,
         };
     });
-
     return templates;
 }
-
 export const onFetchTrainingsSuccess = (resp)=>{
     let trainings = {};
-
     resp.forEach(training => {
         trainings[training.id] = training.name;
     });
-
     return trainings;
+}
+/*
+  common fetch helper functions
+*/
+export const downloadFile = (route, appState) =>{
+  let download = false;
+  let filename = '';
+  getHelper(route, appState)
+  .then(resp=>{
+    if(resp.ok){
+      download = true;
+      filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
+      return resp.blob();
+    }
+    else{
+      return resp.json();
+    }
+  })
+  .then(resp => {
+    if(download){
+      let url = URL.createObjectURL(resp);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    else{
+      appState.alert(resp.message);
+    }
+  });
 }
