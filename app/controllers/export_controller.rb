@@ -5,7 +5,7 @@ class ExportController < ApplicationController
   before_action only: [:cp_offers] do
     cp_admin(true)
   end
-  before_action :cp_admin, only: [:ddahs]
+  before_action :cp_admin, only: [:ddahs, :session_ddahs]
 
   def chass
     exporter = ChassExporter.new
@@ -43,6 +43,27 @@ class ExportController < ApplicationController
     render_helper(response)
   end
 
+  def session_ddahs
+    session = Session.find(params[:session_id])
+    if session
+      filename="#{session[:semester]}_#{session[:year]}_DDAH.zip"
+      files = get_session_ddah_files(session)
+      if files.size > 0
+        binary = Zip::OutputStream.write_buffer do |zio|
+          files.each do |file|
+            zio.put_next_entry(file[:filename])
+            zio.write file[:data]
+          end
+        end
+        send_data binary.string, filename: filename, content_type: 'application/zip'
+      else
+        render status: 404, json: {message: "Error: None of the courses in this session has any offers."}
+      end
+    else
+      render status: 404, json: {message: "Error: Invalid Session"}
+    end
+  end
+
   private
   def render_helper(response)
     if response[:generated]
@@ -53,6 +74,33 @@ class ExportController < ApplicationController
         message: response[:msg]
       }.to_json
     end
+  end
+
+  def get_session_ddah_files(session)
+    generator = CSVGenerator.new
+    positions = get_all_position_in_session(session)
+    files = []
+    positions.each do |position|
+      response = generator.generate_ddahs(position[:id])
+      if response[:generated]
+        files.push({
+          filename: response[:file].gsub('/','-'),
+          data: response[:data],
+        })
+      end
+    end
+    puts files
+    return files
+  end
+
+  def get_all_position_in_session(session)
+    positions =[]
+    Position.all.each do |position|
+      if position[:session_id]==session[:id]
+        positions.push(position)
+      end
+    end
+    return positions
   end
 
 end

@@ -686,14 +686,14 @@ class AppState {
     // export offers to CSV
     exportDdahs() {
         let course = this.getSelectedCourse();
-        if (!course) {
+        let selectedSession = this.getSelectedSession();
+        if (!course && selectedSession=='') {
             this.alert(
-                '<b>Export offers from all sessions</b> This functionality is not currently supported. Please select a course.'
+                '<b>Export ddah from all sessions</b> This functionality is not currently supported. Please select a course or a session.'
             );
             return;
         }
-
-        fetch.exportDdahs(course);
+        fetch.exportDdahs(course, selectedSession);
     }
 
     fetchAll() {
@@ -756,17 +756,34 @@ class AppState {
     getSessionCourse(){
         let session = this.getSelectedSession();
         let courses = this.getCoursesList();
+        let selected = [];
         if (session == ''){
-          return courses;
+          courses.forEach((course, key)=>{
+            selected.push({
+              id: key,
+              code: course.get('code'),
+            });
+          });
         }
         else{
-          let selected = [];
-          courses.forEach(function(course){
+          courses.forEach((course, key)=>{
             if (course.get("session")==session)
-                selected.push(course);
+              selected.push({
+                id: key,
+                code: course.get('code'),
+              });
           });
-          return selected;
         }
+        selected.sort((a, b)=>this.compareString(a, b, 'code'));
+        return selected;
+    }
+
+    compareString(a, b, attr){
+      a = a[attr];
+      b = b[attr];
+      if (a < b) return -1;
+      if (a > b) return 1;
+      return 0;
     }
 
     getDdahsList() {

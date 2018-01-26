@@ -77,6 +77,7 @@ Rails.application.routes.draw do
   post "/import/ddahs", to: "import#ddahs"
   post "/import/templates", to: "import#templates"
   get "/export/ddahs/:position_id", to: "export#ddahs"
+  get "/export/session-ddahs/:session_id", to: "export#session_ddahs"
 
   post "/ddahs/preview" => "ddahs#preview"
   post "/ddahs/can-preview" => "ddahs#can_preview"
