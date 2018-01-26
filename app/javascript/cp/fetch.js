@@ -276,7 +276,7 @@ export const exportDdahs = (course, session) => {
 export const createTemplate = (name) => {
   let user = appState.getCurrentUserName();
   let fetch = true;
-  postData('/instructors/' + user + '/templates', { name: name },() => {
+  return postData('/instructors/' + user + '/templates', { name: name },() => {
       if(fetcht) getTemplates(user);
     }, null,
     resp => {
@@ -289,7 +289,7 @@ export const createTemplate = (name) => {
 // update an existing template
 export const updateTemplate = (id, ddahData) => {
     let user = appState.getCurrentUserName();
-    putData('/instructors/' + user + '/templates/' + id, ddahData, () => {
+    return putData('/instructors/' + user + '/templates/' + id, ddahData, () => {
       getTemplates(user);
     });
 }
@@ -308,7 +308,7 @@ export const createDdah = (offer) => {
     let fetch = true;
     // although the template and ddah models have a relationship in the database, they do not have a
     // relationship in the front-end, and so we do not 'use a template' in this way to create a ddah
-    postData('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer },()=> {
+    return postData('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer },()=> {
       if(fetch) getDdahs(user);
     },null,
     res => {
@@ -320,7 +320,7 @@ export const createDdah = (offer) => {
 // update an existing ddah
 export const updateDdah = (id, ddahData) => {
     let user = appState.getCurrentUserName();
-    putData('/instructors/' + user + '/ddahs/' + id, ddahData, () => {
+    return putData('/instructors/' + user + '/ddahs/' + id, ddahData, () => {
       getDdahs(user);
     });
 }
