@@ -99,7 +99,7 @@ class DdahsController < ApplicationController
     Send Mails (admin)
   '''
   def can_send_ddahs
-    check_ddah_status(params[:ddahs], ["Approved"])
+    check_ddah_status(params[:ddahs], ["Approved", "Pending"])
   end
 
   def send_ddahs

@@ -348,21 +348,26 @@ export const putData = (route, data, fetch, appState) => {
 export const postData = (route, data, fetch, appState, okay = null, error = null) => {
   return postHelper(route, data, appState)
     .then(resp => {
-      if(resp.okay){
-        return (okay!=null)?
-          resp.json().then(res=>okay(res)):
-          resp;
+      if(resp.ok){
+        if(resp.status == 204){
+          return (okay)?okay():resp;
+        }
+        else{
+          return (okay)?
+            resp.json().then(res=>okay(res)):resp;
+        }
       }
       else if(resp.status == 404){
-        return (error!=null)?
+        return (error)?
           resp.json().then(res=>error(res)):
           respFailure(resp, appState);
       }
-      else if(resp.status ==204) okay();
-      else return respFailure(resp, appState);
+      else {
+        return respFailure(resp, appState);
+      }
     })
     .then(() => {
-      if (fetch!=null)
+      if (fetch)
         return fetch();
     });
 }
@@ -427,29 +432,6 @@ export const importData = (route, data, fetch, appState) =>{
         else appState.setImporting(false);
     });
 }
-export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
-  return batchAction(true, canRoute, actionRoute, data, msg, fetch, extra, put, state);
-}
-export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
-  return batchAction(false, canRoute, actionRoute, data, msg, fetch, extra, put, state);
-}
-function batchAction(offer, canRoute, actionRoute, data, msg, fetch, extra, put, state){
-  let appState = state;
-  let valid = data;
-  return postData(canRoute, {offers: data}, null, state,
-    ()=>{
-      data = getActionData(offer, null, data, msg, appState);
-      return setBatchData(actionRoute, data, appState,
-        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
-    },
-    resp=>{
-      data = getActionData(offer, resp, data, msg, appState);
-      if(valid.length >0){
-        return setBatchData(actionRoute, data, appState,
-          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
-      }
-  });
-}
 export const setRole = (roles, cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
@@ -466,6 +448,33 @@ export const setRole = (roles, cp, appState)=>{
           }
           if(cp) appState.setTaCoordinator(resp.ta_coord);
     });
+}
+export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
+  return batchAction(true, canRoute, actionRoute, toInt(data), msg, fetch, extra, put, state);
+}
+export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
+  return batchAction(false, canRoute, actionRoute, toInt(data), msg, fetch, extra, put, state);
+}
+function toInt(data){
+  return data.map((item)=>parseInt(item));
+}
+function batchAction(offer, canRoute, actionRoute, data, msg, fetch, extra, put, state){
+  let appState = state;
+  let valid = data;
+  let postedData = offer?{offers: data}:{ddahs: data};
+  return postData(canRoute, postedData, null, state,
+    ()=>{
+      data = getActionData(offer, null, data, msg, appState);
+      return setBatchData(actionRoute, data, appState,
+        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
+    },
+    resp=>{
+      data = getActionData(offer, resp, data, msg, appState);
+      if(valid.length >0){
+        return setBatchData(actionRoute, data, appState,
+          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
+      }
+  });
 }
 function getActionData(offer, resp, data, msg, appState){
   if(offer){
@@ -496,12 +505,12 @@ function filterOffer(res, validOffers, msg, appState){
           offersList.getIn([offer.toString(), 'firstName']) +
           ' for ' +
           offersList.getIn([offer.toString(), 'course']) +
-          ' '+((!msg.end)?'':msg.end)
+          ' '+(!msg.end?'':msg.end)
       );
       validOffers.splice(validOffers.indexOf(offer), 1);
   });
 }
-function filterDdahs(res, validDdahs, msg, appState){
+function filterDdah(res, validDdahs, msg, appState){
   let ddahsList = appState.getDdahsList();
   let offersList = appState.getOffersList();
   res.invalid_offers.forEach(ddah => {
@@ -513,7 +522,7 @@ function filterDdahs(res, validDdahs, msg, appState){
               offersList.getIn([offer, 'firstName']) +
               ' for ' +
               offersList.getIn([offer, 'course']) +
-              ' '+((msg.end!=null)?'':msg.end)
+              ' '+((!msg.end)?'':msg.end)
       );
       // remove invalid ddah(s) from ddah list
       validDdahs.splice(validDdahs.indexOf(ddah), 1);

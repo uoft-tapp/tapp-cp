@@ -105,6 +105,7 @@ export const importDdahs = (data) => {
 export const sendContracts = (offers) => {
   batchOfferAction('/offers/can-send-contract','/offers/send-contracts',
      offers, {start:'send contract to'}, () => {
+      console.log('hello');
       getOffers();
   });
 }
@@ -367,6 +368,7 @@ export const sendDdahs = (ddahs) => {
   batchDdahAction('/ddahs/can-send-ddahs', '/ddahs/send-ddahs',
     ddahs, {start: 'send DDAH form to'}, ()=>{
       getDdahs();
+      getOffers();
   });
 }
 
