@@ -15,7 +15,7 @@ class PositionsController < ApplicationController
       end
     else
       if params[:utorid]
-        render json: get_all_positions_for_utorid(params[:utorid], null)
+        render json: get_all_positions_for_utorid(params[:utorid])
       else
         positions = Position.all.includes(:instructors)
         render json: positions.to_json(include: [:instructors])
@@ -81,9 +81,9 @@ class PositionsController < ApplicationController
     return positions
   end
 
-  def get_all_positions_for_utorid(utorid, session)
+  def get_all_positions_for_utorid(utorid, session = nil)
     positions = []
-    all_positions = (sessions) ? positions_for_session(session) : Position.includes(:instructors).all
+    all_positions = (session) ? positions_for_session(session) : Position.includes(:instructors).all
     all_positions.each do |position|
       position.instructors.each do |instructor|
         if instructor[:utorid] == utorid

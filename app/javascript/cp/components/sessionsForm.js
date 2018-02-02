@@ -2,69 +2,36 @@ import React from 'react';
 import { Panel, Form, FormGroup, ControlLabel, InputGroup, FormControl } from 'react-bootstrap';
 
 class SessionsForm extends React.Component {
+    changePay(event){
+      this.pay.value=event.target.value;
+    }
     render() {
+        let sessions = this.props.appState.getSessionsList();
+        let session = this.props.appState.getSelectedSession();
+        let pay = sessions.get(session).get('pay');
+        pay = pay?pay:'';
         return (
             <Panel className="sessions">
-                <Form
-                    inline
+                <Form inline
                     onSubmit={event => {
                         event.preventDefault();
-                        if (
-                            this.pay.value !=
-                            this.props.appState.getSessionsList().getIn([this.session.value, 'pay'])
-                        ) {
-                            this.props.appState.updateSessionPay(
-                                this.session.value,
-                                this.pay.value
-                            );
+                        if (this.pay.value != pay) {
+                            this.props.appState.updateSessionPay(session, this.pay.value);
                         }
                     }}>
-                    <FormGroup>
-                        <ControlLabel>Session:</ControlLabel>&ensp;
-                        <FormControl
-                            id="session"
-                            componentClass="select"
-                            inputRef={ref => {
-                                this.session = ref;
-                            }}
-                            onChange={event => {
-                                this.props.appState.selectSession(event.target.value);
-                                let pay = this.props.appState
-                                    .getSessionsList()
-                                    .getIn([event.target.value, 'pay']);
-                                this.pay.value = pay != undefined ? pay : '';
-                            }}>
-                            {this.props.appState.getSessionsList().map((session, sessionId) =>
-                                <option value={sessionId}
-                                  selected={this.props.appState.getSelectedSession()==sessionId?'true':'false'}>
-                                    {session.get('semester')}&nbsp;{session.get('year')}
-                                </option>
-                            )}
-                        </FormControl>
-                    </FormGroup>
                     <FormGroup id="pay">
-                        <ControlLabel>Pay:</ControlLabel>&ensp;
+                        <ControlLabel>Session Pay:</ControlLabel>&ensp;
                         <InputGroup>
                             <InputGroup.Addon>$</InputGroup.Addon>
                             <FormControl
                                 type="number"
                                 min="0.00"
                                 step="0.01"
-                                disabled={this.props.appState.getSelectedSession() == ''}
-                                inputRef={ref => {
-                                    this.pay = ref;
-                                }}
+                                value={pay}
+                                onChange={event=>this.changePay(event)}
                                 onBlur={event => {
-                                    if (
-                                        event.target.value !=
-                                        this.props.appState
-                                            .getSessionsList()
-                                            .getIn([this.session.value, 'pay'])
-                                    ) {
-                                        this.props.appState.updateSessionPay(
-                                            this.session.value,
-                                            event.target.value
-                                        );
+                                    if (event.target.value != pay) {
+                                        this.props.appState.updateSessionPay(session, event.target.value);
                                     }
                                 }}
                             />

@@ -383,8 +383,26 @@ class AppState {
         this.set('nav.selectedTab', eventKey);
     }
 
-    selectSession(session) {
-        this.set('selectedSession', session);
+    selectSession(id) {
+        this.set('selectedSession', id);
+        let role = appState.getSelectedUserRole();
+        switch(role){
+          case 'cp_admin':
+          case 'hr_assistant':
+            fetch.adminFetchAll();
+            break;
+          case 'instructor':
+            fetch.instructorFetchAll();
+            break;
+        }
+    }
+
+    getSessionName(id){
+        let sessions = this.getSessionsList();
+        let selected = sessions.get(id);
+        if(selected)
+            return selected.get('semester')+' '+selected.get('year');
+        else return null;
     }
 
     selectCourse(course) {
@@ -687,12 +705,6 @@ class AppState {
     exportDdahs() {
         let course = this.getSelectedCourse();
         let selectedSession = this.getSelectedSession();
-        if (course!=null && selectedSession=='') {
-            this.alert(
-                '<b>Export ddah from all sessions</b> This functionality is not currently supported. Please select a course or a session.'
-            );
-            return;
-        }
         fetch.exportDdahs(course, selectedSession);
     }
 

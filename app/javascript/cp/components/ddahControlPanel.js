@@ -213,7 +213,6 @@ class DdahControlPanel extends React.Component {
             <Grid fluid id="ddahs-grid" style={cursorStyle}>
                 <ButtonToolbar id="dropdown-menu">
                     <ImportButton {...this.props}/>
-                    <SessionsDropdown {...this.props} />
                     <ExportForm {...this.props} />
 
                     <DdahsMenu {...this.props} />
@@ -237,15 +236,7 @@ class DdahControlPanel extends React.Component {
 
                 <Table
                     config={this.config}
-                    getOffers={() => {
-                        let session = this.props.appState.getSelectedSession();
-                        if (session != '') {
-                            return this.props.appState
-                                .getOffersList()
-                                .filter(offer => offer.get('session') == session);
-                        }
-                        return this.props.appState.getOffersList();
-                    }}
+                    getOffers={() => this.props.appState.getOffersList()}
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
                 />
@@ -254,28 +245,6 @@ class DdahControlPanel extends React.Component {
     }
 }
 
-
-// session selector
-const SessionsDropdown = props =>
-    <Form inline id="sessions">
-        <FormGroup>
-            <ControlLabel>Session:</ControlLabel>&ensp;
-            <FormControl
-                id="session"
-                componentClass="select"
-                onChange={event => {
-                    props.appState.selectSession(event.target.value);
-                    props.appState.getSessionCourse();
-                }}>
-                {props.appState.getSessionsList().map((session, sessionId) =>
-                    <option value={sessionId}
-                      selected={props.appState.getSelectedSession()==sessionId?'true':'false'}>
-                        {session.get('semester')}&nbsp;{session.get('year')}
-                    </option>
-                )}
-            </FormControl>
-        </FormGroup>
-    </Form>;
 
 const DdahsMenu = props =>
     <DropdownButton bsStyle="primary" title="Update DDAH forms" id="ddahs-dropdown">
@@ -305,18 +274,12 @@ const ExportForm = props =>
                     let value = select.options[select.selectedIndex].value;
                     props.appState.selectCourse(value);
                 }}>
-                {
-                  (props.appState.getSelectedSession()=='')?
-                  <option value='' key='course-all'>
-                    Choose a course
-                  </option>:
-                  <option value='all' key='session-all'>
-                    All in Current Session
-                  </option>
-                }
-                {props.appState.getSessionCourse().map((course, key) =>
-                    <option value={course['id']} key={key}>
-                        {course['code']}
+                <option value='all' key='session-all' defaultValue>
+                  All in Current Session
+                </option>
+                {props.appState.getCoursesList().map((_, course) =>
+                    <option value={course} key={course}>
+                        {props.appState.getCoursesList().get(course).get('code')}
                     </option>
                 )}
             </FormControl>
