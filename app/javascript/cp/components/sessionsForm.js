@@ -34,11 +34,9 @@ class SessionsForm extends React.Component {
                                     .getIn([event.target.value, 'pay']);
                                 this.pay.value = pay != undefined ? pay : '';
                             }}>
-                            <option value="" key="session-all">
-                                all
-                            </option>
                             {this.props.appState.getSessionsList().map((session, sessionId) =>
-                                <option value={sessionId}>
+                                <option value={sessionId}
+                                  selected={this.props.appState.getSelectedSession()==sessionId?'true':'false'}>
                                     {session.get('semester')}&nbsp;{session.get('year')}
                                 </option>
                             )}

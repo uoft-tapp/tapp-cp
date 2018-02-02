@@ -1135,6 +1135,21 @@ class AppState {
         this.set('sessions.list', list);
     }
 
+    getLatestSession(){
+      let keys = Object.keys(this.getSessionsList());
+      let latest = null;
+      keys.forEach(key=>{
+        key = parseInt(key);
+        if(!latest|| key>latest)
+          latest = key;
+      });
+      return latest;
+    }
+
+    setLatestSession(){
+      this.set('selectedSession', this.getLatestSession());
+    }
+
     setTemplatesList(list) {
         this.set('templates.list', list);
     }

@@ -10,35 +10,35 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName) =>
-    fetchProc.getResource(route, onSuccess, dataName, null, appState);
+const getResource = (route, onSuccess, dataName, session) =>
+    fetchProc.getResource(route, onSuccess, dataName, null, session, appState);
+
+const getSessions = () => getResource('/sessions',
+    fetchProc.onFetchSessionsSuccess, 'sessions', false);
 
 const getCategories = () => getResource('/categories',
-    fetchProc.onFetchCategoriesSuccess, 'categories');
+    fetchProc.onFetchCategoriesSuccess, 'categories', true);
 
 const getCourses = (user = null) => getResource(
     ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
-    fetchProc.onFetchCpCoursesSuccess, 'courses');
+    fetchProc.onFetchCpCoursesSuccess, 'courses', true);
 
 const getDdahs = user => getResource(
     user ? '/instructors/' + user + '/ddahs' : '/ddahs',
-    fetchProc.onFetchDdahsSuccess, 'ddahs');
+    fetchProc.onFetchDdahsSuccess, 'ddahs', true);
 
 const getDuties = () => getResource('/duties',
-    fetchProc.onFetchDutiesSuccess, 'duties');
+    fetchProc.onFetchDutiesSuccess, 'duties', true);
 
 const getOffers = user => getResource(
     user ? '/instructors/' + user + '/offers' : '/offers',
-    fetchProc.onFetchOffersSuccess, 'offers');
-
-const getSessions = () => getResource('/sessions',
-    fetchProc.onFetchSessionsSuccess, 'sessions');
+    fetchProc.onFetchOffersSuccess, 'offers', true);
 
 const getTemplates = user => getResource('/instructors/' + user + '/templates',
-    fetchProc.onFetchTemplatesSuccess, 'templates');
+    fetchProc.onFetchTemplatesSuccess, 'templates', true);
 
 const getTrainings = () => getResource('/trainings',
-    fetchProc.onFetchTrainingsSuccess, 'trainings');
+    fetchProc.onFetchTrainingsSuccess, 'trainings', true);
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
@@ -54,22 +54,30 @@ const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, 
 
 /* Function to GET all resources */
 export const adminFetchAll = () =>  {
-    getDdahs();
-    getOffers();
-    getSessions();
-    getCourses();
+    getSessions().then(()=>{
+      let session = appState.getLatestSession();
+      if(!session)
+        appState.setLatestSession();
+      getDdahs();
+      getOffers();
+      getCourses();
+    });
 }
 
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
-    getSessions();
-    getCategories();
-    getCourses(user);
-    getDdahs(user);
-    getDuties();
-    getOffers(user);
-    getTemplates();
-    getTrainings();
+    getSessions().then(()=>{
+      let session = appState.getLatestSession();
+      if(!session)
+        appState.setLatestSession();
+      getCategories();
+      getCourses(user);
+      getDdahs(user);
+      getDuties();
+      getOffers(user);
+      getTemplates();
+      getTrainings();
+    });
 }
 
 // import locked assignments from TAPP
