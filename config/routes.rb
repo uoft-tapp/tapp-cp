@@ -14,7 +14,6 @@ Rails.application.routes.draw do
     resources :applications, only: [:index]
     resources :assignments, only: [:index]
     resources :positions, only: [:index]
-    resources :instructors, only: [:index]
     resources :offers, only: [:index]
     resources :ddahs, only: [:index]
   end

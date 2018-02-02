@@ -8,8 +8,11 @@ class ApplicantsController < ApplicationController
     /applicants/
 '''
   def index
-    @applicants = Applicant.all
-    render json: @applicants.to_json
+    if params[:session_id]
+      render json: get_applicants_from_session(params[:session_id])
+    else
+      render json: Applicant.all
+    end
   end
 
 '''
@@ -38,5 +41,35 @@ class ApplicantsController < ApplicationController
   def applicant_params
     params.permit(:commentary)
   end
+
+  def pref_is_from_session(preferences, session)
+    preferences.each do |pref|
+      position = Position.find(pref[:position_id])
+      if position[:session_id] == session.to_i
+        return true
+      end
+    end
+    return false
+  end
+
+  def applications_is_from_session(applications, session)
+    applications.each do |application|
+      if pref_is_from_session(application.preferences, session)
+        return true
+      end
+    end
+    return false
+  end
+
+  def get_applicants_from_session(session)
+    applicants = []
+    Applicant.all.each do |applicant|
+      if applications_is_from_session(applicant.applications, session)
+        applicants.push(applicant)
+      end
+    end
+    return applicants
+  end
+
 
 end
