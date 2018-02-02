@@ -1,18 +1,4 @@
-/*
-  non-export functions
-*/
-function mergeJson(json1, json2){
-  let keys = Object.keys(json2);
-  for(let i =0; i < keys.length; i++)
-    json1[keys[i]] = json2[keys[i]];
-  return json1;
-}
-function fetchHelper(URL, init, appState) {
-    return fetch(URL, init).catch(function(error) {
-        appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
-        return Promise.reject(error);
-    });
-}
+import { fromJS } from 'immutable';
 /*
   fetch core functions
 */
@@ -61,6 +47,16 @@ export const putHelper = (URL, body, appState) => {
         credentials: 'include',
     }, appState);
 }
+export const getResource = (route, onSuccess, dataName, setData, appState) =>
+  getHelper(route)
+      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+      .then(onSuccess)
+      .then(data => {
+          setData? setData(data): appState.set(dataName+'.list', fromJS(data));
+          appState.setFetchingDataList(dataName, false, true);
+      })
+      .catch(() => appState.setFetchingDataList(dataName, false));
+
 /*
   On Fetch Success functions
 */
@@ -450,13 +446,30 @@ export const setRole = (roles, cp, appState)=>{
     });
 }
 export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
-  return batchAction(true, canRoute, actionRoute, toInt(data), msg, fetch, extra, put, state);
+  data = toInt(data);
+  return batchAction(true, canRoute, actionRoute, data, msg, fetch, extra, put, state);
 }
 export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
-  return batchAction(false, canRoute, actionRoute, toInt(data), msg, fetch, extra, put, state);
+  data = toInt(data);
+  return batchAction(false, canRoute, actionRoute, data, msg, fetch, extra, put, state);
 }
+/*
+  non-export functions
+*/
 function toInt(data){
   return data.map((item)=>parseInt(item));
+}
+function mergeJson(json1, json2){
+  let keys = Object.keys(json2);
+  for(let i =0; i < keys.length; i++)
+    json1[keys[i]] = json2[keys[i]];
+  return json1;
+}
+function fetchHelper(URL, init, appState) {
+    return fetch(URL, init).catch(function(error) {
+        appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
+        return Promise.reject(error);
+    });
 }
 function batchAction(offer, canRoute, actionRoute, data, msg, fetch, extra, put, state){
   let appState = state;
@@ -524,7 +537,6 @@ function filterDdah(res, validDdahs, msg, appState){
               offersList.getIn([offer, 'course']) +
               ' '+((!msg.end)?'':msg.end)
       );
-      // remove invalid ddah(s) from ddah list
       validDdahs.splice(validDdahs.indexOf(ddah), 1);
   });
 }

@@ -11,20 +11,10 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
+const getResource = (route, onSuccess, dataName, setData) =>
+  fetchProc.getResource(route, onSuccess, dataName, setData, appState);
 
 /* Resource GETters */
-
-const getResource = (route, onSuccess, dataName, setData) =>
-  getHelper(route)
-      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-      .then(onSuccess)
-      .then(data => {
-          setData(data);
-          appState.setFetchingDataList(dataName, false, true);
-      })
-      .catch(() => appState.setFetchingDataList(dataName, false));
-
-
 const getSessions = () => getResource(
   '/sessions', fetchProc.onFetchSessionsSuccess, 'sessions', appState.setSessionsList);
 

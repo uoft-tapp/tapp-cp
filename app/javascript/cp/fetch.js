@@ -1,5 +1,4 @@
 import React from 'react';
-import { fromJS } from 'immutable';
 import { appState } from './appState.js';
 import * as fetchProc from '../fetchProc.js';
 
@@ -11,17 +10,8 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-
-/* Resource GETters */
 const getResource = (route, onSuccess, dataName) =>
-  getHelper(route)
-      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-      .then(onSuccess)
-      .then(data => {
-          appState.set(dataName+'.list', fromJS(data));
-          appState.setFetchingDataList(dataName, false, true);
-      })
-      .catch(() => appState.setFetchingDataList(dataName, false));
+    fetchProc.getResource(route, onSuccess, dataName, null, appState);
 
 const getCategories = () => getResource('/categories',
     fetchProc.onFetchCategoriesSuccess, 'categories');
