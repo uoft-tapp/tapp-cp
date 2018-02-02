@@ -6,11 +6,20 @@ class PositionsController < ApplicationController
   before_action :either_admin_instructor, only: [:index, :show]
 
   def index
-    if params[:utorid]
-      render json: get_all_positions_for_utorid(params[:utorid])
+    if params[:session_id]
+      if params[:utorid]
+        render json: get_all_positions_for_utorid(params[:utorid], params[:session_id])
+      else
+        positions = positions_for_session(params[:session_id])
+        render json: positions.to_json(include: [:instructors])
+      end
     else
-      positions = Position.all.includes(:instructors)
-      render json: positions.to_json(include: [:instructors])
+      if params[:utorid]
+        render json: get_all_positions_for_utorid(params[:utorid], null)
+      else
+        positions = Position.all.includes(:instructors)
+        render json: positions.to_json(include: [:instructors])
+      end
     end
   end
 
@@ -62,9 +71,20 @@ class PositionsController < ApplicationController
     return utorids
   end
 
-  def get_all_positions_for_utorid(utorid)
+  def positions_for_session(session)
     positions = []
-    Position.all.each do |position|
+    Position.includes(:instructors).all.each do |position|
+      if position[:session_id] == session.to_i
+        positions.push(position)
+      end
+    end
+    return positions
+  end
+
+  def get_all_positions_for_utorid(utorid, session)
+    positions = []
+    all_positions = (sessions) ? positions_for_session(session) : Position.includes(:instructors).all
+    all_positions.each do |position|
       position.instructors.each do |instructor|
         if instructor[:utorid] == utorid
           positions.push(position.format)

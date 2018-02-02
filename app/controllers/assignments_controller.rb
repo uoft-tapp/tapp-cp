@@ -15,6 +15,8 @@ class AssignmentsController < ApplicationController
         Applicant.find(params[:applicant_id]).assignments
       elsif params[:position_id].present?
         Position.find(params[:position_id]).assignments
+      elsif params[:session_id].present?
+        get_assignments_from_session(params[:session_id])
       else
         Assignment.all
       end
@@ -145,6 +147,17 @@ class AssignmentsController < ApplicationController
         end
       end
       return applicants.sort_by { |item| item[:last_name] }
+    end
+
+    def get_assignments_from_session(session)
+      assignments = []
+      Assignment.all.each do |assignment|
+        position = Position.find(assignment[:position_id])
+        if position[:session_id] == session.to_i
+          assignments.push(assignment)
+        end
+      end
+      return assignments
     end
 
     def set_domain

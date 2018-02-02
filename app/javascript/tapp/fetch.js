@@ -18,6 +18,9 @@ const getResource = (route, onSuccess, dataName, setData, mince=true) =>
 const getSessions = () => getResource('/sessions',
   fetchProc.onFetchSessionsSuccess, 'sessions', appState.setSessionsList, false);
 
+const getInstructors = () => getResource('/instructors',
+  fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList, false);
+
 const getApplicants = () => getResource('/applicants',
   fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
@@ -29,10 +32,6 @@ const getCourses = () => getResource('/positions',
 
 const getAssignments = () => getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
-
-const getInstructors = () => getResource('/instructors',
-  fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList);
-
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);

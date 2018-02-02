@@ -595,6 +595,7 @@ class AppState {
     // check if any data is being fetched
     anyFetching() {
         return [
+            this.get('sessions.fetching'),
             this.get('courses.fetching'),
             this.get('instructors.fetching'),
             this.get('applicants.fetching'),
@@ -606,6 +607,7 @@ class AppState {
     // check if any data has not yet been fetched
     anyNull() {
         return [
+            this.get('sessions.list'),
             this.get('courses.list'),
             this.get('instructors.list'),
             this.get('applicants.list'),
@@ -627,6 +629,10 @@ class AppState {
     // export current assignments
     exportOffers() {
         fetch.exportOffers(this.get('selectedRound'));
+    }
+
+    fetchingSessions(){
+        return this.get('sessions.fetching') > 0;
     }
 
     // check if applicants are being fetched
@@ -880,6 +886,19 @@ class AppState {
 
     getSessionsList(){
         return this.get('sessions.list');
+    }
+
+    getSessionName(id){
+        let sessions = this.getSessionsList();
+        let selected = sessions.get(id);
+        if(selected)
+            return selected.get('semester')+' '+selected.get('year');
+        else return null;
+    }
+
+    selectSession(id){
+      this.set('selectedSession', id);
+      fetch.fetchAll();
     }
 
     getLatestSession(){

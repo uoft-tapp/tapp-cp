@@ -14,6 +14,8 @@ class ApplicationsController < ApplicationController
     @applications = if params[:applicant_id].present?
       # Since Applicants are associated to applications
       Applicant.find(params[:applicant_id]).applications.includes(:preferences)
+    elsif params[:session_id].present?
+      get_applications_from_session(params[:session_id])
     else
       Application.includes(:preferences).all
     end
@@ -30,4 +32,26 @@ class ApplicationsController < ApplicationController
     # convert preferences into json - since we did the grunt work before this will be easy -
     render json: @application.to_json(include: [:preferences])
   end
+
+  private
+  def is_from_session(preferences, session)
+    preferences.each do |pref|
+      position = Position.find(pref[:position_id])
+      if position[:session_id] == session.to_i
+        return true
+      end
+    end
+    return false
+  end
+
+  def get_applications_from_session(session)
+    applications = []
+    Application.includes(:preferences).all.each do |application|
+      if is_from_session(application.preferences, session)
+        applications.push(application)
+      end
+    end
+    return applications
+  end
+
 end
