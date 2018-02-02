@@ -11,27 +11,27 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName, setData, session) =>
-  fetchProc.getResource(route, onSuccess, dataName, setData, session, appState);
+const getResource = (route, onSuccess, dataName, setData, mince=true) =>
+  fetchProc.getResource(route, onSuccess, dataName, setData, mince, appState);
 
 /* Resource GETters */
 const getSessions = () => getResource('/sessions',
   fetchProc.onFetchSessionsSuccess, 'sessions', appState.setSessionsList, false);
 
 const getApplicants = () => getResource('/applicants',
-  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList, true);
+  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
 const getApplications = () => getResource('/applications',
-  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList, true);
+  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
 
 const getCourses = () => getResource('/positions',
-  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList, true);
+  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList);
 
 const getAssignments = () => getResource('/assignments',
-  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList, true);
+  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
 const getInstructors = () => getResource('/instructors',
-  fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList, true);
+  fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList);
 
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
@@ -44,7 +44,7 @@ const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState
 
 export const fetchAll = () => {
     getSessions().then(()=>{
-      let session = appState.getLatestSession();
+      let session = appState.getSelectedSession();
       if(!session)
         appState.setLatestSession();
       getApplicants();

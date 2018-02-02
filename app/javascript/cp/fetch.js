@@ -10,35 +10,36 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName, session) =>
-    fetchProc.getResource(route, onSuccess, dataName, null, session, appState);
+const getResource = (route, onSuccess, dataName, mince=true) =>
+    fetchProc.getResource(route, onSuccess, dataName, null, mince, appState);
 
 const getSessions = () => getResource('/sessions',
     fetchProc.onFetchSessionsSuccess, 'sessions', false);
 
 const getCategories = () => getResource('/categories',
-    fetchProc.onFetchCategoriesSuccess, 'categories', true);
+    fetchProc.onFetchCategoriesSuccess, 'categories', false);
+
+const getDuties = () => getResource('/duties',
+    fetchProc.onFetchDutiesSuccess, 'duties', false);
+
+const getTrainings = () => getResource('/trainings',
+    fetchProc.onFetchTrainingsSuccess, 'trainings', false);
+
+const getTemplates = user => getResource('/instructors/' + user + '/templates',
+    fetchProc.onFetchTemplatesSuccess, 'templates', false);
 
 const getCourses = (user = null) => getResource(
     ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
-    fetchProc.onFetchCpCoursesSuccess, 'courses', true);
+    fetchProc.onFetchCpCoursesSuccess, 'courses');
 
 const getDdahs = user => getResource(
     user ? '/instructors/' + user + '/ddahs' : '/ddahs',
-    fetchProc.onFetchDdahsSuccess, 'ddahs', true);
-
-const getDuties = () => getResource('/duties',
-    fetchProc.onFetchDutiesSuccess, 'duties', true);
+    fetchProc.onFetchDdahsSuccess, 'ddahs');
 
 const getOffers = user => getResource(
     user ? '/instructors/' + user + '/offers' : '/offers',
-    fetchProc.onFetchOffersSuccess, 'offers', true);
+    fetchProc.onFetchOffersSuccess, 'offers');
 
-const getTemplates = user => getResource('/instructors/' + user + '/templates',
-    fetchProc.onFetchTemplatesSuccess, 'templates', true);
-
-const getTrainings = () => getResource('/trainings',
-    fetchProc.onFetchTrainingsSuccess, 'trainings', true);
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
@@ -55,11 +56,11 @@ const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, 
 /* Function to GET all resources */
 export const adminFetchAll = () =>  {
     getSessions().then(()=>{
-      let session = appState.getLatestSession();
+      let session = appState.getSelectedSession();
       if(!session)
         appState.setLatestSession();
-      getDdahs();
       getOffers();
+      getDdahs();
       getCourses();
     });
 }
@@ -67,14 +68,14 @@ export const adminFetchAll = () =>  {
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
     getSessions().then(()=>{
-      let session = appState.getLatestSession();
+      let session = appState.getSelectedSession();
       if(!session)
         appState.setLatestSession();
-      getCategories();
-      getCourses(user);
-      getDdahs(user);
-      getDuties();
       getOffers(user);
+      getDdahs(user);
+      getCourses(user);
+      getCategories();
+      getDuties();
       getTemplates();
       getTrainings();
     });
@@ -276,7 +277,7 @@ export const createTemplate = (name) => {
   let user = appState.getCurrentUserName();
   let fetch = true;
   return postData('/instructors/' + user + '/templates', { name: name },() => {
-      if(fetcht) getTemplates(user);
+      if(fetch) getTemplates(user);
     }, null,
     resp => {
       fetch = false;
