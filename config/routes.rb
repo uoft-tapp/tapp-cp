@@ -9,6 +9,20 @@ Rails.application.routes.draw do
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   # TAPP resources
+  resources :sessions do
+    resources :applicants, only: [:index]
+    resources :applications, only: [:index]
+    resources :assignments, only: [:index]
+    resources :positions, only: [:index]
+    resources :instructors, only: [:index]
+    resources :offers, only: [:index]
+    resources :ddahs, only: [:index]
+  end
+  scope '/sessions/:session_id/instructors/:utorid' do
+    get "offers", to: "offers#index"
+    get "positions", to: "positions#index"
+    get "ddahs", to: "ddahs#index"
+  end
   resources :applicants do
     resources :assignments, except: [:show]
     resources :applications, only: [:index]

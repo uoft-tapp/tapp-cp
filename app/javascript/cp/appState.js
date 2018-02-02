@@ -23,7 +23,7 @@ const initialState = {
     selectedSortFields: [],
     selectedFilters: {},
 
-    selectedSession: '',
+    selectedSession: null,
 
     ddahWorksheet: {
         supervisor: null,
@@ -1136,12 +1136,10 @@ class AppState {
     }
 
     getLatestSession(){
-      let keys = Object.keys(this.getSessionsList());
       let latest = null;
-      keys.forEach(key=>{
-        key = parseInt(key);
-        if(!latest|| key>latest)
-          latest = key;
+      this.getSessionsList().forEach((key, id)=>{
+        if(!latest|| id>latest)
+          latest = id;
       });
       return latest;
     }
