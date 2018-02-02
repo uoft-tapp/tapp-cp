@@ -267,11 +267,9 @@ const SessionsDropdown = props =>
                     props.appState.selectSession(event.target.value);
                     props.appState.getSessionCourse();
                 }}>
-                <option value="" key="session-all">
-                    all
-                </option>
                 {props.appState.getSessionsList().map((session, sessionId) =>
-                    <option value={sessionId}>
+                    <option value={sessionId}
+                      selected={props.appState.getSelectedSession()==sessionId?'true':'false'}>
                         {session.get('semester')}&nbsp;{session.get('year')}
                     </option>
                 )}

@@ -26,6 +26,8 @@ const initialState = {
     // application round to display
     selectedRound: null,
 
+    selectedSession: null,
+
     // ABC view
     abcView: {
         selectedCourses: [],
@@ -874,6 +876,25 @@ class AppState {
 
     getCoursesList() {
         return this.getCoursesInSelectedRound();
+    }
+
+    getSessionsList(){
+        return this.get('sessions.list');
+    }
+
+    getLatestSession(){
+      let keys = Object.keys(this.getSessionsList());
+      let latest = null;
+      keys.forEach(key=>{
+        key = parseInt(key);
+        if(!latest|| key>latest)
+          latest = key;
+      });
+      return latest;
+    }
+
+    setLatestSession(){
+      this.set('selectedSession', this.getLatestSession());
     }
 
     getInstructorsList() {

@@ -47,8 +47,11 @@ export const putHelper = (URL, body, appState) => {
         credentials: 'include',
     }, appState);
 }
-export const getResource = (route, onSuccess, dataName, setData, appState) =>
-  getHelper(route)
+export const getResource = (route, onSuccess, dataName, setData, mince, appState) =>{
+  if(mince){
+    let session = appState.getLatestSession();
+  }
+  return getHelper(route)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(onSuccess)
       .then(data => {
@@ -56,6 +59,7 @@ export const getResource = (route, onSuccess, dataName, setData, appState) =>
           appState.setFetchingDataList(dataName, false, true);
       })
       .catch(() => appState.setFetchingDataList(dataName, false));
+}
 
 /*
   On Fetch Success functions
