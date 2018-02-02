@@ -12,10 +12,18 @@ class OffersController < ApplicationController
   end
 
   def index
-    if params[:utorid]
-      render json: get_all_offers_for_utorid(params[:utorid])
+    if params[:session_id]
+      if params[:utorid]
+        render json: get_all_offers_for_utorid(params[:utorid], params[:session_id])
+      else
+        render json: get_offers_from_session(params[:session_id])
+      end
     else
-      render json: get_all_offers
+      if params[:utorid]
+        render json: get_all_offers_for_utorid(params[:utorid], nil)
+      else
+        render json: get_all_offers
+      end
     end
   end
 
@@ -288,9 +296,10 @@ class OffersController < ApplicationController
     end
   end
 
-  def get_all_offers_for_utorid(utorid)
+  def get_all_offers_for_utorid(utorid, session)
     offers = []
-    Offer.all.each do |offer|
+    all_offers = (session) ? get_offers_from_session(session) : get_all_offers
+    all_offers.each do |offer|
       position = Position.find(offer[:position_id])
       position.instructors.each do |instructor|
         if instructor[:utorid] == utorid
@@ -301,5 +310,15 @@ class OffersController < ApplicationController
     return offers
   end
 
+  def get_offers_from_session(session)
+    offers = []
+    get_all_offers.each do |offer|
+      position = Position.find(offer[:position_id])
+      if position[:session_id] == session.to_i
+        offers.push(offer)
+      end
+    end
+    return offers
+  end
 
 end

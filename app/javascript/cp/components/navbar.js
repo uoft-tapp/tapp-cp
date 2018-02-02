@@ -37,6 +37,31 @@ const ViewTabs = props => {
     );
 };
 
+const Session = props => {
+    if (!props.appState.fetchingSessions()){
+      let sessions = props.appState.getSessionsList();
+      if(sessions){
+        let selectedId = props.appState.getSelectedSession();
+        let selectedSession = props.appState.getSessionName(selectedId);
+
+        return (
+          <NavDropdown
+            id = "session-drop-down" noCaret
+            title ={<span>{selectedSession}</span>}
+            onSelect={eventKey => props.appState.selectSession(eventKey)}>
+            {sessions.map((_,id)=>
+              id != selectedSession &&
+              <MenuItem eventKey={id} key={id}>
+              {props.appState.getSessionName(id)}
+              </MenuItem>
+            )}
+          </NavDropdown>
+        );
+      }
+    }
+    return null;
+};
+
 const Notifications = props => {
     let notifications = props.appState.getUnreadNotifications();
 
@@ -108,7 +133,6 @@ const NavbarInst = props =>
             </NavDropdown>
           </Navbar.Brand>
         </Navbar.Header>
-
         {props.appState.getSelectedUserRole() == 'cp_admin' && <ViewTabs {...props} />}
 
         <Nav pullRight>
@@ -129,7 +153,7 @@ const NavbarInst = props =>
                         popup.document.write(ReactDOMServer.renderToStaticMarkup(<DdahAppendix />));
                     }}
                 />}
-
+            <Session {...props}/>
             <Notifications {...props} />
             <Auth {...props} />
         </Nav>

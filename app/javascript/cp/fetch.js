@@ -74,11 +74,11 @@ export const instructorFetchAll = () => {
       getOffers(user);
       getDdahs(user);
       getCourses(user);
-      getCategories();
-      getDuties();
-      getTemplates();
-      getTrainings();
     });
+    getCategories();
+    getDuties();
+    getTemplates();
+    getTrainings();
 }
 
 // import locked assignments from TAPP
@@ -267,7 +267,7 @@ export const exportOffers = (session) => {
 }
 
 export const exportDdahs = (course, session) => {
-  (course!='all')?
+  (course!='all'&&course)?
     downloadFile('/export/ddahs/' + course):
     downloadFile('/export/session-ddahs/'+ session);
 }
