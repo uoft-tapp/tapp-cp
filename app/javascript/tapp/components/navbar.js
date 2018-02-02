@@ -90,12 +90,41 @@ const CoursePanelLayoutTabs = props => {
     return null;
 };
 
+const Session = props => {
+    if (!props.fetchingSessions()){
+      let sessions = props.getSessions();
+      if(sessions){
+        let selectedId = props.getSelectedSession()?
+            props.getSelectedSession():props.getLatestSession();
+        let selectedSession = props.getSessionNameById(selectedId);
+
+        return (
+          <NavDropdown
+            id = "session-drop-down" noCaret
+            title ={<span>{selectedSession}</span>}
+            onSelect={eventKey => props.selectSession(sessions[eventKey])}>
+            {sessions.map((session, i)=>
+              session != selectedSession &&
+              <MenuItem eventKey={i} key={i}>
+              {session}
+              </MenuItem>
+            )}
+          </NavDropdown>
+        );
+      }
+    }
+    return null;
+};
+
 const Round = props => {
-    if (props.isCoursesListNull()) {
+    if (props.isCoursesListNull()||props.fetchingSessions()) {
         return null;
     }
 
-    let rounds = props.getRounds();
+    let selectedSessionId = props.getSelectedSession()?
+        props.getSelectedSession():props.getLatestSession();
+    let rounds = props.getSessionRoundsById(selectedSessionId)?
+        props.getSessionRoundsById(selectedSessionId): [];
     let selectedRound = props.getSelectedRound();
 
     // add round-based colour rules to a new stylesheet
@@ -224,6 +253,7 @@ const NavbarInst = props =>
         <Nav pullRight>
             {props.getSelectedNavTab() == routeConfig.abc.id &&
                 <CoursePanelLayoutTabs {...props} />}
+            <Session {...props} />
             <Round {...props} />
             <Notifications {...props} />
             <Auth {...props} />

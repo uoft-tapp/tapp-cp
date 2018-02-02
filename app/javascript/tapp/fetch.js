@@ -89,6 +89,12 @@ const getInstructors = () =>
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
         .then(onFetchInstructorsSuccess);
 
+const getSessions = () =>
+    getHelper('/sessions')
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onFetchSessionsSuccess);
+
+
 /* Success callbacks for resource GETters */
 
 function onFetchApplicantsSuccess(resp) {
@@ -238,6 +244,20 @@ function onFetchInstructorsSuccess(resp) {
     return instructors;
 }
 
+function onFetchSessionsSuccess(resp) {
+    let sessions = {};
+
+    resp.forEach(session => {
+        sessions[session.id] = {
+          session: session.semester+' '+session.year,
+          rounds: session.rounds,
+        };
+    });
+
+    return sessions;
+}
+
+
 /* Function to GET all resources */
 
 function fetchAll() {
@@ -246,6 +266,7 @@ function fetchAll() {
     appState.setFetchingDataList('courses', true);
     appState.setFetchingDataList('assignments', true);
     appState.setFetchingDataList('instructors', true);
+    appState.setFetchingDataList('sessions', true);
 
     // when applicants are successfully fetched, update the applicants list; set fetching flag to false either way
     getApplicants()
@@ -286,6 +307,14 @@ function fetchAll() {
             appState.setFetchingDataList('instructors', false, true);
         })
         .catch(() => appState.setFetchingDataList('instructors', false));
+
+    // when sessions are successfully fetched, update the instructors list; set fetching flag to false either way
+    getSessions()
+        .then(sessions => {
+            appState.setSessionsList(sessions);
+            appState.setFetchingDataList('sessions', false, true);
+        })
+        .catch(() => appState.setFetchingDataList('sessions', false));
 }
 
 /* Task-specific resource modifiers */
