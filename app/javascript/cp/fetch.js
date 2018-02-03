@@ -1,6 +1,7 @@
 import React from 'react';
 import { appState } from './appState.js';
 import * as fetchProc from '../fetchProc.js';
+import { fromJS } from 'immutable';
 
 /* General helpers */
 const msgFailure = (text) => fetchProc.msgFailure(text, appState);
@@ -58,7 +59,7 @@ export const adminFetchAll = () =>  {
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
-        appState.setSessionsList([]);
+        appState.setSessionsList(fromJS([]));
       }
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
@@ -74,7 +75,7 @@ export const instructorFetchAll = () => {
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
-        appState.setSessionsList([]);
+        appState.setSessionsList(fromJS([]));
       }
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
