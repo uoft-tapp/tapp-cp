@@ -860,7 +860,7 @@ class AppState {
     // get a sorted list of course codes
     getCourseCodes() {
         let courses = this.getCoursesList();
-        if(courses.length>0)
+        if(courses.size>0)
           return courses.map(course => course.get('code')).flip().keySeq().sort();
         else return [];
     }
@@ -928,7 +928,7 @@ class AppState {
     // get a list of all rounds for all courses
     getRounds() {
         let courses = this.get('courses.list');
-        if(courses.length>0)
+        if(courses.size>0)
           return courses.map(course => course.get('round')).flip().keySeq();
         else return [];
     }

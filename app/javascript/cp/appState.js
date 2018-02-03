@@ -399,7 +399,7 @@ class AppState {
 
     getSessionName(id){
         let sessions = this.getSessionsList();
-        if(sessions.length>0){
+        if(sessions.size>0){
           let selected = sessions.get(id);
           if(selected)
               return selected.get('semester')+' '+selected.get('year');
