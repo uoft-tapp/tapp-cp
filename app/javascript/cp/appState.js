@@ -399,10 +399,12 @@ class AppState {
 
     getSessionName(id){
         let sessions = this.getSessionsList();
-        let selected = sessions.get(id);
-        if(selected)
-            return selected.get('semester')+' '+selected.get('year');
-        else return null;
+        if(sessions.length>0){
+          let selected = sessions.get(id);
+          if(selected)
+              return selected.get('semester')+' '+selected.get('year');
+        }
+        return '';
     }
 
     selectCourse(course) {
@@ -705,6 +707,10 @@ class AppState {
     exportDdahs() {
         let course = this.getSelectedCourse();
         let selectedSession = this.getSelectedSession();
+        if(selectedSession=='N/A'){
+          this.alert('<b>Error</b>: You do not have a session in the system. Please import data from TAPP.');
+          return;
+        }
         fetch.exportDdahs(course, selectedSession);
     }
 
@@ -818,7 +824,7 @@ class AppState {
     getPositions() {
         let offers = this.getOffersList();
 
-        if (offers) {
+        if (offers.length>0) {
             return offers
                 .map(offer => offer.get('course'))
                 .flip()
@@ -1153,7 +1159,7 @@ class AppState {
         if(!latest|| id>latest)
           latest = id;
       });
-      return latest;
+      return latest?latest:'N/A';
     }
 
     setLatestSession(){

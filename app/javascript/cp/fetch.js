@@ -56,6 +56,10 @@ const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, 
 /* Function to GET all resources */
 export const adminFetchAll = () =>  {
     getSessions().then(()=>{
+      let sessions = appState.getSessionsList();
+      if(sessions){
+        appState.setSessionsList([]);
+      }
       let session = appState.getSelectedSession();
       if(!session)
         appState.setLatestSession();
@@ -68,6 +72,10 @@ export const adminFetchAll = () =>  {
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
     getSessions().then(()=>{
+      let sessions = appState.getSessionsList();
+      if(sessions){
+        appState.setSessionsList([]);
+      }
       let session = appState.getSelectedSession();
       if(!session)
         appState.setLatestSession();

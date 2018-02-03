@@ -52,11 +52,14 @@ export const getResource = (route, onSuccess, dataName, setData, mince, state) =
   if(mince){
     let session = setData?
       appState.getSelectedSession():appState.get('selectedSession');
-    if(session){
+    if(session&&session!='N/A'){
       route = '/sessions/'+session+route;
       return getResHelper(route, onSuccess, dataName, setData, appState);
     }
-    else return true;
+    else{
+      setData? setData([]): appState.set(dataName+'.list', fromJS([]));
+      return appState.setFetchingDataList(dataName, false, true);
+    };
   }
   else{
     return getResHelper(route, onSuccess, dataName, setData, appState);

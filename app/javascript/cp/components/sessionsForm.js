@@ -8,7 +8,7 @@ class SessionsForm extends React.Component {
     render() {
         let sessions = this.props.appState.getSessionsList();
         let session = this.props.appState.getSelectedSession();
-        let pay = sessions.get(session).get('pay');
+        let pay = (sessions.length>0)?sessions.get(session).get('pay'):null;
         pay = pay?pay:'';
         return (
             <Panel className="sessions">
@@ -28,6 +28,7 @@ class SessionsForm extends React.Component {
                                 min="0.00"
                                 step="0.01"
                                 value={pay}
+                                disabled={session=='N/A'}
                                 onChange={event=>this.changePay(event)}
                                 onBlur={event => {
                                     if (event.target.value != pay) {
