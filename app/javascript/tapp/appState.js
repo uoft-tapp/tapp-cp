@@ -859,7 +859,10 @@ class AppState {
 
     // get a sorted list of course codes
     getCourseCodes() {
-        return this.getCoursesList().map(course => course.get('code')).flip().keySeq().sort();
+        let courses = this.getCoursesList();
+        if(courses.length>0)
+          return courses.map(course => course.get('code')).flip().keySeq().sort();
+        else return [];
     }
 
     getCourseCodeById(course) {
@@ -907,7 +910,7 @@ class AppState {
         if(!latest|| id>latest)
           latest = id;
       });
-      return latest;
+      return latest?latest:'N/A';
     }
 
     setLatestSession(){
@@ -924,7 +927,10 @@ class AppState {
 
     // get a list of all rounds for all courses
     getRounds() {
-        return this.get('courses.list').map(course => course.get('round')).flip().keySeq();
+        let courses = this.get('courses.list');
+        if(courses.length>0)
+          return courses.map(course => course.get('round')).flip().keySeq();
+        else return [];
     }
 
     // get all applicants who have not been assigned to a course; returns a list of [applicantID, applicantData]
