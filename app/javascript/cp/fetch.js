@@ -57,11 +57,11 @@ const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, 
 export const adminFetchAll = () =>  {
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
-      if(sessions){
+      if(!sessions){
         appState.setSessionsList([]);
       }
       let session = appState.getSelectedSession();
-      if(!session)
+      if(!session||session=='N/A')
         appState.setLatestSession();
       getOffers();
       getDdahs();
@@ -73,11 +73,11 @@ export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
-      if(sessions){
+      if(!sessions){
         appState.setSessionsList([]);
       }
       let session = appState.getSelectedSession();
-      if(!session)
+      if(!session||session=='N/A')
         appState.setLatestSession();
       getOffers(user);
       getDdahs(user);

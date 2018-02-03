@@ -44,11 +44,11 @@ const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState
 export const fetchAll = () => {
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
-      if(sessions){
+      if(!sessions){
         appState.setSessionsList([]);
       }
       let session = appState.getSelectedSession();
-      if(!session)
+      if(!session||session=='N/A')
         appState.setLatestSession();
       getApplicants();
       getApplications();
