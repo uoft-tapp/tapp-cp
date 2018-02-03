@@ -50,8 +50,8 @@ export const fetchAll = () => {
       getApplications();
       getAssignments();
       getCourses();
-      getInstructors();
     });
+    getInstructors();
 }
 
 /* Task-specific resource modifiers */

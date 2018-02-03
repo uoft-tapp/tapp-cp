@@ -42,33 +42,13 @@ class ApplicantsController < ApplicationController
     params.permit(:commentary)
   end
 
-  def pref_is_from_session(preferences, session)
-    preferences.each do |pref|
-      position = Position.find(pref[:position_id])
-      if position[:session_id] == session.to_i
-        return true
-      end
-    end
-    return false
-  end
-
-  def applications_is_from_session(applications, session)
-    applications.each do |application|
-      if pref_is_from_session(application.preferences, session)
-        return true
-      end
-    end
-    return false
-  end
-
   def get_applicants_from_session(session)
-    applicants = []
-    Applicant.all.each do |applicant|
-      if applications_is_from_session(applicant.applications, session)
-        applicants.push(applicant)
-      end
-    end
-    return applicants
+    attr = Applicant.column_names.map {|i| "app.#{i}"}
+    session_select = "SELECT p.id id FROM positions p WHERE p.session_id=#{session}"
+    pref_select = "SELECT DISTINCT pref.application_id id FROM preferences pref, (#{session_select}) p WHERE p.id=pref.position_id"
+    application_select="SELECT DISTINCT app.applicant_id id FROM applications app, (#{pref_select}) p WHERE p.id=app.id"
+    sql="SELECT DISTINCT #{attr.join(', ')} FROM applicants app, (#{application_select}) p WHERE p.id=app.id ORDER BY app.id"
+    return execute_sql(sql)
   end
 
 

@@ -150,14 +150,10 @@ class AssignmentsController < ApplicationController
     end
 
     def get_assignments_from_session(session)
-      assignments = []
-      Assignment.all.each do |assignment|
-        position = Position.find(assignment[:position_id])
-        if position[:session_id] == session.to_i
-          assignments.push(assignment)
-        end
-      end
-      return assignments
+      attr = Assignment.column_names.map {|i| "a.#{i}"}
+      session_select = "SELECT p.id id FROM positions p WHERE p.session_id=#{session}"
+      sql="SELECT DISTINCT #{attr.join(', ')} FROM assignments a, (#{session_select}) p WHERE p.id=a.position_id ORDER BY a.id"
+      return execute_sql(sql)
     end
 
     def set_domain

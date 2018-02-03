@@ -50,10 +50,10 @@ const Session = props => {
             title ={<span>{selectedSession}</span>}
             onSelect={eventKey => props.appState.selectSession(eventKey)}>
             {sessions.map((_,id)=>
-              id != selectedSession &&
-              <MenuItem eventKey={id} key={id}>
-              {props.appState.getSessionName(id)}
-              </MenuItem>
+                (parseInt(id) != selectedId) &&
+                <MenuItem eventKey={id} key={id}>
+                {props.appState.getSessionName(id)}
+                </MenuItem>
             )}
           </NavDropdown>
         );

@@ -104,7 +104,7 @@ const Session = props => {
             title ={<span>{selectedSession}</span>}
             onSelect={eventKey => props.selectSession(eventKey)}>
             {sessions.map((id)=>
-              id != selectedSession &&
+              (parseInt(id) != selectedId)&&
               <MenuItem eventKey={id} key={id}>
               {props.getSessionName(id)}
               </MenuItem>

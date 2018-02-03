@@ -3,6 +3,16 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
   before_action :set_cache_headers
   before_action :logged_in
+  include Model
+
+  def execute_sql(sql)
+    results = ActiveRecord::Base.connection.execute("#{sql};")
+    if results.present?
+      return JSON.parse(results.to_json, symbolize_names: true)
+    else
+      return nil
+    end
+  end
 
   private
   def set_cache_headers

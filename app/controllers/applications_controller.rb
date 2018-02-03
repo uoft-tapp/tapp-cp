@@ -1,5 +1,6 @@
 class ApplicationsController < ApplicationController
   include Authorizer
+  include Model
   before_action :tapp_admin
 
 '''
@@ -34,22 +35,15 @@ class ApplicationsController < ApplicationController
   end
 
   private
-  def is_from_session(preferences, session)
-    preferences.each do |pref|
-      position = Position.find(pref[:position_id])
-      if position[:session_id] == session.to_i
-        return true
-      end
-    end
-    return false
-  end
-
   def get_applications_from_session(session)
-    applications = []
-    Application.includes(:preferences).all.each do |application|
-      if is_from_session(application.preferences, session)
-        applications.push(application)
-      end
+    attr = Application.column_names.map {|i| "app.#{i}"}
+    session_select = "SELECT p.id id FROM positions p WHERE p.session_id=#{session}"
+    pref_select = "SELECT DISTINCT pref.application_id id FROM preferences pref, (#{session_select}) p WHERE p.id=pref.position_id"
+    sql="SELECT DISTINCT #{attr.join(', ')} FROM applications app, (#{pref_select}) p WHERE p.id=app.id ORDER BY app.id"
+    applications = execute_sql(sql)
+    applications.each do |app|
+      prefs = "SELECT * FROM preferences WHERE application_id=#{app[:id]}"
+      app[:preferences] = execute_sql(prefs)
     end
     return applications
   end
