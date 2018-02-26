@@ -25,6 +25,11 @@ const routeConfig = {
         label: 'Summary',
         route: '/summary',
         id: 'summary',
+    },
+    asssistant: {
+        label: 'Assistant Panel',
+        route: '/assistantPanel',
+        id: 'assistant',
     }
 };
 

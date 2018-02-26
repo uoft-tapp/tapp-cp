@@ -49,28 +49,25 @@ class App extends React.Component {
             return <div id="loader" />;
         }
 
-        if (role == 'cp_admin') {
-            return <AdminRouter {...this.props} />;
-        }
-
-        if (role == 'hr_assistant') {
-            return (
-                <div>
-                    <Navbar {...this.props} />
-                    <AdminControlPanel {...this.props} />
-                    <AlertContainer {...this.props} />
-                </div>
-            );
-        }
-
-        if (role == 'instructor') {
-            return (
-                <div>
-                    <Navbar {...this.props} />
-                    <InstrControlPanel {...this.props} />
-                    <AlertContainer {...this.props} />
-                </div>
-            );
+        switch (role){
+            case 'cp_admin':
+                return <AdminRouter {...this.props} />;
+            case 'hr_assistant':
+                return (
+                    <div>
+                        <Navbar {...this.props} />
+                        <AdminControlPanel {...this.props} />
+                        <AlertContainer {...this.props} />
+                    </div>
+                );
+            case 'instructor':
+                return (
+                    <div>
+                        <Navbar {...this.props} />
+                        <InstrControlPanel {...this.props} />
+                        <AlertContainer {...this.props} />
+                    </div>
+                );
         }
 
         return null;

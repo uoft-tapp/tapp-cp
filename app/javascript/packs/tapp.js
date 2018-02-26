@@ -24,6 +24,7 @@ import { ABC } from '../tapp/components/abc.js';
 import { Assigned } from '../tapp/components/assigned.js';
 import { Unassigned } from '../tapp/components/unassigned.js';
 import { Summary } from '../tapp/components/summary.js';
+import { Assistant } from '../tapp/components/assistant.js';
 import { ApplicantModal } from '../tapp/components/applicantModal.js';
 
 /*** Main app component ***/
@@ -52,8 +53,13 @@ class App extends React.Component {
             return <div id="loader" />;
         }
 
-        if (role == 'tapp_admin') {
+        switch (role) {
+          case 'tapp_admin':
             return <AdminRouter {...appState} />;
+          case 'tapp_assistant':
+            return <AssistantRouter {...appState} />:;
+          case 'instructor':
+            return <InstrRouter {...appState} />;
         }
 
         return null;
@@ -123,6 +129,35 @@ const InstrRouter = props => {
         </Router>
     );
 };
+
+const AssistantRouter = props =>{
+    return (
+      <Router basename="tapp">
+          <div>
+              <Navbar {...props} />
+              <Switch>
+                  <Route
+                      path={routeConfig.assistant.route}
+                      render={() => <Assistant navKey={routeConfig.assistant.id} {...props} />}
+                  />
+              </Switch>
+              <div className="container-fluid" id="alert-container">
+                  {props
+                      .getAlerts()
+                      .map(alert =>
+                          <div
+                              key={'alert-' + alert.id}
+                              className="alert alert-danger"
+                              onClick={() => props.dismissAlert(alert.id)}
+                              onAnimationEnd={() => props.dismissAlert(alert.id)}
+                              dangerouslySetInnerHTML={{ __html: alert.text }}
+                          />
+                      )}
+              </div>
+          </div>
+      </Router>
+    );
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(<App />, document.getElementById('root'));
