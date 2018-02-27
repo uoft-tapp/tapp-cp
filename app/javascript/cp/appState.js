@@ -824,7 +824,7 @@ class AppState {
     getPositions() {
         let offers = this.getOffersList();
 
-        if (offers.length>0) {
+        if (offers.size>0) {
             return offers
                 .map(offer => offer.get('course'))
                 .flip()
