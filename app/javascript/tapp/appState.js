@@ -787,7 +787,8 @@ class AppState {
         let assignments = this.getAssignmentsList(),
             applicants = this.getApplicantsList();
 
-        return assignments.map((_, applicant) => applicants.get(applicant)).entrySeq();
+        applicants = assignments.map((_, applicant) => applicants.get(applicant));
+        return applicants.filter(_ => _).entrySeq();
     }
 
     getAssignmentByApplicant(applicant, course) {
