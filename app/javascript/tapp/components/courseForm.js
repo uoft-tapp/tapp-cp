@@ -134,8 +134,8 @@ class CourseForm extends React.Component {
                                     type="date"
                                     defaultVal={
                                         this.props.course.startDate
-                                            ? this.props.course.startDate.split('T')[0]
-                                            : undefined
+                                            ? this.props.course.startDate.split(' ')[0]
+                                            : "hello"
                                     }
                                     update={val => {
                                         if (val != this.props.course.startDate) {
@@ -154,7 +154,7 @@ class CourseForm extends React.Component {
                                     type="date"
                                     defaultVal={
                                         this.props.course.endDate
-                                            ? this.props.course.endDate.split('T')[0]
+                                            ? this.props.course.endDate.split(' ')[0]
                                             : undefined
                                     }
                                     update={val => {
