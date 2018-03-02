@@ -169,6 +169,45 @@ export const exportOffers = (round, session) => {
     .then(() => getAssignments());
 }
 
+export const updateInstructor = (instructor) => {
+    let fetch = true;
+    putData('/instructors', instructor, ()=>{
+      getInstructors();
+    },
+    resp=>{
+      alert(resp.message);
+      appState.hideInstructorModal();
+    },
+    resp=>{
+        appState.alert("<b>Error</b>: "+resp.message);
+        fetch = false;
+    });
+}
+
+export const createInstructor = (instructor) => {
+    let fetch = true;
+    postData('/instructors', instructor, ()=>{
+      if(fetch)
+        getInstructors();
+    },
+    resp=>{
+      alert(resp.message);
+      appState.hideInstructorModal();
+    },
+    resp=>{
+      fetch = false;
+      if(resp.id){
+        let choice = confirm("An instructor with the same utorid already exists. Do you want update the information for that instructor?");
+        if(choice){
+          appState.switchInstructorModalTab("update");
+        }
+      }
+      else{
+        appState.alert("<b>Error</b>: "+resp.message);
+      }
+    })
+}
+
 // get current user role and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {

@@ -60,6 +60,9 @@ const initialState = {
         tempAssignments: [],
     },
 
+    // instructor Modal
+    instructorModal: null,
+
     /** DB data **/
 
     applicants: { fetching: 0, list: null },
@@ -715,6 +718,40 @@ class AppState {
         // Note: toString() is a hack because our components think that course IDs are numbers but Immutable
         // thinks they are strings
         return this.getApplicantsList().get(applicant.toString());
+    }
+
+    updateInstructor(instructor){
+        fetch.updateInstructor(instructor);
+    }
+
+    createInstructor(instructor){
+        fetch.createInstructor(instructor);
+    }
+
+    instructorModalOpen(){
+      return this.get("instructorModal");
+    }
+
+    showInstructorModal(){
+      this.set("instructorModal", {
+        selectedTab: 1,
+        instructor: {
+          id: null,
+          utorid: null,
+          name: null,
+          email: null,
+        },
+      });
+    }
+
+    switchInstructorModalTab(tab){
+      if (this.instructorModalOpen()){
+        this.set("instructorModal.selectedTab", tab);
+      }
+    }
+
+    hideInstructorModal(){
+      this.set("instructorModal", null);
     }
 
     getApplicantsInSelectedRound() {

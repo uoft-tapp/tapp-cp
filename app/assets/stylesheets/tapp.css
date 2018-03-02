@@ -180,6 +180,23 @@ footer div p {
     overflow: auto;
 }
 
+.instructor-modal-opener{
+  color: #000;
+  margin-left: 10px;
+}
+
+.clickable{
+  cursor: pointer;
+}
+
+.clickable:hover{
+  opacity: .75;
+}
+
+.clickable:active{
+  opacity: .9;
+}
+
 /* for ApplicantTable in Assigned/Unassigned view */
 #unassigned-grid .table-container,
 #assigned-grid .table-container {
