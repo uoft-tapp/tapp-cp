@@ -39,10 +39,11 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (8.0.0)
-    axlsx (2.1.0.pre)
-      htmlentities (~> 4.3.1)
-      nokogiri (>= 1.4.1)
-      rubyzip (~> 1.1.7)
+    axlsx (3.0.0.pre)
+      htmlentities (~> 4.3, >= 4.3.4)
+      mimemagic (~> 0.3)
+      nokogiri (~> 1.8, >= 1.8.2)
+      rubyzip (~> 1.2, >= 1.2.1)
     axlsx_rails (0.5.1)
       actionpack (>= 3.1)
       axlsx (>= 2.0.1)
@@ -97,6 +98,7 @@ GEM
     mail (2.7.0)
       mini_mime (>= 0.1.1)
     method_source (0.9.0)
+    mimemagic (0.3.2)
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
     minitest (5.11.3)
@@ -171,7 +173,7 @@ GEM
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
     ruby_dep (1.5.0)
-    rubyzip (1.1.7)
+    rubyzip (1.2.1)
     sass (3.5.5)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -221,7 +223,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  axlsx (= 2.1.0.pre)
+  axlsx (~> 3.0.0.pre)
   axlsx_rails
   byebug
   coffee-rails (~> 4.2)
@@ -234,7 +236,7 @@ DEPENDENCIES
   puma (~> 3.7)
   rails (~> 5.1.1)
   rspec-rails (~> 3.5)
-  rubyzip
+  rubyzip (>= 1.2.1)
   sass-rails (~> 5.0)
   spring
   spring-watcher-listen (~> 2.0.0)
