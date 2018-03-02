@@ -31,7 +31,7 @@ gem 'prawn', '~> 2.2'
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
-gem 'rubyzip', '~> 1.1.0'
+gem 'rubyzip'
 gem 'axlsx', '2.1.0.pre'
 gem 'axlsx_rails'
 # Use Capistrano for deployment
