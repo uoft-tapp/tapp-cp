@@ -8,26 +8,26 @@ class ExportController < ApplicationController
   before_action :cp_admin, only: [:ddahs, :session_ddahs]
 
   def chass
-    exporter = ChassExporter.new
+    exporter = ChassExporter.new(params[:session_id])
     response = exporter.export(params[:round_id])
     render_helper(response)
   end
 
   def cdf
     generator = CSVGenerator.new
-    response = generator.generate_cdf_info
+    response = generator.generate_cdf_info(params[:session_id])
     render_helper(response)
   end
 
   def offers
     generator = CSVGenerator.new
-    response = generator.generate_offers
+    response = generator.generate_offers(params[:session_id])
     render_helper(response)
   end
 
   def transcript_access
     generator = CSVGenerator.new
-    response = generator.generate_transcript_access
+    response = generator.generate_transcript_access(params[:session_id])
     render_helper(response)
   end
 

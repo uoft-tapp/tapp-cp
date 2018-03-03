@@ -1,5 +1,6 @@
 class CSVGenerator
   require 'csv'
+  include SessionSeparate
 
   def initialize
     @assignments = Assignment.all.includes([:position, :applicant])
@@ -7,7 +8,8 @@ class CSVGenerator
     @courses = {}
   end
 
-  def generate_cdf_info
+  def generate_cdf_info(session)
+    session_check(session)
     if @assignments.size == 0
       return {generated: false,
         msg: "Warning: You have not made any assignments. Operation aborted."}
@@ -26,7 +28,8 @@ class CSVGenerator
     end
   end
 
-  def generate_offers
+  def generate_offers(session)
+    session_check(session)
     if @assignments.size == 0
       return {generated: false,
         msg: "Warning: You have not made any assignments. Operation aborted."}
@@ -48,7 +51,8 @@ class CSVGenerator
     end
   end
 
-  def generate_transcript_access
+  def generate_transcript_access(session)
+    session_check(session)
     if @applicants.size == 0
       return {generated: false,
         msg: "Warning: There are currenly no applicant in the system. Operation aborted"}
