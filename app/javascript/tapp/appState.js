@@ -950,7 +950,7 @@ class AppState {
             assignments.reduce((result, _, app) => result.delete(app), map);
         });
 
-        return applicants.entrySeq();
+        return applicants.filter(_ => _).entrySeq();
     }
 
     importChass(data, year, semester) {
