@@ -720,12 +720,67 @@ class AppState {
         return this.getApplicantsList().get(applicant.toString());
     }
 
-    updateInstructor(instructor){
-        fetch.updateInstructor(instructor);
+    getInstructorDataFromModal(key = null){
+      if (key){
+          return this.get('instructorModal.instructor.'+key);
+      }
+      else {
+          let id = this.getInstructorDataFromModal('id');
+          if(id){
+            return {
+              id: id,
+              utorid: this.getInstructorDataFromModal('utorid'),
+              name: this.getInstructorDataFromModal('name'),
+              email: this.getInstructorDataFromModal('email'),
+            };
+          }
+          else{
+            return {
+              utorid: this.getInstructorDataFromModal('utorid'),
+              name: this.getInstructorDataFromModal('name'),
+              email: this.getInstructorDataFromModal('email'),
+            };
+          }
+      }
     }
 
-    createInstructor(instructor){
-        fetch.createInstructor(instructor);
+    setInstructorDataFromModal(key, val){
+        this.set('instructorModal.instructor.'+key, val);
+    }
+
+    getSelectedTabFromModal(){
+      return this.get('instructorModal.selectedTab');
+    }
+
+    setSelectedTabFromModal(tab){
+        this.set("instructorModal.selectedTab", tab);
+    }
+
+    containsEmptyInstructorField(instructor){
+      let keys = Object.keys(instructor);
+      keys.forEach(key=>{
+        if(instructor[key].length == 0)
+          return true;
+      });
+      return false;
+    }
+
+    updateInstructor(){
+        if(this.instructorModalOpen()){
+          let instructor = this.getInstructorDataFromModal();
+          if(!this.containsEmptyInstructorField(instructor)){
+            fetch.updateInstructor(instructor);
+          }
+        }
+    }
+
+    createInstructor(){
+      if(this.instructorModalOpen()){
+        let instructor = this.getInstructorDataFromModal();
+        if(!this.containsEmptyInstructorField(instructor)){
+          fetch.createInstructor(instructor);
+        }
+      }
     }
 
     instructorModalOpen(){
@@ -733,21 +788,15 @@ class AppState {
     }
 
     showInstructorModal(){
-      this.set("instructorModal", {
-        selectedTab: 1,
+      this.set("instructorModal", fromJS({
+        selectedTab: 'create',
         instructor: {
           id: null,
           utorid: null,
           name: null,
           email: null,
         },
-      });
-    }
-
-    switchInstructorModalTab(tab){
-      if (this.instructorModalOpen()){
-        this.set("instructorModal.selectedTab", tab);
-      }
+      }));
     }
 
     hideInstructorModal(){
