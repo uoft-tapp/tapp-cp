@@ -203,7 +203,7 @@ class CSVGenerator
           applicant[:student_number],
           applicant[:last_name],
           applicant[:first_name],
-          application[:access_acad_history].downcase,
+          application[:access_acad_history]? application[:access_acad_history].downcase: '',
           applicant[:email],
         ]
       end
