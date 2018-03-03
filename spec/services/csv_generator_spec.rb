@@ -22,7 +22,7 @@ describe CSVGenerator do
     hours: 22,
     estimated_count: 15,
     estimated_total_hours: 330,
-    session_id: session.id,
+    session_id: session[:id],
     cap_enrolment: nil,
     num_waitlisted: nil,
     start_date: "2017-09-01 00:00:00 UTC",
@@ -70,7 +70,7 @@ describe CSVGenerator do
     context "when there are assignments in the system" do
       before(:each) do
         @assignment= applicant.assignments.create!(
-            position_id: position.id,
+            position_id: position[:id],
             hours: 50
         )
         @data = CSV.generate do |csv|
@@ -144,7 +144,7 @@ describe CSVGenerator do
     context "when there are assignments in the system" do
       before(:each) do
         @assignment= applicant.assignments.create!(
-            position_id: position.id,
+            position_id: position[:id],
             hours: 50
         )
         @data = CSV.generate do |csv|
@@ -217,6 +217,9 @@ describe CSVGenerator do
           availability: "MW 9-8, RF 12-7",
           other_info: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget dignissim sem. Curabitur at semper eros. Aenean nec sem lobortis, scelerisque mi at, aliquam diam. Mauris malesuada elit nibh, sed hendrerit nulla mattis sed. Mauris laoreet imperdiet dictum. Pellentesque risus nulla, varius ut massa ut, venenatis fringilla sapien. Cras eget euismod augue, eget dignissim erat. Cras nec nibh ullamcorper ante rutrum dapibus sed nec tellus. In hac habitasse platea dictumst. Suspendisse semper tellus ac sem tincidunt auctor.",
           special_needs: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget dignissim sem. Curabitur at semper eros. Aenean nec sem lobortis, scelerisque mi at, aliquam diam. Mauris malesuada elit nibh, sed hendrerit nulla mattis sed. Mauris laoreet imperdiet dictum. Pellentesque risus nulla, varius ut massa ut, venenatis fringilla sapien. Cras eget euismod augue, eget dignissim erat. Cras nec nibh ullamcorper ante rutrum dapibus sed nec tellus. In hac habitasse platea dictumst. Suspendisse semper tellus ac sem tincidunt auctor."
+        )
+        @application.preferences.create!(
+            position_id: position[:id],
         )
         @data = CSV.generate do |csv|
           csv << [
