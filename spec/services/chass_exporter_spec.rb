@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 describe ChassExporter do
-  let (:exporter) { ChassExporter.new }
   let(:session) do
     Session.create!(
       semester: "Fall",
       year: 2017,
     )
+  let (:exporter) { ChassExporter.new(session[:id]) }
   end
   let(:position) do
     Position.create!(

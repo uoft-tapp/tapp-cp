@@ -60,7 +60,7 @@ describe CSVGenerator do
         )
     end
     context "when there are no assignments in the system" do
-      subject { generator.generate_cdf_info }
+      subject { generator.generate_cdf_info(session[:id]) }
       it "return generated false and an error message" do
         expect(subject).to eq({generated: false,
           msg: "Warning: You have not made any assignments. Operation aborted."})
@@ -94,7 +94,7 @@ describe CSVGenerator do
           ]
         end
       end
-      subject { generator.generate_cdf_info }
+      subject { generator.generate_cdf_info(session[:id]) }
 
       it "returns generated true and data of all cdf info" do
         expect(subject).to eq ({generated: true, data: @data, type: "text/csv",
@@ -134,7 +134,7 @@ describe CSVGenerator do
     end
 
     context "when there are no assignments in the system" do
-      subject { generator.generate_offers }
+      subject { generator.generate_offers(session[:id]) }
       it "return generated false and an error message" do
         expect(subject).to eq({generated: false,
           msg: "Warning: You have not made any assignments. Operation aborted."})
@@ -174,7 +174,7 @@ describe CSVGenerator do
           ]
         end
       end
-      subject { generator.generate_offers }
+      subject { generator.generate_offers(session[:id]) }
 
       it "returns generated true and data of all cdf info" do
         expect(subject).to eq ({generated: true, data: @data, type: "text/csv",
@@ -185,7 +185,7 @@ describe CSVGenerator do
 
   context "when generating transcript_access" do
     context "when there are no applicants in the system" do
-      subject { generator.generate_transcript_access }
+      subject { generator.generate_transcript_access(session[:id]) }
       it "return generated false and an error message" do
         expect(subject).to eq({generated: false,
           msg: "Warning: There are currenly no applicant in the system. Operation aborted"})
@@ -235,7 +235,7 @@ describe CSVGenerator do
           ]
         end
       end
-      subject { generator.generate_transcript_access }
+      subject { generator.generate_transcript_access(session[:id]) }
 
       it "returns generated true and data of all cdf info" do
         expect(subject).to eq ({generated: true, data: @data, type: "text/csv",

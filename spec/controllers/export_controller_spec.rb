@@ -32,7 +32,7 @@ RSpec.describe ExportController, type: :controller do
   context "when there are no applicants in the system" do
     context "when calling #transcript_access" do
       it "returns status 404 and an error message" do
-        get :transcript_access
+        get :transcript_access, params: {session_id: session[:id]}
         message = {message:
           "Warning: There are currenly no applicant in the system. Operation aborted"}
         expect(response.status).to eq(404)
@@ -71,7 +71,7 @@ RSpec.describe ExportController, type: :controller do
 
     context "when calling #transcript_access" do
       it "returns status 200 and downloads transcript_access.csv" do
-        get :transcript_access
+        get :transcript_access, params: {session_id: session[:id]}, params: {session_id: session[:id]}
         expect(response.status).to eq(200)
         expect(response.content_type).to eq("text/csv")
         expect(response.header["Content-Disposition"]).to eq(
@@ -83,7 +83,7 @@ RSpec.describe ExportController, type: :controller do
       context "when calling #chass" do
         context "when round_id is valid" do
           it "returns status 404 and an error message" do
-            get :chass, params: {round_id: position[:round_id]}
+            get :chass, params: {round_id: position[:round_id], session_id: session[:id]}
             message = {message:
               "Warning: You have not made any assignments. Operation aborted."}
             expect(response.status).to eq(404)
@@ -96,7 +96,7 @@ RSpec.describe ExportController, type: :controller do
 
       context "when calling #cdf" do
         it "returns status 404 and an error message" do
-          get :cdf
+          get :cdf, params: {session_id: session[:id]}
           expect(response.status).to eq(404)
           message = {message:
             "Warning: You have not made any assignments. Operation aborted."}
@@ -108,7 +108,7 @@ RSpec.describe ExportController, type: :controller do
 
       context "when calling #offers" do
         it "returns status 404 and an error message" do
-          get :offers
+          get :offers, params: {session_id: session[:id]}
           expect(response.status).to eq(404)
           message = {message:
             "Warning: You have not made any assignments. Operation aborted."}
@@ -128,7 +128,7 @@ RSpec.describe ExportController, type: :controller do
       context "when calling #chass" do
         context "when round_id is invalid" do
           it "returns status 404 and an error message" do
-            get :chass, params: {round_id: 1}
+            get :chass, params: {round_id: 1, session_id: session[:id]}
             message = {message: "Error: Invalid round_id"}
             expect(response.status).to eq(404)
             expect(response.body).to eq(message.to_json)
@@ -138,7 +138,7 @@ RSpec.describe ExportController, type: :controller do
 
         context "when round_id is valid" do
           it "returns status 200 and downloads offers_(round_id).json" do
-            get :chass, params: {round_id: position[:round_id]}
+            get :chass, params: {round_id: position[:round_id], session_id: session[:id]}
             expect(response.status).to eq(200)
             expect(response.content_type).to eq("application/json")
             expect(response.header["Content-Disposition"]).to eq(
@@ -151,7 +151,7 @@ RSpec.describe ExportController, type: :controller do
 
       context "when calling #cdf" do
         it "returns status 200 and downloads cdf_info.csv" do
-          get :cdf
+          get :cdf, params: {session_id: session[:id]}
           expect(response.status).to eq(200)
           expect(response.content_type).to eq("text/csv")
           expect(response.header["Content-Disposition"]).to eq(
@@ -162,7 +162,7 @@ RSpec.describe ExportController, type: :controller do
 
       context "when calling #offers" do
         it "returns status 200 and downloads offers.csv" do
-          get :offers
+          get :offers, params: {session_id: session[:id]}
           expect(response.status).to eq(200)
           expect(response.content_type).to eq("text/csv")
           expect(response.header["Content-Disposition"]).to eq(
