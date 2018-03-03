@@ -731,7 +731,14 @@ class AppState {
                     assignments.get(applicant).some(ass => ass.get('positionId') == course)
             );
 
-        return applications.map((_, applicant) => applicants.get(applicant)).entrySeq();
+        // sort applications for unassigned table by preference
+        let sortedApplications = applications.sort(function(a, b) {
+            var aPref = a.get(0).get('prefs').some(pref => pref.get('positionId') == course && pref.get('preferred'));
+            var bPref = b.get(0).get('prefs').some(pref => pref.get('positionId') == course && pref.get('preferred'));
+            return bPref - aPref;
+            });
+
+        return sortedApplications.map((_, applicant) => applicants.get(applicant)).entrySeq();
     }
 
     getApplicationById(applicant) {
