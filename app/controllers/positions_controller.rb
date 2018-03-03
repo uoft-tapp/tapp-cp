@@ -10,7 +10,7 @@ class PositionsController < ApplicationController
       if params[:utorid]
         render json: get_all_positions_for_utorid(params[:utorid], params[:session_id])
       else
-        positions = positions_for_session(params[:session_id])
+        positions = positions_from_session(params[:session_id])
         render json: positions.to_json(include: [:instructors])
       end
     else
@@ -71,42 +71,10 @@ class PositionsController < ApplicationController
     return utorids
   end
 
-  def positions_for_session(session)
-    if session
-      sql = "SELECT * FROM positions p WHERE p.session_id=#{session} ORDER BY p.id"
-    else
-      sql = "SELECT * FROM positions p ORDER BY p.id"
-    end
-    positions = execute_sql(sql)
-    positions.each do |position|
-      instructors_select = "SELECT DISTINCT * FROM instructors i, instructors_positions ip WHERE i.id=ip.instructor_id AND position_id=#{position[:id]}"
-      instructors= execute_sql(instructors_select)
-      if session
-        position[:instructors] = instructors
-      else
-        excludes = [
-          :duties,
-          :round_id,
-          :qualifications,
-          :estimated_count,
-          :estimated_total_hours,
-          :hours,
-          :start_date,
-          :end_date,
-          :open,
-        ]
-        instructors.each do |instructor|
-          position[:instructors][instructor[:id]] = instructor[:name]
-        end
-        position = position.except(*excludes)
-      end
-    end
-    return positions
-  end
 
   def get_all_positions_for_utorid(utorid, session = nil)
     positions = []
-    all_positions = positions_for_session(session)
+    all_positions = positions_from_session(session)
     all_positions.each do |position|
       position[:instructors].each do |instructor|
         if instructor[:utorid] == utorid

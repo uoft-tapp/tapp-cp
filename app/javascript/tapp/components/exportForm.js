@@ -4,6 +4,7 @@ import { Form, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 // form for exporting app data to a file
 class ExportForm extends React.Component {
     exportData(data, format) {
+        let session = this.props.getSelectedSession();
         if (data == 'offers') {
             // export offers
             if (Object.keys(this.props.getAssignmentsList()).length == 0) {
@@ -14,7 +15,7 @@ class ExportForm extends React.Component {
 
             if (format == 'csv') {
                 // export offers in CSV format
-                window.open('/export/offers');
+                this.props.downloadFile('/export/offers/'+session);
             } else if (this.props.getSelectedRound() != null) {
                 // export offers for a round in JSON format
                 if (
@@ -23,7 +24,7 @@ class ExportForm extends React.Component {
                     )
                 ) {
                     // export offers in JSON format
-                    this.props.exportOffers();
+                    this.props.exportOffers(session);
                 }
             } else {
                 // export offers for all rounds in JSON format
@@ -41,7 +42,7 @@ class ExportForm extends React.Component {
 
             // export other data in CS
             if (format == 'csv') {
-                window.open('/export/' + data);
+                this.props.downloadFile('/export/' + data+'/'+session);
             } else {
                 this.props.alert(
                     '<b>Export JSON</b> This functionality is not currently supported.'

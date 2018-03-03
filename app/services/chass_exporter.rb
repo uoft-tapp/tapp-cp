@@ -1,8 +1,8 @@
 class ChassExporter
+  include SessionSeparate
 
-    def initialize
-      @assignments = Assignment.all.includes([:position, :applicant])
-      @applicants = Applicant.all.includes([:applications])
+    def initialize(session)
+      session_check(session)
     end
 
     def export(round_id)

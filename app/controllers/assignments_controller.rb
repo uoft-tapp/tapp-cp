@@ -16,7 +16,7 @@ class AssignmentsController < ApplicationController
       elsif params[:position_id].present?
         Position.find(params[:position_id]).assignments
       elsif params[:session_id].present?
-        get_assignments_from_session(params[:session_id])
+        assignments_from_session(params[:session_id])
       else
         Assignment.all
       end
@@ -147,13 +147,6 @@ class AssignmentsController < ApplicationController
         end
       end
       return applicants.sort_by { |item| item[:last_name] }
-    end
-
-    def get_assignments_from_session(session)
-      attr = Assignment.column_names.map {|i| "a.#{i}"}
-      session_select = "SELECT p.id id FROM positions p WHERE p.session_id=#{session}"
-      sql="SELECT DISTINCT #{attr.join(', ')} FROM assignments a, (#{session_select}) p WHERE p.id=a.position_id ORDER BY a.id"
-      return execute_sql(sql)
     end
 
     def set_domain

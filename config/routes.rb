@@ -62,10 +62,10 @@ Rails.application.routes.draw do
   resources :templates, only: [:index, :show, :create, :destroy, :update]
 
   # TAPP routes
-  get "/export/chass/:round_id", to: "export#chass"
-  get "/export/cdf-info", to: "export#cdf"
-  get "/export/transcript-access", to: "export#transcript_access"
-  get "/export/offers", to: "export#offers"
+  get "/export/chass/sessions/:session_id/:round_id", to: "export#chass"
+  get "/export/cdf-info/:session_id", to: "export#cdf"
+  get "/export/transcript-access/:session_id", to: "export#transcript_access"
+  get "/export/offers/:session_id", to: "export#offers"
   post "/import/chass", to: "import#chass"
   get "/export/cp-offers/:session_id", to: "export#cp_offers"
   post "/import/enrolment", to: "import#enrolment"

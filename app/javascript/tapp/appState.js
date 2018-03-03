@@ -627,8 +627,12 @@ class AppState {
     }
 
     // export current assignments
-    exportOffers() {
-        fetch.exportOffers(this.get('selectedRound'));
+    exportOffers(session) {
+        fetch.exportOffers(this.get('selectedRound'), session);
+    }
+
+    downloadFile(route){
+        fetch.downloadFile(route);
     }
 
     fetchingSessions(){

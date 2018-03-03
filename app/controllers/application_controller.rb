@@ -4,15 +4,7 @@ class ApplicationController < ActionController::Base
   before_action :set_cache_headers
   before_action :logged_in
   include Model
-
-  def execute_sql(sql)
-    results = ActiveRecord::Base.connection.execute("#{sql};")
-    if results.present?
-      return JSON.parse(results.to_json, symbolize_names: true)
-    else
-      return nil
-    end
-  end
+  include SessionSeparate
 
   private
   def set_cache_headers

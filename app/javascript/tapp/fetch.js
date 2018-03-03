@@ -33,7 +33,7 @@ const getCourses = () => getResource('/positions',
 const getAssignments = () => getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
-const downloadFile = (route) => fetchProc.downloadFile(route, appState);
+export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
 const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
@@ -138,8 +138,8 @@ export const unlockAssignment = (applicant, assignment) => {
 }
 
 // export offers from CHASS (locking the corresponding assignments)
-export const exportOffers = (round) => {
-    downloadFile('/export/chass/' + round)
+export const exportOffers = (round, session) => {
+    downloadFile('/export/sessions/'+session+'/chass/' + round)
     .then(() => getAssignments());
 }
 
