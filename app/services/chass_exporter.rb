@@ -39,7 +39,7 @@ class ChassExporter
         if course[:round_id]==round_id.to_i
           course_id = course[:position]
           round_id = course[:round_id]
-          applications = @applicants.find(assignment.applicant[:id]).applications
+          applications = Applicant.all.find(assignment.applicant[:id]).applications
           application = get_application(applications, round_id)
           applicant = assignment.applicant
           if application
