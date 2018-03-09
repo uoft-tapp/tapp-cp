@@ -47,8 +47,26 @@ export const putHelper = (URL, body, appState) => {
         credentials: 'include',
     }, appState);
 }
-export const getResource = (route, onSuccess, dataName, setData, appState) =>
-  getHelper(route)
+export const getResource = (route, onSuccess, dataName, setData, mince, state) =>{
+  let appState = state;
+  if(mince){
+    let session = setData?
+      appState.getSelectedSession():appState.get('selectedSession');
+    if(session&&session!='N/A'){
+      route = '/sessions/'+session+route;
+      return getResHelper(route, onSuccess, dataName, setData, appState);
+    }
+    else{
+      setData? setData([]): appState.set(dataName+'.list', fromJS([]));
+      return appState.setFetchingDataList(dataName, false, true);
+    };
+  }
+  else{
+    return getResHelper(route, onSuccess, dataName, setData, appState);
+  }
+}
+function getResHelper(route, onSuccess, dataName, setData, appState){
+  return getHelper(route)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(onSuccess)
       .then(data => {
@@ -56,6 +74,7 @@ export const getResource = (route, onSuccess, dataName, setData, appState) =>
           appState.setFetchingDataList(dataName, false, true);
       })
       .catch(() => appState.setFetchingDataList(dataName, false));
+}
 
 /*
   On Fetch Success functions
@@ -435,7 +454,7 @@ export const setRole = (roles, cp, appState)=>{
           if (resp.development) {
               appState.setCurrentUserRoles(roles);
               appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName('DEV');
+              appState.setCurrentUserName('zaleskim');
           } else {
               roles = resp.roles.filter(role =>roles.includes(role));
               appState.setCurrentUserRoles(roles);

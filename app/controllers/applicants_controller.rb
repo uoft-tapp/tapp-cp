@@ -8,8 +8,11 @@ class ApplicantsController < ApplicationController
     /applicants/
 '''
   def index
-    @applicants = Applicant.all
-    render json: @applicants.to_json
+    if params[:session_id]
+      render json: applicants_from_session(params[:session_id])
+    else
+      render json: Applicant.all
+    end
   end
 
 '''

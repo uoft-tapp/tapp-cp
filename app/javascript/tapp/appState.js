@@ -26,6 +26,8 @@ const initialState = {
     // application round to display
     selectedRound: null,
 
+    selectedSession: null,
+
     // ABC view
     abcView: {
         selectedCourses: [],
@@ -593,6 +595,7 @@ class AppState {
     // check if any data is being fetched
     anyFetching() {
         return [
+            this.get('sessions.fetching'),
             this.get('courses.fetching'),
             this.get('instructors.fetching'),
             this.get('applicants.fetching'),
@@ -604,6 +607,7 @@ class AppState {
     // check if any data has not yet been fetched
     anyNull() {
         return [
+            this.get('sessions.list'),
             this.get('courses.list'),
             this.get('instructors.list'),
             this.get('applicants.list'),
@@ -623,8 +627,16 @@ class AppState {
     }
 
     // export current assignments
-    exportOffers() {
-        fetch.exportOffers(this.get('selectedRound'));
+    exportOffers(session) {
+        fetch.exportOffers(this.get('selectedRound'), session);
+    }
+
+    downloadFile(route){
+        fetch.downloadFile(route);
+    }
+
+    fetchingSessions(){
+        return this.get('sessions.fetching') > 0;
     }
 
     // check if applicants are being fetched
@@ -786,7 +798,8 @@ class AppState {
         let assignments = this.getAssignmentsList(),
             applicants = this.getApplicantsList();
 
-        return assignments.map((_, applicant) => applicants.get(applicant)).entrySeq();
+        applicants = assignments.map((_, applicant) => applicants.get(applicant));
+        return applicants.filter(_ => _).entrySeq();
     }
 
     getAssignmentByApplicant(applicant, course) {
@@ -858,7 +871,10 @@ class AppState {
 
     // get a sorted list of course codes
     getCourseCodes() {
-        return this.getCoursesList().map(course => course.get('code')).flip().keySeq().sort();
+        let courses = this.getCoursesList();
+        if(courses.size>0)
+          return courses.map(course => course.get('code')).flip().keySeq().sort();
+        else return [];
     }
 
     getCourseCodeById(course) {
@@ -883,13 +899,50 @@ class AppState {
         return this.getCoursesInSelectedRound();
     }
 
+    getSessionsList(){
+        return this.get('sessions.list');
+    }
+
+    getSessionName(id){
+        let sessions = this.getSessionsList();
+        let selected = sessions.get(id);
+        if(selected)
+            return selected.get('semester')+' '+selected.get('year');
+        else return null;
+    }
+
+    selectSession(id){
+      this.set('selectedSession', id);
+      fetch.fetchAll();
+    }
+
+    getLatestSession(){
+      let latest = null;
+      this.getSessionsList().forEach((key, id)=>{
+        if(!latest|| id>latest)
+          latest = id;
+      });
+      return latest?latest:'N/A';
+    }
+
+    setLatestSession(){
+      this.set('selectedSession', this.getLatestSession());
+    }
+
+    getSelectedSession(){
+      return this.get('selectedSession');
+    }
+
     getInstructorsList() {
         return this.get('instructors.list');
     }
 
     // get a list of all rounds for all courses
     getRounds() {
-        return this.get('courses.list').map(course => course.get('round')).flip().keySeq();
+        let courses = this.get('courses.list');
+        if(courses.size>0)
+          return courses.map(course => course.get('round')).flip().keySeq();
+        else return [];
     }
 
     // get all applicants who have not been assigned to a course; returns a list of [applicantID, applicantData]
@@ -901,7 +954,7 @@ class AppState {
             assignments.reduce((result, _, app) => result.delete(app), map);
         });
 
-        return applicants.entrySeq();
+        return applicants.filter(_ => _).entrySeq();
     }
 
     importChass(data, year, semester) {

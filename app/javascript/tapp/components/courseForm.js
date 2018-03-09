@@ -135,7 +135,7 @@ class CourseForm extends React.Component {
                                     defaultVal={
                                         this.props.course.startDate
                                             ? this.props.course.startDate.split('T')[0]
-                                            : undefined
+                                            : "hello"
                                     }
                                     update={val => {
                                         if (val != this.props.course.startDate) {

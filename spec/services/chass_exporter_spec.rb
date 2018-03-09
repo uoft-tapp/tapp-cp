@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe ChassExporter do
-  let (:exporter) { ChassExporter.new }
   let(:session) do
     Session.create!(
       semester: "Fall",
@@ -58,7 +57,9 @@ describe ChassExporter do
   end
 
   context "when round_id is invalid" do
-    subject { exporter.export(1) }
+    subject do
+      ChassExporter.new(session[:id]).export(1)
+    end
     it "return generated false and an error message" do
       expect(subject).to eq({generated: false, msg: "Error: Invalid round_id"})
     end
@@ -66,8 +67,9 @@ describe ChassExporter do
 
   context "when round_id is valid" do
     context "and there are no assignments" do
-      subject { exporter.export(position[:round_id]) }
-
+      subject do
+        ChassExporter.new(session[:id]).export(position[:round_id])
+      end
       it "returns generated false and an error message" do
         expect(subject).to eq ({generated: false,
           msg: "Warning: You have not made any assignments. Operation aborted."})
@@ -89,7 +91,9 @@ describe ChassExporter do
           name: "#{@applicant[:first_name]} #{@applicant[:last_name]}"
         }]
       end
-      subject { exporter.export(position[:round_id]) }
+      subject do
+        ChassExporter.new(session[:id]).export(position[:round_id])
+      end 
 
       it "returns generated true and data of all assignments in :round_id" do
         expect(subject).to eq ({generated: true, data: JSON.pretty_generate(@data),

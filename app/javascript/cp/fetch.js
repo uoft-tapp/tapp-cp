@@ -1,6 +1,7 @@
 import React from 'react';
 import { appState } from './appState.js';
 import * as fetchProc from '../fetchProc.js';
+import { fromJS } from 'immutable';
 
 /* General helpers */
 const msgFailure = (text) => fetchProc.msgFailure(text, appState);
@@ -10,11 +11,23 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName) =>
-    fetchProc.getResource(route, onSuccess, dataName, null, appState);
+const getResource = (route, onSuccess, dataName, mince=true) =>
+    fetchProc.getResource(route, onSuccess, dataName, null, mince, appState);
+
+const getSessions = () => getResource('/sessions',
+    fetchProc.onFetchSessionsSuccess, 'sessions', false);
 
 const getCategories = () => getResource('/categories',
-    fetchProc.onFetchCategoriesSuccess, 'categories');
+    fetchProc.onFetchCategoriesSuccess, 'categories', false);
+
+const getDuties = () => getResource('/duties',
+    fetchProc.onFetchDutiesSuccess, 'duties', false);
+
+const getTrainings = () => getResource('/trainings',
+    fetchProc.onFetchTrainingsSuccess, 'trainings', false);
+
+const getTemplates = user => getResource('/instructors/' + user + '/templates',
+    fetchProc.onFetchTemplatesSuccess, 'templates', false);
 
 const getCourses = (user = null) => getResource(
     ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
@@ -24,21 +37,10 @@ const getDdahs = user => getResource(
     user ? '/instructors/' + user + '/ddahs' : '/ddahs',
     fetchProc.onFetchDdahsSuccess, 'ddahs');
 
-const getDuties = () => getResource('/duties',
-    fetchProc.onFetchDutiesSuccess, 'duties');
-
 const getOffers = user => getResource(
     user ? '/instructors/' + user + '/offers' : '/offers',
     fetchProc.onFetchOffersSuccess, 'offers');
 
-const getSessions = () => getResource('/sessions',
-    fetchProc.onFetchSessionsSuccess, 'sessions');
-
-const getTemplates = user => getResource('/instructors/' + user + '/templates',
-    fetchProc.onFetchTemplatesSuccess, 'templates');
-
-const getTrainings = () => getResource('/trainings',
-    fetchProc.onFetchTrainingsSuccess, 'trainings');
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
@@ -54,20 +56,36 @@ const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, 
 
 /* Function to GET all resources */
 export const adminFetchAll = () =>  {
-    getDdahs();
-    getOffers();
-    getSessions();
-    getCourses();
+    getSessions().then(()=>{
+      let sessions = appState.getSessionsList();
+      if(!sessions){
+        appState.setSessionsList(fromJS([]));
+      }
+      let session = appState.getSelectedSession();
+      if(!session||session=='N/A')
+        appState.setLatestSession();
+      getOffers();
+      getDdahs();
+      getCourses();
+    });
 }
 
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
-    getSessions();
+    getSessions().then(()=>{
+      let sessions = appState.getSessionsList();
+      if(!sessions){
+        appState.setSessionsList(fromJS([]));
+      }
+      let session = appState.getSelectedSession();
+      if(!session||session=='N/A')
+        appState.setLatestSession();
+      getOffers(user);
+      getDdahs(user);
+      getCourses(user);
+    });
     getCategories();
-    getCourses(user);
-    getDdahs(user);
     getDuties();
-    getOffers(user);
     getTemplates();
     getTrainings();
 }
@@ -258,7 +276,7 @@ export const exportOffers = (session) => {
 }
 
 export const exportDdahs = (course, session) => {
-  (course!='all')?
+  (course!='all'&&course)?
     downloadFile('/export/ddahs/' + course):
     downloadFile('/export/session-ddahs/'+ session);
 }
@@ -268,7 +286,7 @@ export const createTemplate = (name) => {
   let user = appState.getCurrentUserName();
   let fetch = true;
   return postData('/instructors/' + user + '/templates', { name: name },() => {
-      if(fetcht) getTemplates(user);
+      if(fetch) getTemplates(user);
     }, null,
     resp => {
       fetch = false;

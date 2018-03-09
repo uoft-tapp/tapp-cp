@@ -1,8 +1,8 @@
 class ChassExporter
+  include SessionSeparate
 
-    def initialize
-      @assignments = Assignment.all.includes([:position, :applicant])
-      @applicants = Applicant.all.includes([:applications])
+    def initialize(session)
+      session_check(session)
     end
 
     def export(round_id)
@@ -39,7 +39,7 @@ class ChassExporter
         if course[:round_id]==round_id.to_i
           course_id = course[:position]
           round_id = course[:round_id]
-          applications = @applicants.find(assignment.applicant[:id]).applications
+          applications = Applicant.all.find(assignment.applicant[:id]).applications
           application = get_application(applications, round_id)
           applicant = assignment.applicant
           if application

@@ -14,10 +14,18 @@ class DdahsController < ApplicationController
   end
 
   def index
-    if params[:utorid]
-      render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid]))
+    if params[:session_id]
+      if params[:utorid]
+        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], params[:session_id]))
+      else
+        render json: get_all_ddahs(ddahs_from_session(params[:session_id]))
+      end
     else
-      render json: get_all_ddahs(Ddah.all)
+      if params[:utorid]
+        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], nil))
+      else
+        render json: get_all_ddahs(Ddah.all)
+      end
     end
   end
 
@@ -267,9 +275,10 @@ class DdahsController < ApplicationController
     end
   end
 
-  def get_all_ddah_for_utorid(utorid)
+  def get_all_ddah_for_utorid(utorid, session = nil)
     ddahs = []
-    Ddah.all.each do |ddah|
+    all_ddahs = (session) ? ddahs_from_session(session) : Ddah.all
+    all_ddahs.each do |ddah|
       offer = Offer.find(ddah[:offer_id])
       position = Position.find(offer[:position_id])
       position.instructors.each do |instructor|

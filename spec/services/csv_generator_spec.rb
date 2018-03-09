@@ -22,7 +22,7 @@ describe CSVGenerator do
     hours: 22,
     estimated_count: 15,
     estimated_total_hours: 330,
-    session_id: session.id,
+    session_id: session[:id],
     cap_enrolment: nil,
     num_waitlisted: nil,
     start_date: "2017-09-01 00:00:00 UTC",
@@ -60,7 +60,7 @@ describe CSVGenerator do
         )
     end
     context "when there are no assignments in the system" do
-      subject { generator.generate_cdf_info }
+      subject { generator.generate_cdf_info(session[:id]) }
       it "return generated false and an error message" do
         expect(subject).to eq({generated: false,
           msg: "Warning: You have not made any assignments. Operation aborted."})
@@ -70,7 +70,7 @@ describe CSVGenerator do
     context "when there are assignments in the system" do
       before(:each) do
         @assignment= applicant.assignments.create!(
-            position_id: position.id,
+            position_id: position[:id],
             hours: 50
         )
         @data = CSV.generate do |csv|
@@ -94,7 +94,7 @@ describe CSVGenerator do
           ]
         end
       end
-      subject { generator.generate_cdf_info }
+      subject { generator.generate_cdf_info(session[:id]) }
 
       it "returns generated true and data of all cdf info" do
         expect(subject).to eq ({generated: true, data: @data, type: "text/csv",
@@ -134,7 +134,7 @@ describe CSVGenerator do
     end
 
     context "when there are no assignments in the system" do
-      subject { generator.generate_offers }
+      subject { generator.generate_offers(session[:id]) }
       it "return generated false and an error message" do
         expect(subject).to eq({generated: false,
           msg: "Warning: You have not made any assignments. Operation aborted."})
@@ -144,7 +144,7 @@ describe CSVGenerator do
     context "when there are assignments in the system" do
       before(:each) do
         @assignment= applicant.assignments.create!(
-            position_id: position.id,
+            position_id: position[:id],
             hours: 50
         )
         @data = CSV.generate do |csv|
@@ -174,7 +174,7 @@ describe CSVGenerator do
           ]
         end
       end
-      subject { generator.generate_offers }
+      subject { generator.generate_offers(session[:id]) }
 
       it "returns generated true and data of all cdf info" do
         expect(subject).to eq ({generated: true, data: @data, type: "text/csv",
@@ -185,7 +185,7 @@ describe CSVGenerator do
 
   context "when generating transcript_access" do
     context "when there are no applicants in the system" do
-      subject { generator.generate_transcript_access }
+      subject { generator.generate_transcript_access(session[:id]) }
       it "return generated false and an error message" do
         expect(subject).to eq({generated: false,
           msg: "Warning: There are currenly no applicant in the system. Operation aborted"})
@@ -218,6 +218,9 @@ describe CSVGenerator do
           other_info: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget dignissim sem. Curabitur at semper eros. Aenean nec sem lobortis, scelerisque mi at, aliquam diam. Mauris malesuada elit nibh, sed hendrerit nulla mattis sed. Mauris laoreet imperdiet dictum. Pellentesque risus nulla, varius ut massa ut, venenatis fringilla sapien. Cras eget euismod augue, eget dignissim erat. Cras nec nibh ullamcorper ante rutrum dapibus sed nec tellus. In hac habitasse platea dictumst. Suspendisse semper tellus ac sem tincidunt auctor.",
           special_needs: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eget dignissim sem. Curabitur at semper eros. Aenean nec sem lobortis, scelerisque mi at, aliquam diam. Mauris malesuada elit nibh, sed hendrerit nulla mattis sed. Mauris laoreet imperdiet dictum. Pellentesque risus nulla, varius ut massa ut, venenatis fringilla sapien. Cras eget euismod augue, eget dignissim erat. Cras nec nibh ullamcorper ante rutrum dapibus sed nec tellus. In hac habitasse platea dictumst. Suspendisse semper tellus ac sem tincidunt auctor."
         )
+        @application.preferences.create!(
+            position_id: position[:id],
+        )
         @data = CSV.generate do |csv|
           csv << [
             "student_number",
@@ -235,7 +238,7 @@ describe CSVGenerator do
           ]
         end
       end
-      subject { generator.generate_transcript_access }
+      subject { generator.generate_transcript_access(session[:id]) }
 
       it "returns generated true and data of all cdf info" do
         expect(subject).to eq ({generated: true, data: @data, type: "text/csv",

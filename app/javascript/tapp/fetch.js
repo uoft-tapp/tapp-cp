@@ -11,30 +11,29 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName, setData) =>
-  fetchProc.getResource(route, onSuccess, dataName, setData, appState);
+const getResource = (route, onSuccess, dataName, setData, mince=true) =>
+  fetchProc.getResource(route, onSuccess, dataName, setData, mince, appState);
 
 /* Resource GETters */
-const getSessions = () => getResource(
-  '/sessions', fetchProc.onFetchSessionsSuccess, 'sessions', appState.setSessionsList);
+const getSessions = () => getResource('/sessions',
+  fetchProc.onFetchSessionsSuccess, 'sessions', appState.setSessionsList, false);
 
-const getApplicants = () => getResource(
-  '/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
+const getInstructors = () => getResource('/instructors',
+  fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList, false);
 
-const getApplications = () => getResource(
-  '/applications', fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
+const getApplicants = () => getResource('/applicants',
+  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
-const getCourses = () => getResource(
-  '/positions', fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList);
+const getApplications = () => getResource('/applications',
+  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
 
-const getAssignments = () => getResource(
-  '/assignments', fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
+const getCourses = () => getResource('/positions',
+  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList);
 
-const getInstructors = () => getResource(
-  '/instructors', fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList);
+const getAssignments = () => getResource('/assignments',
+  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
-
-const downloadFile = (route) => fetchProc.downloadFile(route, appState);
+export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
 const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
@@ -43,10 +42,19 @@ const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState
 /* Function to GET all resources */
 
 export const fetchAll = () => {
-    getApplicants();
-    getApplications();
-    getAssignments();
-    getCourses();
+    getSessions().then(()=>{
+      let sessions = appState.getSessionsList();
+      if(!sessions){
+        appState.setSessionsList([]);
+      }
+      let session = appState.getSelectedSession();
+      if(!session||session=='N/A')
+        appState.setLatestSession();
+      getApplicants();
+      getApplications();
+      getAssignments();
+      getCourses();
+    });
     getInstructors();
 }
 
@@ -130,8 +138,8 @@ export const unlockAssignment = (applicant, assignment) => {
 }
 
 // export offers from CHASS (locking the corresponding assignments)
-export const exportOffers = (round) => {
-    downloadFile('/export/chass/' + round)
+export const exportOffers = (round, session) => {
+    downloadFile('/export/sessions/'+session+'/chass/' + round)
     .then(() => getAssignments());
 }
 

@@ -90,6 +90,32 @@ const CoursePanelLayoutTabs = props => {
     return null;
 };
 
+const Session = props => {
+    if (!props.fetchingSessions()){
+      let sessions = props.getSessionsList();
+      if(sessions){
+        sessions = Object.keys(sessions);
+        let selectedId = props.getSelectedSession();
+        let selectedSession = props.getSessionName(selectedId);
+
+        return (
+          <NavDropdown
+            id = "session-drop-down" noCaret
+            title ={<span>{selectedSession}</span>}
+            onSelect={eventKey => props.selectSession(eventKey)}>
+            {sessions.map((id)=>
+              (parseInt(id) != selectedId)&&
+              <MenuItem eventKey={id} key={id}>
+              {props.getSessionName(id)}
+              </MenuItem>
+            )}
+          </NavDropdown>
+        );
+      }
+    }
+    return null;
+};
+
 const Round = props => {
     if (props.isCoursesListNull()) {
         return null;
@@ -224,6 +250,7 @@ const NavbarInst = props =>
         <Nav pullRight>
             {props.getSelectedNavTab() == routeConfig.abc.id &&
                 <CoursePanelLayoutTabs {...props} />}
+            <Session {...props} />
             <Round {...props} />
             <Notifications {...props} />
             <Auth {...props} />

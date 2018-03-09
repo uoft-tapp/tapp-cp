@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
   before_action :set_cache_headers
   before_action :logged_in
+  include Model
+  include SessionSeparate
 
   private
   def set_cache_headers

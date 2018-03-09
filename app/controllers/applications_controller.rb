@@ -1,5 +1,6 @@
 class ApplicationsController < ApplicationController
   include Authorizer
+  include Model
   before_action :tapp_admin
 
 '''
@@ -14,6 +15,8 @@ class ApplicationsController < ApplicationController
     @applications = if params[:applicant_id].present?
       # Since Applicants are associated to applications
       Applicant.find(params[:applicant_id]).applications.includes(:preferences)
+    elsif params[:session_id].present?
+      applications_from_session(params[:session_id])
     else
       Application.includes(:preferences).all
     end
@@ -30,4 +33,5 @@ class ApplicationsController < ApplicationController
     # convert preferences into json - since we did the grunt work before this will be easy -
     render json: @application.to_json(include: [:preferences])
   end
+
 end

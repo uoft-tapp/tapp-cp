@@ -23,7 +23,7 @@ const initialState = {
     selectedSortFields: [],
     selectedFilters: {},
 
-    selectedSession: '',
+    selectedSession: null,
 
     ddahWorksheet: {
         supervisor: null,
@@ -383,8 +383,28 @@ class AppState {
         this.set('nav.selectedTab', eventKey);
     }
 
-    selectSession(session) {
-        this.set('selectedSession', session);
+    selectSession(id) {
+        this.set('selectedSession', id);
+        let role = appState.getSelectedUserRole();
+        switch(role){
+          case 'cp_admin':
+          case 'hr_assistant':
+            fetch.adminFetchAll();
+            break;
+          case 'instructor':
+            fetch.instructorFetchAll();
+            break;
+        }
+    }
+
+    getSessionName(id){
+        let sessions = this.getSessionsList();
+        if(sessions.size>0){
+          let selected = sessions.get(id);
+          if(selected)
+              return selected.get('semester')+' '+selected.get('year');
+        }
+        return '';
     }
 
     selectCourse(course) {
@@ -687,11 +707,9 @@ class AppState {
     exportDdahs() {
         let course = this.getSelectedCourse();
         let selectedSession = this.getSelectedSession();
-        if (course!=null && selectedSession=='') {
-            this.alert(
-                '<b>Export ddah from all sessions</b> This functionality is not currently supported. Please select a course or a session.'
-            );
-            return;
+        if(selectedSession=='N/A'){
+          this.alert('<b>Error</b>: You do not have a session in the system. Please import data from TAPP.');
+          return;
         }
         fetch.exportDdahs(course, selectedSession);
     }
@@ -806,7 +824,7 @@ class AppState {
     getPositions() {
         let offers = this.getOffersList();
 
-        if (offers) {
+        if (offers.size>0) {
             return offers
                 .map(offer => offer.get('course'))
                 .flip()
@@ -1133,6 +1151,19 @@ class AppState {
         });
 
         this.set('sessions.list', list);
+    }
+
+    getLatestSession(){
+      let latest = null;
+      this.getSessionsList().forEach((key, id)=>{
+        if(!latest|| id>latest)
+          latest = id;
+      });
+      return latest?latest:'N/A';
+    }
+
+    setLatestSession(){
+      this.set('selectedSession', this.getLatestSession());
     }
 
     setTemplatesList(list) {
