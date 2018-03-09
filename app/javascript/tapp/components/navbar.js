@@ -95,7 +95,7 @@ const Round = props => {
         return null;
     }
 
-    let rounds = props.getRounds();
+    let rounds = props.getRounds().sort((a, b)=> parseInt(a)-parseInt(b));
     let selectedRound = props.getSelectedRound();
 
     // add round-based colour rules to a new stylesheet
