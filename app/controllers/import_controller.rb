@@ -14,7 +14,7 @@ class ImportController < ApplicationController
   def import_locked_assignments
     importer = OfferImporter.new
     importer.import_assignments()
-    render json: {errors: false, message: ["Importing locked assignments as offers was successful."]}
+    render json: {errors: false}
   end
 
   def chass
@@ -26,17 +26,13 @@ class ImportController < ApplicationController
   def enrolment
     updater = EnrolmentUpdater.new(params[:enrolment_data])
     status = updater.get_status
-    if status[:updated]==true
-      render json: {message: status[:message]}
-    else
-      render status: 404, json: {message: status[:message]}
-    end
+    import_helper(status)
   end
 
   def instructors
     importer = InstructorImporter.new
     importer.import_instructors(params[:instructor_data])
-    render json: {message: "Instructors successfully imported."}
+    render json: {errors: false}
   end
 
   def ddahs
@@ -54,7 +50,7 @@ class ImportController < ApplicationController
   private
   def import_helper(status)
     if status[:success]
-      render json: {message: status[:message], errors: status[:errors]}
+      render json: {errors: status[:errors], message: status[:message]}
     else
       render status: 404, json: {message: status[:message], errors: status[:errors]}
     end

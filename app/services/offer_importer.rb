@@ -3,6 +3,9 @@ class OfferImporter
 
   def import_json(file)
     exceptions = []
+    if file[:offers]==nil
+      return {success: false, errors: true, message: ["Error: This file is not an offer JSON."]}
+    end
     file[:offers].each do |offer|
       position = Position.find_by(position: offer["course_id"], round_id: offer["round_id"])
       applicant = Applicant.find_by(utorid: offer["utorid"])

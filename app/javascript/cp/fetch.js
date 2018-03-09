@@ -1,831 +1,152 @@
 import React from 'react';
-import { fromJS } from 'immutable';
 import { appState } from './appState.js';
+import * as fetchProc from '../fetchProc.js';
 
 /* General helpers */
+const msgFailure = (text) => fetchProc.msgFailure(text, appState);
+const respFailure = (resp) => fetchProc.respFailure(resp, appState);
 
-function msgFailure(text) {
-    appState.alert('<b>Action Failed:</b> ' + text);
-    return Promise.reject();
-}
+const getHelper = (URL) => fetchProc.getHelper(URL, appState);
+const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
+const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
+const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
+const getResource = (route, onSuccess, dataName) =>
+    fetchProc.getResource(route, onSuccess, dataName, null, appState);
 
-function respFailure(resp) {
-    appState.alert('<b>Action Failed</b> ' + resp.url + ': ' + resp.statusText);
-    return Promise.reject();
-}
+const getCategories = () => getResource('/categories',
+    fetchProc.onFetchCategoriesSuccess, 'categories');
 
-function fetchHelper(URL, init) {
-    return fetch(URL, init).catch(function(error) {
-        appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
-        return Promise.reject(error);
-    });
-}
+const getCourses = (user = null) => getResource(
+    ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
+    fetchProc.onFetchCpCoursesSuccess, 'courses');
 
-function getHelper(URL) {
-    return fetchHelper(URL, {
-        headers: {
-            Accept: 'application/json',
-        },
-        method: 'GET',
-        credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
-    });
-}
+const getDdahs = user => getResource(
+    user ? '/instructors/' + user + '/ddahs' : '/ddahs',
+    fetchProc.onFetchDdahsSuccess, 'ddahs');
 
-function postHelper(URL, body) {
-    return fetchHelper(URL, {
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'POST',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    });
-}
+const getDuties = () => getResource('/duties',
+    fetchProc.onFetchDutiesSuccess, 'duties');
 
-function deleteHelper(URL) {
-    return fetchHelper(URL, {
-        method: 'DELETE',
-        credentials: 'include',
-    });
-}
+const getOffers = user => getResource(
+    user ? '/instructors/' + user + '/offers' : '/offers',
+    fetchProc.onFetchOffersSuccess, 'offers');
 
-function putHelper(URL, body) {
-    return fetchHelper(URL, {
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'PUT',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    });
-}
+const getSessions = () => getResource('/sessions',
+    fetchProc.onFetchSessionsSuccess, 'sessions');
 
-function patchHelper(URL, body) {
-    return fetchHelper(URL, {
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-        },
-        method: 'PATCH',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    });
-}
+const getTemplates = user => getResource('/instructors/' + user + '/templates',
+    fetchProc.onFetchTemplatesSuccess, 'templates');
 
-/* Resource GETters */
+const getTrainings = () => getResource('/trainings',
+    fetchProc.onFetchTrainingsSuccess, 'trainings');
 
-const getCategories = () =>
-    getHelper('/categories')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchCategoriesSuccess);
+const downloadFile = (route) => fetchProc.downloadFile(route, appState);
+const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
+const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
+const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
+const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
 
-const getCourses = ((user = null) =>{
-    let url = "";
-    if (user != null)
-        url = '/instructors/' + user + '/positions';
-    else
-        url = '/positions';
-    return getHelper(url)
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchCoursesSuccess);
-});
+const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra = null, put =false) =>
+  fetchProc.batchOfferAction(canRoute, actionRoute, data, msg, fetch, extra, put, appState);
 
-const getDdahs = user =>
-    getHelper(user ? '/instructors/' + user + '/ddahs' : '/ddahs')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchDdahsSuccess);
-
-const getDuties = () =>
-    getHelper('/duties')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchDutiesSuccess);
-
-const getOffers = user =>
-    getHelper(user ? '/instructors/' + user + '/offers' : '/offers')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchOffersSuccess);
-
-const getSessions = () =>
-    getHelper('/sessions')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchSessionsSuccess);
-
-const getTemplates = user =>
-    getHelper('/instructors/' + user + '/templates')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchTemplatesSuccess);
-
-const getTrainings = () =>
-    getHelper('/trainings')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(onFetchTrainingsSuccess);
-
-const downloadFile = (route) =>{
-  let download = false;
-  let filename = '';
-  getHelper(route)
-  .then(resp=>{
-    if(resp.ok){
-      download = true;
-      filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
-      return resp.blob();
-    }
-    else{
-      return resp.json();
-    }
-  })
-  .then(resp => {
-    if(download){
-      let url = URL.createObjectURL(resp);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-    else{
-      appState.alert(resp.message);
-    }
-  });
-}
-
-/* Success callbacks for resource GETters */
-
-function onFetchCategoriesSuccess(resp) {
-    let categories = {};
-
-    resp.forEach(category => {
-        categories[category.id] = category.name;
-    });
-
-    return categories;
-}
-
-function onFetchCoursesSuccess(resp) {
-    let courses = {};
-
-    resp.forEach(course => {
-        courses[course.id] = {
-            name: course.course_name,
-            code: course.position,
-            campus: (function(code) {
-                switch (code) {
-                    case 1:
-                        return 'St. George';
-                    case 3:
-                        return 'Scarborough';
-                    case 5:
-                        return 'Mississauga';
-                    default:
-                        return 'Other';
-                }
-            })(course.campus_code),
-            session: course.session_id,
-            estimatedEnrol: course.current_enrolment,
-            cap: course.cap_enrolment,
-            waitlist: course.num_waitlisted,
-            instructors: course.instructors,
-        };
-    });
-
-    return courses;
-}
-
-function onFetchDdahsSuccess(resp) {
-    let ddahs = {};
-
-    resp.forEach(ddah => {
-        ddahs[ddah.id] = {
-            offer: ddah.offer_id,
-            position: ddah.position.id,
-            department: ddah.department,
-            supervisor: ddah.supervisor,
-            supervisorId: ddah.instructor_id,
-            tutCategory: ddah.tutorial_category,
-            optional: ddah.optional,
-            requiresTraining: ddah.scaling_learning,
-            allocations: ddah.allocations.map(allocation => ({
-                id: allocation.id,
-                units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
-                time: allocation.minutes,
-            })),
-            trainings: ddah.trainings,
-            categories: ddah.categories,
-            superSignature: ddah.supervisor_signature,
-            superSignDate: ddah.supervisor_sign_date,
-            authSignature: ddah.ta_coord_signature,
-            authSignDate: ddah.ta_coord_sign_date,
-            studentSignature: ddah.student_signature,
-            studentSignDate: ddah.student_sign_date,
-            link: ddah.link,
-        };
-    });
-
-    return ddahs;
-}
-
-function onFetchDutiesSuccess(resp) {
-    let duties = {};
-
-    resp.forEach(duty => {
-        duties[duty.id] = duty.name;
-    });
-
-    return duties;
-}
-
-function onFetchOffersSuccess(resp) {
-    let offers = {};
-
-    resp.forEach(offer => {
-        offers[offer.id] = {
-            applicantId: offer.applicant_id,
-            firstName: offer.applicant.first_name,
-            lastName: offer.applicant.last_name,
-            studentNumber: offer.applicant.student_number,
-            email: offer.applicant.email,
-            utorid: offer.applicant.utorid,
-            course: offer.position,
-            position: offer.position_id,
-            session: offer.session ? offer.session.id : undefined,
-            hours: offer.hours,
-            nagCount: offer.nag_count,
-            InstructorNagCount: offer.ddah_nag_count,
-            ddahNagCount: offer.ddah_applicant_nag_count,
-            status: offer.status,
-            hrStatus: offer.hr_status,
-            ddahStatus: offer.ddah_status,
-            sentAt: offer.send_date,
-            printedAt: offer.print_time,
-            link: offer.link,
-            note: offer.commentary,
-            ddahSendDate: offer.ddah_send_date,
-        };
-    });
-
-    return offers;
-}
-
-function onFetchSessionsSuccess(resp) {
-    let sessions = {};
-
-    resp.forEach(session => {
-        sessions[session.id] = {
-            year: session.year,
-            semester: session.semester,
-            pay: session.pay,
-        };
-    });
-
-    return sessions;
-}
-
-function onFetchTemplatesSuccess(resp) {
-    let templates = {};
-
-    resp.forEach(template => {
-        templates[template.id] = {
-            name: template.name,
-            optional: template.optional,
-            requiresTraining: template.scaling_learning,
-            allocations: template.allocations.map(allocation => ({
-                id: allocation.id,
-                units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
-                time: allocation.minutes,
-            })),
-            trainings: template.trainings,
-            categories: template.trainings,
-        };
-    });
-
-    return templates;
-}
-
-function onFetchTrainingsSuccess(resp) {
-    let trainings = {};
-
-    resp.forEach(training => {
-        trainings[training.id] = training.name;
-    });
-
-    return trainings;
-}
+const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra = null, put=false) =>
+  fetchProc.batchDdahAction(canRoute, actionRoute, data, msg, fetch, extra, put, appState);
 
 /* Function to GET all resources */
-
-function adminFetchAll() {
-    appState.setFetchingDataList('ddahs', true);
-    appState.setFetchingDataList('offers', true);
-    appState.setFetchingDataList('sessions', true);
-    appState.setFetchingDataList('courses', true);
-
-    // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
-    getDdahs()
-        .then(ddahs => {
-            appState.setDdahsList(fromJS(ddahs));
-            appState.setFetchingDataList('ddahs', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('ddahs', false));
-
-    // when offers are successfully fetched, update the offers list; set fetching flag to false either way
-    getOffers()
-        .then(offers => {
-            appState.setOffersList(fromJS(offers));
-            appState.setFetchingDataList('offers', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('offers', false));
-
-    // when sessions are successfully fetched, update the sessions list; set fetching flag to false either way
-    getSessions()
-        .then(sessions => {
-            appState.setSessionsList(fromJS(sessions));
-            appState.setFetchingDataList('sessions', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('sessions', false));
-
-    // when courses are successfully fetched, update the courses list; set fetching flag to false either way
-    getCourses()
-        .then(courses => {
-            appState.setCoursesList(fromJS(courses));
-            appState.setFetchingDataList('courses', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('courses', false));
+export const adminFetchAll = () =>  {
+    getDdahs();
+    getOffers();
+    getSessions();
+    getCourses();
 }
 
-function instructorFetchAll() {
+export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
-
-    appState.setFetchingDataList('categories', true);
-    appState.setFetchingDataList('courses', true);
-    appState.setFetchingDataList('ddahs', true);
-    appState.setFetchingDataList('duties', true);
-    appState.setFetchingDataList('offers', true);
-    appState.setFetchingDataList('templates', true);
-    appState.setFetchingDataList('trainings', true);
-
-    // when categories are successfully fetched, update the categories list; set fetching flag to false either way
-    getCategories()
-        .then(categories => {
-            appState.setCategoriesList(fromJS(categories));
-            appState.setFetchingDataList('categories', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('categories', false));
-
-    // when courses are successfully fetched, update the courses list; set fetching flag to false either way
-    getCourses(user)
-        .then(courses => {
-            appState.setCoursesList(fromJS(courses));
-            appState.setFetchingDataList('courses', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('courses', false));
-
-    // when ddahs are successfully fetched, update the ddahs list; set fetching flag to false either way
-    getDdahs(user)
-        .then(ddahs => {
-            appState.setDdahsList(fromJS(ddahs));
-            appState.setFetchingDataList('ddahs', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('ddahs', false));
-
-    // when duties are successfully fetched, update the duties list; set fetching flag to false either way
-    getDuties()
-        .then(duties => {
-            appState.setDutiesList(fromJS(duties));
-            appState.setFetchingDataList('duties', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('duties', false));
-
-    // when offers are successfully fetched, update the offers list; set fetching flag to false either way
-    getOffers(user)
-        .then(offers => {
-            appState.setOffersList(fromJS(offers));
-            appState.setFetchingDataList('offers', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('offers', false));
-
-    // when templates are successfully fetched, update the templates list; set fetching flag to false either way
-    getTemplates(user)
-        .then(templates => {
-            appState.setTemplatesList(fromJS(templates));
-            appState.setFetchingDataList('templates', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('templates', false));
-
-    // when trainings are successfully fetched, update the trainings list; set fetching flag to false either way
-    getTrainings()
-        .then(trainings => {
-            appState.setTrainingsList(fromJS(trainings));
-            appState.setFetchingDataList('trainings', false, true);
-        })
-        .catch(() => appState.setFetchingDataList('trainings', false));
+    getSessions();
+    getCategories();
+    getCourses(user);
+    getDdahs(user);
+    getDuties();
+    getOffers(user);
+    getTemplates();
+    getTrainings();
 }
 
 // import locked assignments from TAPP
-function importAssignments() {
-    appState.setImporting(true);
-
-    postHelper('/import/locked-assignments', {})
-        .then(resp => {
-            // import succeeded
-            if (resp.ok) {
-                return resp.json().then(resp => {
-                    // import succeeded with errors
-                    if (resp.errors) {
-                        return resp.message.forEach(message => appState.alert(message));
-                    }
-                    return Promise.resolve();
-                });
-            }
-            // import failed with errors
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => resp.message.forEach(message => appState.alert(message)))
-                    .then(Promise.reject);
-            }
-            return respFailure(resp);
-        })
-        .then(
-            () => {
-                appState.setImporting(false, true);
-
-                appState.setFetchingDataList('offers', true);
-                getOffers()
-                    .then(offers => {
-                        appState.setOffersList(fromJS(offers));
-                        appState.setFetchingDataList('offers', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('offers', false));
-            },
-            () => appState.setImporting(false)
-        );
+export const importAssignments = () => {
+    importData('/import/locked-assignments', {}, () => {
+        getOffers();
+    });
 }
-
 // send CHASS offers data
-function importOffers(data) {
-    appState.setImporting(true);
-
-    postHelper('/import/offers', { chass_offers: data })
-        .then(resp => {
-            // import succeeded
-            if (resp.ok) {
-                return resp.json().then(resp => {
-                    // import succeeded with errors
-                    if (resp.errors) {
-                        return resp.message.forEach(message => appState.alert(message));
-                    }
-                    return Promise.resolve();
-                });
-            }
-            // import failed with errors
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => resp.message.forEach(message => appState.alert(message)))
-                    .then(Promise.reject);
-            }
-            return respFailure(resp);
-        })
-        .then(
-            () => {
-                appState.setImporting(false, true);
-
-                appState.setFetchingDataList('offers', true);
-                getOffers()
-                    .then(offers => {
-                        appState.setOffersList(fromJS(offers));
-                        appState.setFetchingDataList('offers', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('offers', false));
-            },
-            () => appState.setImporting(false)
-        );
+export const importOffers= (data) => {
+    importData('/import/offers', { chass_offers: data }, () => {
+        getOffers();
+    });
 }
-
-function importDdahs(data) {
-    appState.setImporting(true);
-
-    postHelper('/import/ddahs', { ddah_data: data })
-        .then(resp => {
-            if (resp.ok) {
-                return resp.json().then(resp => {
-                    // import succeeded with errors
-                    if (resp.errors) {
-                        return resp.message.forEach(message => appState.alert(message));
-                    }
-                    return Promise.resolve();
-                });
-            }
-            // import failed with errors
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => resp.message.forEach(message => appState.alert(message)))
-                    .then(Promise.reject);
-            }
-            return respFailure(resp);
-        })
-        .then(
-            () => {
-                appState.setFetchingDataList('ddahs', true);
-                appState.setFetchingDataList('offers', true);
-
-                getOffers()
-                    .then(offers => {
-                        appState.setOffersList(fromJS(offers));
-                        appState.setFetchingDataList('offers', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('offers', false));
-
-                getDdahs()
-                    .then(ddahs => {
-                        appState.setDdahsList(fromJS(ddahs));
-                        appState.setFetchingDataList('ddahs', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('ddahs', false));
-            }
-        ).then(() => appState.setImporting(false));
+export const importDdahs = (data) => {
+    importData('/import/ddahs', { ddah_data: data }, () => {
+        getOffers();
+        getDdahs();
+    });
 }
-
 
 // send contracts
-function sendContracts(offers) {
-    let validOffers = offers;
-
-    // check which contracts can be sent
-    postHelper('/offers/can-send-contract', { contracts: offers })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some contracts cannot be sent
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot send contract to ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer.toString(), 'firstName']) +
-                                ' for ' +
-                                offersList.getIn([offer.toString(), 'course'])
-                        );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
-                    });
-
-                    if (validOffers.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // send contracts for valid offers
-        .then(() => postHelper('/offers/send-contracts', { offers: validOffers }))
-        .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const sendContracts = (offers) => {
+  batchOfferAction('/offers/can-send-contract','/offers/send-contracts',
+     offers, {start:'send contract to'}, () => {
+      console.log('hello');
+      getOffers();
+  });
 }
 
 // nag applicants about offers
-function nagOffers(offers) {
-    let validOffers = offers;
-
-    // check which applicants can be nagged
-    postHelper('/offers/can-nag', { contracts: offers })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some applicants cannot be nagged
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot nag ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer.toString(), 'firstName']) +
-                                ' about ' +
-                                offersList.getIn([offer.toString(), 'course'])
-                        );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
-                    });
-
-                    if (validOffers.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // nag valid offers
-        .then(() => postHelper('/offers/nag', { contracts: validOffers }))
-        .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const nagOffers = (offers) => {
+  batchOfferAction('/offers/can-nag', '/offers/nag',
+    offers, {start: 'nag'}, ()=>{
+      getOffers();
+  });
 }
 
 // mark contracts as hr_processed
-function setHrProcessed(offers) {
-    let validOffers = offers;
-
-    // check which offers can be marked as hr_processed
-    postHelper('/offers/can-hr-update', { offers: offers })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some offers cannot be updated
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot mark offer to ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer.toString(), 'firstName']) +
-                                ' for ' +
-                                offersList.getIn([offer.toString(), 'course']) +
-                                ' as HRIS processed'
-                        );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
-                    });
-
-                    if (validOffers.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // update valid offers
-        .then(() =>
-            putHelper('/offers/batch-update', {
-                offers: validOffers,
-                hr_status: 'Processed',
-            })
-        )
-        .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const setHrProcessed = (offers) => {
+    batchOfferAction('/offers/can-hr-update', '/offers/batch-update',
+      offers, {start: 'mark offer to', end: 'as HRIS processed'}, ()=>{
+        getOffers();
+    },{
+      hr_status: 'Processed'
+    }, true);
 }
 
 // mark contracts as ddah_accepted
-function setDdahAccepted(offers) {
-    let validOffers = offers;
-
-    // check which offers can be marked as ddah_accepted
-    postHelper('/offers/can-ddah-update', { offers: offers })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some offers cannot be updated
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot mark offer to ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer.toString(), 'firstName']) +
-                                ' for ' +
-                                offersList.getIn([offer.toString(), 'course']) +
-                                ' as DDAH accepted'
-                        );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
-                    });
-                    if (validOffers.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // update valid offers
-        .then(() =>
-            putHelper('/offers/batch-update', {
-                offers: validOffers,
-                ddah_status: 'Accepted',
-            })
-        )
-        .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            appState.setFetchingDataList('offers', true);
-
-            getDdahs()
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const setDdahAccepted = (offers) => {
+    batchOfferAction('/offers/can-ddah-update', '/offers/batch-update',
+      offers, {start: 'mark offer to', end: 'as DDAH accepted'}, ()=>{
+        getDdahs();
+        getOffers();
+    },{
+      ddah_status: 'Accepted'
+    }, true);
 }
 
 // mark contracts as ddah_approved
-function setDdahApproved(ddahs, signature) {
-  let validDdahs = ddahs;
-
-  // check which ddahs can be sent
-  postHelper('/ddahs/status/can-approve', { ddahs: ddahs })
-      .then(resp => {
-          if (resp.status == 404) {
-              // some ddahs cannot be sent
-              let ddahsList = appState.getDdahsList();
-              let offersList = appState.getOffersList();
-
-              return resp.json().then(res => {
-                  res.invalid_offers.forEach(ddah => {
-                      var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
-
-                      appState.alert(
-                          '<b>Error</b>: Cannot approve the DDAH form of ' +
-                              offersList.getIn([offer, 'lastName']) +
-                              ', ' +
-                              offersList.getIn([offer, 'firstName']) +
-                              ' for ' +
-                              offersList.getIn([offer, 'course'])
-                      );
-                      // remove invalid ddah(s) from ddah list
-                      validDdahs.splice(validDdahs.indexOf(ddah), 1);
-                  });
-
-                  if (validDdahs.length == 0) {
-                      return Promise.reject();
-                  }
-              }, msgFailure);
-          } else if (!resp.ok) {
-              // request failed
-              return respFailure(resp);
-          }
-      })
-      // send contracts for valid ddahs
-      .then(() => postHelper('/ddahs/status/approve', { ddahs: validDdahs, signature: signature }))
-      .then(() => {
-          appState.setFetchingDataList('ddahs', true);
-          appState.setFetchingDataList('offers', true);
-
-          getDdahs()
-              .then(ddahs => {
-                  appState.setDdahsList(fromJS(ddahs));
-                  appState.setFetchingDataList('ddahs', false, true);
-              })
-              .catch(() => appState.setFetchingDataList('ddahs', false));
-
-          getOffers()
-              .then(offers => {
-                  appState.setOffersList(fromJS(offers));
-                  appState.setFetchingDataList('offers', false, true);
-              })
-              .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const setDdahApproved = (ddahs, signature) => {
+  batchDdahAction('/ddahs/status/can-approve', '/ddahs/status/approve',
+    ddahs, {start: 'approve the DDAH form of'}, ()=>{
+      getDdahs();
+      getOffers();
+  }, {
+    signature: signature,
+  });
 }
 
 // show the contract for this offer in a new window, as an applicant would see it
-function showContractApplicant(offer) {
+export const showContractApplicant= (offer) => {
     window.open('/offers/' + offer + '/pdf');
 }
 
 // show the contract for this offer in a new window, as HR would see it
-function showContractHr(offer) {
+export const showContractHr=(offer) =>{
     postHelper('/offers/print', { contracts: [offer], update: false })
         .then(resp => (resp.ok ? resp.blob().catch(msgFailure) : respFailure))
         .then(blob => {
@@ -836,7 +157,7 @@ function showContractHr(offer) {
 }
 
 // withdraw offers
-function withdrawOffers(offers) {
+export const withdrawOffers=(offers) =>{
     // create an array of promises for each offer being withdrawn
     // force each promise to resolve so that we can see which failed.
     // foible of all is that it will reject as soon as any promise fails.
@@ -855,13 +176,7 @@ function withdrawOffers(offers) {
             if (resp.type != 'error') {
                 // network error did not occur
                 if (resp.ok) {
-                    appState.setFetchingDataList('offers', true);
-                    getOffers()
-                        .then(offers => {
-                            appState.setOffersList(fromJS(offers));
-                            appState.setFetchingDataList('offers', false, true);
-                        })
-                        .catch(() => appState.setFetchingDataList('offers', false));
+                  getOffers();
                 } else {
                     // request failed
                     resp.json().then(resp => appState.alert(resp.message)); // IS THIS REALLY WHAT WE EXPECT?
@@ -872,610 +187,194 @@ function withdrawOffers(offers) {
 }
 
 // print contracts
-function print(offers) {
-    let validOffers = offers;
-
-    // check which contracts can be printed
-    let printPromise = postHelper('/offers/can-print', { contracts: offers })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some contracts cannot be printed
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot print ' +
-                                offersList.getIn([offer.toString(), 'course']) +
-                                ' contract for ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer.toString(), 'firstName'])
-                        );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
-                    });
-
-                    if (validOffers.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // print valid offers
-        .then(() =>
-            postHelper('/offers/print', {
-                contracts: validOffers,
-                update: true,
-            })
-        )
-        .then(resp => (resp.ok ? resp.blob().catch(msgFailure) : respFailure));
-
-    printPromise.then(blob => {
-        let fileURL = URL.createObjectURL(blob);
-        let pdfWindow = window.open(fileURL);
-        pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
-        pdfWindow.document.onload = pdfWindow.print();
-    });
-
-    printPromise.then(() => {
-        appState.setFetchingDataList('offers', true);
-        getOffers()
-            .then(offers => {
-                appState.setOffersList(fromJS(offers));
-                appState.setFetchingDataList('offers', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('offers', false));
+export const print=(offers)=>{
+    batchOfferAction('/offers/can-print', '/offers/print',
+      offers, {start: 'print Contract for'}, resp => {
+        if(resp.ok){
+          return resp.blob().then(res=>{
+            getOffers();
+            let fileURL = URL.createObjectURL(blob);
+            let pdfWindow = window.open(fileURL);
+            pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
+            pdfWindow.document.onload = pdfWindow.print();
+          });
+        }
+        else return respFailure(resp);
+    },
+    {
+      update: true,
     });
 }
 
 // change session pay
-function updateSessionPay(session, pay) {
+export const updateSessionPay = (session, pay) =>{
     putHelper('/sessions/' + session, { pay: pay })
         .then(resp => (resp.ok ? resp : respFailure))
         .then(
             () => {
-                appState.setFetchingDataList('sessions', true);
-                getSessions()
-                    .then(sessions => {
-                        appState.setSessionsList(fromJS(sessions));
-                        appState.setFetchingDataList('sessions', false, true);
-                    })
-                    .catch(() => appState.setFetchingDataList('sessions', false));
+              getSessions();
             },
             resp => resp.json().then(resp => appState.alert(resp.message)) // IS THIS REALLY WHAT WE EXPECT?
         );
 }
 
 // add/update the note for a withdrawn offer
-function noteOffer(offer, note) {
-    putHelper('/offers/' + offer, { commentary: note })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const noteOffer = (offer, note) => {
+    putData('/offers/' + offer, { commentary: note },() => {
+      getOffers();
+    });
 }
 
 // clear HR status
-function clearHrStatus(offers) {
-    let validOffers = offers;
-
-    // check which offers can have their HR status cleared
-    postHelper('/offers/can-clear-hris-status', { contracts: offers })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some offers cannot be updated
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(offer => {
-                        appState.alert(
-                            '<b>Error</b>: Cannot clear HRIS status for offer to ' +
-                                offersList.getIn([offer.toString(), 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer.toString(), 'firstName']) +
-                                ' for ' +
-                                offersList.getIn([offer.toString(), 'course'])
-                        );
-                        // remove invalid offer(s) from offer list
-                        validOffers.splice(validOffers.indexOf(offer), 1);
-                    });
-                    if (validOffers.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // update valid offers
-        .then(() => postHelper('/offers/clear-hris-status', { contracts: validOffers }))
-        .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const clearHrStatus = (offers) =>{
+    batchOfferAction('/offers/can-clear-hris-status', '/offers/clear-hris-status',
+      offers, {start: 'clear HRIS status for offer to'}, ()=>{
+        getOffers();
+    });
 }
 
 // set status to accepted
-function setOfferAccepted(offer) {
-    postHelper('/offers/' + offer + '/accept', {})
-        .then(resp => {
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .then(resp => appState.alert(resp.message))
-                    .then(Promise.reject);
-            } else if (!resp.ok) {
-                return respFailure(resp);
-            }
-        })
-        .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const setOfferAccepted = (offer) => {
+    let fetch = true;
+    postData('/offers/' + offer + '/accept', {}, () => {
+      if(fetch) getOffers();
+    }, null,
+    resp => {
+      fetch = false;
+      appState.alert(resp.message);
+    });
 }
 
 // set status to unsent and clear other information
-function resetOffer(offer) {
-    postHelper('/offers/' + offer + '/reset', {})
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-            appState.setFetchingDataList('offers', true);
-            getOffers()
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+export const resetOffer = (offer) => {
+    postData('/offers/' + offer + '/reset', {}, () => {
+      getOffers();
+    });
 }
 
 // export all offers from the session to CSV
-function exportOffers(session) {
-    window.open('/export/cp-offers/' + session);
+export const exportOffers = (session) => {
+    downloadFile('/export/cp-offers/' + session);
 }
 
-function exportDdahs(course, session){
-    if(!course){
-      downloadFile('/export/session-ddahs/'+ session);
-    }
-    else{
-      downloadFile('/export/ddahs/' + course);
-    }
+export const exportDdahs = (course, session) => {
+  (course!='all')?
+    downloadFile('/export/ddahs/' + course):
+    downloadFile('/export/session-ddahs/'+ session);
 }
-
 
 // create a new, empty template with this name
-function createTemplate(name) {
-    let user = appState.getCurrentUserName();
+export const createTemplate = (name) => {
+  let user = appState.getCurrentUserName();
+  let fetch = true;
+  return postData('/instructors/' + user + '/templates', { name: name },() => {
+      if(fetcht) getTemplates(user);
+    }, null,
+    resp => {
+      fetch = false;
+      msgFailure(res.message);
+    })
 
-    return postHelper('/instructors/' + user + '/templates', { name: name })
-        .then(resp => {
-            if (resp.ok) {
-                return resp.json().catch(msgFailure);
-            }
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .catch(msgFailure)
-                    .then(res => msgFailure(res.message));
-            }
-            return respFailure(resp);
-        })
-        .then(resp => {
-            appState.setFetchingDataList('templates', true);
-            return getTemplates(user)
-                .then(templates => {
-                    appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingDataList('templates', false, true);
-                    return resp.id; // return the id of the newly-created template
-                })
-                .catch(() => appState.setFetchingDataList('templates', false));
-        });
 }
 
 // update an existing template
-function updateTemplate(id, ddahData) {
+export const updateTemplate = (id, ddahData) => {
     let user = appState.getCurrentUserName();
-
-    return patchHelper('/instructors/' + user + '/templates/' + id, ddahData)
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-            appState.setFetchingDataList('templates', true);
-            return getTemplates(user)
-                .then(templates => {
-                    appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingDataList('templates', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('templates', false));
-        });
+    return putData('/instructors/' + user + '/templates/' + id, ddahData, () => {
+      getTemplates(user);
+    });
 }
 
 // create a new template using data from an existing ddah
-function createTemplateFromDdah(name, ddah) {
+export const createTemplateFromDdah = (name, ddah) => {
     let user = appState.getCurrentUserName();
-
-    postHelper('/ddahs/' + ddah + '/new-template', { name: name })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-            appState.setFetchingDataList('templates', true);
-            getTemplates(user)
-                .then(templates => {
-                    appState.setTemplatesList(fromJS(templates));
-                    appState.setFetchingDataList('templates', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('templates', false));
-        });
+    postData('/ddahs/' + ddah + '/new-template', { name: name }, () => {
+      getTemplates(user);
+    });
 }
 
 // create a new, empty ddah for this offer
-function createDdah(offer) {
+export const createDdah = (offer) => {
     let user = appState.getCurrentUserName();
-
+    let fetch = true;
     // although the template and ddah models have a relationship in the database, they do not have a
     // relationship in the front-end, and so we do not 'use a template' in this way to create a ddah
-    return postHelper('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer })
-        .then(resp => {
-            if (resp.ok) {
-                return resp.json().catch(msgFailure);
-            }
-            if (resp.status == 404) {
-                return resp
-                    .json()
-                    .catch(msgFailure)
-                    .then(res => msgFailure(res.message));
-            }
-            return respFailure(resp);
-        })
-        .then(resp => {
-            appState.setFetchingDataList('ddahs', true);
-            return getDdahs(user)
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                    return resp.id; // return the id of the newly-created ddah
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-        });
+    return postData('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer },()=> {
+      if(fetch) getDdahs(user);
+    },null,
+    res => {
+      fetch = false;
+      msgFailure(res.message);
+    });
 }
 
 // update an existing ddah
-function updateDdah(id, ddahData) {
+export const updateDdah = (id, ddahData) => {
     let user = appState.getCurrentUserName();
-
-    return patchHelper('/instructors/' + user + '/ddahs/' + id, ddahData)
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            return getDdahs(user)
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-        });
+    return putData('/instructors/' + user + '/ddahs/' + id, ddahData, () => {
+      getDdahs(user);
+    });
 }
 
 // submit an existing ddah for approval
-function submitDdah(signature, ddah) {
+export const submitDdah = (signature, ddah) => {
     let user = appState.getCurrentUserName();
 
     // this route expects to perform a batch transaction, where the validity of each transaction has
     // already been verified with '/ddahs/status/can-finish'
     // however, in the current interface, only one ddah can be submitted at a time
-    postHelper('/ddahs/status/finish', { signature: signature, ddahs: [ddah] })
-        .then(resp => (resp.ok ? resp : respFailure))
-        .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            appState.setFetchingDataList('offers', true);
-
-            getDdahs(user)
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-
-            getOffers(user)
-                .then(offers => {
-                    appState.setOffersList(fromJS(offers));
-                    appState.setFetchingDataList('offers', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('offers', false));
-        });
+    postData('/ddahs/status/finish', { signature: signature, ddahs: [ddah] }, () => {
+        getDdahs(user);
+        getOffers(user);
+    });
 }
 
 // open a PDF version of the ddah
-function previewDdah(ddah) {
+export const previewDdah = (ddah) => {
     window.open('/ddahs/' + ddah + '/pdf');
 }
 
 // nag applicants about ddahs
-function nagApplicantDdahs(ddahs) {
-    let validDdahs = ddahs;
-
-    // check which ddahs can be sent
-    postHelper('/ddahs/can-nag-student', { ddahs: ddahs })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some ddahs cannot be sent
-                let ddahsList = appState.getDdahsList();
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(ddah => {
-                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
-
-                        appState.alert(
-                            '<b>Error</b>: Cannot send DDAH form to ' +
-                                offersList.getIn([offer, 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer, 'firstName']) +
-                                ' for ' +
-                                offersList.getIn([offer, 'course'])
-                        );
-                        // remove invalid ddah(s) from ddah list
-                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
-                    });
-
-                    if (validDdahs.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // send contracts for valid ddahs
-        .then(() => postHelper('/ddahs/send-nag-student', { ddahs: validDdahs }))
-        .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            getDdahs()
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-        });
+export const nagApplicantDdahs = (ddahs) => {
+  batchDdahAction('/ddahs/can-nag-student', '/ddahs/send-nag-student',
+    ddahs, {start: 'send DDAH form to'}, ()=>{
+      getDdahs();
+  });
 }
 
-function nagInstructors(offers) {
-  let validOffers = offers;
-
-  // check which applicants can be nagged
-  postHelper('/offers/can-nag-instructor', { offers: offers })
-      .then(resp => {
-          if (resp.status == 404) {
-              // some applicants cannot be nagged
-              let offersList = appState.getOffersList();
-
-              return resp.json().then(res => {
-                  res.invalid_offers.forEach(offer => {
-                      appState.alert(
-                          '<b>Error</b>: Cannot nag Instructor for ' +
-                          offersList.getIn([offer.toString(), 'lastName']) +
-                          ', ' +
-                          offersList.getIn([offer.toString(), 'firstName']) +
-                          ' about ' +
-                          offersList.getIn([offer.toString(), 'course']) +
-                          '. Check if this position has an instructor.'
-                      );
-                      // remove invalid offer(s) from offer list
-                      validOffers.splice(validOffers.indexOf(offer), 1);
-                  });
-
-                  if (validOffers.length == 0) {
-                      return Promise.reject();
-                  }
-              }, msgFailure);
-          } else if (!resp.ok) {
-              // request failed
-              return respFailure(resp);
-          }
-      })
-      // nag valid offers
-      .then(() => postHelper('/offers/send-nag-instructor', { offers: validOffers }))
-      .then(() => {
-        appState.setFetchingDataList('ddahs', true);
-        appState.setFetchingDataList('offers', true);
-
-        getDdahs()
-            .then(ddahs => {
-                appState.setDdahsList(fromJS(ddahs));
-                appState.setFetchingDataList('ddahs', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('ddahs', false));
-
-        getOffers()
-            .then(offers => {
-                appState.setOffersList(fromJS(offers));
-                appState.setFetchingDataList('offers', false, true);
-            })
-            .catch(() => appState.setFetchingDataList('offers', false));
-      });
+export const nagInstructors = (offers) => {
+  batchOfferAction('/offers/can-nag-instructor', '/offers/send-nag-instructor',
+    offers, {
+      start: 'nag Instructor about',
+      end: 'Check if this course has an instructor.'
+    }, ()=>{
+      getDdahs();
+      getOffers();
+  });
 }
 
 // send ddah forms
-function sendDdahs(ddahs) {
-    let validDdahs = ddahs;
-
-    // check which ddahs can be sent
-    postHelper('/ddahs/can-send-ddahs', { ddahs: ddahs })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some ddahs cannot be sent
-                let ddahsList = appState.getDdahsList();
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(ddah => {
-                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
-
-                        appState.alert(
-                            '<b>Error</b>: Cannot send DDAH form to ' +
-                                offersList.getIn([offer, 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer, 'firstName']) +
-                                ' for ' +
-                                offersList.getIn([offer, 'course'])
-                        );
-                        // remove invalid ddah(s) from ddah list
-                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
-                    });
-
-                    if (validDdahs.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // send contracts for valid ddahs
-        .then(() => postHelper('/ddahs/send-ddahs', { ddahs: validDdahs }))
-        .then(() => {
-            appState.setFetchingDataList('ddahs', true);
-            getDdahs()
-                .then(ddahs => {
-                    appState.setDdahsList(fromJS(ddahs));
-                    appState.setFetchingDataList('ddahs', false, true);
-                })
-                .catch(() => appState.setFetchingDataList('ddahs', false));
-        });
+export const sendDdahs = (ddahs) => {
+  batchDdahAction('/ddahs/can-send-ddahs', '/ddahs/send-ddahs',
+    ddahs, {start: 'send DDAH form to'}, ()=>{
+      getDdahs();
+      getOffers();
+  });
 }
 
 // send ddah forms
-function previewDdahs(ddahs) {
-    let validDdahs = ddahs;
-    let filename = "";
-
-    // check which ddahs can be sent
-    postHelper('/ddahs/can-preview', { ddahs: ddahs })
-        .then(resp => {
-            if (resp.status == 404) {
-                // some ddahs cannot be sent
-                let ddahsList = appState.getDdahsList();
-                let offersList = appState.getOffersList();
-
-                return resp.json().then(res => {
-                    res.invalid_offers.forEach(ddah => {
-                        var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
-
-                        appState.alert(
-                            '<b>Error</b>: Cannot send DDAH form to ' +
-                                offersList.getIn([offer, 'lastName']) +
-                                ', ' +
-                                offersList.getIn([offer, 'firstName']) +
-                                ' for ' +
-                                offersList.getIn([offer, 'course'])
-                        );
-                        // remove invalid ddah(s) from ddah list
-                        validDdahs.splice(validDdahs.indexOf(ddah), 1);
-                    });
-
-                    if (validDdahs.length == 0) {
-                        return Promise.reject();
-                    }
-                }, msgFailure);
-            } else if (!resp.ok) {
-                // request failed
-                return respFailure(resp);
-            }
-        })
-        // preview pdf for valid ddahs
-        .then(() => postHelper('/ddahs/preview', { ddahs: validDdahs }))
-        .then(resp => {
-            // extract the filename from the response headers
-            filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
-            // parse the response body as a blob
-            return resp.blob();
-        })
-        // create a URL for the object body of the response
-        .then(blob => URL.createObjectURL(blob))
-        .then(url => {
-            window.open(url);
+export const previewDdahs = (ddahs) => {
+    batchDdahAction('/ddahs/can-preview', '/ddahs/preview',
+      ddahs, {start: 'send DDAH form to'}, resp => {
+        return resp.blob().then(blob=>{
+          let url = URL.createObjectURL(blob);
+          window.open(url);
         });
+    });
 }
 
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
-function fetchAuth() {
-    return getHelper('/roles')
-        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-        .then(resp => {
-            if (resp.development) {
-                appState.setCurrentUserRoles(['cp_admin', 'hr_assistant', 'instructor']);
-                // default to cp_admin as selected user role
-                appState.selectUserRole('cp_admin');
-                appState.setCurrentUserName('zaleskim');
-                appState.setTaCoordinator(resp.ta_coord);
-            } else {
-                // filter out roles not relevant to this application
-                let roles = resp.roles.filter(role =>
-                    ['cp_admin', 'hr_assistant', 'instructor'].includes(role)
-                );
-                appState.setCurrentUserRoles(roles);
-                appState.selectUserRole(roles[0]);
-                appState.setCurrentUserName(resp.utorid);
-                appState.setTaCoordinator(resp.ta_coord);
-            }
-        });
+export const fetchAuth = () => {
+    return fetchProc.setRole(['cp_admin', 'hr_assistant', 'instructor'], true, appState);
 }
-
-export {
-    adminFetchAll,
-    instructorFetchAll,
-    importOffers,
-    importAssignments,
-    importDdahs,
-    sendContracts,
-    nagOffers,
-    setHrProcessed,
-    setDdahAccepted,
-    setDdahApproved,
-    showContractApplicant,
-    showContractHr,
-    withdrawOffers,
-    print,
-    updateSessionPay,
-    noteOffer,
-    exportOffers,
-    exportDdahs,
-    clearHrStatus,
-    setOfferAccepted,
-    resetOffer,
-    createTemplate,
-    updateTemplate,
-    createTemplateFromDdah,
-    createDdah,
-    updateDdah,
-    submitDdah,
-    previewDdah,
-    previewDdahs,
-    nagApplicantDdahs,
-    nagInstructors,
-    sendDdahs,
-    fetchAuth,
-};

@@ -65,6 +65,7 @@ const initialState = {
     assignments: { fetching: 0, list: null },
     courses: { fetching: 0, list: null },
     instructors: { fetching: 0, list: null },
+    sessions: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -1019,6 +1020,10 @@ class AppState {
 
     setInstructorsList(list) {
         this.set('instructors.list', list);
+    }
+
+    setSessionsList(list) {
+        this.set('sessions.list', list);
     }
 
     updateAssignment(applicant, assignment, hours) {

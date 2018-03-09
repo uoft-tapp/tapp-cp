@@ -567,7 +567,7 @@ class AppState {
             return;
         }
 
-        fetch.clearHrStatus(offers.map(offer => parseInt(offer)));
+        fetch.clearHrStatus(offers);
     }
 
     createTemplate() {
@@ -687,7 +687,7 @@ class AppState {
     exportDdahs() {
         let course = this.getSelectedCourse();
         let selectedSession = this.getSelectedSession();
-        if (!course && selectedSession=='') {
+        if (course!=null && selectedSession=='') {
             this.alert(
                 '<b>Export ddah from all sessions</b> This functionality is not currently supported. Please select a course or a session.'
             );
@@ -947,7 +947,7 @@ class AppState {
           return;
       }
 
-      fetch.nagInstructors(offers.map(offer => parseInt(offer)));
+      fetch.nagInstructors(offers);
     }
 
     nagOffers(offers) {
@@ -956,7 +956,7 @@ class AppState {
             return;
         }
 
-        fetch.nagOffers(offers.map(offer => parseInt(offer)));
+        fetch.nagOffers(offers);
     }
 
     // add/update the notes for a withdrawn offer
@@ -976,7 +976,7 @@ class AppState {
             return;
         }
 
-        fetch.print(offers.map(offer => parseInt(offer)));
+        fetch.print(offers);
     }
 
     resetOffer(offers) {
@@ -1000,7 +1000,7 @@ class AppState {
             return;
         }
 
-        fetch.sendContracts(offers.map(offer => parseInt(offer)));
+        fetch.sendContracts(offers);
     }
 
     sendDdahs(offers) {
@@ -1042,7 +1042,7 @@ class AppState {
         }
         let ddahs = this.getDdahsFromOffers(offers);
         if (ddahs.length > 0){
-          fetch.setDdahAccepted(offers.map(offer => parseInt(offer)));
+          fetch.setDdahAccepted(offers);
         }
     }
 
@@ -1078,7 +1078,7 @@ class AppState {
             return;
         }
 
-        fetch.setHrProcessed(offers.map(offer => parseInt(offer)));
+        fetch.setHrProcessed(offers);
     }
 
     setImporting(importing, success) {

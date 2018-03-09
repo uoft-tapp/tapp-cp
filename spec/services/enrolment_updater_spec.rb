@@ -33,8 +33,8 @@ describe EnrolmentUpdater do
     end_date: "2017-12-31 00:00:00 UTC",
     )
   end
-  failure = {updated: false, message: "Error: This file is not formatted correctly."}
-  success = {updated: true, message: "Enrolment update success."}
+  failure = {success: false, errors: true, message: ["Error: This file is not formatted correctly."]}
+  success = {success: true, errors: false}
 
   context "well-formatted data" do
     before :each do

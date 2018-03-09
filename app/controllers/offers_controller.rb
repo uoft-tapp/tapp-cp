@@ -46,21 +46,21 @@ class OffersController < ApplicationController
 
   # can send contracts for offers that are unsent or pending
   def can_send_contract
-    check_offers_status(params[:contracts], :status, ["Unsent", "Pending"])
+    check_offers_status(params[:offers], :status, ["Unsent", "Pending"])
   end
 
   # can nag for offers that are pending
   def can_nag
-    check_offers_status(params[:contracts], :status, ["Pending"])
+    check_offers_status(params[:offers], :status, ["Pending"])
   end
 
   # can print contracts for offers that are pending, accepted, or rejected
   def can_print
-    check_offers_status(params[:contracts], :status, ["Pending", "Accepted", "Rejected"])
+    check_offers_status(params[:offers], :status, ["Pending", "Accepted", "Rejected"])
   end
 
   def can_clear_hris_status
-    check_offers_status(params[:contracts], :hr_status, [nil, "Processed", "Printed"])
+    check_offers_status(params[:offers], :hr_status, [nil, "Processed", "Printed"])
   end
 
   def update
@@ -80,26 +80,35 @@ class OffersController < ApplicationController
   end
 
   def send_contracts
-    params[:offers].each do |id|
-      offer = Offer.find(id)
-        if ENV['RAILS_ENV'] != 'test'
-          offer.update_attributes!(link: "/pb/#{offer[:id]}")
-          CpMailer.contract_email(offer.format,"#{ENV["domain"]}#{offer[:link]}").deliver_now!
-        end
-        offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
+    begin
+      params[:offers].each do |id|
+        offer = Offer.find(id)
+          if ENV['RAILS_ENV'] != 'test'
+            offer.update_attributes!(link: "/pb/#{offer[:id]}")
+            CpMailer.contract_email(offer.format,"#{ENV["domain"]}#{offer[:link]}").deliver_now!
+          end
+          offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
+      end
+      render status: 200, json: {message: "You've successfully sent out all the contracts."}
+    rescue Errno::ECONNREFUSED
+      puts "rejected"
+      render status: 404, json: {message: "Connection Refused."}
     end
-    render status: 200, json: {message: "You've successfully sent out all the contracts."}
   end
 
   def batch_email_nags
-    params[:contracts].each do |id|
-      offer = Offer.find(id)
-      offer.increment!(:nag_count, 1)
-      if ENV['RAILS_ENV'] != 'test'
-        CpMailer.nag_email(offer.format, "#{ENV["domain"]}#{offer[:link]}").deliver_now!
+    begin
+      params[:offers].each do |id|
+        offer = Offer.find(id)
+        offer.increment!(:nag_count, 1)
+        if ENV['RAILS_ENV'] != 'test'
+          CpMailer.nag_email(offer.format, "#{ENV["domain"]}#{offer[:link]}").deliver_now!
+        end
       end
+      render json: {message: "You've sent the nag emails."}
+    rescue Errno::ECONNREFUSED
+      render status: 404, json: {message: "Connection Refused."}
     end
-    render json: {message: "You've sent the nag emails."}
   end
 
   '''
@@ -120,23 +129,27 @@ class OffersController < ApplicationController
   end
 
   def send_nag_instructor
-    params[:offers].each do |id|
-      offer = Offer.find(id)
-      instructors = offer.format[:instructors]
-      offer.increment!(:ddah_nag_count, 1)
-      if ENV['RAILS_ENV'] != 'test'
-        instructors.each do |instructor|
-          CpMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+    begin
+      params[:offers].each do |id|
+        offer = Offer.find(id)
+        instructors = offer.format[:instructors]
+        offer.increment!(:ddah_nag_count, 1)
+        if ENV['RAILS_ENV'] != 'test'
+          instructors.each do |instructor|
+            CpMailer.instructor_nag_email(offer.format, instructor).deliver_now!
+          end
         end
       end
+      render status: 200, json: {message: "You've successfully sent out all the nag emails."}
+    rescue Errno::ECONNREFUSED
+      render status: 404, json: {message: "Connection Refused."}
     end
-    render status: 200, json: {message: "You've successfully sent out all the nag emails."}
   end
 
 
   def combine_contracts_print
     offers = []
-    params[:contracts].each do |offer_id|
+    params[:offers].each do |offer_id|
       if params[:update]
         update_print_status(offer_id)
       end
@@ -172,7 +185,7 @@ class OffersController < ApplicationController
   end
 
   def clear_hris_status
-    params[:contracts].each do |id|
+    params[:offers].each do |id|
       offer = Offer.find(id)
       offer.update_attributes!(hr_status: nil, print_time: nil)
     end
