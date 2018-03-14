@@ -1243,7 +1243,6 @@ class AppState {
             allocations: ddah
                 .get('allocations')
                 .map(allocation => ({
-                    id: allocation.get('id'),
                     num_unit: allocation.get('units'),
                     unit_name: allocation.get('type'),
                     minutes: allocation.get('time'),
