@@ -139,7 +139,7 @@ export const unlockAssignment = (applicant, assignment) => {
 
 // export offers from CHASS (locking the corresponding assignments)
 export const exportOffers = (round, session) => {
-    downloadFile('/export/sessions/'+session+'/chass/' + round)
+    downloadFile('/export/chass/sessions/'+session+'/' + round)
     .then(() => getAssignments());
 }
 
