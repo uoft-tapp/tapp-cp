@@ -1,7 +1,7 @@
 import React from 'react';
 import { ApplicantTableMenu } from './applicantTableMenu.js';
 import { ApplicantTable } from './applicantTable.js';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { ButtonGroup, Button, DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
 
 class CoursePanel extends React.Component {
     constructor(props) {
@@ -274,6 +274,8 @@ class InstructorPreferenceMenu extends React.Component {
     this.setState({
       btnTitle: val
     });
+
+    this.props.selectApplicant(this.props.applicantId);
   }
 
   render() {
@@ -281,11 +283,12 @@ class InstructorPreferenceMenu extends React.Component {
         <DropdownButton style={{ width: '15vw' }}
             bsStyle={"default"}
             title={this.state.btnTitle}
-            id={'dropdown-basic-${props.applicantId}'}
+            key={this.props.applicantId}
+            id={'dropdown-basic-${this.props.applicantId}'}
             noCaret
             onSelect={e => this.handleChange(e)}>
             {instructorPrefMenuItems.map((item, index) =>
-                <MenuItem eventKey={index}>{item}</MenuItem>
+                <MenuItem eventKey={index} key={index}>{item}</MenuItem>
             )}
         </DropdownButton>
     );
