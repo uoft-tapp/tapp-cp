@@ -110,6 +110,13 @@ export const noteApplicant = (applicant, notes) => {
     });
 }
 
+// add/update the instructor prefs for an application
+export const updateInstructorPref = (application, pref) => {
+    putData('/applications/update-instructor-pref' + application, { instructor_pref: pref }, () => {
+      getApplicants();
+    });
+}
+
 // update the number of hours for an assignment
 export const updateAssignmentHours = (applicant, assignment, hours) => {
     putData('/applicants/' + applicant + '/assignments/' + assignment, {
