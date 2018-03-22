@@ -1,6 +1,7 @@
 import React from 'react';
 import { ApplicantTableMenu } from './applicantTableMenu.js';
 import { ApplicantTable } from './applicantTable.js';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 class CoursePanel extends React.Component {
     constructor(props) {
@@ -131,6 +132,15 @@ class CoursePanel extends React.Component {
                 style: { width: 0.04 },
             },
             {
+                header: 'Instructor Pref.',
+                data: p => {
+                        let application = this.props.getApplicationById(p.applicantId);
+                        return (<InstructorPreferenceMenu {...this.props} application={application} applicantId={p.applicantId}/>);
+                    },
+
+                style: { width: 0.15 },
+            },
+            {
                 header: 'Other',
                 // comma-separated list of the codes for the (other) courses to which this applicant is assigned
                 data: p =>
@@ -244,6 +254,44 @@ const DraggableHeader = props => {
     );
 };
 
+const instructorPrefMenuItems = ['', 'Unsuitable', 'Preferred', 'Strongly Preferred'];
+
+class InstructorPreferenceMenu extends React.Component {
+  constructor(props) {
+    super(props);
+
+    let defaultValue = props.getInstructorPref(props.application);
+    if (defaultValue === null) defaultValue = 0;
+    this.state = {btnTitle: instructorPrefMenuItems[defaultValue]};
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.props.updateInstructorPref(this.props.application, event);
+
+    var val = instructorPrefMenuItems[event];
+    this.setState({
+      btnTitle: val
+    });
+  }
+
+  render() {
+    return (
+        <DropdownButton style={{ width: '15vw' }}
+            bsStyle={"default"}
+            title={this.state.btnTitle}
+            id={'dropdown-basic-${props.applicantId}'}
+            noCaret
+            onSelect={e => this.handleChange(e)}>
+            {instructorPrefMenuItems.map((item, index) =>
+                <MenuItem eventKey={index}>{item}</MenuItem>
+            )}
+        </DropdownButton>
+    );
+  }
+}
+
 const AssignedApplicantTable = props =>
     <ApplicantTable
         config={props.config}
@@ -273,5 +321,6 @@ const UnassignedApplicantTable = props =>
                 : props.getCoursePanelLayout() == 3 ? '45vw' : '100vw'
         }
     />;
+
 
 export { CoursePanel };
