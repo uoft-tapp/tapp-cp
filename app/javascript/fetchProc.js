@@ -149,6 +149,7 @@ export const onFetchApplicationsSuccess = (resp) => {
             avail: app.availability,
             other: app.other_info,
             specialNeeds: app.special_needs,
+            instructorPref: app.instructor_pref,
         };
         if (applications[app.applicant_id]) {
             applications[app.applicant_id].push(newApp);
