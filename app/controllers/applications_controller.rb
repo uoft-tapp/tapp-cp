@@ -34,4 +34,17 @@ class ApplicationsController < ApplicationController
     render json: @application.to_json(include: [:preferences])
   end
 
+ '''
+    update_instructor_pref #POST
+        /applications/update-instructor-pref/:id
+      pref
+
+      Add/Update instructor preference for an application.
+  '''
+  def update_instructor_pref
+    #applicant = Applicant.find(params[:id])
+    @application = Application.find(params[:id])
+    @application.update_attributes(instructor_pref: params[:pref])
+  end
+
 end
