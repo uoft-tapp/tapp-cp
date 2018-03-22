@@ -1010,13 +1010,13 @@ class AppState {
         return this.getApplicationsInSelectedRound();
     }
 
-    getInstructorPref(applicant) {
-       return this.get(getApplicationById(applicant).get(instructorPref));
-   }
+    getInstructorPref(application) {
+        return application.get('instructorPref');
+    }
 
-   updateInstructorPref(applicant, event) {
-        this.set(getApplicationById(applicant).get(instructorPref), event);
-   }
+    updateInstructorPref(application, event) {
+        this.set(application.get('instructorPref'), event);
+    }
 
     // get all applicants who have been assigned to a course; returns a list of [applicantID, applicantData]
     getAssignedApplicants() {
