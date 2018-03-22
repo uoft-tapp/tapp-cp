@@ -254,7 +254,7 @@ const DraggableHeader = props => {
     );
 };
 
-const instructorPrefMenuItems = ['', 'Unsuitable', 'Preferred', 'Strongly Preferred'];
+const instructorPrefMenuItems = ['\xa0', 'Unsuitable', 'Preferred', 'Strongly Preferred'];
 
 class InstructorPreferenceMenu extends React.Component {
   constructor(props) {
