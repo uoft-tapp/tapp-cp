@@ -268,7 +268,7 @@ class InstructorPreferenceMenu extends React.Component {
   }
 
   handleChange(event) {
-    this.props.updateInstructorPref(this.props.application, event);
+    this.props.updateInstructorPref(this.props.applicantId, event);
 
     var val = instructorPrefMenuItems[event];
     this.setState({

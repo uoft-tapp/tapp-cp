@@ -36,15 +36,14 @@ class ApplicationsController < ApplicationController
 
  '''
     update_instructor_pref #POST
-        /applications/update-instructor-pref/:id
+        /applications/update-instructor-pref/:applicant_id
       pref
 
       Add/Update instructor preference for an application.
   '''
   def update_instructor_pref
-    #applicant = Applicant.find(params[:id])
-    @application = Application.find(params[:id])
-    @application.update_attributes(instructor_pref: params[:pref])
+    @application = Applicant.find(params[:applicant_id]).applications
+    @application.update_attributes(instructor_pref: params[:instructor_pref])
   end
 
 end
