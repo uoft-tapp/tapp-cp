@@ -831,7 +831,7 @@ class AppState {
     }
 
     updateInstructorPref(application, event) {
-        this.set(application.get('instructorPref'), event);
+        fetch.updateInstructorPref(application, event);
     }
 
     // get all applicants who have been assigned to a course; returns a list of [applicantID, applicantData]
