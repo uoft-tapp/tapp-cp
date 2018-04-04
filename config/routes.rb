@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     resources :applications, only: [:index]
   end
   resources :assignments, only: [:index, :show]
-  resources :applications, only: [:index, :show]
+  resources :applications, only: [:index, :show, :update]
   resources :positions
   resources :instructors
 
@@ -71,7 +71,6 @@ Rails.application.routes.draw do
   post "/import/enrolment", to: "import#enrolment"
   post "/import/instructors", to: "import#instructors"
   post '/email-assignments', to: "assignments#email_assignments"
-  post '/applications/update-instructor-pref/:applicant_id', to: "applications#update_instructor_pref"
 
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"
