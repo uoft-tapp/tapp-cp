@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180322031441) do
+ActiveRecord::Schema.define(version: 20180404063613) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,7 +62,6 @@ ActiveRecord::Schema.define(version: 20180322031441) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "round_id"
-    t.integer "instructor_pref"
     t.index ["applicant_id"], name: "index_applications_on_applicant_id"
   end
 
@@ -203,6 +202,7 @@ ActiveRecord::Schema.define(version: 20180322031441) do
     t.integer "rank"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "instructor_pref"
     t.index ["application_id"], name: "index_preferences_on_application_id"
     t.index ["position_id"], name: "index_preferences_on_position_id"
   end
