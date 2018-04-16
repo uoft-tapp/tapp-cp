@@ -259,7 +259,7 @@ class InstructorPreferenceMenu extends React.Component {
   constructor(props) {
     super(props);
 
-    let defaultValue = props.getInstructorPref(props.application);
+    let defaultValue = props.getInstructorPref(props.applicantId, props.course);
     if (defaultValue === null) defaultValue = 0;
     this.state = {btnTitle: instructorPrefMenuItems[defaultValue]};
 
@@ -267,7 +267,7 @@ class InstructorPreferenceMenu extends React.Component {
   }
 
   handleChange(event) {
-    this.props.updateInstructorPref(this.props.applicantId,this.props.course,  event);
+    this.props.updateInstructorPref(this.props.applicantId, this.props.course, event);
 
     var val = instructorPrefMenuItems[event];
     this.setState({
