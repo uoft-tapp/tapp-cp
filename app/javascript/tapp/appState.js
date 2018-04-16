@@ -1012,14 +1012,14 @@ class AppState {
 
     getInstructorPref(applicant, course) {
         let prefs = this.getApplicationById(applicant).get('prefs');
-        let pref = prefs.find(pref => pref.get('positionId') == course && pref.get('instructorPref'))
+        let pref = prefs.find(pref => pref.get('positionId') == course);
 
         return pref.instructorPref;
     }
 
     updateInstructorPref(applicant, course, event) {
         let prefs = this.getApplicationById(applicant).get('prefs');
-        let pref = prefs.find(pref => pref.get('positionId') == course && pref.get('instructorPref'))
+        let pref = prefs.find(pref => pref.get('positionId') == course);
 
         let applicationId = pref.applicationId;
 
