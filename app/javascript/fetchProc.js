@@ -131,7 +131,9 @@ export const onFetchApplicationsSuccess = (resp) => {
             prefs: (function(prefs) {
                 return prefs.map(pref => ({
                     positionId: pref.position_id,
+                    applicationId: pref.application_id,
                     preferred: pref.rank == 1,
+                    instructorPref: pref.instructor_pref,
                 }));
             })(app.preferences),
             rawPrefs: app.raw_prefs,
@@ -141,7 +143,6 @@ export const onFetchApplicationsSuccess = (resp) => {
             avail: app.availability,
             other: app.other_info,
             specialNeeds: app.special_needs,
-            instructorPref: app.instructor_pref,
         };
         if (applications[app.applicant_id]) {
             applications[app.applicant_id].push(newApp);
