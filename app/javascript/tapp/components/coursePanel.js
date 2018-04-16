@@ -134,8 +134,7 @@ class CoursePanel extends React.Component {
             {
                 header: 'Instructor Pref.',
                 data: p => {
-                        let application = this.props.getApplicationById(p.applicantId);
-                        return (<InstructorPreferenceMenu {...this.props} application={application} applicantId={p.applicantId}/>);
+                        return (<InstructorPreferenceMenu {...this.props} course={p.course} applicantId={p.applicantId}/>);
                     },
 
                 style: { width: 0.15 },
@@ -268,7 +267,7 @@ class InstructorPreferenceMenu extends React.Component {
   }
 
   handleChange(event) {
-    this.props.updateInstructorPref(this.props.applicantId, event);
+    this.props.updateInstructorPref(this.props.applicantId,this.props.course,  event);
 
     var val = instructorPrefMenuItems[event];
     this.setState({

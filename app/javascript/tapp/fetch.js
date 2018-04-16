@@ -122,9 +122,9 @@ export const noteApplicant = (applicant, notes) => {
 }
 
 // add/update the instructor prefs for an application
-export const updateInstructorPref = (application, pref) => {
-    putData('/applications/' + application, { instructor_pref: pref }, () => {
-      getApplicants();
+export const updateInstructorPref = (application, position, pref) => {
+    putData('/applications/' + application, { position: position, pref: pref }, () => {
+      getApplications();
     });
 }
 

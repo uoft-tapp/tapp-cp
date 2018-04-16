@@ -1010,12 +1010,20 @@ class AppState {
         return this.getApplicationsInSelectedRound();
     }
 
-    getInstructorPref(application) {
-        return application.get('instructorPref');
+    getInstructorPref(applicant, course) {
+        let prefs = this.getApplicationById(applicant).get('prefs');
+        let pref = prefs.find(pref => pref.get('positionId') == course && pref.get('instructorPref'))
+
+        return pref.instructorPref;
     }
 
-    updateInstructorPref(application, event) {
-        fetch.updateInstructorPref(application, event);
+    updateInstructorPref(applicant, course, event) {
+        let prefs = this.getApplicationById(applicant).get('prefs');
+        let pref = prefs.find(pref => pref.get('positionId') == course && pref.get('instructorPref'))
+
+        let applicationId = pref.applicationId;
+
+        fetch.updateInstructorPref(applicationId, course, event);
     }
 
     // get all applicants who have been assigned to a course; returns a list of [applicantID, applicantData]
