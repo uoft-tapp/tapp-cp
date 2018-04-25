@@ -47,7 +47,8 @@ class CSVGenerator
         "round_id",
       ]
       data = get_offers(attributes)
-      return {generated: true, data: data, file: "offers.csv", type: "text/csv"}
+      session = Session.find(session)
+      return {generated: true, data: data, file: "#{session[:semester]}_#{session[:year]}_Offers.csv", type: "text/csv"}
     end
   end
 
