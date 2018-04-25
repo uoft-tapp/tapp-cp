@@ -146,7 +146,7 @@ export const exportOffers = (round, session) => {
 // get current user role and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-  fetchProc.setRole(['tapp_admin', 'instructor'], false, appState);
+  fetchProc.setRole(['tapp_admin', 'instructor', 'tapp_assistant'], false, appState);
 }
 
 export const emailAssignments = (code, round, key) => {

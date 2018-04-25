@@ -27,17 +27,36 @@ const ViewTab = props =>
     </li>;
 
 const ViewTabs = props => {
-    let activeKey = props.getSelectedNavTab();
+    let activeKey = props.getSelectedNavTab(),
+        role = props.getSelectedUserRole();
 
-    return (
-        <ul className="nav navbar-nav navbar-left">
-            <ViewTab activeKey={activeKey} {...routeConfig.courses} />
-            <ViewTab activeKey={activeKey} {...routeConfig.abc} />
-            <ViewTab activeKey={activeKey} {...routeConfig.assigned} />
-            <ViewTab activeKey={activeKey} {...routeConfig.unassigned} />
-            <ViewTab activeKey={activeKey} {...routeConfig.summary} />
-        </ul>
-    );
+    switch(role){
+      case 'tapp_admin':
+        return (
+            <ul className="nav navbar-nav navbar-left">
+                <ViewTab activeKey={activeKey} {...routeConfig.courses} />
+                <ViewTab activeKey={activeKey} {...routeConfig.abc} />
+                <ViewTab activeKey={activeKey} {...routeConfig.assigned} />
+                <ViewTab activeKey={activeKey} {...routeConfig.unassigned} />
+                <ViewTab activeKey={activeKey} {...routeConfig.summary} />
+            </ul>
+        );
+        break;
+      case 'tapp_assistant':
+        return (
+            <ul className="nav navbar-nav navbar-left">
+                <ViewTab activeKey={activeKey} {...routeConfig.assistant} />
+            </ul>
+        );
+        break;
+      case 'instructor':
+        return (
+            <ul className="nav navbar-nav navbar-left">
+                <ViewTab activeKey={activeKey} {...routeConfig.instructor} />
+            </ul>
+        );
+        break;
+    }
 };
 
 const CoursePanelLayoutTabs = props => {
@@ -250,8 +269,8 @@ const NavbarInst = props =>
         <Nav pullRight>
             {props.getSelectedNavTab() == routeConfig.abc.id &&
                 <CoursePanelLayoutTabs {...props} />}
-            <Session {...props} />
-            <Round {...props} />
+            {(props.role=='tapp_admin')||(props.role=='instructor')?<Session {...props} />:''}
+            {props.role=='tapp_admin'?<Round {...props} />:''}
             <Notifications {...props} />
             <Auth {...props} />
         </Nav>

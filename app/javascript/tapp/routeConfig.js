@@ -26,10 +26,15 @@ const routeConfig = {
         route: '/summary',
         id: 'summary',
     },
-    asssistant: {
+    assistant: {
         label: 'Assistant Panel',
         route: '/assistantPanel',
         id: 'assistant',
+    },
+    instructor: {
+        label: 'Instructor Panel',
+        route: '/instructorPanel',
+        id: 'instructor',
     }
 };
 

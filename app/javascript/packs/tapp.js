@@ -25,6 +25,7 @@ import { Assigned } from '../tapp/components/assigned.js';
 import { Unassigned } from '../tapp/components/unassigned.js';
 import { Summary } from '../tapp/components/summary.js';
 import { Assistant } from '../tapp/components/assistant.js';
+import { Instructor } from '../tapp/components/instructor.js';
 import { ApplicantModal } from '../tapp/components/applicantModal.js';
 
 /*** Main app component ***/
@@ -57,7 +58,7 @@ class App extends React.Component {
           case 'tapp_admin':
             return <AdminRouter {...appState} />;
           case 'tapp_assistant':
-            return <AssistantRouter {...appState} />:;
+            return <AssistantRouter {...appState} />;
           case 'instructor':
             return <InstrRouter {...appState} />;
         }
@@ -74,7 +75,7 @@ const AdminRouter = props => {
     return (
         <Router basename="tapp">
             <div>
-                <Navbar {...props} />
+                <Navbar {...props} role='tapp_admin'/>
 
                 <Switch>
                     <Route
@@ -124,7 +125,14 @@ const InstrRouter = props => {
     return (
         <Router basename="tapp">
             <div>
-                <Navbar {...props} />
+                <Navbar {...props} role='instructor'/>
+                <Switch>
+                    <Route
+                        path={routeConfig.instructor.route}
+                        render={() => <Instructor navKey={routeConfig.instructor.id} {...props} />}
+                    />
+                    <Redirect from="/" to={routeConfig.instructor.route} />
+                </Switch>
             </div>
         </Router>
     );
@@ -134,26 +142,14 @@ const AssistantRouter = props =>{
     return (
       <Router basename="tapp">
           <div>
-              <Navbar {...props} />
+              <Navbar {...props} role='tapp_assistant'/>
               <Switch>
                   <Route
                       path={routeConfig.assistant.route}
                       render={() => <Assistant navKey={routeConfig.assistant.id} {...props} />}
                   />
+                  <Redirect from="/" to={routeConfig.assistant.route} />
               </Switch>
-              <div className="container-fluid" id="alert-container">
-                  {props
-                      .getAlerts()
-                      .map(alert =>
-                          <div
-                              key={'alert-' + alert.id}
-                              className="alert alert-danger"
-                              onClick={() => props.dismissAlert(alert.id)}
-                              onAnimationEnd={() => props.dismissAlert(alert.id)}
-                              dangerouslySetInnerHTML={{ __html: alert.text }}
-                          />
-                      )}
-              </div>
           </div>
       </Router>
     );
