@@ -58,23 +58,28 @@ const fetchTappAdminAll = () => {
 }
 
 const fetchTappAssistantAll = () => {
-  getSessions();
+    getSessions().then(()=>{
+      let sessions = appState.getSessionsList();
+      if(!sessions){
+        appState.setSessionsList([]);
+      }
+    });
 }
 
 const fetchInstructorAll = () => {
-  getSessions().then(()=>{
-    let sessions = appState.getSessionsList();
-    if(!sessions){
-      appState.setSessionsList([]);
-    }
-    let session = appState.getSelectedSession();
-    if(!session||session=='N/A')
-      appState.setLatestSession();
-    getApplicants();
-    getApplications();
-    getAssignments();
-    getCourses();
-  });
+    getSessions().then(()=>{
+      let sessions = appState.getSessionsList();
+      if(!sessions){
+        appState.setSessionsList([]);
+      }
+      let session = appState.getSelectedSession();
+      if(!session||session=='N/A')
+        appState.setLatestSession();
+      getApplicants();
+      getApplications();
+      getAssignments();
+      getCourses();
+    });
 }
 /* Task-specific resource modifiers */
 
