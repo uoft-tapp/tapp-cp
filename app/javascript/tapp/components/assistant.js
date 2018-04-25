@@ -3,7 +3,7 @@ import { ListGroup, ListGroupItem } from 'react-bootstrap';
 
 class Assistant extends React.Component {
     render() {
-      if (this.anyFetching()) {
+      if (this.props.anyFetching()) {
         return null;
       }
       else{
