@@ -1,10 +1,12 @@
 module Authorizer
-  def tapp_admin(tapp_assistant = false)
-    if tapp_assistant
-      expected_roles = ["tapp_admin", "tapp_assistant"]
-    else
-      expected_roles = ["tapp_admin"]
-    end
+
+  def tapp_access
+    expected_roles = ["tapp_admin", "tapp_assistant", "instructor"]
+    access(expected_roles)
+  end
+
+  def tapp_admin()
+    expected_roles = ["tapp_admin"]
     access(expected_roles)
   end
 

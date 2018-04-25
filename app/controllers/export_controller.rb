@@ -1,7 +1,8 @@
 class ExportController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
-  before_action :tapp_admin, except: [:cp_offers]
+  before_action :tapp_access, except: [:offers]
+  before_action :tapp_admin, except: [:cp_offers, :offers]
   before_action only: [:cp_offers] do
     cp_admin(true)
   end
