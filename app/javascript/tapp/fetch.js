@@ -40,24 +40,42 @@ const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, ap
 const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
 
 /* Function to GET all resources */
-
 export const fetchAll = () => {
-    getSessions().then(()=>{
-      let sessions = appState.getSessionsList();
-      if(!sessions){
-        appState.setSessionsList([]);
-      }
-      let session = appState.getSelectedSession();
-      if(!session||session=='N/A')
-        appState.setLatestSession();
-      getApplicants();
-      getApplications();
-      getAssignments();
-      getCourses();
-    });
+  let role = appState.getSelectedUserRole();
+  switch(role){
+    case 'tapp_admin':
+      fetchTappAdminAll();
+    case 'tapp_assistant':
+      fetchTappAssistantAll();
+    case 'instructor':
+      fetchInstructorAll();
+  }
+}
+
+const fetchTappAdminAll = () => {
+    fetchInstructorAll();
     getInstructors();
 }
 
+const fetchTappAssistantAll = () => {
+  getSessions();
+}
+
+const fetchInstructorAll = () => {
+  getSessions().then(()=>{
+    let sessions = appState.getSessionsList();
+    if(!sessions){
+      appState.setSessionsList([]);
+    }
+    let session = appState.getSelectedSession();
+    if(!session||session=='N/A')
+      appState.setLatestSession();
+    getApplicants();
+    getApplications();
+    getAssignments();
+    getCourses();
+  });
+}
 /* Task-specific resource modifiers */
 
 // create a new assignment
@@ -146,7 +164,7 @@ export const exportOffers = (round, session) => {
 // get current user role and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-  fetchProc.setRole(['tapp_admin', 'instructor', 'tapp_assistant'], false, appState);
+  return fetchProc.setRole(['tapp_admin', 'instructor', 'tapp_assistant'], false, appState);
 }
 
 export const emailAssignments = (code, round, key) => {

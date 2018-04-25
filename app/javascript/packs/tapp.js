@@ -35,10 +35,7 @@ class App extends React.Component {
         super(props);
 
         // get current user role and username
-        fetchAuth();
-
-        // start fetching data
-        fetchAll();
+        fetchAuth().then(()=> fetchAll());
     }
 
     componentDidMount() {

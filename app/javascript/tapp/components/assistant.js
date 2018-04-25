@@ -8,7 +8,7 @@ class Assistant extends React.Component {
         <div id='tapp-assistant'>
           <ListGroup style={{width: '500px', margin: '0 auto'}}>
             {sessions.map(id=>
-              <ListGroupItem id={'session-'+id}
+              <ListGroupItem key={id} id={'session-'+id}
                 onClick={()=>this.props.downloadFile('/export/offers/'+id)}>
                 {this.props.getSessionName(id)}&nbsp;
                 <i className="fa fa-download"></i>
