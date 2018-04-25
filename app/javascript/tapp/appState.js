@@ -594,27 +594,60 @@ class AppState {
 
     // check if any data is being fetched
     anyFetching() {
-        return [
-            this.get('sessions.fetching'),
-            this.get('courses.fetching'),
-            this.get('instructors.fetching'),
-            this.get('applicants.fetching'),
-            this.get('applications.fetching'),
-            this.get('assignments.fetching'),
-        ].some(val => val > 0);
+      let role = this.getSelectedUserRole();
+      switch(role){
+        case 'tapp_admin':
+          return [
+              this.get('sessions.fetching'),
+              this.get('courses.fetching'),
+              this.get('instructors.fetching'),
+              this.get('applicants.fetching'),
+              this.get('applications.fetching'),
+              this.get('assignments.fetching'),
+          ].some(val => val > 0);
+        case 'tapp_assistant':
+          return [
+              this.get('sessions.fetching'),
+          ].some(val => val > 0);
+        case 'instructor':
+          return [
+              this.get('sessions.fetching'),
+              this.get('courses.fetching'),
+              this.get('applicants.fetching'),
+              this.get('applications.fetching'),
+              this.get('assignments.fetching'),
+          ].some(val => val > 0);
+      }
     }
 
     // check if any data has not yet been fetched
     anyNull() {
-        return [
-            this.get('sessions.list'),
-            this.get('courses.list'),
-            this.get('instructors.list'),
-            this.get('applicants.list'),
-            this.get('applications.list'),
-            this.get('assignments.list'),
-        ].some(val => val == null);
+      let role = this.getSelectedUserRole();
+      switch(role){
+        case 'tapp_admin':
+          return [
+              this.get('sessions.list'),
+              this.get('courses.list'),
+              this.get('instructors.list'),
+              this.get('applicants.list'),
+              this.get('applications.list'),
+              this.get('assignments.list'),
+          ].some(val => val == null);
+        case 'tapp_assistant':
+          return [
+              this.get('sessions.list'),
+          ].some(val => val == null);
+        case 'instructor':
+          return [
+              this.get('sessions.list'),
+              this.get('courses.list'),
+              this.get('applicants.list'),
+              this.get('applications.list'),
+              this.get('assignments.list'),
+          ].some(val => val == null);
+      }
     }
+
 
     // create a new assignment
     createAssignment(applicant, course, hours) {
