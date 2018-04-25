@@ -58,12 +58,7 @@ const fetchTappAdminAll = () => {
 }
 
 const fetchTappAssistantAll = () => {
-    getSessions().then(()=>{
-      let sessions = appState.getSessionsList();
-      if(!sessions){
-        appState.setSessionsList([]);
-      }
-    });
+    getSessions();
 }
 
 const fetchInstructorAll = () => {
