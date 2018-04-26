@@ -185,6 +185,7 @@ RSpec.describe TemplatesController, type: :controller do
           }
           patch :update, params: update_data
           template.reload
+          template.allocations.reload
           expect(get_allocations(template.allocations)).to eq(update_data[:allocations])
           expect(template.training_ids).to eq(update_data[:trainings])
           expect(template.category_ids).to eq(update_data[:categories])
