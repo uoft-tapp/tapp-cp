@@ -170,9 +170,8 @@ export const exportOffers = (round, session) => {
 }
 
 export const updateInstructor = (instructor) => {
-    let fetch = true;
     putData('/instructors/'+instructor.id, instructor, resp=>{
-      if(fetch) getInstructors();
+      getInstructors();
     },
     resp=>{
       alert(resp.message);
@@ -180,14 +179,12 @@ export const updateInstructor = (instructor) => {
     },
     resp=>{
       appState.alert(resp.message);
-      fetch = false;
     });
 }
 
 export const deleteInstructor = (id) => {
-  let fetch = true;
   deleteData('/instructors/'+id, ()=>{
-    if(fetch) getInstructors();
+    getInstructors();
   },
   resp=>{
     alert(resp.message);
@@ -195,14 +192,12 @@ export const deleteInstructor = (id) => {
   },
   resp=>{
     appState.alert(resp.message);
-    fetch = false;
   });
 }
 
 export const createInstructor = (instructor) => {
-    let fetch = true;
     postData('/instructors', instructor, ()=>{
-      if(fetch) getInstructors();
+      getInstructors();
     },
     resp=>{
       alert(resp.message);
@@ -210,7 +205,6 @@ export const createInstructor = (instructor) => {
     },
     resp=>{
       appState.alert(resp.message);
-      fetch = false;
     });
 }
 
