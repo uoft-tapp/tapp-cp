@@ -85,23 +85,29 @@ class DdahsController < ApplicationController
   end
 
   def new_template
-    ddah = Ddah.find(params[:ddah_id])
-    offer = Offer.find(ddah[:offer_id])
-    position = Position.find(offer[:position_id])
-    data = {
-      name: params[:name],
-      optional: ddah[:optional],
-      instructor_id: ddah[:instructor_id],
-      tutorial_category: ddah[:tutorial_category],
-      department: ddah[:department],
-      scaling_learning: ddah[:scaling_learning],
-      # position_id: position[:id],
-    }
-    template = Template.create!(data)
-    copy_allocations(template, ddah.allocations, :ddah_id, :template_id)
-    template.training_ids = ddah.training_ids
-    template.category_ids = ddah.category_ids
-    render status: 200, json: {message: "A new template was successfully created."}
+    ddah = Ddah.find_by(id: params[:ddah_id])
+    if ddah
+      template = Template.find_by(name: params[:name], instructor_id: ddah[:instructor_id])
+      if !template
+        data = {
+          name: params[:name],
+          optional: ddah[:optional],
+          instructor_id: ddah[:instructor_id],
+          tutorial_category: ddah[:tutorial_category],
+          department: ddah[:department],
+          scaling_learning: ddah[:scaling_learning],
+        }
+        template = Template.create!(data)
+        copy_allocations(template, ddah.allocations, :ddah_id, :template_id)
+        template.training_ids = ddah.training_ids
+        template.category_ids = ddah.category_ids
+        render status: 200, json: {message: "A new template was successfully created."}
+      else
+        render status: 404, json: {message: "A template with the same name already exists."}
+      end
+    else
+      render status: 404, json: {message: "Invalid or no id given."}
+    end
   end
 
   '''
@@ -200,17 +206,21 @@ class DdahsController < ApplicationController
   end
 
   def pdf
-    ddah = Ddah.find(params[:ddah_id])
+    ddah = Ddah.find_by(id: params[:ddah_id])
     if ddah
       get_ddah_pdf(ddah)
     else
-      render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
+      render status: 404, json: {message: "A DDAH has not been made for this offer."}
     end
   end
 
   def accept
-    ddah = Ddah.find(params[:ddah_id])
-    accept_ddah(ddah[:offer_id])
+    ddah = Ddah.find_by(id: params[:ddah_id])
+    if ddah
+      accept_ddah(false, ddah[:offer_id], ddah)
+    else
+      render status: 404, json: {message: "A DDAH has not been made for this offer."}
+    end
   end
 
   '''
@@ -221,12 +231,12 @@ class DdahsController < ApplicationController
     if ddah
       get_ddah_pdf(ddah)
     else
-      render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
+      render status: 404, json: {message: "A DDAH has not been made for this offer."}
     end
   end
 
   def student_accept
-    accept_ddah(params[:offer_id], true, params[:signature])
+    accept_ddah(true, params[:offer_id], nil, params[:signature])
   end
 
   private
@@ -244,24 +254,29 @@ class DdahsController < ApplicationController
     send_data generator.render, filename: "ddah.pdf", disposition: "inline"
   end
 
-  def accept_ddah(offer_id, student = false, signature = nil)
-    offer = Offer.find(offer_id)
-    if offer[:ddah_status] == "Accepted"
-      render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
-    else
-      ddah = Ddah.find_by(offer_id: offer_id)
-      if ddah
-        if student
+  def accept_ddah(student, offer_id, ddah, signature = nil)
+    offer = Offer.find_by(id: offer_id)
+    if offer
+      if student
+        ddah = Ddah.find_by(offer_id: offer_id)
+        if ddah
           accept_student_ddah(ddah, offer, signature, DateTime.now.to_date)
+        else
+          render status: 404, json: {message: "DDAH does not exist."}
+        end
+      else
+        if offer[:ddah_status] == "Accepted"
+          render status: 404, json: {message: "You have already accepted this DDAH.", status: offer[:ddah_status]}
         else
           offer.update_attributes!(ddah_status: "Accepted")
           ddah.update_attributes!(student_signature: signature, student_sign_date:  DateTime.now.to_date)
           render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
         end
-      else
-        render status: 404, json: {message: "Error: DDAH not found."}
       end
+    else
+      render status: 404, json: {message: "Offer does not exist."}
     end
+
   end
 
   def accept_student_ddah(ddah, offer, signature, date)
@@ -270,7 +285,7 @@ class DdahsController < ApplicationController
       ddah.update_attributes!(student_signature: signature, student_sign_date: date)
       render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
     else
-      render status: 404, json: {message: "Error: You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
+      render status: 404, json: {message: "You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
     end
   end
 

@@ -2,6 +2,22 @@ require 'rails_helper'
 
 RSpec.describe TemplatesController, type: :controller do
 
+  def get_allocations(alloc)
+    allocations = []
+    alloc.each do |allocation|
+      data = {
+          num_unit: allocation[:num_unit],
+          unit_name: allocation[:unit_name],
+          minutes: allocation[:minutes],
+      }
+      if allocation[:duty_id]
+        data[:duty_id] = allocation[:duty_id]
+      end
+      allocations.push(data)
+    end
+    return allocations
+  end
+
   let(:instructor1) do
     Instructor.create!(
       utorid: "utorid1",
@@ -121,7 +137,7 @@ RSpec.describe TemplatesController, type: :controller do
         it "throws status 404 with error message" do
           get :create, params: {utorid: instructor1[:utorid], name: template[:name]}
           expect(response.status).to eq(404)
-          message = {message: "Error: A template with the same name already exists."}
+          message = {message: "A template with the same name already exists."}
           expect(response.body).to eq(message.to_json)
         end
       end
@@ -169,19 +185,7 @@ RSpec.describe TemplatesController, type: :controller do
           }
           patch :update, params: update_data
           template.reload
-          allocations = []
-          template.allocations.each do |allocation|
-            data = {
-                num_unit: allocation[:num_unit],
-                unit_name: allocation[:unit_name],
-                minutes: allocation[:minutes],
-            }
-            if allocation[:duty_id]
-              data[:duty_id] = allocation[:duty_id]
-            end
-            allocations.push(data)
-          end
-          expect(allocations).to eq(update_data[:allocations])
+          expect(get_allocations(template.allocations)).to eq(update_data[:allocations])
           expect(template.training_ids).to eq(update_data[:trainings])
           expect(template.category_ids).to eq(update_data[:categories])
           expect(template[:scaling_learning]).to eq(update_data[:scaling_learning])

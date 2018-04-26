@@ -43,7 +43,7 @@ class TemplatesController < ApplicationController
       )
       render status: 201, json: template.to_json
     else
-      render status: 404, json: {message: "Error: A template with the same name already exists."}
+      render status: 404, json: {message: "A template with the same name already exists."}
     end
   end
 
