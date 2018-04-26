@@ -15,7 +15,7 @@ class InstructorsController < ApplicationController
 
   def create
     if params[:utorid]
-      if params[:name] || params[:email]
+      if params[:name] && params[:email]
         instructor = Instructor.find_by(utorid: params[:utorid])
         if !instructor
           Instructor.create(
@@ -36,31 +36,29 @@ class InstructorsController < ApplicationController
   end
 
   def update
-    if params[:id]
-      instructor = Instructor.find(params[:id])
-      if instructor
-        if params[:name] || params[:email]
-          instructor.update_attributes!(
-            name: params[:name],
-            email: params[:email],
-          )
-          render status: 200, json: {message: "Instructor #{params[:name]}'s data has been updated.'"}
-        else
-          render status: 404, json: {message: "Missing either name or email."}
-        end
+    instructor = Instructor.find_by(id: params[:id])
+    if instructor
+      if params[:name] && params[:email]
+        instructor.update_attributes!(
+          name: params[:name],
+          email: params[:email],
+        )
+        render status: 200, json: {message: "Instructor #{params[:name]}'s data has been updated.'"}
       else
-        render status: 404, json: {message: "No instructor with id #{params[:id]} exists in the system."}
+        render status: 404, json: {message: "Missing either name or email."}
       end
     else
-      render status: 404, json: {message: "No id given."}
+      render status: 404, json: {message: "No instructor with id #{params[:id]} exists in the system."}
     end
   end
 
   def destroy
-    instructor = Instructor.find(params[:id])
+    instructor = Instructor.find_by(id: params[:id])
     if instructor
       instructor.destroy!
       render status: 200, json: {message: "Instructor #{params[:id]} has been deleted."}
+    else
+      render status: 404, json: {message: "No instructor with id #{params[:id]} exists in the system."}
     end
   end
 
