@@ -7,9 +7,6 @@ class InstructorModal extends React.Component {
         let modalData = this.props.instructorModalOpen();
         if(modalData){
           let id = this.props.getInstructorDataFromModal('id'),
-              utorid = this.props.getInstructorDataFromModal('utorid'),
-              name = this.props.getInstructorDataFromModal('name'),
-              email = this.props.getInstructorDataFromModal('email'),
               instructors = this.props.getInstructorsList(true),
               selectedTab = this.props.getSelectedTabFromModal();
 
@@ -36,16 +33,14 @@ class InstructorModal extends React.Component {
                               <NavItem eventKey="create">Create Instructor</NavItem>
                               <NavItem eventKey="edit">Edit Instructor</NavItem>
                             </Nav>
-                            <Alert id='instructor-modal-alert' bsStyle="danger">text</Alert>
+                            <Alert bsStyle="danger" style={{opacity: this.props.getInstructorModalAlert()?'1':'0'}}>
+                              <b>Error: </b>{this.props.getInstructorModalAlert()}
+                            </Alert>
                           </Col>
                           <Col sm={12}>
                             <Tab.Content animation style={{margin: '0px 0 20px 20px'}}>
-                              <CreateInstructor {...this.props} id={id}
-                                utorid={utorid} name={name} email={email}
-                                instructors={instructors}/>
-                              <EditInstructor {...this.props} id={id}
-                                utorid={utorid} name={name} email={email}
-                                instructors={instructors}/>
+                              <CreateInstructor {...this.props} instructors={instructors}/>
+                              <EditInstructor {...this.props} id={id} instructors={instructors}/>
                             </Tab.Content>
                           </Col>
                           </Row>
@@ -72,10 +67,10 @@ const CreateInstructor = props =>(
       <FormFormat cid='instructor-utorid' type='text'
         label='Utorid'
         placeholder='Utorid'
-        value={props.utorid}
+        value={props.getInstructorDataFromModal('utorid')}
         update={event=>props.setInstructorDataFromModal('utorid', event.target.value)}
         {...props}/>
-      <InstructorForm name={props.name} email={props.email} {...props}/>
+      <InstructorForm {...props}/>
   </Tab.Pane>
 );
 
@@ -84,7 +79,6 @@ const EditInstructor = props =>(
     <FormFormat cid='instructor-utorid-dropdown' type='dropdown'
       label='Instructor'
       placeholder={props.id?props.instructors[props.id]['utorid']:'Choose a Utorid'}
-      value={props.name}
       update={key=>props.setInstructorDataFromModal('id', key)}
       body={Object.keys(props.instructors).map(key=>
             <MenuItem key={key} eventKey={key}>
@@ -92,7 +86,7 @@ const EditInstructor = props =>(
             </MenuItem>
       )}
       {...props}/>
-    <InstructorForm name={props.name} email={props.email} {...props}/>
+    <InstructorForm {...props}/>
   </Tab.Pane>
 );
 
@@ -101,13 +95,13 @@ const InstructorForm = props =>(
     <FormFormat cid='instructor-name' type='text'
       label='Name'
       placeholder='Full Name'
-      value={props.name}
+      value={props.getInstructorDataFromModal('name')}
       update={event=>props.setInstructorDataFromModal('name', event.target.value)}
       {...props}/>
     <FormFormat cid='instructor-email' type='email'
       label='Email'
       placeholder='Email'
-      value={props.email}
+      value={props.getInstructorDataFromModal('email')}
       update={event=>props.setInstructorDataFromModal('email', event.target.value)}
       {...props}/>
   </div>
@@ -128,8 +122,8 @@ const FormFormat = props =>(
       </DropdownButton>:
       <FormControl type={props.type}
         placeholder={props.placeholder}
-        onBlur={props.update}
-        defaultValue={props.value?props.value:''}/>}
+        onChange={props.update}
+        value={props.value}/>}
     </Col>
   </FormGroup>
 );

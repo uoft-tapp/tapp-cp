@@ -36,8 +36,8 @@ const getAssignments = () => getResource('/assignments',
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
-const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
-const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
+const putData = (route, data, fetch, okay = null, error = null) => fetchProc.putData(route, data, fetch, appState, okay, error);
+const deleteData = (route, fetch, okay = null, error = null) => fetchProc.deleteData(route, fetch, appState, okay, error);
 
 /* Function to GET all resources */
 export const fetchAll = () => {
@@ -171,7 +171,7 @@ export const exportOffers = (round, session) => {
 
 export const updateInstructor = (instructor) => {
     let fetch = true;
-    putData('/instructors', instructor, ()=>{
+    putData('/instructors/'+instructor.id, instructor, resp=>{
       getInstructors();
     },
     resp=>{
@@ -179,8 +179,8 @@ export const updateInstructor = (instructor) => {
       appState.hideInstructorModal();
     },
     resp=>{
-        appState.alert("<b>Error</b>: "+resp.message);
-        fetch = false;
+      appState.alert(resp.message);
+      fetch = false;
     });
 }
 
@@ -195,17 +195,9 @@ export const createInstructor = (instructor) => {
       appState.hideInstructorModal();
     },
     resp=>{
+      appState.alert(resp.message);
       fetch = false;
-      if(resp.id){
-        let choice = confirm("An instructor with the same utorid already exists. Do you want update the information for that instructor?");
-        if(choice){
-          appState.switchInstructorModalTab("update");
-        }
-      }
-      else{
-        appState.alert("<b>Error</b>: "+resp.message);
-      }
-    })
+    });
 }
 
 // get current user role and username

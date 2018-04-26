@@ -25,7 +25,7 @@ class InstructorsController < ApplicationController
           )
           render status: 200, json: {message: "Instructor #{params[:name]} has been created.'"}
         else
-          render status: 404, json: {message: "This instructor already exists.", id: instructor[:id]}
+          render status: 404, json: {message: "This instructor already exists."}
         end
       else
         render status: 404, json: {message: "Missing either name or email."}

@@ -61,7 +61,17 @@ const initialState = {
     },
 
     // instructor Modal
-    instructorModal: null,
+    instructorModal: {
+      open: false,
+      selectedTab: 'create',
+      alert: null,
+      instructor: {
+        id: null,
+        utorid: null,
+        name: null,
+        email: null,
+      },
+    },
 
     /** DB data **/
 
@@ -185,9 +195,7 @@ class AppState {
     // add an alert to the list of active alerts
     alert(text) {
         if(this.instructorModalOpen()){
-          let alertBody = document.getElementById("instructor-modal-alert");
-          alertBody.style.opacity='1';
-          alertBody.innerHTML = text;
+          this.setInstructorModalAlert(text);
         }
         else {
           let alerts = this.get('alerts');
@@ -733,26 +741,22 @@ class AppState {
             this.get('instructorModal.instructor.'+key).trim(): '';
       }
       else {
-          let id = this.getInstructorDataFromModal('id');
-          if(id){
-            return {
-              id: id,
-              utorid: this.getInstructorDataFromModal('utorid'),
-              name: this.getInstructorDataFromModal('name'),
-              email: this.getInstructorDataFromModal('email'),
-            };
-          }
-          else{
-            return {
-              utorid: this.getInstructorDataFromModal('utorid'),
-              name: this.getInstructorDataFromModal('name'),
-              email: this.getInstructorDataFromModal('email'),
-            };
-          }
+        let id = this.getInstructorDataFromModal('id');
+        return {
+            id: (id==''||!id)? null: parseInt(id),
+            utorid: this.getInstructorDataFromModal('utorid'),
+            name: this.getInstructorDataFromModal('name'),
+            email: this.getInstructorDataFromModal('email'),
+          };
       }
     }
 
     setInstructorDataFromModal(key, val){
+        if(key=='id'){
+          this.setInstructorDataFromModal('utorid', this.getInstructorAttributeById(val, 'utorid'));
+          this.setInstructorDataFromModal('name', this.getInstructorAttributeById(val, 'name'));
+          this.setInstructorDataFromModal('email', this.getInstructorAttributeById(val, 'email'));
+        }
         this.set('instructorModal.instructor.'+key, val);
     }
 
@@ -767,43 +771,65 @@ class AppState {
     containsEmptyInstructorField(instructor){
       let keys = Object.keys(instructor);
       for(let i in keys) {
-        if(instructor[keys[i]].length == 0)
+        if(instructor[keys[i]]=='')
           return true;
       }
       return false;
     }
 
     updateInstructor(){
-        if(this.instructorModalOpen()){
-          let instructor = this.getInstructorDataFromModal();
-          if(!this.containsEmptyInstructorField(instructor)){
-            console.log('edit');
-            fetch.updateInstructor(instructor);
+      this.validateInstructorModalForm((instructor, action2)=>{
+          if((this.getInstructorAttributeById(instructor.id, 'name')==instructor.name)
+              &&(this.getInstructorAttributeById(instructor.id, 'email')==instructor.email))
+            this.alert("This instructor's information remains unchanged.");
+          else{
+            action2(instructor);
           }
-        }
+        }, (instructor)=>{
+        this.validateInstructorNameEmail(instructor.name, instructor.email, ()=>{
+          delete instructor.utorid;
+          fetch.updateInstructor(instructor);
+        });
+      });
     }
 
     createInstructor(){
+      this.validateInstructorModalForm((instructor, action2)=>{
+        if(!this.validInstructorUtorid(instructor.utorid))
+          this.alert("An instructor with this utorid already exists.");
+        else{
+          action2(instructor);
+        }
+      }, (instructor)=>{
+        this.validateInstructorNameEmail(instructor.name, instructor.email, ()=>{
+          delete instructor.id;
+          fetch.createInstructor(instructor);
+        });
+      });
+    }
+
+    validateInstructorModalForm(action1, action2){
       if(this.instructorModalOpen()){
         let instructor = this.getInstructorDataFromModal();
         if(!this.containsEmptyInstructorField(instructor)){
-          if(!this.validInstructorUtorid(instructor.utorid))
-            this.alert("<b>Error: </b> An instructor with this utorid already exists.");
-          else{
-            if(!this.validInstructorName(instructor.name))
-              this.alert("<b>Error: </b> Please enter both the first and last name.");
-            else {
-              if (!this.validInstructorEmail(instructor.email)){
-                this.alert("<b>Error</b> Invalid Email");
-              }
-              else{
-                fetch.createInstructor(instructor);
-              }
-            }
-          }
+          if(action1)
+            action1(instructor, action2);
+          else
+            action2(instructor);
         }
+        else this.alert("This form contains empty fields.");
+      }
+    }
+
+    validateInstructorNameEmail(name, email, action){
+      if(!this.validInstructorName(name))
+        this.alert("Please enter both the first and last name.");
+      else {
+        if (!this.validInstructorEmail(email))
+          this.alert("Invalid Email");
         else{
-          this.alert("<b>Error: </b> This form contains empty fields.");
+          this.setInstructorModalAlert(null);
+          action();
         }
       }
     }
@@ -828,23 +854,27 @@ class AppState {
     }
 
     instructorModalOpen(){
-      return this.get("instructorModal");
+      return this.get("instructorModal.open");
+    }
+
+    getInstructorModalAlert(){
+      return this.get("instructorModal.alert");
+    }
+
+    setInstructorModalAlert(text){
+      this.set('instructorModal.alert', text);
     }
 
     showInstructorModal(){
-      this.set("instructorModal", fromJS({
-        selectedTab: 'create',
-        instructor: {
-          id: null,
-          utorid: null,
-          name: null,
-          email: null,
-        },
-      }));
+      this.set("instructorModal.open", true);
     }
 
     hideInstructorModal(){
-      this.set("instructorModal", null);
+      this.set("instructorModal.instructor.id", null);
+      this.set("instructorModal.instructor.utorid", null);
+      this.set("instructorModal.instructor.name", null);
+      this.set("instructorModal.instructor.email", null);
+      this.set("instructorModal.open", false);
     }
 
     getApplicantsInSelectedRound() {
@@ -1109,12 +1139,13 @@ class AppState {
         }
     }
 
-    getInstructorUtoridById(id){
+    getInstructorAttributeById(id, attribute){
+      let val = null;
       this.get('instructors.list').forEach((instr, key)=>{
-        if(parseInt(key) == parseInt(id))
-          return instr.get('utorid');
+        if(key == id)
+          val = instr.get(attribute);
       });
-      return null;
+      return val;
     }
 
     // get a list of all rounds for all courses

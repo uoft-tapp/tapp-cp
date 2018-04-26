@@ -230,6 +230,7 @@ export const onFetchInstructorsSuccess = (resp) => {
         instructors[instr.id] = {
           name: instr.name,
           utorid: instr.utorid,
+          email: instr.email,
         };
     });
     return instructors;
@@ -356,44 +357,46 @@ export const onFetchTrainingsSuccess = (resp)=>{
 /*
   common fetch helper functions
 */
-export const putData = (route, data, fetch, appState) => {
+function responseDealer(resp, data, appState, okay, error){
+  if(resp.ok){
+    if(resp.status == 204){
+      return (okay)?okay():resp;
+    }
+    else{
+      if(data.blob)
+        return (okay)?resp.blob().then(res=>okay(res)):resp;
+      else
+        return (okay)?resp.json().then(res=>okay(res)):resp;
+    }
+  }
+  else if(resp.status == 404){
+    return (error)?
+      resp.json().then(res=>error(res)):
+      respFailure(resp, appState);
+  }
+  else {
+    return respFailure(resp, appState);
+  }
+}
+export const putData = (route, data, fetch, appState, okay = null, error = null) => {
   return putHelper(route, data, appState)
-    .then(resp => (resp.ok ? resp : respFailure(resp, appState)))
+    .then(resp => responseDealer(resp, data, appState, okay, error))
     .then(res => {
-      fetch(res);
+      if (fetch)
+        return fetch(res);
     });
 }
 export const postData = (route, data, fetch, appState, okay = null, error = null) => {
   return postHelper(route, data, appState)
-    .then(resp => {
-      if(resp.ok){
-        if(resp.status == 204){
-          return (okay)?okay():resp;
-        }
-        else{
-          if(data.blob)
-            return (okay)?resp.blob().then(res=>okay(res)):resp;
-          else
-            return (okay)?resp.json().then(res=>okay(res)):resp;
-        }
-      }
-      else if(resp.status == 404){
-        return (error)?
-          resp.json().then(res=>error(res)):
-          respFailure(resp, appState);
-      }
-      else {
-        return respFailure(resp, appState);
-      }
-    })
+    .then(resp => responseDealer(resp, data, appState, okay, error))
     .then(() => {
       if (fetch)
         return fetch();
     });
 }
-export const deleteData = (route, fetch, appState) =>{
+export const deleteData = (route, fetch, appState, okay = null, error = null) =>{
   return deleteHelper(route, appState)
-    .then(resp => (resp.ok ? resp : respFailure(resp, appState)))
+    .then(resp => responseDealer(resp, {}, appState, okay, error))
     .then(() => {
       fetch();
     });
