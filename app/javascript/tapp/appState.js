@@ -735,18 +735,19 @@ class AppState {
         return this.getApplicantsList().get(applicant.toString());
     }
 
-    getInstructorDataFromModal(key = null){
+    getInstructorDataFromModal(key = null, trim = false){
       if (key){
-          return this.get('instructorModal.instructor.'+key)?
-            this.get('instructorModal.instructor.'+key).trim(): '';
+        let result = this.get('instructorModal.instructor.'+key)?
+          this.get('instructorModal.instructor.'+key): '';
+        return trim?result.trim():result;
       }
       else {
-        let id = this.getInstructorDataFromModal('id');
+        let id = this.getInstructorDataFromModal('id', true);
         return {
             id: (id==''||!id)? null: parseInt(id),
-            utorid: this.getInstructorDataFromModal('utorid'),
-            name: this.getInstructorDataFromModal('name'),
-            email: this.getInstructorDataFromModal('email'),
+            utorid: this.getInstructorDataFromModal('utorid', true),
+            name: this.getInstructorDataFromModal('name', true),
+            email: this.getInstructorDataFromModal('email', true),
           };
       }
     }
