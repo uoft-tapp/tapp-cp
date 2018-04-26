@@ -74,7 +74,7 @@ RSpec.describe ExportController, type: :controller do
 
     context "when calling #transcript_access" do
       it "returns status 200 and downloads transcript_access.csv" do
-        get :transcript_access, params: {session_id: session[:id]}, params: {session_id: session[:id]}
+        get :transcript_access, params: {session_id: session[:id]}
         expect(response.status).to eq(200)
         expect(response.content_type).to eq("text/csv")
         expect(response.header["Content-Disposition"]).to eq(
