@@ -524,11 +524,9 @@ RSpec.describe DdahsController, type: :controller do
         end
       end
       context "contains status = Pending" do
-        it "throws status 404 with invalid ddahs" do
+        it "throws status 204" do
           post :can_send_ddahs, params: {ddahs: [sent_ddah[:id]]}
-          expect(response.status).to eq(404)
-          message = {invalid_offers: [sent_ddah[:id]]}
-          expect(response.body).to eq(message.to_json)
+          expect(response.status).to eq(204)
         end
       end
       context "contains status = Accepted" do
@@ -725,6 +723,6 @@ RSpec.describe DdahsController, type: :controller do
   end
 
   describe "GET /pb/ddah/:offer_id/pdf" do
-    
+
   end
 end
