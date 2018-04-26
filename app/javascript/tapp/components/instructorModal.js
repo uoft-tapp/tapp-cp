@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Form, FormGroup, FormControl,DropdownButton, MenuItem, Row, Col, Nav, NavItem, Tab, Button } from 'react-bootstrap';
+import { Modal, Form, FormGroup, Alert, FormControl,DropdownButton, MenuItem, Row, Col, Nav, NavItem, Tab, Button } from 'react-bootstrap';
 import { Applicant } from './applicant.js';
 
 class InstructorModal extends React.Component {
@@ -10,8 +10,9 @@ class InstructorModal extends React.Component {
               utorid = this.props.getInstructorDataFromModal('utorid'),
               name = this.props.getInstructorDataFromModal('name'),
               email = this.props.getInstructorDataFromModal('email'),
-              instructors = this.props.getInstructorsList(),
+              instructors = this.props.getInstructorsList(true),
               selectedTab = this.props.getSelectedTabFromModal();
+
           return (
               <Modal id="instructor-modal" show={true} onHide={() => this.props.hideInstructorModal()}>
                 <Form horizontal>
@@ -35,9 +36,10 @@ class InstructorModal extends React.Component {
                               <NavItem eventKey="create">Create Instructor</NavItem>
                               <NavItem eventKey="edit">Edit Instructor</NavItem>
                             </Nav>
+                            <Alert id='instructor-modal-alert' bsStyle="danger">text</Alert>
                           </Col>
                           <Col sm={12}>
-                            <Tab.Content animation style={{margin: '50px 0 20px 20px'}}>
+                            <Tab.Content animation style={{margin: '0px 0 20px 20px'}}>
                               <CreateInstructor {...this.props} id={id}
                                 utorid={utorid} name={name} email={email}
                                 instructors={instructors}/>
@@ -73,10 +75,7 @@ const CreateInstructor = props =>(
         value={props.utorid}
         update={event=>props.setInstructorDataFromModal('utorid', event.target.value)}
         {...props}/>
-      <InstructorForm
-        name={props.name}
-        email={props.email}
-        {...props}/>
+      <InstructorForm name={props.name} email={props.email} {...props}/>
   </Tab.Pane>
 );
 
@@ -84,17 +83,16 @@ const EditInstructor = props =>(
   <Tab.Pane eventKey="edit">
     <FormFormat cid='instructor-utorid-dropdown' type='dropdown'
       label='Instructor'
-      placeholder={props.id?props.instructors[props.id]:'Choose a Utorid'}
+      placeholder={props.id?props.instructors[props.id]['utorid']:'Choose a Utorid'}
       value={props.name}
       update={key=>props.setInstructorDataFromModal('id', key)}
       body={Object.keys(props.instructors).map(key=>
-        <MenuItem key={key} eventKey={key}>{props.instructors[key]}</MenuItem>
+            <MenuItem key={key} eventKey={key}>
+              {props.instructors[key]['utorid']}
+            </MenuItem>
       )}
       {...props}/>
-    <InstructorForm
-      name={props.name}
-      email={props.email}
-      {...props}/>
+    <InstructorForm name={props.name} email={props.email} {...props}/>
   </Tab.Pane>
 );
 

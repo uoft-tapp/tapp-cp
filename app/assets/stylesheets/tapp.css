@@ -561,3 +561,8 @@ footer div p {
   text-decoration: none;
   color: #555;
 }
+
+/* ---- instructor_form ----- */
+#instructor-modal-alert{
+  opacity: 0;
+}

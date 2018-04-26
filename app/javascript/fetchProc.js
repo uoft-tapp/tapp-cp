@@ -227,7 +227,10 @@ export const onFetchAssignmentsSuccess = (resp) => {
 export const onFetchInstructorsSuccess = (resp) => {
     let instructors = {};
     resp.forEach(instr => {
-        instructors[instr.id] = instr.name;
+        instructors[instr.id] = {
+          name: instr.name,
+          utorid: instr.utorid,
+        };
     });
     return instructors;
 }

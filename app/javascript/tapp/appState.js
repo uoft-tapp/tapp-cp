@@ -184,15 +184,22 @@ class AppState {
 
     // add an alert to the list of active alerts
     alert(text) {
-        let alerts = this.get('alerts');
-        // give it an id that is 1 larger than the largest id in the array, or 0 if the array is empty
-        this.add(
-            'alerts',
-            fromJS({
-                id: alerts.size > 0 ? alerts.last().get('id') + 1 : 0,
-                text: text,
-            })
-        );
+        if(this.instructorModalOpen()){
+          let alertBody = document.getElementById("instructor-modal-alert");
+          alertBody.style.opacity='1';
+          alertBody.innerHTML = text;
+        }
+        else {
+          let alerts = this.get('alerts');
+          // give it an id that is 1 larger than the largest id in the array, or 0 if the array is empty
+          this.add(
+              'alerts',
+              fromJS({
+                  id: alerts.size > 0 ? alerts.last().get('id') + 1 : 0,
+                  text: text,
+              })
+          );
+        }
     }
 
     // check whether any of the given filters in the category are selected on the applicant table in a course panel
@@ -722,7 +729,8 @@ class AppState {
 
     getInstructorDataFromModal(key = null){
       if (key){
-          return this.get('instructorModal.instructor.'+key);
+          return this.get('instructorModal.instructor.'+key)?
+            this.get('instructorModal.instructor.'+key).trim(): '';
       }
       else {
           let id = this.getInstructorDataFromModal('id');
@@ -758,10 +766,10 @@ class AppState {
 
     containsEmptyInstructorField(instructor){
       let keys = Object.keys(instructor);
-      keys.forEach(key=>{
-        if(instructor[key].length == 0)
+      for(let i in keys) {
+        if(instructor[keys[i]].length == 0)
           return true;
-      });
+      }
       return false;
     }
 
@@ -769,6 +777,7 @@ class AppState {
         if(this.instructorModalOpen()){
           let instructor = this.getInstructorDataFromModal();
           if(!this.containsEmptyInstructorField(instructor)){
+            console.log('edit');
             fetch.updateInstructor(instructor);
           }
         }
@@ -778,9 +787,44 @@ class AppState {
       if(this.instructorModalOpen()){
         let instructor = this.getInstructorDataFromModal();
         if(!this.containsEmptyInstructorField(instructor)){
-          fetch.createInstructor(instructor);
+          if(!this.validInstructorUtorid(instructor.utorid))
+            this.alert("<b>Error: </b> An instructor with this utorid already exists.");
+          else{
+            if(!this.validInstructorName(instructor.name))
+              this.alert("<b>Error: </b> Please enter both the first and last name.");
+            else {
+              if (!this.validInstructorEmail(instructor.email)){
+                this.alert("<b>Error</b> Invalid Email");
+              }
+              else{
+                fetch.createInstructor(instructor);
+              }
+            }
+          }
+        }
+        else{
+          this.alert("<b>Error: </b> This form contains empty fields.");
         }
       }
+    }
+
+    validInstructorUtorid(utorid){
+      let instructors = this.getInstructorsList(true),
+        valid = true;
+      instructors.forEach(instr=>{
+        if(utorid == instr.get('utorid'))
+          valid = false;
+      });
+      return valid;
+    }
+
+    validInstructorEmail(email){
+      let regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return regex.test(email);
+    }
+
+    validInstructorName(name){
+      return name.split(" ").filter(word => word!=='').length >= 2;
     }
 
     instructorModalOpen(){
@@ -1052,8 +1096,25 @@ class AppState {
       return this.get('selectedSession');
     }
 
-    getInstructorsList() {
-        return this.get('instructors.list');
+    getInstructorsList(fullData = false) {
+        if(fullData)
+          return this.get('instructors.list');
+        else {
+          let instructors = this.get('instructors.list');
+          let list = {};
+          instructors.forEach((instructor,id)=> {
+            list[id] = instructor.get('name');
+          });
+          return list;
+        }
+    }
+
+    getInstructorUtoridById(id){
+      this.get('instructors.list').forEach((instr, key)=>{
+        if(parseInt(key) == parseInt(id))
+          return instr.get('utorid');
+      });
+      return null;
     }
 
     // get a list of all rounds for all courses
