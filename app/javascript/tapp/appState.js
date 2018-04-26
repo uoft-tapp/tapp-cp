@@ -794,6 +794,17 @@ class AppState {
       });
     }
 
+    deleteInstructor(){
+      let id = this.getInstructorDataFromModal('id', true);
+      if(id=='')
+        this.alert('No instructor selected.');
+      else{
+        let response = confirm("Are you sure you want to delete this instructor?");
+        if(response)
+            fetch.deleteInstructor(parseInt(id));
+      }
+    }
+
     createInstructor(){
       this.validateInstructorModalForm((instructor, action2)=>{
         if(!this.validInstructorUtorid(instructor.utorid))

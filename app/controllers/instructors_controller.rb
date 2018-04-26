@@ -56,6 +56,14 @@ class InstructorsController < ApplicationController
     end
   end
 
+  def destroy
+    instructor = Instructor.find(params[:id])
+    if instructor
+      instructor.destroy!
+      render status: 200, json: {message: "Instructor #{params[:id]} has been deleted."}
+    end
+  end
+
   def show_by_utorid
     instructor = Instructor.find_by(utorid: params[:utorid])
     render json: instructor.to_json

@@ -172,7 +172,7 @@ export const exportOffers = (round, session) => {
 export const updateInstructor = (instructor) => {
     let fetch = true;
     putData('/instructors/'+instructor.id, instructor, resp=>{
-      getInstructors();
+      if(fetch) getInstructors();
     },
     resp=>{
       alert(resp.message);
@@ -184,11 +184,25 @@ export const updateInstructor = (instructor) => {
     });
 }
 
+export const deleteInstructor = (id) => {
+  let fetch = true;
+  deleteData('/instructors/'+id, ()=>{
+    if(fetch) getInstructors();
+  },
+  resp=>{
+    alert(resp.message);
+    appState.hideInstructorModal();
+  },
+  resp=>{
+    appState.alert(resp.message);
+    fetch = false;
+  });
+}
+
 export const createInstructor = (instructor) => {
     let fetch = true;
     postData('/instructors', instructor, ()=>{
-      if(fetch)
-        getInstructors();
+      if(fetch) getInstructors();
     },
     resp=>{
       alert(resp.message);

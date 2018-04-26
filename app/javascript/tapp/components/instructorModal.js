@@ -114,12 +114,15 @@ const FormFormat = props =>(
     </Col>
     <Col sm={9}>
       {(props.type=='dropdown')?
+      <div id='instructor-modal-utorid-row'>
       <DropdownButton key='1' id={props.cid}
         bsStyle='default'
         title={props.placeholder}
         onSelect={props.update}>
         {props.body}
-      </DropdownButton>:
+      </DropdownButton>
+      <i className='fa fa-trash' onClick={()=>props.deleteInstructor()}></i>
+      </div>:
       <FormControl type={props.type}
         placeholder={props.placeholder}
         onChange={props.update}
