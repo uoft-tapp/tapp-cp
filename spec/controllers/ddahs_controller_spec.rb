@@ -2,6 +2,22 @@ require 'rails_helper'
 
 RSpec.describe DdahsController, type: :controller do
 
+  def get_allocations(alloc)
+    allocations = []
+    alloc.each do |allocation|
+      data = {
+          num_unit: allocation[:num_unit],
+          unit_name: allocation[:unit_name],
+          minutes: allocation[:minutes],
+      }
+      if allocation[:duty_id]
+        data[:duty_id] = allocation[:duty_id]
+      end
+      allocations.push(data)
+    end
+    return allocations
+  end
+
   let(:session) do
     session = Session.create!(
         semester: "Fall",
@@ -134,6 +150,30 @@ RSpec.describe DdahsController, type: :controller do
     address: "100 Jameson Ave Toronto, ON M65-48H")
   end
 
+  let(:applicant_7) do
+    Applicant.create!(
+    utorid: "cookie227",
+    app_id: "17",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+
+  let(:offer) do
+    Offer.create!(
+        position_id: position[:id],
+        applicant_id: applicant_7[:id],
+        hours: 60,
+        link: "mangled-link",
+        ddah_status: "None",
+    )
+  end
   let(:attached_offer) do
     Offer.create!(
         position_id: position[:id],
@@ -233,6 +273,17 @@ RSpec.describe DdahsController, type: :controller do
       offer_id: accepted_offer[:id],
       instructor_id: instructor3[:id],
       optional: true,
+    )
+  end
+
+  let(:template) do
+    Template.create!(
+      name: 'template',
+      optional: ddah[:optional],
+      instructor_id: ddah[:instructor_id],
+      tutorial_category: ddah[:tutorial_category],
+      department: ddah[:department],
+      scaling_learning: ddah[:scaling_learning],
     )
   end
 
@@ -343,7 +394,7 @@ RSpec.describe DdahsController, type: :controller do
     end
   end
 
-  describe "PATCH /instructors/:utorid/ddahs/:id" do
+  describe "data[:duty_" do
     context "when :utorid is valid" do
       context "when :id is valid" do
         before(:each) do
@@ -363,7 +414,7 @@ RSpec.describe DdahsController, type: :controller do
           			unit_name: "test string",
           			minutes: 30,
                 duty_id: 1,
-        		},
+        		  },
           		{
           			num_unit: 2,
           			unit_name: "test string2",
@@ -377,19 +428,7 @@ RSpec.describe DdahsController, type: :controller do
           }
           patch :update, params: update_data
           ddah.reload
-          allocations = []
-          ddah.allocations.each do |allocation|
-            data = {
-                num_unit: allocation[:num_unit],
-                unit_name: allocation[:unit_name],
-                minutes: allocation[:minutes],
-            }
-            if allocation[:duty_id]
-              data[:duty_id] = allocation[:duty_id]
-            end
-            allocations.push(data)
-          end
-          expect(allocations).to eq(update_data[:allocations])
+          expect(get_allocations(ddah.allocations)).to eq(update_data[:allocations])
           expect(ddah.training_ids).to eq(update_data[:trainings])
           expect(ddah.category_ids).to eq(update_data[:categories])
           expect(ddah[:scaling_learning]).to eq(update_data[:scaling_learning])
@@ -690,39 +729,198 @@ RSpec.describe DdahsController, type: :controller do
 
   describe "batch actions" do
     describe "POST /ddahs/preview" do
-
+      it "returns a PDF file" do
+        post :preview, params: {ddahs: [ddah[:id]]}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"ddahs.pdf\"")
+      end
     end
     describe "POST /ddahs/send-ddahs" do
-
+      it "sends out the ddahs" do
+        post :send_ddahs, params: {ddahs: [approved_ddah[:id], sent_ddah[:id]]}
+        expect(response.status).to eq(200)
+        message = {message: "You've successfully sent out all the DDAH's."}
+        expect(response.body).to eq(message.to_json)
+      end
     end
     describe "POST /ddahs/send-nag-student" do
-
+      it "sends out the nag emails" do
+        post :send_nag_student, params: {ddahs: [sent_ddah[:id]]}
+        expect(response.status).to eq(200)
+        message = {message: "You've sent the nag emails."}
+        expect(response.body).to eq(message.to_json)
+      end
     end
     describe "POST /ddahs/status/finish" do
-
+      it "sets the ddah status to ready" do
+        signature='poop'
+        post :finish_ddah, params: {ddahs: [ddah[:id]], signature: signature}
+        expect(response.status).to eq(200)
+        message = {message: "The selected DDAH's have been signed and set to status 'Ready'."}
+        expect(response.body).to eq(message.to_json)
+        ddah.reload
+        expect(Offer.find(ddah[:offer_id])[:ddah_status]).to eq("Ready")
+        expect(ddah[:supervisor_signature]).to eq(signature)
+      end
     end
     describe "POST /ddahs/status/approve" do
-
+      it "sets the ddah status to approved" do
+        signature='poop'
+        post :approve_ddah, params: {ddahs: [ready_ddah[:id]], signature: signature}
+        expect(response.status).to eq(200)
+        message = {message: "The selected DDAH's have been signed and set to status 'Approved'."}
+        expect(response.body).to eq(message.to_json)
+        ready_ddah.reload
+        expect(Offer.find(ready_ddah[:offer_id])[:ddah_status]).to eq("Approved")
+        expect(ready_ddah[:ta_coord_signature]).to eq(signature)
+      end
     end
   end
 
   describe "POST /ddahs/:ddah_id/new-template" do
-
+    describe "when expected" do
+      it "returns a status 200" do
+        post :new_template, params: {ddah_id: ddah[:id], name: 'poops'}
+        expect(response.status).to eq(200)
+        message = {message: "A new template was successfully created."}
+        expect(response.body).to eq(message.to_json)
+        template = Template.find_by(name: 'poops')
+        expect(template).not_to eq(nil)
+        expect(template[:optional]).to eq(ddah[:optional])
+        expect(template[:instructor_id]).to eq(ddah[:instructor_id])
+        expect(template[:tutorial_category]).to eq(ddah[:tutorial_category])
+        expect(template[:department]).to eq(ddah[:department])
+        expect(template[:scaling_learning]).to eq(ddah[:scaling_learning])
+        expect(template.training_ids).to eq(ddah.training_ids)
+        expect(template.category_ids).to eq(ddah.category_ids)
+        expect(template.allocations.length).to eq(ddah.allocations.length)
+        expect(get_allocations(template.allocations)).to eq(get_allocations(ddah.allocations))
+      end
+    end
+    describe "when template with the same name already exists" do
+      it "throws a status 404 error" do
+        post :new_template, params: {ddah_id: ddah[:id], name: template[:name]}
+        expect(response.status).to eq(404)
+        message = {message: "A template with the same name already exists."}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
+    describe "when ddah {id} is invalid" do
+      it "throws a status 404 error" do
+        post :new_template, params: {ddah_id: 'poops', name: 'poops'}
+        expect(response.status).to eq(404)
+        message = {message: "Invalid or no id given."}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
   end
 
   describe "GET /ddahs/:ddah_id/pdf" do
-
+    describe "when expected" do
+      it "returns a status 200" do
+        post :pdf, params: {ddah_id: ddah[:id]}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"ddah.pdf\"")
+      end
+    end
+    describe "when ddah {id} is invalid" do
+      it "throws a status 404 error" do
+        post :pdf, params: {ddah_id: 'poops'}
+        expect(response.status).to eq(404)
+        message = {message: "A DDAH has not been made for this offer."}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
   end
 
   describe "POST /ddahs/:ddah_id/accept" do
-
+    describe "when expected" do
+      it "returns a status 200" do
+        post :accept, params: {ddah_id: ddah[:id]}
+        expect(response.status).to eq(200)
+        message = {message: "You have accepted this DDAH.", status: "Accepted"}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
+    describe "when ddah is already Accepted" do
+      it "throws a status 404 error" do
+        post :accept, params: {ddah_id: accepted_ddah[:id]}
+        expect(response.status).to eq(404)
+        message = {message: "You have already accepted this DDAH.", status: "Accepted"}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
+    describe "when ddah {id} is invalid" do
+      it "throws a status 404 error" do
+        post :accept, params: {ddah_id: 'poops'}
+        expect(response.status).to eq(404)
+        message = {message: "A DDAH has not been made for this offer."}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
   end
 
   describe "POST /pb/ddah/:offer_id/accept" do
-
+    describe "when expected" do
+      it "returns a status 200" do
+        signature = 'poops'
+        post :student_accept, params: {offer_id: sent_offer[:id], signature: signature}
+        expect(response.status).to eq(200)
+        message = {message: "You have accepted this DDAH.", status: "Accepted"}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
+    describe "when ddah is unsent" do
+      it "throws a status 404 error" do
+        signature = 'poops'
+        post :student_accept, params: {offer_id: attached_offer[:id], signature: signature}
+        expect(response.status).to eq(404)
+        message = {message: "You cannot accept an unsent DDAH.", status: 'Created'}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
+    describe "when offer doesn't have a ddah" do
+      it "throws a status 404 error" do
+        signature = 'poops'
+        post :student_accept, params: {offer_id: offer[:id], signature: signature}
+        expect(response.status).to eq(404)
+        message = {message: "DDAH does not exist."}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
+    describe "when offer {id} is invalid" do
+      it "throws a status 404 error" do
+        signature = 'poops'
+        post :student_accept, params: {offer_id: signature, signature: signature}
+        expect(response.status).to eq(404)
+        message = {message: "Offer does not exist."}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
   end
 
   describe "GET /pb/ddah/:offer_id/pdf" do
-
+    describe "when expected" do
+      it "returns a status 200" do
+        post :student_pdf, params: {offer_id: attached_offer[:id]}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"ddah.pdf\"")
+      end
+    end
+    describe "when ddah {id} is invalid" do
+      it "throws a status 404 error" do
+        post :student_pdf, params: {offer_id: 'poops'}
+        expect(response.status).to eq(404)
+        message = {message: "A DDAH has not been made for this offer."}
+        expect(response.body).to eq(message.to_json)
+      end
+    end
   end
+
 end
