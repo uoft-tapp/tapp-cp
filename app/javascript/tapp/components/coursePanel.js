@@ -1,7 +1,7 @@
 import React from 'react';
 import { ApplicantTableMenu } from './applicantTableMenu.js';
 import { ApplicantTable } from './applicantTable.js';
-import { ButtonGroup, Button, DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 class CoursePanel extends React.Component {
     constructor(props) {
@@ -323,6 +323,5 @@ const UnassignedApplicantTable = props =>
                 : props.getCoursePanelLayout() == 3 ? '45vw' : '100vw'
         }
     />;
-
 
 export { CoursePanel };
