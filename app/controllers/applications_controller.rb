@@ -37,8 +37,8 @@ class ApplicationsController < ApplicationController
 
   def update
     #find the right preference in @application to update by using position id
-    @application = Application.includes(:preferences).where(:preferences => { position_id: params[:position] }).find(params[:id])
-    @application.update_attributes(instructor_pref: params[:pref])
+    @application = Application.includes(:preferences).find(params[:id])
+    @application.preferences.where(:position_id => params[:position]).first.update_attribute(:instructor_pref, params[:pref])
   end
 
 end
