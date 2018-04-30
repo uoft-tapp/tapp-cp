@@ -428,12 +428,11 @@ RSpec.describe DdahsController, type: :controller do
           }
           patch :update, params: update_data
           ddah.reload
-          ddah.allocations.reload
-          expect(ddah.allocations.to_json).to eq('haha')
-          expect(get_allocations(ddah.allocations)).to eq(update_data[:allocations])
           expect(ddah.training_ids).to eq(update_data[:trainings])
           expect(ddah.category_ids).to eq(update_data[:categories])
           expect(ddah[:scaling_learning]).to eq(update_data[:scaling_learning])
+          ddah.allocations.reload
+          expect(get_allocations(ddah.allocations)).to eq(update_data[:allocations])
         end
       end
       context "when :id is invalid" do
