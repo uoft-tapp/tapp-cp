@@ -68,7 +68,7 @@ class OffersController < ApplicationController
   end
 
   def can_clear_hris_status
-    check_offers_status(params[:offers], :hr_status, [nil, "Processed", "Printed"])
+    check_offers_status(params[:offers], :hr_status, ["Processed", "Printed"])
   end
 
   def update

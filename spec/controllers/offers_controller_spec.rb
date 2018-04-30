@@ -8,6 +8,14 @@ RSpec.describe OffersController, type: :controller do
     )
   end
 
+  let(:instructor) do
+    Instructor.create!(
+      utorid: "poops",
+      name: "poops lastname",
+      email: "poops@example.com"
+    )
+  end
+
   let(:position) do
     Position.create!(
       position: "CSC104H1S",
@@ -72,6 +80,49 @@ RSpec.describe OffersController, type: :controller do
     address: "100 Jameson Ave Toronto, ON M65-48H")
   end
 
+  let(:applicant_4) do
+    Applicant.create!(
+    utorid: "cookie224",
+    app_id: "19",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+  let(:applicant_5) do
+    Applicant.create!(
+    utorid: "cookie225",
+    app_id: "21",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+  let(:applicant_6) do
+    Applicant.create!(
+    utorid: "cookie226",
+    app_id: "22",
+    student_number: 1234567890,
+    first_name: "Landy",
+    last_name: "Simpson",
+    dept: "Computer Science",
+    program_id: "4UG",
+    yip: 4,
+    email: "simps@mail.com",
+    phone: "4165558888",
+    address: "100 Jameson Ave Toronto, ON M65-48H")
+  end
+
   let(:offer) do
     Offer.create!(
         position_id: position[:id],
@@ -86,6 +137,7 @@ RSpec.describe OffersController, type: :controller do
         applicant_id: applicant_2[:id],
         hours: 60,
         status: "Pending",
+        ddah_status: "Pending",
         send_date: DateTime.now,
         link: "mangled-link",
     )
@@ -96,6 +148,44 @@ RSpec.describe OffersController, type: :controller do
         applicant_id: applicant_3[:id],
         hours: 60,
         status: "Accepted",
+        ddah_status: "Accepted",
+        hr_status: "Printed",
+        send_date: DateTime.now,
+        link: "mangled-link",
+    )
+  end
+  let(:processed_offer) do
+    Offer.create!(
+        position_id: position[:id],
+        applicant_id: applicant_4[:id],
+        hours: 60,
+        status: "Accepted",
+        hr_status: "Processed",
+        ddah_status: "Approved",
+        send_date: DateTime.now,
+        link: "mangled-link",
+    )
+  end
+  let(:created_offer) do
+    Offer.create!(
+        position_id: position[:id],
+        applicant_id: applicant_5[:id],
+        hours: 60,
+        status: "Rejected",
+        ddah_status: "Created",
+        hr_status: "Printed",
+        send_date: DateTime.now,
+        link: "mangled-link",
+    )
+  end
+  let(:ready_offer) do
+    Offer.create!(
+        position_id: position[:id],
+        applicant_id: applicant_6[:id],
+        hours: 60,
+        status: "Withdrawn",
+        ddah_status: "Ready",
+        hr_status: "Printed",
         send_date: DateTime.now,
         link: "mangled-link",
     )
@@ -515,24 +605,290 @@ RSpec.describe OffersController, type: :controller do
   end
 
   describe "POST /offers/can-clear-hris-status" do
-
+    context "hris status = nil" do
+      it "it throws a status 404 error" do
+        post :can_clear_hris_status, params: {offers: [sent_offer[:id]]}
+        expect(response.status).to eq(404)
+        body = {invalid_offers: [sent_offer[:id]]}
+        expect(response.body).to eq(body.to_json)
+      end
+    end
+    context "hris status = Printed" do
+      it "it passes with a status 204" do
+        post :can_clear_hris_status, params: {offers: [accepted_offer[:id]]}
+        expect(response.status).to eq(204)
+      end
+    end
+    context "hris status = Processed" do
+      it "it passes with a status 204" do
+        post :can_clear_hris_status, params: {offers: [processed_offer[:id]]}
+        expect(response.status).to eq(204)
+      end
+    end
   end
+
   describe "/offers/clear-hris-status" do
-
+    context "when hris status = Printed" do
+      it "returns a status 204" do
+        post :clear_hris_status, params: {offers: [accepted_offer[:id]]}
+        expect(response.status).to eq(204)
+        accepted_offer.reload
+        expect(accepted_offer[:hr_status]).to eq(nil)
+        expect(accepted_offer[:print_time]).to eq(nil)
+      end
+    end
+    context "when hris status = Processed" do
+      it "returns a status 204" do
+        post :clear_hris_status, params: {offers: [processed_offer[:id]]}
+        expect(response.status).to eq(204)
+        processed_offer.reload
+        expect(processed_offer[:hr_status]).to eq(nil)
+        expect(processed_offer[:print_time]).to eq(nil)
+      end
+    end
   end
+
   describe "POST /offers/can-nag-instructor" do
-
+    context "when position has instructor" do
+      before(:each) do
+        position.instructor_ids = [instructor[:id]]
+      end
+      context "when ddah_status = None" do
+        it "throws a 204 status" do
+          post :can_nag_instructor, params: {offers: [offer[:id]]}
+          expect(response.status).to eq(204)
+        end
+      end
+      context "when ddah_status = Created" do
+        it "throws a 204 status" do
+          post :can_nag_instructor, params: {offers: [created_offer[:id]]}
+          expect(response.status).to eq(204)
+        end
+      end
+      context "when ddah_status = Ready" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [ready_offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [ready_offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+        end
+      end
+      context "when ddah_status = Pending" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [sent_offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [sent_offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+      end
+      end
+      context "when ddah_status = Accepted" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [processed_offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [processed_offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+        end
+      end
+    end
+    context "when position has no instructor" do
+      context "when ddah_status = None" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+        end
+      end
+      context "when ddah_status = Created" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [created_offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [created_offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+        end
+      end
+      context "when ddah_status = Ready" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [ready_offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [ready_offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+        end
+      end
+      context "when ddah_status = Pending" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [sent_offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [sent_offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+      end
+      end
+      context "when ddah_status = Accepted" do
+        it "throws a 404 error" do
+          post :can_nag_instructor, params: {offers: [processed_offer[:id]]}
+          expect(response.status).to eq(404)
+          body = {invalid_offers: [processed_offer[:id]]}
+          expect(response.body).to eq(body.to_json)
+        end
+      end
+    end
   end
+
   describe "POST /offers/send-nag-instructor" do
-
+    context "when ddah_status = Ready" do
+      it "throws a 200 status" do
+        post :send_nag_instructor, params: {offers: [ready_offer[:id]]}
+        expect(response.status).to eq(200)
+        body = {message: "You've successfully sent out all the nag emails."}
+        expect(response.body).to eq(body.to_json)
+      end
+    end
+    context "when ddah_status = Pending" do
+      it "throws a 200 status" do
+        post :send_nag_instructor, params: {offers: [sent_offer[:id]]}
+        expect(response.status).to eq(200)
+        body = {message: "You've successfully sent out all the nag emails."}
+        expect(response.body).to eq(body.to_json)
+    end
+    end
+    context "when ddah_status = Accepted" do
+      it "throws a 200 status" do
+        post :send_nag_instructor, params: {offers: [processed_offer[:id]]}
+        expect(response.status).to eq(200)
+        body = {message: "You've successfully sent out all the nag emails."}
+        expect(response.body).to eq(body.to_json)
+      end
+    end
   end
-  describe "GET /offers/:offer_id/pdf" do
 
+  describe "GET /offers/:offer_id/pdf" do
+    context "when :offer_id is valid" do
+      it "returns status 200 a pdf" do
+        get :get_contract, params: {offer_id: offer[:id]}
+        expect(response.status).to eq(200)
+        expect(response.content_type).to eq("application/pdf")
+        expect(response.header["Content-Disposition"]).to eq(
+          "inline; filename=\"contract.pdf\"")
+      end
+    end
+
+    context "when :offer_id is invalid" do
+      it "returns status 404 and an error message" do
+        get :get_contract, params: {offer_id: "poops"}
+        expect(response.status).to eq(404)
+      end
+    end
   end
   describe "POST /offers/:offer_id/accept" do
-
+    context "when offer status = Unsent" do
+      it "return a status 404 error" do
+        post :accept_offer, params: {offer_id: offer[:id]}
+        expect(response.status).to eq(404)
+        body = {message: "Error: You can't accept an Unsent offer."}
+        expect(response.body).to eq(body.to_json)
+      end
+    end
+    context "when offer status = Pending" do
+      it "return a status 200" do
+        post :accept_offer, params: {offer_id: sent_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = sent_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Accepted'."}
+        sent_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(sent_offer[:status]).to eq("Accepted")
+      end
+    end
+    context "when offer status = Accepted" do
+      it "return a status 200" do
+        post :accept_offer, params: {offer_id: accepted_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = accepted_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Accepted'."}
+        accepted_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(accepted_offer[:status]).to eq("Accepted")
+      end
+    end
+    context "when offer status = Rejected" do
+      it "return a status 200" do
+        post :accept_offer, params: {offer_id: created_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = created_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Accepted'."}
+        created_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(created_offer[:status]).to eq("Accepted")
+      end
+    end
+    context "when offer status = Withdrawn" do
+      it "return a status 200" do
+        post :accept_offer, params: {offer_id: ready_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = ready_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Accepted'."}
+        ready_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(ready_offer[:status]).to eq("Accepted")
+      end
+    end
   end
-  describe "POST /offers/:offer_id/reset" do
 
+  describe "POST /offers/:offer_id/reset" do
+    context "when offer status = Unsent" do
+      it "return a status 404 error" do
+        post :reset_offer, params: {offer_id: offer[:id]}
+        expect(response.status).to eq(200)
+        offer.reload
+        expect(offer[:status]).to eq('Unsent')
+        temp = offer.format
+        body = {message: "You've changed the status of #{temp[:applicant][:first_name]} #{temp[:applicant][:last_name]}'s offer for #{temp[:position]} to 'Unsent'."}
+        expect(response.body).to eq(body.to_json)
+      end
+    end
+    context "when offer status = Pending" do
+      it "return a status 200" do
+        post :reset_offer, params: {offer_id: sent_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = sent_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Unsent'."}
+        sent_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(sent_offer[:status]).to eq('Unsent')
+      end
+    end
+    context "when offer status = Accepted" do
+      it "return a status 200" do
+        post :reset_offer, params: {offer_id: accepted_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = accepted_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Unsent'."}
+        accepted_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(accepted_offer[:status]).to eq('Unsent')
+      end
+    end
+    context "when offer status = Rejected" do
+      it "return a status 200" do
+        post :reset_offer, params: {offer_id: created_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = created_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Unsent'."}
+        created_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(created_offer[:status]).to eq('Unsent')
+      end
+    end
+    context "when offer status = Withdrawn" do
+      it "return a status 200" do
+        post :reset_offer, params: {offer_id: ready_offer[:id]}
+        expect(response.status).to eq(200)
+        offer = ready_offer.format
+        body = {message: "You've changed the status of #{offer[:applicant][:first_name]} #{offer[:applicant][:last_name]}'s offer for #{offer[:position]} to 'Unsent'."}
+        ready_offer.reload
+        expect(response.body).to eq(body.to_json)
+        expect(ready_offer[:status]).to eq('Unsent')
+      end
+    end
   end
 end
