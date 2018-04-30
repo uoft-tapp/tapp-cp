@@ -407,6 +407,10 @@ class AppState {
         return '';
     }
 
+    getSessionPay(session){
+      return this.get('sessions.list.'+session+'.pay');
+    }
+
     selectCourse(course) {
         this.set('selectedCourse', course);
     }
@@ -1229,8 +1233,11 @@ class AppState {
         fetch.updateDdah(ddahId, updates).then(this.set('ddahWorksheet.changed', false));
     }
 
-    updateSessionPay(session, pay) {
-        fetch.updateSessionPay(session, pay);
+    updateSessionPay(session, pay, dbUpdate=false) {
+        if(dbUpdate)
+          fetch.updateSessionPay(session, pay);
+        else
+          this.set('sessions.list.'+session+'.pay', pay);
     }
 
     updateTemplate(template) {

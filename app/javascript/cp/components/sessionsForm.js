@@ -3,18 +3,12 @@ import { Panel, Form, FormGroup, ControlLabel, InputGroup, FormControl } from 'r
 
 class SessionsForm extends React.Component {
     render() {
-        let sessions = this.props.appState.getSessionsList();
-        let session = this.props.appState.getSelectedSession();
-        let pay = (sessions.size>0)?sessions.get(session).get('pay'):null;
+        let session = this.props.appState.getSelectedSession(),
+            pay = this.props.appState.getSessionPay(session);
         pay = pay?pay:'';
         return (
             <Panel className="sessions">
-                <Form inline
-                    onSubmit={event => {
-                        event.preventDefault();
-                        if(this.pay.value != pay)
-                            this.props.appState.updateSessionPay(session, this.pay.value);
-                    }}>
+                <Form inline>
                     <FormGroup id="pay">
                         <ControlLabel>Session Pay:</ControlLabel>&ensp;
                         <InputGroup>
@@ -23,12 +17,10 @@ class SessionsForm extends React.Component {
                                 type="number"
                                 min="0.00"
                                 step="0.01"
-                                defaultValue={pay}
+                                value={pay}
                                 disabled={session=='N/A'}
-                                onBlur={event => {
-                                  if(event.target.value!=pay)
-                                    this.props.appState.updateSessionPay(session, event.target.value);
-                                }}
+                                onChange={event=> this.props.appState.updateSessionPay(session, event.target.value)}
+                                onBlur={event => this.props.appState.updateSessionPay(session, event.target.value,true)}
                             />
                         </InputGroup>
                     </FormGroup>
