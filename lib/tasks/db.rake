@@ -1,5 +1,6 @@
 namespace :email do
   task status: :environment do
+    ENV['domain']='email-status'
     date = DateTime.now
     today = date.strftime("%A")
     if today != "Sunday" && today != "Saturday"
@@ -38,10 +39,10 @@ namespace :ddah do
         puts response[:data]
       else
         puts "Error: File wasn't generated"
-      end      
+      end
     else
       puts "Error: Position #{args[:position]} cannot be found for round #{round_id}"
-    end    
+    end
   end
   task :import, [:file] => [:environment] do |t, args|
     importer = DdahImporter.new
@@ -55,4 +56,3 @@ namespace :ddah do
     end
   end
 end
-
