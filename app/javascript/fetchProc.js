@@ -368,8 +368,10 @@ export const postData = (route, data, fetch, appState, okay = null, error = null
           return (okay)?okay():resp;
         }
         else{
-          return (okay)?
-            resp.json().then(res=>okay(res)):resp;
+          if(data.blob)
+            return (okay)?resp.blob().then(res=>okay(res)):resp;
+          else
+            return (okay)?resp.json().then(res=>okay(res)):resp;
         }
       }
       else if(resp.status == 404){

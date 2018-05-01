@@ -113,7 +113,6 @@ export const importDdahs = (data) => {
 export const sendContracts = (offers) => {
   batchOfferAction('/offers/can-send-contract','/offers/send-contracts',
      offers, {start:'send contract to'}, () => {
-      console.log('hello');
       getOffers();
   });
 }
@@ -165,13 +164,15 @@ export const showContractApplicant= (offer) => {
 
 // show the contract for this offer in a new window, as HR would see it
 export const showContractHr=(offer) =>{
-    postHelper('/offers/print', { contracts: [offer], update: false })
-        .then(resp => (resp.ok ? resp.blob().catch(msgFailure) : respFailure))
-        .then(blob => {
-            let fileURL = URL.createObjectURL(blob);
-            let contractWindow = window.open(fileURL);
-            contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
-        });
+    postData('/offers/print', { offers: [parseInt(offer)], update: false, blob: true },null,
+    resp=>{
+      let fileURL = URL.createObjectURL(resp);
+      let contractWindow = window.open(fileURL);
+      contractWindow.onclose = () => URL.revokeObjectURL(fileURL);
+    },
+    resp=>{
+      appState.alert(resp.message);
+    });
 }
 
 // withdraw offers
@@ -208,19 +209,15 @@ export const withdrawOffers=(offers) =>{
 export const print=(offers)=>{
     batchOfferAction('/offers/can-print', '/offers/print',
       offers, {start: 'print Contract for'}, resp => {
-        if(resp.ok){
-          return resp.blob().then(res=>{
-            getOffers();
-            let fileURL = URL.createObjectURL(blob);
-            let pdfWindow = window.open(fileURL);
-            pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
-            pdfWindow.document.onload = pdfWindow.print();
-          });
-        }
-        else return respFailure(resp);
+        getOffers();
+        let fileURL = URL.createObjectURL(resp);
+        let pdfWindow = window.open(fileURL);
+        pdfWindow.onclose = () => URL.revokeObjectURL(fileURL);
+        pdfWindow.document.onload = pdfWindow.print();
     },
     {
       update: true,
+      blob: true,
     });
 }
 
@@ -384,10 +381,10 @@ export const sendDdahs = (ddahs) => {
 export const previewDdahs = (ddahs) => {
     batchDdahAction('/ddahs/can-preview', '/ddahs/preview',
       ddahs, {start: 'send DDAH form to'}, resp => {
-        return resp.blob().then(blob=>{
-          let url = URL.createObjectURL(blob);
-          window.open(url);
-        });
+        let url = URL.createObjectURL(resp);
+        window.open(url);
+    },{
+      blob: true,
     });
 }
 
