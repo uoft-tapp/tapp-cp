@@ -412,7 +412,7 @@ export const downloadFile = (route, appState) =>{
   .then(resp => {
     if(download){
       if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-        window.navigator.msSaveOrOpenBlob(blob, filename);
+        window.navigator.msSaveOrOpenBlob(resp, filename);
       }
       else{
         let url = URL.createObjectURL(resp);
