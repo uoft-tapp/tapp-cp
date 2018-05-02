@@ -420,7 +420,7 @@ export const downloadFile = (route, appState) =>{
       document.body.appendChild(a); //required in FF
       a.click();
       URL.revokeObjectURL(url);
-      a.document.body.removeChild(a); //required in FF
+      document.body.removeChild(a); //required in FF
     }
     else{
       appState.alert(resp.message);
