@@ -411,16 +411,21 @@ export const downloadFile = (route, appState) =>{
   })
   .then(resp => {
     if(download){
-      let url = URL.createObjectURL(resp);
-      let a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.target="_self" ; //required in FF
-      a.style.display = 'none';
-      document.body.appendChild(a); //required in FF
-      a.click();
-      URL.revokeObjectURL(url);
-      document.body.removeChild(a); //required in FF
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+      }
+      else{
+        let url = URL.createObjectURL(resp);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.target="_self" ; //required in FF
+        a.style.display = 'none';
+        document.body.appendChild(a); //required in FF
+        a.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a); //required in FF
+      }
     }
     else{
       appState.alert(resp.message);
