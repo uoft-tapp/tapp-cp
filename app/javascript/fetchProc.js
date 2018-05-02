@@ -412,11 +412,12 @@ export const downloadFile = (route, appState) =>{
   .then(resp => {
     if(download){
       let url = URL.createObjectURL(resp);
-      var a = document.createElement('a');
-      document.body.appendChild(a); //required in FF
+      let a = document.createElement('a');
       a.href = url;
       a.download = filename;
       a.target="_self" ; //required in FF
+      a.style.display = 'none';
+      document.body.appendChild(a); //required in FF
       a.click();
       URL.revokeObjectURL(url);
       a.document.body.removeChild(a); //required in FF
