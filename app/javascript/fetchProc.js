@@ -416,7 +416,7 @@ export const downloadFile = (route, appState) =>{
       document.body.appendChild(a); //required in FF
       a.href = url;
       a.download = filename;
-      pom.target="_self" ; //required in FF
+      a.target="_self" ; //required in FF
       a.click();
       URL.revokeObjectURL(url);
       a.document.body.removeChild(a); //required in FF
