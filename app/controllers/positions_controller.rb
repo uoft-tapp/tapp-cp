@@ -50,4 +50,25 @@ class PositionsController < ApplicationController
     end
   end
 
+  def get_utorids(position)
+    utorids = []
+    position.instructors.each do |instructor|
+      utorids.push(instructor[:utorid])
+    end
+    return utorids
+  end
+
+  def get_all_positions_for_utorid(utorid, session = nil)
+    positions = []
+    all_positions = positions_from_session(session)
+    all_positions.each do |position|
+      position.instructors.each do |instructor|
+        if instructor[:utorid] == utorid
+          positions.push(position)
+        end
+      end
+    end
+    return positions
+  end
+
 end

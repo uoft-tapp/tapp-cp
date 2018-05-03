@@ -31,6 +31,7 @@ module SessionSeparate
   end
 
   def applicants_from_session(session, utorid = nil)
+<<<<<<< HEAD
     application_select = applications_from_session(session, utorid, false)
     sql="SELECT DISTINCT app.id FROM applicants app, (#{application_select}) p WHERE p.id=app.id ORDER BY app.id"
     return get_plain_table_data(Applicant.all, sql)

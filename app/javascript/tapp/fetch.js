@@ -29,11 +29,13 @@ const getApplications = (utorid = null) => !utorid?getResource('/applications',
   fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList):
   getResource('/instructors/'+utorid+'/applications', fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
 
-const getCourses = () => getResource('/positions',
-  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList);
+const getCourses = (utorid = null) => !utorid?getResource('/positions',
+  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList):
+  getResource('/instructors/'+utorid+'/positions', fetchProc.onFetchTappCoursesSuccess,'applications',  appState.setApplicationsList);
 
-const getAssignments = () => getResource('/assignments',
-  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
+const getAssignments = (utorid = null) => !utorid?getResource('/assignments',
+  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList):
+  getResource('/instructors/'+utorid+'/assignments', fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);

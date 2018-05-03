@@ -26,7 +26,6 @@ import { Assigned } from '../tapp/components/assigned.js';
 import { Unassigned } from '../tapp/components/unassigned.js';
 import { Summary } from '../tapp/components/summary.js';
 import { Assistant } from '../tapp/components/assistant.js';
-import { Instructor } from '../tapp/components/instructor.js';
 import { ApplicantModal } from '../tapp/components/applicantModal.js';
 
 /*** Main app component ***/
@@ -126,7 +125,7 @@ const InstrRouter = props => {
                 <Switch>
                     <Route
                         path={routeConfig.instructor.route}
-                        render={() => <Instructor navKey={routeConfig.instructor.id} {...props} />}
+                        render={() => <ABC navKey={routeConfig.instructor.id} {...props} />}
                     />
                     <Redirect from="/" to={routeConfig.instructor.route} />
                 </Switch>

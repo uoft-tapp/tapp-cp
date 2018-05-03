@@ -9,10 +9,8 @@ class ApplicantsController < ApplicationController
     /applicants/
 '''
   def index
-    if session[:roles].include?("tapp_admin")
-      render json: applicants_from_session(params[:session_id])
-    elsif params[:session_id]
-      render json: applicants_from_session(params[:session_id], session[:utorid])
+    if params[:session_id]
+      render json: applicants_from_session(params[:session_id], params[:utorid])
     else
       render file: 'public/403.html'
     end
