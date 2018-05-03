@@ -137,7 +137,7 @@ class CoursePanel extends React.Component {
                         return (<InstructorPreferenceMenu {...this.props} course={p.course} applicantId={p.applicantId}/>);
                     },
 
-                style: { width: 0.15 },
+                style: { width: 0.08 },
             },
             {
                 header: 'Other',
@@ -279,7 +279,7 @@ class InstructorPreferenceMenu extends React.Component {
 
   render() {
     return (
-        <DropdownButton style={{ width: '15vw' }}
+        <DropdownButton style={{ width: '10em' }}
             bsStyle={"default"}
             title={this.state.btnTitle}
             key={this.props.applicantId}
