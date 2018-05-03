@@ -178,7 +178,7 @@ describe CSVGenerator do
 
       it "returns generated true and data of all cdf info" do
         expect(subject).to eq ({generated: true, data: @data, type: "text/csv",
-          file: "offers.csv"})
+          file: "#{session[:semester]}_#{session[:year]}_Offers.csv"})
       end
     end
   end

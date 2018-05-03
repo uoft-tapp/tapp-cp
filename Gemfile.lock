@@ -235,6 +235,7 @@ DEPENDENCIES
   prawn (~> 2.2)
   puma (~> 3.7)
   rails (~> 5.1.1)
+  rake
   rspec-rails (~> 3.5)
   rubyzip (>= 1.2.1)
   sass-rails (~> 5.0)

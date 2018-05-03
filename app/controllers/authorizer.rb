@@ -1,5 +1,11 @@
 module Authorizer
-  def tapp_admin
+
+  def tapp_access
+    expected_roles = ["tapp_admin", "tapp_assistant", "instructor"]
+    access(expected_roles)
+  end
+
+  def tapp_admin()
     expected_roles = ["tapp_admin"]
     access(expected_roles)
   end
@@ -10,7 +16,7 @@ module Authorizer
   end
 
   def app_access
-    expected_roles = ["tapp_admin","cp_admin", "hr_assistant", "instructor"]
+    expected_roles = ["tapp_admin","cp_admin", "tapp_assistant", "hr_assistant", "instructor"]
     access(expected_roles)
   end
 
@@ -185,6 +191,10 @@ module Authorizer
       {
         access: listed_as(ENV['CP_ADMINS']),
         role: "cp_admin",
+      },
+      {
+        access: listed_as(ENV['TAPP_ASSISTANTS']),
+        role: "tapp_assistant",
       },
       {
         access: listed_as(ENV['HR_ASSISTANTS']),

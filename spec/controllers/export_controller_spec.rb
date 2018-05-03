@@ -169,7 +169,7 @@ RSpec.describe ExportController, type: :controller do
           expect(response.status).to eq(200)
           expect(response.content_type).to eq("text/csv")
           expect(response.header["Content-Disposition"]).to eq(
-            "attachment; filename=\"offers.csv\"")
+            "attachment; filename=\"#{session[:semester]}_#{session[:year]}_Offers.csv\"")
         end
       end
     end

@@ -20,6 +20,7 @@ services:
       HR_ADMIN_NAME: ${HR_ADMIN_NAME}
       TAPP_ADMINS: ${TAPP_ADMINS}
       CP_ADMINS: ${CP_ADMINS}
+      TAPP_ASSISTANTS: ${TAPP_ASSISTANTS}
       HR_ASSISTANTS: ${HR_ASSISTANTS}
     networks:
       - default

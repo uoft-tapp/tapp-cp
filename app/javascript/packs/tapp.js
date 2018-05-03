@@ -24,6 +24,8 @@ import { ABC } from '../tapp/components/abc.js';
 import { Assigned } from '../tapp/components/assigned.js';
 import { Unassigned } from '../tapp/components/unassigned.js';
 import { Summary } from '../tapp/components/summary.js';
+import { Assistant } from '../tapp/components/assistant.js';
+import { Instructor } from '../tapp/components/instructor.js';
 import { ApplicantModal } from '../tapp/components/applicantModal.js';
 
 /*** Main app component ***/
@@ -33,10 +35,7 @@ class App extends React.Component {
         super(props);
 
         // get current user role and username
-        fetchAuth();
-
-        // start fetching data
-        fetchAll();
+        fetchAuth().then(()=> fetchAll());
     }
 
     componentDidMount() {
@@ -52,8 +51,13 @@ class App extends React.Component {
             return <div id="loader" />;
         }
 
-        if (role == 'tapp_admin') {
+        switch (role) {
+          case 'tapp_admin':
             return <AdminRouter {...appState} />;
+          case 'tapp_assistant':
+            return <AssistantRouter {...appState} />;
+          case 'instructor':
+            return <InstrRouter {...appState} />;
         }
 
         return null;
@@ -68,7 +72,7 @@ const AdminRouter = props => {
     return (
         <Router basename="tapp">
             <div>
-                <Navbar {...props} />
+                <Navbar {...props} role='tapp_admin'/>
 
                 <Switch>
                     <Route
@@ -118,11 +122,35 @@ const InstrRouter = props => {
     return (
         <Router basename="tapp">
             <div>
-                <Navbar {...props} />
+                <Navbar {...props} role='instructor'/>
+                <Switch>
+                    <Route
+                        path={routeConfig.instructor.route}
+                        render={() => <Instructor navKey={routeConfig.instructor.id} {...props} />}
+                    />
+                    <Redirect from="/" to={routeConfig.instructor.route} />
+                </Switch>
             </div>
         </Router>
     );
 };
+
+const AssistantRouter = props =>{
+    return (
+      <Router basename="tapp">
+          <div>
+              <Navbar {...props} role='tapp_assistant'/>
+              <Switch>
+                  <Route
+                      path={routeConfig.assistant.route}
+                      render={() => <Assistant navKey={routeConfig.assistant.id} {...props} />}
+                  />
+                  <Redirect from="/" to={routeConfig.assistant.route} />
+              </Switch>
+          </div>
+      </Router>
+    );
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(<App />, document.getElementById('root'));
