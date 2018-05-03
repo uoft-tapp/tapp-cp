@@ -118,6 +118,7 @@ const AdminRouter = props => {
 };
 
 const InstrRouter = props => {
+    let selectedApplicant = props.getSelectedApplicant();
     return (
         <Router basename="tapp">
             <div>
@@ -129,6 +130,7 @@ const InstrRouter = props => {
                     />
                     <Redirect from="/" to={routeConfig.instructor.route} />
                 </Switch>
+                {selectedApplicant && <ApplicantModal applicantId={selectedApplicant} {...props} />}
             </div>
         </Router>
     );
