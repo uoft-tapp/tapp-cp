@@ -71,12 +71,11 @@ class PositionsController < ApplicationController
     return utorids
   end
 
-
   def get_all_positions_for_utorid(utorid, session = nil)
     positions = []
     all_positions = positions_from_session(session)
     all_positions.each do |position|
-      position[:instructors].each do |instructor|
+      position.instructors.each do |instructor|
         if instructor[:utorid] == utorid
           positions.push(position)
         end
@@ -84,6 +83,7 @@ class PositionsController < ApplicationController
     end
     return positions
   end
+
 
 
 end

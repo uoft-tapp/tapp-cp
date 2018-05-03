@@ -17,7 +17,7 @@ class ApplicationsController < ApplicationController
       # Since Applicants are associated to applications
       Applicant.find(params[:applicant_id]).applications.includes(:preferences)
     elsif params[:session_id].present?
-      applications_from_session(params[:session_id])
+      applications_from_session(params[:session_id],params[:utorid])
     else
       Application.includes(:preferences).all
     end
