@@ -6,6 +6,7 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 class CoursePanel extends React.Component {
     constructor(props) {
         super(props);
+        let isInstructor = props.getSelectedUserRole()=='instructor';
 
         // table/menu configuration
         this.config = [
@@ -35,14 +36,16 @@ class CoursePanel extends React.Component {
                         }
 
                         return (
+                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={true}
                                 onClick={() => props.deleteAssignment(p.applicantId, assignment.id)}
-                            />
+                            />:''
                         );
                     } else {
                         return (
+                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={false}
@@ -52,12 +55,12 @@ class CoursePanel extends React.Component {
                                         p.course,
                                         props.getCourseById(p.course).positionHours
                                     )}
-                            />
+                            />:''
                         );
                     }
                 },
 
-                style: { width: 0.02, textAlign: 'center' },
+                style: { width: !isInstructor?0.02:0.001, textAlign: 'center' },
             },
             {
                 header: 'Last Name',
@@ -134,7 +137,11 @@ class CoursePanel extends React.Component {
             {
                 header: 'Instructor Pref.',
                 data: p => {
-                        return (<InstructorPreferenceMenu {...this.props} course={p.course} applicantId={p.applicantId}/>);
+                        return (
+                          isInstructor?
+                          <InstructorPreferenceMenu {...this.props} course={p.course} applicantId={p.applicantId}/>:
+                          instructorPrefMenuItems[props.getInstructorPref(p.applicantId, p.course)]
+                        );
                     },
 
                 style: { width: 0.08 },
