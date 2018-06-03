@@ -53,16 +53,15 @@ class AssignmentForm extends React.Component {
                                     paddingTop: '10px',
                                     verticalAlign: 'middle',
                                 }}>
-                                {this.props.getSelectedUserRole()=='instructor'?'':<b>Add assignment:&nbsp;</b>}
+                                <b>Add assignment:&nbsp;</b>
                             </td>
                             <td style={{ paddingTop: '10px' }}>
-                                {this.props.getSelectedUserRole()=='instructor'?'':
                                 <AssignmentInput
                                     courses={courses}
                                     assignments={assignments}
                                     tempAssignments={tempAssignments}
                                     {...this.props}
-                                />}
+                                />
                             </td>
                         </tr>
                     </tbody>
@@ -86,8 +85,6 @@ const AssignmentRow = props =>
                     }
                     event.preventDefault();
                 }}>
-                {props.getSelectedUserRole()=='instructor'?
-                props.assignment.hours:
                 <input
                     type="number"
                     style={{ width: '50px' }}
@@ -103,10 +100,9 @@ const AssignmentRow = props =>
                     }}
                     defaultValue={props.assignment.hours}
                     disabled={props.assignment.locked}
-                />}
+                />
                 &emsp;
-                {props.getSelectedUserRole()=='instructor'?'':
-                (props.assignment.locked
+                {props.assignment.locked
                     ? <Lock
                           click={() => {
                               if (
@@ -120,8 +116,7 @@ const AssignmentRow = props =>
                       />
                     : <X
                           click={() => props.deleteAssignment(props.applicant, props.assignment.id)}
-                      />)
-                }
+                      />}
             </form>
         </td>
     </tr>;

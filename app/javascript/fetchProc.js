@@ -131,9 +131,7 @@ export const onFetchApplicationsSuccess = (resp) => {
             prefs: (function(prefs) {
                 return prefs.map(pref => ({
                     positionId: pref.position_id,
-                    applicationId: pref.application_id,
                     preferred: pref.rank == 1,
-                    instructorPref: pref.instructor_pref,
                 }));
             })(app.preferences),
             rawPrefs: app.raw_prefs,

@@ -1,12 +1,10 @@
 import React from 'react';
 import { ApplicantTableMenu } from './applicantTableMenu.js';
 import { ApplicantTable } from './applicantTable.js';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 class CoursePanel extends React.Component {
     constructor(props) {
         super(props);
-        let isInstructor = props.getSelectedUserRole()=='instructor';
 
         // table/menu configuration
         this.config = [
@@ -36,16 +34,14 @@ class CoursePanel extends React.Component {
                         }
 
                         return (
-                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={true}
                                 onClick={() => props.deleteAssignment(p.applicantId, assignment.id)}
-                            />:''
+                            />
                         );
                     } else {
                         return (
-                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={false}
@@ -55,12 +51,12 @@ class CoursePanel extends React.Component {
                                         p.course,
                                         props.getCourseById(p.course).positionHours
                                     )}
-                            />:''
+                            />
                         );
                     }
                 },
 
-                style: { width: !isInstructor?0.02:0.001, textAlign: 'center' },
+                style: { width: 0.02, textAlign: 'center' },
             },
             {
                 header: 'Last Name',
@@ -133,18 +129,6 @@ class CoursePanel extends React.Component {
                 sortData: p => props.getApplicationPreference(p.applicantId, p.course),
 
                 style: { width: 0.04 },
-            },
-            {
-                header: 'Instructor Pref.',
-                data: p => {
-                        return (
-                          isInstructor?
-                          <InstructorPreferenceMenu {...this.props} course={p.course} applicantId={p.applicantId}/>:
-                          instructorPrefMenuItems[props.getInstructorPref(p.applicantId, p.course)]
-                        );
-                    },
-
-                style: { width: 0.08 },
             },
             {
                 header: 'Other',
@@ -259,47 +243,6 @@ const DraggableHeader = props => {
         </div>
     );
 };
-
-const instructorPrefMenuItems = ['\xa0', 'Unsuitable', 'Preferred', 'Strongly Preferred'];
-
-class InstructorPreferenceMenu extends React.Component {
-  constructor(props) {
-    super(props);
-
-    let defaultValue = props.getInstructorPref(props.applicantId, props.course);
-    if (defaultValue === null) defaultValue = 0;
-    this.state = {btnTitle: instructorPrefMenuItems[defaultValue]};
-
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(event) {
-    this.props.updateInstructorPref(this.props.applicantId, this.props.course, event);
-
-    var val = instructorPrefMenuItems[event];
-    this.setState({
-      btnTitle: val
-    });
-
-    this.props.selectApplicant(this.props.applicantId);
-  }
-
-  render() {
-    return (
-        <DropdownButton style={{ width: '10em' }}
-            bsStyle={"default"}
-            title={this.state.btnTitle}
-            key={this.props.applicantId}
-            id={'dropdown-basic-${this.props.applicantId}'}
-            noCaret
-            onSelect={e => this.handleChange(e)}>
-            {instructorPrefMenuItems.map((item, index) =>
-                <MenuItem eventKey={index} key={index}>{item}</MenuItem>
-            )}
-        </DropdownButton>
-    );
-  }
-}
 
 const AssignedApplicantTable = props =>
     <ApplicantTable
