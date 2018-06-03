@@ -21,21 +21,17 @@ const getSessions = () => getResource('/sessions',
 const getInstructors = () => getResource('/instructors',
   fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList, false);
 
-const getApplicants = (utorid = null) => !utorid?getResource('/applicants',
-  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList):
-  getResource('/instructors/'+utorid+'/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
+const getApplicants = () => getResource('/applicants',
+  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
-const getApplications = (utorid = null) => !utorid?getResource('/applications',
-  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList):
-  getResource('/instructors/'+utorid+'/applications', fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
+const getApplications = () => getResource('/applications',
+  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
 
-const getCourses = (utorid = null) => !utorid?getResource('/positions',
-  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList):
-  getResource('/instructors/'+utorid+'/positions', fetchProc.onFetchTappCoursesSuccess,'applications',  appState.setApplicationsList);
+const getCourses = () => getResource('/positions',
+  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList);
 
-const getAssignments = (utorid = null) => !utorid?getResource('/assignments',
-  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList):
-  getResource('/instructors/'+utorid+'/assignments', fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
+const getAssignments = () => getResource('/assignments',
+  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
@@ -54,7 +50,7 @@ export const fetchAll = () => {
       fetchTappAssistantAll();
       break;
     case 'instructor':
-      fetchInstructorAll(true);
+      fetchInstructorAll();
       break;
   }
 }
@@ -73,7 +69,7 @@ const fetchTappAssistantAll = () => {
     });
 }
 
-const fetchInstructorAll = (instructor = false) => {
+const fetchInstructorAll = () => {
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
@@ -82,19 +78,10 @@ const fetchInstructorAll = (instructor = false) => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      if(instructor){
-        let utorid = appState.getCurrentUserName();
-        getApplicants(utorid);
-        getApplications(utorid);
-        getAssignments(utorid);
-        getCourses(utorid);
-      }
-      else{
-        getApplicants();
-        getApplications();
-        getAssignments();
-        getCourses();
-      }
+      getApplicants();
+      getApplications();
+      getAssignments();
+      getCourses();
     });
 }
 /* Task-specific resource modifiers */
@@ -120,13 +107,6 @@ export const deleteAssignment = (applicant, assignment) => {
 export const noteApplicant = (applicant, notes) => {
     putData('/applicants/' + applicant, { commentary: notes }, () => {
       getApplicants();
-    });
-}
-
-// add/update the instructor prefs for an application
-export const updateInstructorPref = (application, position, pref) => {
-    putData('/applications/' + application, { position: position, pref: pref }, () => {
-      getApplications();
     });
 }
 

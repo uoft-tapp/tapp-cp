@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     resources :applications, only: [:index]
   end
   resources :assignments, only: [:index, :show]
-  resources :applications, only: [:index, :show, :update]
+  resources :applications, only: [:index, :show]
   resources :positions
   resources :instructors
 
