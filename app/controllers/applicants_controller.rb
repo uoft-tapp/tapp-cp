@@ -9,7 +9,7 @@ class ApplicantsController < ApplicationController
 '''
   def index
     if params[:session_id]
-      render json: applicants_from_session(params[:session_id])
+      render json: applicants_from_session(params[:session_id], params[:utorid])
     else
       render json: Applicant.all
     end
