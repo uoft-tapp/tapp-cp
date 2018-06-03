@@ -149,7 +149,7 @@ class AppState {
     // note that we do not allow multiple sorts on the same field (incl. in different directions)
     addCoursePanelSort(course, field) {
         if (
-            !this.get('abcView.panelFields.' + course + '.selectedFilters').some(
+            !this.get('abcView.panelFields.' + course + '.selectedSortFields').some(
                 ([f, _]) => f == field
             )
         ) {
@@ -177,6 +177,10 @@ class AppState {
             'assignmentForm.tempAssignments',
             fromJS({ positionId: positionId, hours: hours })
         );
+    }
+
+    clearTempAssignments(course) {
+        this.set('assignmentForm.tempAssignments.', fromJS([]));
     }
 
     // add an alert to the list of active alerts
