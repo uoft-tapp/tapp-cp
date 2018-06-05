@@ -180,6 +180,10 @@ footer div p {
     overflow: auto;
 }
 
+#course-form .expand-button {
+    padding: 10px 15px 0px 10px;
+}
+
 /* for ApplicantTable in Assigned/Unassigned view */
 #unassigned-grid .table-container,
 #assigned-grid .table-container {
@@ -335,6 +339,14 @@ footer div p {
 .form_table input {
     width: 100%;
     height: var(--text-input-height);
+}
+
+.form_table .col-half {
+    width: 50%;
+}
+
+.form_table .long-text {
+    height: 250px;
 }
 
 /* immutable course information */
