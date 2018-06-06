@@ -80,7 +80,11 @@ const EditInstructor = props =>(
       label='Instructor'
       placeholder={props.id?props.instructors[props.id]['utorid']:'Choose a Utorid'}
       update={key=>props.setInstructorDataFromModal('id', key)}
-      body={Object.keys(props.instructors).map(key=>
+      body={Object.keys(props.instructors).sort(function(a,b){
+          const x = props.instructors[a]['utorid'];
+          const y = props.instructors[b]['utorid'];
+          return x<y ? -1 : x>y ? 1 : 0;
+      }).map(key=>
             <MenuItem key={key} eventKey={key}>
               {props.instructors[key]['utorid']}
             </MenuItem>
