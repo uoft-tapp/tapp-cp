@@ -171,7 +171,11 @@ class CourseForm extends React.Component {
 
                             <td className="col-7">
                                 <p>
-                                    <b>Instructors: </b>
+                                    <b>Instructors
+                                     <i className="fa fa-pencil instructor-modal-opener clickable"
+                                      title="Open Instructor Editor"
+                                      onClick={()=> this.props.showInstructorModal()}></i>
+                                    </b>
                                 </p>
                                 <InstructorForm
                                     courseId={this.props.courseId}
