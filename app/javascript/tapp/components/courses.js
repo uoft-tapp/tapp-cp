@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Grid, Panel, ListGroup } from 'react-bootstrap';
 import { CourseList } from './courseList.js';
 import { CourseForm } from './courseForm.js';
+import { InstructorModal } from './instructorModal.js';
 
 class Courses extends React.Component {
     selectThisTab() {
@@ -34,7 +35,6 @@ class Courses extends React.Component {
         return (
             <Grid fluid id="courses-grid">
                 <CourseList courses={courses}  {...this.props}/>
-
                 <Panel id="course-form">
                     <ListGroup fill>
                         {courses.map(([key, course]) =>
@@ -42,6 +42,7 @@ class Courses extends React.Component {
                         )}
                     </ListGroup>
                 </Panel>
+                <InstructorModal {...this.props}/>
             </Grid>
         );
     }

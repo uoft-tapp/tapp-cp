@@ -45,8 +45,8 @@ const getOffers = user => getResource(
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
-const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
-const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
+const putData = (route, data, fetch, okay = null, error = null) => fetchProc.putData(route, data, fetch, appState, okay, error);
+const deleteData = (route, fetch, okay = null, error = null) => fetchProc.deleteData(route, fetch, appState, okay, error);
 
 const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra = null, put =false) =>
   fetchProc.batchOfferAction(canRoute, actionRoute, data, msg, fetch, extra, put, appState);
