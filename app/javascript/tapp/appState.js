@@ -60,6 +60,19 @@ const initialState = {
         tempAssignments: [],
     },
 
+    // instructor Modal
+    instructorModal: {
+      open: false,
+      selectedTab: 'create',
+      alert: null,
+      instructor: {
+        id: null,
+        utorid: null,
+        name: null,
+        email: null,
+      },
+    },
+
     /** DB data **/
 
     applicants: { fetching: 0, list: null },
@@ -185,15 +198,20 @@ class AppState {
 
     // add an alert to the list of active alerts
     alert(text) {
-        let alerts = this.get('alerts');
-        // give it an id that is 1 larger than the largest id in the array, or 0 if the array is empty
-        this.add(
-            'alerts',
-            fromJS({
-                id: alerts.size > 0 ? alerts.last().get('id') + 1 : 0,
-                text: text,
-            })
-        );
+        if(this.instructorModalOpen()){
+          this.setInstructorModalAlert(text);
+        }
+        else {
+          let alerts = this.get('alerts');
+          // give it an id that is 1 larger than the largest id in the array, or 0 if the array is empty
+          this.add(
+              'alerts',
+              fromJS({
+                  id: alerts.size > 0 ? alerts.last().get('id') + 1 : 0,
+                  text: text,
+              })
+          );
+        }
     }
 
     // check whether any of the given filters in the category are selected on the applicant table in a course panel
@@ -721,6 +739,160 @@ class AppState {
         return this.getApplicantsList().get(applicant.toString());
     }
 
+    getInstructorDataFromModal(key = null, trim = false){
+      if (key){
+        let result = this.get('instructorModal.instructor.'+key)?
+          this.get('instructorModal.instructor.'+key): '';
+        return trim?result.trim():result;
+      }
+      else {
+        let id = this.getInstructorDataFromModal('id', true);
+        return {
+            id: (id==''||!id)? null: parseInt(id),
+            utorid: this.getInstructorDataFromModal('utorid', true),
+            name: this.getInstructorDataFromModal('name', true),
+            email: this.getInstructorDataFromModal('email', true),
+          };
+      }
+    }
+
+    setInstructorDataFromModal(key, val){
+        if(key=='id'){
+          this.setInstructorDataFromModal('utorid', this.getInstructorAttributeById(val, 'utorid'));
+          this.setInstructorDataFromModal('name', this.getInstructorAttributeById(val, 'name'));
+          this.setInstructorDataFromModal('email', this.getInstructorAttributeById(val, 'email'));
+        }
+        this.set('instructorModal.instructor.'+key, val);
+    }
+
+    getSelectedTabFromModal(){
+      return this.get('instructorModal.selectedTab');
+    }
+
+    setSelectedTabFromModal(tab){
+        this.set("instructorModal.selectedTab", tab);
+    }
+
+    containsEmptyInstructorField(instructor){
+      let keys = Object.keys(instructor);
+      for(let i in keys) {
+        if(instructor[keys[i]]=='')
+          return true;
+      }
+      return false;
+    }
+
+    updateInstructor(){
+      this.validateInstructorModalForm((instructor, action2)=>{
+          if((this.getInstructorAttributeById(instructor.id, 'name')==instructor.name)
+              &&(this.getInstructorAttributeById(instructor.id, 'email')==instructor.email))
+            this.alert("This instructor's information remains unchanged.");
+          else{
+            action2(instructor);
+          }
+        }, (instructor)=>{
+        this.validateInstructorNameEmail(instructor.name, instructor.email, ()=>{
+          delete instructor.utorid;
+          fetch.updateInstructor(instructor);
+        });
+      });
+    }
+
+    deleteInstructor(){
+      let id = this.getInstructorDataFromModal('id', true);
+      if(id=='')
+        this.alert('No instructor selected.');
+      else{
+        let response = confirm("Are you sure you want to delete this instructor?");
+        if(response)
+            fetch.deleteInstructor(parseInt(id));
+      }
+    }
+
+    createInstructor(){
+      this.validateInstructorModalForm((instructor, action2)=>{
+        if(!this.validInstructorUtorid(instructor.utorid))
+          this.alert("An instructor with this utorid already exists.");
+        else{
+          action2(instructor);
+        }
+      }, (instructor)=>{
+        this.validateInstructorNameEmail(instructor.name, instructor.email, ()=>{
+          delete instructor.id;
+          fetch.createInstructor(instructor);
+        });
+      });
+    }
+
+    validateInstructorModalForm(action1, action2){
+      if(this.instructorModalOpen()){
+        let instructor = this.getInstructorDataFromModal();
+        if(!this.containsEmptyInstructorField(instructor)){
+          if(action1)
+            action1(instructor, action2);
+          else
+            action2(instructor);
+        }
+        else this.alert("This form contains empty fields.");
+      }
+    }
+
+    validateInstructorNameEmail(name, email, action){
+      if(!this.validInstructorName(name))
+        this.alert("Please enter both the first and last name.");
+      else {
+        if (!this.validInstructorEmail(email))
+          this.alert("Invalid Email");
+        else{
+          this.setInstructorModalAlert(null);
+          action();
+        }
+      }
+    }
+
+    validInstructorUtorid(utorid){
+      let instructors = this.getInstructorsList(true),
+        valid = true;
+      instructors.forEach(instr=>{
+        if(utorid == instr.get('utorid'))
+          valid = false;
+      });
+      return valid;
+    }
+
+    validInstructorEmail(email){
+      let regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return regex.test(email);
+    }
+
+    validInstructorName(name){
+      return name.split(" ").filter(word => word!=='').length >= 2;
+    }
+
+    instructorModalOpen(){
+      return this.get("instructorModal.open");
+    }
+
+    getInstructorModalAlert(){
+      return this.get("instructorModal.alert");
+    }
+
+    setInstructorModalAlert(text){
+      this.set('instructorModal.alert', text);
+    }
+
+    showInstructorModal(){
+      this.set("instructorModal.open", true);
+    }
+
+    hideInstructorModal(){
+      this.set("instructorModal.instructor.id", null);
+      this.set("instructorModal.instructor.utorid", null);
+      this.set("instructorModal.instructor.name", null);
+      this.set("instructorModal.instructor.email", null);
+      this.set("instructorModal.open", false);
+    }
+
     getApplicantsInSelectedRound() {
         let round = this.get('selectedRound'),
             applicants = this.get('applicants.list'),
@@ -984,8 +1156,26 @@ class AppState {
       return this.get('selectedSession');
     }
 
-    getInstructorsList() {
-        return this.get('instructors.list');
+    getInstructorsList(fullData = false) {
+        if(fullData)
+          return this.get('instructors.list');
+        else {
+          let instructors = this.get('instructors.list');
+          let list = {};
+          instructors.forEach((instructor,id)=> {
+            list[id] = instructor.get('name');
+          });
+          return list;
+        }
+    }
+
+    getInstructorAttributeById(id, attribute){
+      let val = null;
+      this.get('instructors.list').forEach((instr, key)=>{
+        if(key == id)
+          val = instr.get(attribute);
+      });
+      return val;
     }
 
     // get a list of all rounds for all courses
