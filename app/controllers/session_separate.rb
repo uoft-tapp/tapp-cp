@@ -69,9 +69,9 @@ module SessionSeparate
         return Position.all.includes(:instructors)
       else
         p "doesn't include instructors"
-        instructor_select = "SELECT id FROM instructors WHERE utorid=#{utorid}"
-        instr_position_select = "SELECT id FROM instructors_positions a, (#{instructor_select}) b WHERE a.instructor_id=b.id"
-        return "SELECT id FROM positions a, (#{instr_position_select}) b WHERE a.id=b.position_id"
+        instructor_select = "SELECT id FROM instructors WHERE utorid='#{utorid}'"
+        instr_position_select = "SELECT a.position_id position_id FROM instructors_positions a, (#{instructor_select}) b WHERE a.instructor_id=b.id"
+        return "SELECT a.id id FROM positions a, (#{instr_position_select}) b WHERE a.id=b.position_id"
       end
     else
       sql = "SELECT * FROM positions p ORDER BY p.id"

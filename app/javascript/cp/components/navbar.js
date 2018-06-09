@@ -106,6 +106,7 @@ const Auth = props => {
                         Switch to {r} role
                     </MenuItem>
             )}
+            
             <MenuItem
                 onClick={() => {
                     var form = document.createElement('form');

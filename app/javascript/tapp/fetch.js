@@ -31,7 +31,7 @@ const getApplications = (utorid = null) => !utorid?getResource('/applications',
 
 const getCourses = (utorid = null) => !utorid?getResource('/positions',
   fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList):
-  getResource('/instructors/'+utorid+'/positions', fetchProc.onFetchTappCoursesSuccess,'applications',  appState.setApplicationsList);
+  getResource('/instructors/'+utorid+'/positions', fetchProc.onFetchTappCoursesSuccess, 'courses',  appState.setCoursesList);
 
 const getAssignments = (utorid = null) => !utorid?getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList):

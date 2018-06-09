@@ -8,7 +8,7 @@ class PositionsController < ApplicationController
   def index
     if params[:session_id]
       if params[:utorid]
-        render json: get_all_positions_for_utorid(params[:utorid], params[:session_id])
+        render json: get_all_positions_for_utorid(params[:utorid], params[:session_id]).to_json(include: [:instructors])
       else
         positions = positions_from_session(params[:session_id])
         render json: positions.to_json(include: [:instructors])
