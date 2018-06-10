@@ -1,0 +1,53 @@
+:root {
+    --footer-height: 4vh; /* includes margins */
+    --navbar-height: 71px; /* includes margins */
+    --applicant-table-menu-height: calc(34px + 1vh);
+    --main-div-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+    --min-row-height: 32px;
+    --course-list-panel-width: calc(15em + 8px); /* includes margins */
+    --closed-panel-height: 47px; /* includes top margin */
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: var(--footer-height);
+}
+
+/* for footer (sticky bottom fixed-height footer) */
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: calc(var(--footer-height) - 1vh);
+    background-color: #f5f5f5;
+    border: 1px solid #e7e7e7;
+    margin-top: 1vh;
+}
+
+footer div {
+    text-align: right;
+}
+
+footer div p {
+    margin: 0;
+}
+
+/* applies to the first div after the navbar, which should be the main div container for the view, between the
+ * navbar and the footer */
+#root nav + div {
+    top: 0;
+    margin-top: var(--navbar-height);
+    position: absolute;
+    height: var(--main-div-height);
+    width: 100%;
+}
+
+#app-drop-down, #app-drop-down li a{
+    list-style: none;
+    text-decoration: none;
+    color: #555;
+}

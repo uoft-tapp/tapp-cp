@@ -1,0 +1,92 @@
+/* for summary view */
+#summary-grid .panel-group {
+    max-height: var(--main-div-height);
+    margin-bottom: 0;
+}
+
+#summary-grid .panel {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* for utilities panel in summary view */
+#summary-grid #utils {
+    display: flex;
+}
+
+#summary-grid #utils .panel-body {
+    width: 100%;
+    padding: 0;
+}
+
+#summary-grid #utils .btn {
+    height: 60px;
+    width: 60px;
+    padding: 0;
+    border: 0;
+}
+
+#summary-grid #utils .divider {
+    width: 0;
+    height: 0;
+    border-top: 30px solid transparent;
+    border-bottom: 30px solid transparent;
+    border-left: 30px solid #e3e3e3;
+    float: left;
+    margin-right: 2vw;
+}
+
+#summary-grid #utils form {
+    padding: 12px 0;
+}
+
+#summary-grid #utils input {
+    display: inline;
+}
+
+#summary-grid #utils #import-form-container,
+#summary-grid #utils #export-form-container {
+    height: 60px;
+    width: calc(100% - 60px * 3 - 1vw);
+    float: right;
+
+    display: none;
+}
+
+#summary-grid #utils #year {
+    width: 80px;
+}
+
+/* for statistics panel in summary view */
+#summary-grid #stats .panel-heading {
+    height: 40px;
+}
+
+#summary-grid #stats .panel-body {
+    /* we subtract the height of the utilities panel, the margin below it, and the stats panel header */
+    max-height: calc(var(--main-div-height) - 60px - 10px - 40px);
+    overflow: auto;
+}
+
+#summary-grid #gen-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#summary-grid #gen-stats span {
+    margin: 0;
+}
+
+#summary-grid #gen-stats .divider {
+    font-size: 40px;
+}
+
+#summary-grid #gen-stats h2 {
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+#summary-grid #per-course {
+    margin-bottom: 0;
+}

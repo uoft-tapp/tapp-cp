@@ -1,0 +1,37 @@
+/* for course panel container in ABC view */
+#abc-grid #course-panel-layout {
+    width: calc(100% - var(--course-list-panel-width));
+    float: left;
+    height: var(--main-div-height);
+}
+
+/* for CoursePanels in ABC view */
+#abc-grid .course-panel {
+    border-width: 1px;
+    float: left;
+    margin: 0;
+}
+
+#abc-grid .course-panel .panel-heading {
+    padding: 5px 15px !important;
+    height: 30px;
+    cursor: move;
+}
+
+#abc-grid .course-panel .panel-body {
+    overflow: auto;
+    height: calc(100% - 30px);
+}
+
+/* for body of ApplicantTable of assigned applicants in ABC view */
+#abc-grid .assigned-table.table-body {
+    /* maximum height of 10 rows (assuming rows are all single-height */
+    max-height: calc(var(--min-row-height) * 10);
+    overflow: auto;
+    margin-bottom: 1vh;
+}
+
+/* for container of ApplicantTable of unassigned applicants in ABC view */
+#abc-grid .unassigned-table.table-container {
+    margin-top: 1vh;
+}

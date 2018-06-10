@@ -1,0 +1,14 @@
+/* for ApplicantTable in Assigned/Unassigned view */
+#unassigned-grid .table-container,
+#assigned-grid .table-container {
+    margin-top: 1vh;
+}
+
+#unassigned-grid .table-body,
+#assigned-grid .table-body {
+    /* note that this assumes that the header is at most one row high */
+    max-height: calc(
+            var(--main-div-height) - var(--applicant-table-menu-height) - var(--min-row-height)
+    );
+    overflow: auto;
+}

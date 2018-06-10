@@ -1,0 +1,20 @@
+#alert-container {
+    position: relative;
+    z-index: 5000;
+    margin-top: var(--navbar-height);
+}
+
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+#alert-container .alert {
+    margin-bottom: 2px;
+    animation-name: fadeout;
+    animation-duration: 10s;
+}

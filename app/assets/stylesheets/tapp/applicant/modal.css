@@ -1,0 +1,35 @@
+/* for Applicant modal */
+#applicant-modal .modal-dialog {
+    width: 98vw;
+}
+
+#applicant-modal .modal-body {
+    max-height: calc(
+            98vh - 55px - 60px
+    ); /* modal header is 55px high, modal has 30px top and bottom margin */
+    overflow: auto;
+}
+
+/* for panels in Applicant view */
+#applicant-modal .panel {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+#applicant-modal .panel-heading {
+    padding: 5px 15px;
+}
+
+#applicant-modal .panel_table td + td {
+    padding-left: 40px;
+    margin-top: 0;
+    vertical-align: top;
+}
+
+#applicant-modal .panel_table td p {
+    margin-bottom: 0;
+}
+
+#applicant-modal .panel_table tr + tr > td {
+    padding-top: 5px;
+}

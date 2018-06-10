@@ -1,0 +1,60 @@
+/* for contents of CourseMenu and CourseList */
+.course-list-group {
+    height: calc(100% - 30px);
+    overflow: auto;
+}
+
+.course-list-group .list-group-item {
+    height: 2em;
+    padding: 3px;
+}
+
+.course-list-group .list-group-item:hover {
+    background: #EEE;
+}
+
+.course-list-group .list-group-item a {
+    color: #333;
+}
+
+.course-list-group .list-group-item .course {
+    width: calc(100% - 15px);
+    float: left;
+}
+.course-list-group .list-group-item .course:hover {
+    text-decoration: none;
+}
+.course-list-group .list-group-item .spinning-icon {
+    display:none;
+}
+.course-list-group .list-group-item .email-icon,
+.course-list-group .list-group-item .spinning-icon {
+    float: right;
+    width: 15px;
+}
+
+/* for CourseList contents in Courses view */
+#courses-grid .course-list-group .list-group-item {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* for CourseMenu contents in ABC view */
+#abc-grid .course-list-group .list-group-item span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#abc-grid .course-list-group .list-group-item .course-code {
+    float: left;
+    max-width: 10em;
+}
+
+#abc-grid .course-list-group .list-group-item .counts {
+    float: right;
+    max-width: calc(100% - 10em);
+}
+
