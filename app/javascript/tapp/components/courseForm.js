@@ -1,7 +1,6 @@
 import React from 'react';
 import { ListGroupItem, Badge } from 'react-bootstrap';
 
-
 class CourseForm extends React.Component {
     constructor(props) {
         super(props);
@@ -73,7 +72,7 @@ class CourseForm extends React.Component {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'estimatedEnrol'
+                                                'estextensionsimatedEnrol'
                                             );
                                         }
                                     }}
@@ -198,7 +197,7 @@ class CourseForm extends React.Component {
                         </tr>
                     </tbody>
                 </table>
-                <CourseFormDescriptions expanded={this.state.expanded}
+                <ExpandableDescriptions expanded={this.state.expanded}
                                         handleClick={() => this.toggleExpanded()}
                                         {...this.props}
                 />
@@ -207,67 +206,80 @@ class CourseForm extends React.Component {
     }
 }
 
-function CourseFormDescriptions(props) {
-    if (props.expanded) {
+
+class ExpandableDescriptions extends React.Component {
+    render () {
+        if (this.props.expanded) {
+            return (
+                <div>
+                    <Descriptions {...this.props} key={this.props.courseId}/>
+                    <div>
+                        <button className="expand-button" onClick={() => this.props.handleClick()}>
+                            <span className="glyphicon glyphicon-chevron-up">
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <button className="expand-button" onClick={() => this.props.handleClick()}>
+                        <span className="glyphicon glyphicon-chevron-down">
+                        </span>
+                    </button>
+                </div>
+            );
+        }
+    }
+}
+
+class Descriptions extends React.Component {
+    render() {
         return (
             <div>
                 <table className="form_table">
                     <tbody>
-                        <tr>
-                            <td className="col-half">
-                                <p>
-                                    <b>Qualifications: </b>
-                                </p>
-                                <textarea
-                                    className="long-text"
-                                    onBlur={event => {
-                                        if (event.target.value != props.course.qual) {
-                                            props.updateCourse(
-                                                props.courseId,
-                                                event.target.value,
-                                                'qual'
-                                            );
-                                        }
-                                    }}
-                                    defaultValue={props.course.qual}
-                                />
-                            </td>
-                            <td className="col-half">
-                                <p>
-                                    <b>Responsibilities: </b>
-                                </p>
-                                <textarea
-                                    className="long-text"
-                                    onBlur={event => {
-                                        if (event.target.value != props.course.resp) {
-                                            props.updateCourse(
-                                                props.courseId,
-                                                event.target.value,
-                                                'resp'
-                                            );
-                                        }
-                                    }}
-                                    defaultValue={props.course.resp}
-                                />
-                            </td>
-                        </tr>
+                    <tr>
+                        <td className="col-half">
+                            <p>
+                                <b>Qualifications: </b>
+                            </p>
+                            <textarea
+                                className="long-text"
+                                onBlur={event => {
+                                    if (event.target.value != this.props.course.qual) {
+                                        this.props.updateCourse(
+                                            this.props.courseId,
+                                            event.target.value,
+                                            'qual'
+                                        );
+                                    }
+                                }}
+                                defaultValue={this.props.course.qual}
+                            />
+                        </td>
+                        <td className="col-half">
+                            <p>
+                                <b>Responsibilities: </b>
+                            </p>
+                            <textarea
+                                className="long-text"
+                                onBlur={event => {
+                                    if (event.target.value != this.props.course.resp) {
+                                        this.props.updateCourse(
+                                            this.props.courseId,
+                                            event.target.value,
+                                            'resp'
+                                        );
+                                    }
+                                }}
+                                defaultValue={this.props.course.resp}
+                            />
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
-                <div className="expand-button">
-                    <button onClick={() => props.handleClick()}>
-                        <span className="glyphicon glyphicon-chevron-up">
-                        </span>
-                    </button>
-                </div>
-            </div>
-        );
-    } else {
-        return (
-            <div className="expand-button">
-                <button onClick={() => props.handleClick()}>
-                    <span className="glyphicon glyphicon-chevron-down">
-                    </span>
-                </button>
             </div>
         );
     }
