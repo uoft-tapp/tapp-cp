@@ -12,9 +12,9 @@ class ApplicantModal extends React.Component {
                     <Modal.Title>
                         {applicant.lastName},&nbsp;{applicant.firstName}
                         <span className="text-muted" style={{ float: 'right' }}>
-                            <i className="fa fa-external-link" style={{ fontSize: '16px' }} />&ensp;
+                            <i className="fa fa-external-link clickable" style={{ fontSize: '16px' }} />&ensp;
                             <i
-                                className="fa fa-times"
+                                className="fa fa-times clickable"
                                 style={{ fontSize: '18px' }}
                                 onClick={() => this.props.unselectApplicant()}
                             />

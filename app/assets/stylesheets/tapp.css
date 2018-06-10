@@ -187,6 +187,38 @@ footer div p {
     margin: 10px 10px 0px 10px;
 }
 
+.instructor-modal-opener{
+    color: #000;
+    margin-left: 10px;
+}
+
+#instructor-modal-utorid-row i{
+    font-size: 40px;
+    color: #aaa;
+    margin-right: 10px;
+    float: right;
+}
+
+#instructor-modal-utorid-row i:hover{
+    color: #666;
+}
+
+#instructor-modal-utorid-row i:active{
+    color: #333;
+}
+
+.clickable{
+    cursor: pointer;
+}
+
+.clickable:hover{
+    opacity: .75;
+}
+
+.clickable:active{
+    opacity: .9;
+}
+
 /* for ApplicantTable in Assigned/Unassigned view */
 #unassigned-grid .table-container,
 #assigned-grid .table-container {

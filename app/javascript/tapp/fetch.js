@@ -36,8 +36,8 @@ const getAssignments = () => getResource('/assignments',
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
-const putData = (route, data, fetch) => fetchProc.putData(route, data, fetch, appState);
-const deleteData = (route, fetch) => fetchProc.deleteData(route, fetch, appState);
+const putData = (route, data, fetch, okay = null, error = null) => fetchProc.putData(route, data, fetch, appState, okay, error);
+const deleteData = (route, fetch, okay = null, error = null) => fetchProc.deleteData(route, fetch, appState, okay, error);
 
 /* Function to GET all resources */
 export const fetchAll = () => {
@@ -167,6 +167,45 @@ export const unlockAssignment = (applicant, assignment) => {
 export const exportOffers = (round, session) => {
     downloadFile('/export/chass/sessions/'+session+'/' + round)
     .then(() => getAssignments());
+}
+
+export const updateInstructor = (instructor) => {
+    putData('/instructors/'+instructor.id, instructor, resp=>{
+      getInstructors();
+    },
+    resp=>{
+      alert(resp.message);
+      appState.hideInstructorModal();
+    },
+    resp=>{
+      appState.alert(resp.message);
+    });
+}
+
+export const deleteInstructor = (id) => {
+  deleteData('/instructors/'+id, ()=>{
+    getInstructors();
+  },
+  resp=>{
+    alert(resp.message);
+    appState.hideInstructorModal();
+  },
+  resp=>{
+    appState.alert(resp.message);
+  });
+}
+
+export const createInstructor = (instructor) => {
+    postData('/instructors', instructor, ()=>{
+      getInstructors();
+    },
+    resp=>{
+      alert(resp.message);
+      appState.hideInstructorModal();
+    },
+    resp=>{
+      appState.alert(resp.message);
+    });
 }
 
 // get current user role and username
