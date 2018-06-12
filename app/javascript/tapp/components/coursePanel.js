@@ -1,7 +1,7 @@
 import React from 'react';
 import { ApplicantTableMenu } from './applicantTableMenu.js';
 import { ApplicantTable } from './applicantTable.js';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
 
 class CoursePanel extends React.Component {
     constructor(props) {
@@ -140,11 +140,11 @@ class CoursePanel extends React.Component {
                         return (
                           isInstructor?
                           <InstructorPreferenceMenu {...this.props} course={p.course} applicantId={p.applicantId}/>:
-                          instructorPrefMenuItems[props.getInstructorPref(p.applicantId, p.course)]
+                          <Glyphicon glyph={glyphicons[props.getInstructorPref(p.applicantId, p.course)]} />
                         );
                     },
 
-                style: { width: 0.08 },
+                style: { width: 0.05 },
             },
             {
                 header: 'Other',
@@ -262,13 +262,15 @@ const DraggableHeader = props => {
 
 const instructorPrefMenuItems = ['\xa0', 'Unsuitable', 'Preferred', 'Strongly Preferred'];
 
+const glyphicons = ['', 'thumbs-down', 'thumbs-up', 'heart-empty'];
+
 class InstructorPreferenceMenu extends React.Component {
   constructor(props) {
     super(props);
 
     let defaultValue = props.getInstructorPref(props.applicantId, props.course);
     if (defaultValue === null) defaultValue = 0;
-    this.state = {btnTitle: instructorPrefMenuItems[defaultValue]};
+    this.state = {btnTitle: instructorPrefMenuItems[defaultValue], val: defaultValue};
 
     this.handleChange = this.handleChange.bind(this);
   }
@@ -278,23 +280,27 @@ class InstructorPreferenceMenu extends React.Component {
 
     var val = instructorPrefMenuItems[event];
     this.setState({
-      btnTitle: val
+      btnTitle: val,
+      val: event
     });
 
-    this.props.selectApplicant(this.props.applicantId);
   }
 
   render() {
     return (
-        <DropdownButton style={{ width: '10em' }}
+        <DropdownButton style={{ width: '5em' }}
             bsStyle={"default"}
-            title={this.state.btnTitle}
+            title={
+                <div style={{ display: 'inline-block' }}> 
+                  <Glyphicon glyph={glyphicons[this.state.val]} />
+                </div>
+              }
             key={this.props.applicantId}
             id={'dropdown-basic-${this.props.applicantId}'}
             noCaret
             onSelect={e => this.handleChange(e)}>
             {instructorPrefMenuItems.map((item, index) =>
-                <MenuItem eventKey={index} key={index}>{item}</MenuItem>
+                <MenuItem eventKey={index} key={index}><Glyphicon glyph={glyphicons[index]} /></MenuItem>
             )}
         </DropdownButton>
     );
