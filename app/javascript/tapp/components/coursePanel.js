@@ -36,14 +36,16 @@ class CoursePanel extends React.Component {
                         }
 
                         return (
+                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={true}
                                 onClick={() => props.deleteAssignment(p.applicantId, assignment.id)}
-                            />
+                            />:''
                         );
                     } else {
                         return (
+                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={false}
@@ -53,7 +55,7 @@ class CoursePanel extends React.Component {
                                         p.course,
                                         props.getCourseById(p.course).positionHours
                                     )}
-                            />
+                            />:''
                         );
                     }
                 },
@@ -268,8 +270,12 @@ class InstructorPreferenceMenu extends React.Component {
 
     let defaultValue = props.getInstructorPref(props.applicantId, props.course);
     if (defaultValue === null) defaultValue = 0;
-    this.state = {btnTitle: instructorPrefMenuItems[defaultValue], val: defaultValue};
-
+      
+    this.state = {
+        btnTitle: instructorPrefMenuItems[defaultValue], 
+        val: defaultValue
+    };
+      
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -277,12 +283,13 @@ class InstructorPreferenceMenu extends React.Component {
     this.props.updateInstructorPref(this.props.applicantId, this.props.course, event);
 
     var val = instructorPrefMenuItems[event];
+      
     this.setState({
       btnTitle: val,
       val: event
     });
-
-//    this.props.selectApplicant(this.props.applicantId);
+      
+    this.props.selectApplicant(this.props.applicantId);
   }
 
   render() {
