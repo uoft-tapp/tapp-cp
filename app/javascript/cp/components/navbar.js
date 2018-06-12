@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
+import { adminFetchAll, instructorFetchAll } from '../fetch.js'
 
 import { Link } from 'react-router-dom';
 import {
@@ -101,12 +102,15 @@ const Auth = props => {
                         key={'switch-' + r}
                         onClick={() => {
                             props.appState.selectUserRole(r);
-                            props.appState.fetchAll();
+                            if (r == "instructor") {
+                                instructorFetchAll();
+                            } else {
+                                adminFetchAll();
+                            }
                         }}>
                         Switch to {r} role
                     </MenuItem>
             )}
-            
             <MenuItem
                 onClick={() => {
                     var form = document.createElement('form');

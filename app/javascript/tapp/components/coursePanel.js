@@ -7,58 +7,58 @@ class CoursePanel extends React.Component {
     constructor(props) {
         super(props);
         let isInstructor = props.getSelectedUserRole()=='instructor';
-        let hidden_for_instructor = {
-            header: '',
-            // checkbox that is checked if the applicant is currently assigned, unchecked if not
-            data: p => {
-                if (p.assigned) {
-                    let assignment = props.getAssignmentByApplicant(p.applicantId, p.course);
+        // table/menu configuration
+        this.config = [
+            {
+                header: '',
+                // checkbox that is checked if the applicant is currently assigned, unchecked if not
+                data: p => {
+                    if (p.assigned) {
+                        let assignment = props.getAssignmentByApplicant(p.applicantId, p.course);
 
-                    if (assignment.locked) {
+                        if (assignment.locked) {
+                            return (
+                                <i
+                                    className="fa fa-lock"
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => {
+                                        if (
+                                            confirm(
+                                                'This will unlock an assignment that has already been exported.\nAre you sure?'
+                                            )
+                                        ) {
+                                            props.unlockAssignment(p.applicantId, assignment.id);
+                                        }
+                                    }}
+                                />
+                            );
+                        }
+
                         return (
-                            <i
-                                className="fa fa-lock"
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => {
-                                    if (
-                                        confirm(
-                                            'This will unlock an assignment that has already been exported.\nAre you sure?'
-                                        )
-                                    ) {
-                                        props.unlockAssignment(p.applicantId, assignment.id);
-                                    }
-                                }}
+                            <input
+                                type="checkbox"
+                                defaultChecked={true}
+                                onClick={() => props.deleteAssignment(p.applicantId, assignment.id)}
+                            />
+                        );
+                    } else {
+                        return (
+                            <input
+                                type="checkbox"
+                                defaultChecked={false}
+                                onClick={() =>
+                                    props.createAssignment(
+                                        p.applicantId,
+                                        p.course,
+                                        props.getCourseById(p.course).positionHours
+                                    )}
                             />
                         );
                     }
+                },
 
-                    return (
-                        <input
-                            type="checkbox"
-                            defaultChecked={true}
-                            onClick={() => props.deleteAssignment(p.applicantId, assignment.id)}
-                        />
-                    );
-                } else {
-                    return (
-                        <input
-                            type="checkbox"
-                            defaultChecked={false}
-                            onClick={() =>
-                                props.createAssignment(
-                                    p.applicantId,
-                                    p.course,
-                                    props.getCourseById(p.course).positionHours
-                                )}
-                        />
-                    );
-                }
+                style: { width: !isInstructor?0.02:0.001, textAlign: 'center' },
             },
-
-            style: { width: !isInstructor?0.02:0.001, textAlign: 'center' },
-        };
-        // table/menu configuration
-        this.config = [
             {
                 header: 'Last Name',
                 // clicking last name generates a modal of the applicant's individual page
@@ -180,10 +180,6 @@ class CoursePanel extends React.Component {
                 ],
             },
         ];
-
-        if (!isInstructor) {
-            this.config.unshift(hidden_for_instructor);
-        }
     }
 
     render() {
