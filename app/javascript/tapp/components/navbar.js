@@ -226,20 +226,13 @@ const Notifications = props => {
 const Auth = props => {
     let roles = props.getCurrentUserRoles(),
         role = props.getSelectedUserRole(),
-        name = props.getCurrentUserName();
+        name = props.getCurrentUserName(),
+        developmentMode = props.getIsDevelopment();
     let utorid_input = null;
-    return (
-        <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
-            {roles.map(
-                r =>
-                    role != r &&
-                    <MenuItem key={'switch-' + r} onClick={() => {
-                        props.selectUserRole(r);
-                        fetchAll();
-                    }}>
-                        Switch to {r} role
-                    </MenuItem>
-            )}
+    let utorid_field;
+    
+    if (developmentMode) {
+        utorid_field = (
             <MenuItem disabled>
                 <FormGroup>
                     <InputGroup>
@@ -268,6 +261,25 @@ const Auth = props => {
                     </InputGroup>
                 </FormGroup>
             </MenuItem>
+            
+        );
+    }
+    
+    return (
+        <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
+            {roles.map(
+                r =>
+                    role != r &&
+                    <MenuItem key={'switch-' + r} onClick={() => {
+                        props.selectUserRole(r);
+                        fetchAll();
+                    }}>
+                        Switch to {r} role
+                    </MenuItem>
+            )}
+            
+            {utorid_field}
+            
             <MenuItem
                 onClick={() => {
                     var form = document.createElement('form');
