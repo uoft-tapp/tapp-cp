@@ -7,7 +7,6 @@ class CoursePanel extends React.Component {
     constructor(props) {
         super(props);
         let isInstructor = props.getSelectedUserRole()=='instructor';
-
         // table/menu configuration
         this.config = [
             {
@@ -36,16 +35,14 @@ class CoursePanel extends React.Component {
                         }
 
                         return (
-                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={true}
                                 onClick={() => props.deleteAssignment(p.applicantId, assignment.id)}
-                            />:''
+                            />
                         );
                     } else {
                         return (
-                            !isInstructor?
                             <input
                                 type="checkbox"
                                 defaultChecked={false}
@@ -55,7 +52,7 @@ class CoursePanel extends React.Component {
                                         p.course,
                                         props.getCourseById(p.course).positionHours
                                     )}
-                            />:''
+                            />
                         );
                     }
                 },
@@ -288,8 +285,8 @@ class InstructorPreferenceMenu extends React.Component {
       btnTitle: val,
       val: event
     });
-      
-    this.props.selectApplicant(this.props.applicantId);
+
+    //this.props.selectApplicant(this.props.applicantId);
   }
 
   render() {

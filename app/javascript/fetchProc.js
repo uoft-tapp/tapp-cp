@@ -73,7 +73,8 @@ function getResHelper(route, onSuccess, dataName, setData, appState){
           setData? setData(data): appState.set(dataName+'.list', fromJS(data));
           appState.setFetchingDataList(dataName, false, true);
       })
-      .catch(() => appState.setFetchingDataList(dataName, false));
+      .catch((error) => //appState.setFetchingDataList(dataName, false)
+                        console.error(error));
 }
 
 /*
@@ -202,6 +203,9 @@ function getCourse(course, tapp){
     session: course.session_id,
     instructors: course.instructors,
   };
+  console.log("1");
+  console.log("data");
+  console.log("extra");
   return mergeJson(data, extra);
 }
 
@@ -472,8 +476,8 @@ export const setRole = (roles, cp, appState)=>{
       .then(resp => {
           if (resp.development) {
               appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName('zaleskim');
+              appState.selectUserRole(roles[1]);
+              appState.setCurrentUserName('campb128');
           } else {
               roles = resp.roles.filter(role =>roles.includes(role));
               appState.setCurrentUserRoles(roles);

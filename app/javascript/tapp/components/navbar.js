@@ -2,10 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown, MenuItem, FormGroup, InputGroup } from 'react-bootstrap';
+import FormControl from 'react-bootstrap/lib/FormControl';
 
 import { routeConfig } from '../routeConfig.js';
 import { roundColourConfig } from '../roundColourConfig.js';
+import { fetchAll, is_valid_instructor } from '../fetch.js';
 
 /*** Navbar ABC view layout icons ***/
 import img20 from '../img/layout-20.png';
@@ -225,17 +227,47 @@ const Auth = props => {
     let roles = props.getCurrentUserRoles(),
         role = props.getSelectedUserRole(),
         name = props.getCurrentUserName();
-
+    let utorid_input = null;
     return (
         <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
             {roles.map(
                 r =>
                     role != r &&
-                    <MenuItem key={'switch-' + r} onClick={() => props.selectUserRole(r)}>
+                    <MenuItem key={'switch-' + r} onClick={() => {
+                        props.selectUserRole(r);
+                        fetchAll();
+                    }}>
                         Switch to {r} role
                     </MenuItem>
             )}
-
+            <MenuItem disabled>
+                <FormGroup>
+                    <InputGroup>
+                        <FormControl
+                            placeholder="Type instructor's name"
+                            type="input"
+                            inputRef={input => utorid_input = input}
+                            onKeyPress={event => {
+                                if (event.key === "Enter") {
+                                    if (utorid_input) {
+                                        is_valid_instructor(utorid_input.value, props).then(responseJson => {
+                                            var valid = responseJson != null;
+                                            if (valid) {
+                                                props.setCurrentUserName(utorid_input.value);
+                                                props.selectUserRole("instructor");
+                                                fetchAll();
+                                                ReactDOM.findDOMNode(utorid_input).reset();
+                                            } else {
+                                                console.error("Instructor with utorid: " + utorid_input.value +" does not exist");
+                                            }
+                                        });
+                                    }
+                                }
+                            }}
+                        />
+                    </InputGroup>
+                </FormGroup>
+            </MenuItem>
             <MenuItem
                 onClick={() => {
                     var form = document.createElement('form');

@@ -162,7 +162,7 @@ class AppState {
     // note that we do not allow multiple sorts on the same field (incl. in different directions)
     addCoursePanelSort(course, field) {
         if (
-            !this.get('abcView.panelFields.' + course + '.selectedFilters').some(
+            !this.get('abcView.panelFields.' + course + '.selectedSortFields').some(
                 ([f, _]) => f == field
             )
         ) {
@@ -190,6 +190,10 @@ class AppState {
             'assignmentForm.tempAssignments',
             fromJS({ positionId: positionId, hours: hours })
         );
+    }
+
+    clearTempAssignments(course) {
+        this.set('assignmentForm.tempAssignments.', fromJS([]));
     }
 
     // add an alert to the list of active alerts
@@ -419,6 +423,7 @@ class AppState {
     }
 
     selectUserRole(role) {
+        console.log("set to role:" + role);
         this.set('nav.selectedRole', role);
     }
 
@@ -543,11 +548,14 @@ class AppState {
         if (i == -1) {
             if (selected.size < 4) {
                 this.add('abcView.selectedCourses', course);
+                //this.alert('added course' + course);
             } else {
                 this.alert('<b>Courses Menu</b>&ensp;Cannot select more than 4 courses.');
+                //this.alert('here?');
             }
         } else {
             this.remove('abcView.selectedCourses', i);
+            //this.alert('here2??');
         }
     }
 
@@ -946,6 +954,7 @@ class AppState {
         return sortedApplications.map((_, applicant) => applicants.get(applicant)).entrySeq();
     }
 
+    //returns a list of applications this applicant applied to
     getApplicationById(applicant) {
         // applications should already be filtered by round, so the applicant should only have
         // one application
@@ -1001,14 +1010,18 @@ class AppState {
     getInstructorPref(applicant, course) {
         let prefs = this.getApplicationById(applicant).get('prefs');
         let pref = prefs.find(pref => pref.get('positionId') == course);
-
+        if (!pref) {
+            return [];
+        }
         return pref.get('instructorPref');
     }
 
     updateInstructorPref(applicant, course, event) {
         let prefs = this.getApplicationById(applicant).get('prefs');
         let pref = prefs.find(pref => pref.get('positionId') == course);
-
+        if (!pref) {
+            return;
+        }
         fetch.updateInstructorPref(pref.get('applicationId'), course, event);
     }
 
