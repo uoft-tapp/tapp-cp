@@ -16,6 +16,8 @@ const initialState = {
         // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
         notifications: [],
     },
+    
+    isDevelopment: null,
 
     // list of UI alerts (string can contain HTML, but be careful because it is not sanitized!)
     alerts: [],
@@ -313,6 +315,10 @@ class AppState {
 
     getSelectedUserRole() {
         return this.get('nav.selectedRole');
+    }
+    
+    getIsDevelopment() {
+        return this.get('isDevelopment');
     }
 
     // return the name of the appState component that corresponds to the currently selected view
@@ -1271,6 +1277,10 @@ class AppState {
 
     setApplicantsList(list) {
         this.set('applicants.list', list);
+    }
+    
+    setIsDevelopment(bool) {
+        this.set('isDevelopment', bool);
     }
 
     setApplicationsList(list) {
