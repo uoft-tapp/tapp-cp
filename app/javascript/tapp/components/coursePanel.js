@@ -1,10 +1,12 @@
 import React from 'react';
 import { ApplicantTableMenu } from './applicantTableMenu.js';
 import { ApplicantTable } from './applicantTable.js';
+import { DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
 
 class CoursePanel extends React.Component {
     constructor(props) {
         super(props);
+        let isInstructor = props.getSelectedUserRole()=='instructor';
 
         // table/menu configuration
         this.config = [
@@ -56,7 +58,7 @@ class CoursePanel extends React.Component {
                     }
                 },
 
-                style: { width: 0.02, textAlign: 'center' },
+                style: { width: !isInstructor?0.02:0.001, textAlign: 'center' },
             },
             {
                 header: 'Last Name',
@@ -129,6 +131,18 @@ class CoursePanel extends React.Component {
                 sortData: p => props.getApplicationPreference(p.applicantId, p.course),
 
                 style: { width: 0.04 },
+            },
+            {
+                header: 'Instructor Pref.',
+                data: p => {
+                        return (
+                          isInstructor?
+                          <InstructorPreferenceMenu {...this.props} course={p.course} applicantId={p.applicantId}/>:
+                          <Glyphicon glyph={glyphicons[props.getInstructorPref(p.applicantId, p.course)]} />
+                        );
+                    },
+
+                style: { width: 0.08 },
             },
             {
                 header: 'Other',
@@ -243,6 +257,54 @@ const DraggableHeader = props => {
         </div>
     );
 };
+
+const instructorPrefMenuItems = ['\xa0', 'Unsuitable', 'Preferred', 'Strongly Preferred'];
+
+const glyphicons = ['', 'thumbs-down', 'thumbs-up', 'heart-empty'];
+
+class InstructorPreferenceMenu extends React.Component {
+  constructor(props) {
+    super(props);
+
+    let defaultValue = props.getInstructorPref(props.applicantId, props.course);
+    if (defaultValue === null) defaultValue = 0;
+    this.state = {btnTitle: instructorPrefMenuItems[defaultValue], val: defaultValue};
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.props.updateInstructorPref(this.props.applicantId, this.props.course, event);
+
+    var val = instructorPrefMenuItems[event];
+    this.setState({
+      btnTitle: val,
+      val: event
+    });
+
+//    this.props.selectApplicant(this.props.applicantId);
+  }
+
+  render() {
+    return (
+        <DropdownButton style={{ width: '6vw' }}
+            bsStyle={"default"}
+            title={
+                <div style={{ display: 'inline-block' }}> 
+                  <Glyphicon glyph={glyphicons[this.state.val]} />
+                </div>
+              }
+            key={this.props.applicantId}
+            id={'dropdown-basic-${this.props.applicantId}'}
+            noCaret
+            onSelect={e => this.handleChange(e)}>
+            {instructorPrefMenuItems.map((item, index) =>
+                <MenuItem eventKey={index} key={index}><Glyphicon glyph={glyphicons[index]} /></MenuItem>
+            )}
+        </DropdownButton>
+    );
+  }
+}
 
 const AssignedApplicantTable = props =>
     <ApplicantTable
