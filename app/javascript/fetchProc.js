@@ -203,9 +203,6 @@ function getCourse(course, tapp){
     session: course.session_id,
     instructors: course.instructors,
   };
-  console.log("1");
-  console.log("data");
-  console.log("extra");
   return mergeJson(data, extra);
 }
 
