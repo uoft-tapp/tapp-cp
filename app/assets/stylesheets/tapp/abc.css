@@ -35,3 +35,26 @@
 #abc-grid .unassigned-table.table-container {
     margin-top: 1vh;
 }
+
+/* for "no selected courses" message in ABC view */
+#no-courses-well {
+    text-align: center;
+    color: #555;
+}
+
+/* for CourseMenu contents in ABC view */
+#abc-grid .course-list-group .list-group-item span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#abc-grid .course-list-group .list-group-item .course-code {
+    float: left;
+    max-width: 10em;
+}
+
+#abc-grid .course-list-group .list-group-item .counts {
+    float: right;
+    max-width: calc(100% - 10em);
+}
