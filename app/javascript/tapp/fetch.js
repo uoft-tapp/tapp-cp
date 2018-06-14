@@ -13,7 +13,16 @@ const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
 const getResource = (route, onSuccess, dataName, setData, mince=true) =>
   fetchProc.getResource(route, onSuccess, dataName, setData, mince, appState);
+export const is_valid_instructor = (utorid, appState) => {
 
+    return fetch('/instructors/utorid/' + utorid).then(response => {
+                                                            return response.json();
+                                                }).catch(function(error) {
+                                                    appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
+                                                    return Promise.reject(error);
+                                                });
+                                                        
+}
 /* Resource GETters */
 const getSessions = () => getResource('/sessions',
   fetchProc.onFetchSessionsSuccess, 'sessions', appState.setSessionsList, false);
@@ -21,17 +30,21 @@ const getSessions = () => getResource('/sessions',
 const getInstructors = () => getResource('/instructors',
   fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList, false);
 
-const getApplicants = () => getResource('/applicants',
-  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
+const getApplicants = (utorid = null) => !utorid?getResource('/applicants',
+  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList):
+  getResource('/instructors/'+utorid+'/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
-const getApplications = () => getResource('/applications',
-  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
+const getApplications = (utorid = null) => !utorid?getResource('/applications',
+  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList):
+  getResource('/instructors/'+utorid+'/applications', fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
 
-const getCourses = () => getResource('/positions',
-  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList);
+const getCourses = (utorid = null) => !utorid?getResource('/positions',
+  fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList):
+  getResource('/instructors/'+utorid+'/positions', fetchProc.onFetchTappCoursesSuccess, 'courses',  appState.setCoursesList);
 
-const getAssignments = () => getResource('/assignments',
-  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
+const getAssignments = (utorid = null) => !utorid?getResource('/assignments',
+  fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList):
+  getResource('/instructors/'+utorid+'/assignments', fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
@@ -45,12 +58,14 @@ export const fetchAll = () => {
   switch(role){
     case 'tapp_admin':
       fetchTappAdminAll();
+      console.log("admin");
       break;
     case 'tapp_assistant':
       fetchTappAssistantAll();
       break;
     case 'instructor':
-      fetchInstructorAll();
+      console.log("instr");
+      fetchInstructorAll(true);
       break;
   }
 }
@@ -69,7 +84,7 @@ const fetchTappAssistantAll = () => {
     });
 }
 
-const fetchInstructorAll = () => {
+const fetchInstructorAll = (instructor = false) => {
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
@@ -78,10 +93,19 @@ const fetchInstructorAll = () => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      getApplicants();
-      getApplications();
-      getAssignments();
-      getCourses();
+      if(instructor){
+        let utorid = appState.getCurrentUserName();
+        getApplicants(utorid);
+        getApplications(utorid);
+        getAssignments(utorid);
+        getCourses(utorid);
+      }
+      else{
+        getApplicants();
+        getApplications();
+        getAssignments();
+        getCourses();
+      }
     });
 }
 /* Task-specific resource modifiers */
@@ -107,6 +131,13 @@ export const deleteAssignment = (applicant, assignment) => {
 export const noteApplicant = (applicant, notes) => {
     putData('/applicants/' + applicant, { commentary: notes }, () => {
       getApplicants();
+    });
+}
+
+// add/update the instructor prefs for an application
+export const updateInstructorPref = (application, position, pref) => {
+    putData('/applications/' + application, { position: position, pref: pref }, () => {
+      getApplications();
     });
 }
 

@@ -3,6 +3,10 @@ import { Modal } from 'react-bootstrap';
 import { Applicant } from './applicant.js';
 
 class ApplicantModal extends React.Component {
+    componentWillUnmount() {
+        this.props.clearTempAssignments();
+    }
+
     render() {
         let applicant = this.props.getApplicantById(this.props.applicantId);
 
