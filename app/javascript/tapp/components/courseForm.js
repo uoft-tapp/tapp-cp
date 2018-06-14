@@ -216,13 +216,11 @@ class ExpandableDescriptions extends React.Component {
         if (this.props.expanded) {
             return (
                 <div>
+                    <button className="expand-button" onClick={() => this.props.handleClick()}>
+                        <span className="glyphicon glyphicon-chevron-up">
+                        </span>
+                    </button>
                     <Descriptions {...this.props} key={this.props.courseId}/>
-                    <div>
-                        <button className="expand-button" onClick={() => this.props.handleClick()}>
-                            <span className="glyphicon glyphicon-chevron-up">
-                            </span>
-                        </button>
-                    </div>
                 </div>
             );
         } else {
@@ -241,50 +239,48 @@ class ExpandableDescriptions extends React.Component {
 class Descriptions extends React.Component {
     render() {
         return (
-            <div>
-                <table className="form_table">
-                    <tbody>
-                    <tr>
-                        <td className="col-half">
-                            <p>
-                                <b>Qualifications: </b>
-                            </p>
-                            <textarea
-                                className="long-text"
-                                onBlur={event => {
-                                    if (event.target.value != this.props.course.qual) {
-                                        this.props.updateCourse(
-                                            this.props.courseId,
-                                            event.target.value,
-                                            'qual'
-                                        );
-                                    }
-                                }}
-                                defaultValue={this.props.course.qual}
-                            />
-                        </td>
-                        <td className="col-half">
-                            <p>
-                                <b>Responsibilities: </b>
-                            </p>
-                            <textarea
-                                className="long-text"
-                                onBlur={event => {
-                                    if (event.target.value != this.props.course.resp) {
-                                        this.props.updateCourse(
-                                            this.props.courseId,
-                                            event.target.value,
-                                            'resp'
-                                        );
-                                    }
-                                }}
-                                defaultValue={this.props.course.resp}
-                            />
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table className="form_table">
+                <tbody>
+                <tr>
+                    <td className="col-half">
+                        <p>
+                            <b>Qualifications: </b>
+                        </p>
+                        <textarea
+                            className="long-text"
+                            onBlur={event => {
+                                if (event.target.value != this.props.course.qual) {
+                                    this.props.updateCourse(
+                                        this.props.courseId,
+                                        event.target.value,
+                                        'qual'
+                                    );
+                                }
+                            }}
+                            defaultValue={this.props.course.qual}
+                        />
+                    </td>
+                    <td className="col-half">
+                        <p>
+                            <b>Responsibilities: </b>
+                        </p>
+                        <textarea
+                            className="long-text"
+                            onBlur={event => {
+                                if (event.target.value != this.props.course.resp) {
+                                    this.props.updateCourse(
+                                        this.props.courseId,
+                                        event.target.value,
+                                        'resp'
+                                    );
+                                }
+                            }}
+                            defaultValue={this.props.course.resp}
+                        />
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         );
     }
 }
