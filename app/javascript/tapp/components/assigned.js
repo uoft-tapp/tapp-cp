@@ -118,7 +118,7 @@ class Assigned extends React.Component {
                 ),
             },
         ];
-        let className = ".navbar-margin-top"
+
         return (
             <Grid fluid id="assigned-grid">
                 <ApplicantTableMenu

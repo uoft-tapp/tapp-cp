@@ -16,10 +16,8 @@ class Summary extends React.Component {
         return (
             <Grid fluid id="summary-grid" style={cursorStyle}>
                 <PanelGroup>
-                    <div className="panel-group">
-                        <Utilities {...this.props} />
-                        <Stats {...this.props} />
-                    </div>
+                    <Utilities {...this.props} />
+                    <Stats {...this.props} />
                 </PanelGroup>
             </Grid>
         );
