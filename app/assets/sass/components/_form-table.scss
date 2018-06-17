@@ -1,11 +1,11 @@
 .form_table {
-    width: 100%;
+  width: 100%;
 }
 .form_table td {
-    vertical-align: top;
+  vertical-align: top;
 }
 .form_table .course {
-    font-weight: bold;
+  font-weight: bold;
 }
 /* margin between text boxes in the first five columns */
 .form_table .col-1 p + p,
@@ -13,65 +13,65 @@
 .form_table .col-4 p + p,
 .form_table .col-3 form + form,
 .form_table .col-5 form + form {
-    margin-top: 5px;
+  margin-top: 5px;
 }
 
 /* left padding for all but the left column */
 .form_table td + td {
-    padding-left: var(--sep-width);
+  padding-left: var(--sep-width);
 }
 
 .form_table p {
-    margin: 0;
+  margin: 0;
 }
 
 .form_table input {
-    width: 100%;
-    height: var(--text-input-height);
+  width: 100%;
+  height: var(--text-input-height);
 }
 
 /* immutable course information */
 .form_table .col-1 {
-    width: var(--col-1-width);
+  width: var(--col-1-width);
 }
 
 /* numerical field labels */
 .form_table .col-2,
 .form_table .col-4 {
-    width: var(--col-2-4-width);
+  width: var(--col-2-4-width);
 }
 .form_table .col-2 p,
 .form_table .col-4 p {
-    height: var(--text-input-height);
-    line-height: var(--text-input-height);
+  height: var(--text-input-height);
+  line-height: var(--text-input-height);
 }
 .form_table .col-2 p b,
 .form_table .col-4 p b {
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1em;
 }
 
 /* numerical fields */
 .form_table .col-3,
 .form_table .col-5 {
-    width: var(--col-3-5-width);
+  width: var(--col-3-5-width);
 }
 
 /* date fields */
 .form_table .col-6,
 .form_table .col-6 input {
-    width: var(--col-6-width);
+  width: var(--col-6-width);
 }
 
 .form_table .col-7 {
-    width: var(--col-7-width);
+  width: var(--col-7-width);
 }
 
 /* last 3 columns */
 .form_table textarea {
-    width: 100%;
-    height: 80px;
-    float: left;
-    resize: none;
+  width: 100%;
+  height: 80px;
+  float: left;
+  resize: none;
 }
