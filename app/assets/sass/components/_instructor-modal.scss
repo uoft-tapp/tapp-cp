@@ -8,10 +8,12 @@
   color: #aaa;
   margin-right: 10px;
   float: right;
-}
-#instructor-modal-utorid-row i:hover {
-  color: #666;
-}
-#instructor-modal-utorid-row i:active {
-  color: #333;
+
+  &:hover {
+    color: #666;
+  }
+
+  &:active {
+    color: #333;
+  }
 }

@@ -8,7 +8,7 @@ class CourseForm extends React.Component {
         return (
             <ListGroupItem key={this.props.courseId}>
                 <a name={this.props.courseId} />
-                <table className="form_table">
+                <table className="form-table">
                     <tbody>
                         <tr>
                             <td className="col-1">

@@ -3,14 +3,16 @@
  * that form pages (see sass/pages for page styling).
  */
 
-@import 'alert';
+@import 'app-drop-down';
 @import 'applicant-modal';
+@import 'applicant-table';
+@import 'applicant-table-menu';
 @import 'course-list-group';
 @import 'course-list-panel';
-@import 'form-table';
 @import 'help';
 @import 'instructor-form';
 @import 'instructor-modal';
 @import 'load';
 @import 'misc';
+@import 'table-container';
 

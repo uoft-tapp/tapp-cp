@@ -1,22 +1,17 @@
-// TODO: probably change to component
+// TODO: refactor to component and split this file into two
 /* for ApplicantTable in Assigned/Unassigned view */
-#unassigned-grid .table-container,
-#assigned-grid .table-container {
-  margin-top: 1vh;
-}
 
-#unassigned-grid .table-body,
-#assigned-grid .table-body {
-  /* note that this assumes that the header is at most one row high */
-  max-height: calc(
-          var(--main-div-height) - var(--applicant-table-menu-height) - var(--min-row-height)
-  );
-  overflow: auto;
-}
+#unassigned-grid, #assigned-grid {
+  .table-container {
+    margin-top: 1vh;
+  }
 
-/* for ApplicantTables*/
-.unassigned-table table,
-.assigned-table table {
-  margin: 0;
+  .table-body {
+    /* note that this assumes that the header is at most one row high */
+    max-height: calc(
+            var(--main-div-height) - var(--applicant-table-menu-height) - var(--min-row-height)
+    );
+    overflow: auto;
+  }
 }
 //

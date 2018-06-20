@@ -1,8 +1,13 @@
-// TODO: change to not use ID
 #alert-container {
   position: relative;
   z-index: 5000;
   margin-top: var(--navbar-height);
+
+  .alert {
+    margin-bottom: 2px;
+    animation-name: fadeout;
+    animation-duration: 10s;
+  }
 }
 
 @keyframes fadeout {
@@ -13,10 +18,3 @@
     opacity: 0.5;
   }
 }
-
-#alert-container .alert {
-  margin-bottom: 2px;
-  animation-name: fadeout;
-  animation-duration: 10s;
-}
-//

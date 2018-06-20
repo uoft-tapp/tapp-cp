@@ -2,41 +2,35 @@
 .course-list-group {
   height: calc(100% - 30px);
   overflow: auto;
-}
 
-.course-list-group .list-group-item {
-  height: 2em;
-  padding: 3px;
-}
+  .list-group-item {
+    height: 2em;
+    padding: 3px;
 
-.course-list-group .list-group-item:hover {
-  background: #EEE;
-}
+    &:hover {
+      background: #EEE;
+    }
 
-.course-list-group .list-group-item a {
-  color: #333;
-}
+    a {
+      color: #333;
+    }
 
-.course-list-group .list-group-item .course {
-  width: calc(100% - 15px);
-  float: left;
-}
-.course-list-group .list-group-item .course:hover {
-  text-decoration: none;
-}
-.course-list-group .list-group-item .spinning-icon {
-  display:none;
-}
-.course-list-group .list-group-item .email-icon,
-.course-list-group .list-group-item .spinning-icon {
-  float: right;
-  width: 15px;
-}
+    .course {
+      width: calc(100% - 15px);
+      float: left;
 
-/* for CourseList contents in Courses view */
-#courses-grid .course-list-group .list-group-item {
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .spinning-icon {
+      display:none;
+    }
+
+    .email-icon, .spinning-icon {
+      float: right;
+      width: 15px;
+    }
+  }
 }

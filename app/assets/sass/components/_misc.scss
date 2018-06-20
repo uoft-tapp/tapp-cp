@@ -1,24 +1,24 @@
 // TODO: incorporate into components
 .clickable {
-    cursor: pointer;
-}
+  cursor: pointer;
 
-.clickable:hover{
+  &:hover{
     opacity: .75;
-}
+  }
 
-.clickable:active {
+  &:active {
     opacity: .9;
+  }
 }
 
 .highlightOnHover:hover {
-    font-weight: bold;
-    cursor: pointer;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .info-button {
-    padding: 0;
-    border: none;
-    background: none;
-    outline: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  outline: 0;
 }
