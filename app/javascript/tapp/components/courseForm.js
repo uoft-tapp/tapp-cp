@@ -9,11 +9,12 @@ class CourseForm extends React.Component {
         };
     }
 
-    toggleExpanded() {
+    toggleExpanded = (e) => {
+        e.preventDefault();
         this.setState({
             expanded: !this.state.expanded,
         });
-    }
+    };
 
     render() {
         let instructors = this.props.getInstructorsList();
@@ -202,7 +203,7 @@ class CourseForm extends React.Component {
                     </tbody>
                 </table>
                 <ExpandableDescriptions expanded={this.state.expanded}
-                                        handleClick={() => this.toggleExpanded()}
+                                        handleClick={this.toggleExpanded}
                                         {...this.props}
                 />
             </ListGroupItem>
@@ -216,7 +217,7 @@ class ExpandableDescriptions extends React.Component {
         if (this.props.expanded) {
             return (
                 <div>
-                    <button className="expand-button" onClick={() => this.props.handleClick()}>
+                    <button className="expand-button" onClick={this.props.handleClick}>
                         <span className="glyphicon glyphicon-chevron-up">
                         </span>
                     </button>
@@ -226,7 +227,7 @@ class ExpandableDescriptions extends React.Component {
         } else {
             return (
                 <div>
-                    <button className="expand-button" onClick={() => this.props.handleClick()}>
+                    <button className="expand-button" onClick={this.props.handleClick}>
                         <span className="glyphicon glyphicon-chevron-down">
                         </span>
                     </button>
