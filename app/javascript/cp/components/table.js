@@ -97,7 +97,7 @@ class TableInst extends React.Component {
 
     render() {
         return (
-            <div className="table">
+            <div className="table-container">
                 <Table striped bordered condensed hover>
                     <THeader config={this.props.config} />
                 </Table>

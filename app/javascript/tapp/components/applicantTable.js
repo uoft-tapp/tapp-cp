@@ -110,7 +110,7 @@ class ApplicantTable extends React.Component {
         return (
             <div
                 className={
-                    'table ' +
+                    'table-container ' +
                     (this.props.assigned ? 'assigned' : 'unassigned')
                 }>
                 <Table striped bordered condensed hover>

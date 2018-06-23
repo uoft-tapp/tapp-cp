@@ -97,7 +97,7 @@ footer div p {
 }
 
 /* for Table in admin view */
-#offers-grid .sessions ~ .table .table-body {
+#offers-grid .sessions ~ .table-container .table-body {
     /* note that this assumes that the header is at most two rows high */
     max-height: calc(
         var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) -
@@ -113,12 +113,12 @@ footer div p {
     overflow: auto;
 }
 
-#offers-grid .table th {
+#offers-grid .table-container th {
     text-overflow: ellipsis;
 }
 
-#offers-grid .table td,
-#offers-grid .table th {
+#offers-grid .table-container td,
+#offers-grid .table-container th {
     word-break: break-all;
 }
 
@@ -498,12 +498,12 @@ footer div p {
     overflow: auto;
 }
 
-#ddahs-grid .table th {
+#ddahs-grid .table-container th {
     text-overflow: ellipsis;
 }
 
-#ddahs-grid .table td,
-#ddahs-grid .table th {
+#ddahs-grid .table-container td,
+#ddahs-grid .table-container th {
     word-break: break-all;
 }
 
