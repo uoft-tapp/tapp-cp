@@ -1,5 +1,7 @@
 .table-container {
-  margin: 0;
+  table {
+    margin: 0;
+  }
 
   &.assigned {
     .table-body {
@@ -10,7 +12,7 @@
   }
 
   &.unassigned {
-    margin-top: 3vh;
+    margin-top: 1vh;
   }
 
   td, th {
