@@ -97,7 +97,7 @@ footer div p {
 }
 
 /* for Table in admin view */
-#offers-grid .sessions ~ .table-container .table-body {
+#offers-grid .sessions ~ .table .table-body {
     /* note that this assumes that the header is at most two rows high */
     max-height: calc(
         var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) -
@@ -113,12 +113,12 @@ footer div p {
     overflow: auto;
 }
 
-#offers-grid .table-container th {
+#offers-grid .table th {
     text-overflow: ellipsis;
 }
 
-#offers-grid .table-container td,
-#offers-grid .table-container th {
+#offers-grid .table td,
+#offers-grid .table th {
     word-break: break-all;
 }
 
@@ -498,12 +498,12 @@ footer div p {
     overflow: auto;
 }
 
-#ddahs-grid .table-container th {
+#ddahs-grid .table th {
     text-overflow: ellipsis;
 }
 
-#ddahs-grid .table-container td,
-#ddahs-grid .table-container th {
+#ddahs-grid .table td,
+#ddahs-grid .table th {
     word-break: break-all;
 }
 
@@ -518,7 +518,7 @@ footer div p {
     margin: 0 5px;
 }
 
-#app-drop-down, #app-drop-down li a{
+#drop-down, #drop-down li a{
   list-style: none;
   text-decoration: none;
   color: #555;

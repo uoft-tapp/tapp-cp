@@ -124,7 +124,7 @@ const Auth = props => {
 
 const NavbarInst = props =>
     <Navbar fixedTop fluid>
-        <Navbar.Header id ="app-drop-down">
+        <Navbar.Header id ="drop-down">
           <Navbar.Brand>
             <NavDropdown id='1' title={<span>CP:TAPP</span>} noCaret >
               <MenuItem href="/tapp">

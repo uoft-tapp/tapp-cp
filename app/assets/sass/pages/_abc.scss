@@ -24,19 +24,6 @@
     }
   }
 
-  /* for body of ApplicantTable of assigned applicants in ABC view */
-  .assigned-table.table-body {
-    /* maximum height of 10 rows (assuming rows are all single-height */
-    max-height: calc(var(--min-row-height) * 10);
-    overflow: auto;
-    margin-bottom: 1vh;
-  }
-
-  /* for container of ApplicantTable of unassigned applicants in ABC view */
-  .unassigned-table.table-container {
-    margin-top: 1vh;
-  }
-
   /* for CourseMenu contents in ABC view */
   .course-list-group {
     .list-group-item {

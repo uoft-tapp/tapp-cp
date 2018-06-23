@@ -7,7 +7,7 @@ class ApplicantModal extends React.Component {
         let applicant = this.props.getApplicantById(this.props.applicantId);
 
         return (
-            <Modal id="applicant-modal" show={true} onHide={() => this.props.unselectApplicant()}>
+            <Modal className="modal applicant" show={true} onHide={() => this.props.unselectApplicant()}>
                 <Modal.Header>
                     <Modal.Title>
                         {applicant.lastName},&nbsp;{applicant.firstName}

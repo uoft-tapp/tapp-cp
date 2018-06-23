@@ -3,9 +3,7 @@
  * that form pages (see sass/pages for page styling).
  */
 
-@import 'app-drop-down';
-@import 'applicant-modal';
-@import 'applicant-table';
+@import 'drop-down';
 @import 'applicant-table-menu';
 @import 'course-list-group';
 @import 'course-list-panel';
@@ -14,5 +12,5 @@
 @import 'instructor-modal';
 @import 'load';
 @import 'misc';
-@import 'table-container';
-
+@import 'modal';
+@import 'table';

@@ -110,18 +110,15 @@ class ApplicantTable extends React.Component {
         return (
             <div
                 className={
-                    'table-container ' +
-                    (this.props.assigned ? 'assigned-table' : 'unassigned-table')
+                    'table ' +
+                    (this.props.assigned ? 'assigned' : 'unassigned')
                 }>
                 <Table striped bordered condensed hover>
                     <THeader config={this.props.config} width={this.props.width} />
                 </Table>
 
                 <div
-                    className={
-                        'table-body ' +
-                        (this.props.assigned ? 'assigned-table' : 'unassigned-table')
-                    }>
+                    className='table-body'>
                     <Table striped bordered condensed hover>
                         <tbody>
                             {this.applicants.map(([key, val]) =>
