@@ -1,5 +1,5 @@
-// TODO: make modals reusable
-.modal {
+// Preceding underscore to differentiate with Bootstrap modal class
+._modal {
   &.applicant {
     .modal-dialog {
       width: 98vw;

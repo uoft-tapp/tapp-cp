@@ -1,9 +1,9 @@
 /* for course panel container in ABC view */
 #abc-grid {
   #course-panel-layout {
-    width: calc(100% - var(--course-list-panel-width));
+    width: calc(100% - #{$course-list-panel-width});
     float: left;
-    height: var(--main-div-height);
+    height: $main-div-height;
   }
 
   /* for CoursePanels in ABC view */

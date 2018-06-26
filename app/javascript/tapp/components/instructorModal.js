@@ -11,13 +11,13 @@ class InstructorModal extends React.Component {
               selectedTab = this.props.getSelectedTabFromModal();
 
           return (
-              <Modal className="modal instructor" show={true} onHide={() => this.props.hideInstructorModal()}>
+              <Modal className="_modal instructor" show={true} onHide={() => this.props.hideInstructorModal()}>
                 <Form horizontal>
                   <Modal.Header>
                       <Modal.Title>
                           Instructor Editor
                           <span className="text-muted" style={{ float: 'right' }}>
-                              <i className="fa fa-times clickable"
+                              <i className="fa fa-times button"
                                   style={{ fontSize: '18px' }}
                                   onClick={() => this.props.hideInstructorModal()}
                               />

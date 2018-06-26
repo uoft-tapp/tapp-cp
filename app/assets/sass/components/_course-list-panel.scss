@@ -3,7 +3,7 @@
   width: 15em;
   float: left;
   margin: 0px 8px 0px 0px;
-  height: var(--main-div-height);
+  height: $main-div-height;
 
   .panel-heading {
     padding: 5px 15px !important;

@@ -8,9 +8,9 @@
 
 /* for CourseForm in Courses view */
 #courses-grid #course-form {
-  width: calc(100% - var(--course-list-panel-width));
+  width: calc(100% - #{$course-list-panel-width});
   float: left;
-  height: var(--main-div-height);
+  height: $main-div-height;
   overflow: auto;
 }
 
@@ -18,18 +18,16 @@
 .course-panel .fa-envelope-o{
   float: left;
 }
-#courses-grid {
-  --text-input-height: 30px;
-  --sep-width: 10px; /* width of margin between columns */
-  --col-1-width: 220px; /* immutable course information */
-  --col-2-4-width: 80px; /* numerical field labels */
-  --col-3-5-width: 60px; /* numerical fields */
-  --col-6-width: 140px; /* date fields */
-  --col-7-width: 240px; /* instructor form */
-}
 
-/* for CourseForm */
 .form-table {
+  $text-input-height: 30px;
+  $sep-width:         10px; /* width of margin between columns */
+  $col-1-width:       220px; /* immutable course information */
+  $col-2-4-width:     80px; /* numerical field labels */
+  $col-3-5-width:     60px; /* numerical fields */
+  $col-6-width:       140px; /* date fields */
+  $col-7-width:       240px; /* instructor form */
+
   width: 100%;
 
   td {
@@ -51,7 +49,7 @@
 
   /* left padding for all but the left column */
   td + td {
-    padding-left: var(--sep-width);
+    padding-left: $sep-width;
   }
 
   p {
@@ -60,24 +58,24 @@
 
   input {
     width: 100%;
-    height: var(--text-input-height);
+    height: $text-input-height;
   }
 
   /* immutable course information */
   .col-1 {
-    width: var(--col-1-width);
+    width: $col-1-width;
   }
 
   /* numerical field labels */
   .col-2,
   .col-4 {
-    width: var(--col-2-4-width);
+    width: $col-2-4-width;
   }
 
   .col-2 p,
   .col-4 p {
-    height: var(--text-input-height);
-    line-height: var(--text-input-height);
+    height: $text-input-height;
+    line-height: $text-input-height;
   }
 
   .col-2 p b,
@@ -90,17 +88,17 @@
   /* numerical fields */
   .col-3,
   .col-5 {
-    width: var(--col-3-5-width);
+    width: $col-3-5-width;
   }
 
   /* date fields */
   .col-6,
   .col-6 input {
-    width: var(--col-6-width);
+    width: $col-6-width;
   }
 
   .col-7 {
-    width: var(--col-7-width);
+    width: $col-7-width;
   }
 
   /* last 3 columns */
@@ -109,5 +107,42 @@
     height: 80px;
     float: left;
     resize: none;
+  }
+}
+
+.instructor-form {
+  border: #ccc 1px solid;
+  height: 80px;
+  overflow-y: auto;
+
+  td {
+    border: red 1px solid;
+    float: left;
+    padding: 0;
+    border-collapse: collapse;
+    white-space: nowrap;
+    width: auto !important;
+  }
+
+  input[type="text"] {
+    border: none;
+    float: left;
+    padding: 0 2px;
+    vertical-align: text-bottom;
+  }
+
+  input[type="text"]:focus {
+    outline: 0;
+  }
+
+  div {
+    width: 100% !important;
+    min-height: calc(100% - 2px);
+    float: left;
+  }
+
+  button {
+    background: none;
+    border: none;
   }
 }

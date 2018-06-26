@@ -5,7 +5,7 @@
 
   &.assigned {
     .table-body {
-      max-height: calc(var(--min-row-height) * 10);
+      max-height: calc(#{$min-row-height} * 10);
       overflow: auto;
       margin-bottom: 1vh;
     }

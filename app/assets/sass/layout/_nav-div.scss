@@ -2,8 +2,8 @@
  * navbar and the footer */
 #root nav + div {
   top: 0;
-  margin-top: var(--navbar-height);
+  margin-top: $navbar-height;
   position: absolute;
-  height: var(--main-div-height);
+  height: $main-div-height;
   width: 100%;
 }

@@ -1,12 +1,12 @@
-:root {
-  --footer-height: 4vh; /* includes margins */
-  --navbar-height: 71px; /* includes margins */
-  --applicant-table-menu-height: calc(34px + 1vh);
-  --main-div-height: calc(100vh - var(--navbar-height) - var(--footer-height));
-  --min-row-height: 32px;
-  --course-list-panel-width: calc(15em + 8px); /* includes margins */
-  --closed-panel-height: 47px; /* includes top margin */
-}
+// Global variables
+
+$footer-height:               4vh; /* includes margins */
+$navbar-height:               71px; /* includes margins */
+$applicant-table-menu-height: calc(34px + 1vh);
+$main-div-height:             calc(100vh - #{$navbar-height} - #{$footer-height});
+$min-row-height:              32px;
+$course-list-panel-width:     calc(15em + 8px); /* includes margins */
+$closed-panel-height:         47px; /* includes top margin */
 
 html {
   position: relative;
@@ -14,5 +14,5 @@ html {
 }
 
 body {
-  margin-bottom: var(--footer-height);
+  margin-bottom: $footer-height;
 }

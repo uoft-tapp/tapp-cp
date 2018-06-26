@@ -1,7 +1,7 @@
 #alert-container {
   position: relative;
   z-index: 5000;
-  margin-top: var(--navbar-height);
+  margin-top: $navbar-height;
 
   .alert {
     margin-bottom: 2px;
