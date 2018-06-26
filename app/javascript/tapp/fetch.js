@@ -11,7 +11,7 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName, setData, mince=true) =>
+const getResource = (route, onSuccess, dataName, setData, mince=true) => 
   fetchProc.getResource(route, onSuccess, dataName, setData, mince, appState);
 export const is_valid_instructor = (utorid, appState) => {
 
@@ -58,13 +58,11 @@ export const fetchAll = () => {
   switch(role){
     case 'tapp_admin':
       fetchTappAdminAll();
-      console.log("admin");
       break;
     case 'tapp_assistant':
       fetchTappAssistantAll();
       break;
     case 'instructor':
-      console.log("instr");
       fetchInstructorAll(true);
       break;
   }

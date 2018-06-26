@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
   get '/cp/(*z)', to: "app#cp"
   get '/roles', to: "app#roles"
+  get '/development', to: "app#is_development"
+  get '/development/set_utorid/:utorid', to: "app#set_utorid"
+  get '/development/get_admins', to: "app#get_admins"
 
   post '/logout', to: "app#logout"
   post '/reenter-session', to: "app#reenter_session"
