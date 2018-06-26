@@ -20,7 +20,7 @@ class AppController < ApplicationController
     if ENV['RAILS_ENV'] == 'production'
       render json: {development: false, ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
     else
-      render json: {development: true,  ta_coord: ENV["TA_COORD"], utorid: "development", roles: session[:roles]}
+      render json: {development: true,  ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
     end
   end
 
@@ -63,4 +63,26 @@ class AppController < ApplicationController
     session[:logged_in] = true
   end
 
+  def is_development
+    render json: {development: ENV['RAILS_ENV']}
+  end
+
+  def set_utorid
+    if ENV['RAILS_ENV'] == 'development'
+      session[:utorid] = params[:utorid]
+      puts "set to" + params[:utorid]
+      set_roles
+      render status: 200, json: {message: "successful"}
+    else 
+      render status: 403, json: {message: "not authorized"}
+    end
+  end
+
+  def get_admins
+    if ENV['RAILS_ENV'] == 'development'
+      render json: {admins: ENV['TAPP_ADMINS'].split(',')}
+    else
+      render status: 403, json: {message: "not authorized"}
+    end
+  end
 end

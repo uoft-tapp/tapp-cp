@@ -138,19 +138,15 @@ module Authorizer
 
   def listed_as(users)
     users = users.split(',')
-    if ENV['RAILS_ENV'] == 'production'
-      return users.include?(get_utorid)
-    end
+    return users.include?(get_utorid)
   end
 
   def is_instructor
-    if ENV['RAILS_ENV'] == 'production'
-      if get_utorid
-        instructor = Instructor.find_by(utorid: get_utorid)
-        return instructor
-      else
-        return nil
-      end
+    if get_utorid
+      instructor = Instructor.find_by(utorid: get_utorid)
+      return instructor
+    else
+      return nil
     end
   end
 
@@ -206,11 +202,7 @@ module Authorizer
       }
     ]
     roles.each do |role|
-      if ENV['RAILS_ENV'] == 'production'
-        if role[:access]
-          session[:roles].push(role[:role])
-        end
-      else
+      if role[:access]
         session[:roles].push(role[:role])
       end
     end
