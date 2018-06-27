@@ -1,255 +1,246 @@
 /* admin control panel view */
 
 #offers-grid #dropdown-menu {
-    margin-bottom: 1vh;
+  margin-bottom: 1vh;
 }
 
 #offers-grid .table-menu > .btn-group:first-child {
-    margin-left: 3vw;
+  margin-left: 3vw;
 }
 
 #offers-grid table {
-    margin: 0;
+  margin: 0;
 }
 
 /* for Table in admin view */
 #offers-grid .sessions ~ .table-container .table-body {
-    /* note that this assumes that the header is at most two rows high */
-    max-height: calc(
-        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) -
-            var(--sessions-height) - 25px
-    );
+  /* note that this assumes that the header is at most two rows high */
+  max-height: calc(
+          #{$main-div-height} - #{$table-menu-height} - #{$min-row-height} -
+          #{$sessions-height} - 25px
+  );
 }
 
 #offers-grid .table-body {
-    /* note that this assumes that the header is at most two rows high */
-    max-height: calc(
-        var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - 25px
-    );
-    overflow: auto;
+  /* note that this assumes that the header is at most two rows high */
+  max-height: calc(
+          #{$main-div-height} - #{$table-menu-height} - #{$min-row-height} - 25px
+  );
+  overflow: auto;
 }
 
 #offers-grid .table-container th {
-    text-overflow: ellipsis;
+  text-overflow: ellipsis;
 }
 
 #offers-grid .table-container td,
 #offers-grid .table-container th {
-    word-break: break-all;
+  word-break: break-all;
 }
 
 #offer-note-popover .popover-content {
-    text-align: right;
+  text-align: right;
 }
 
 #offer-note {
-    max-width: calc(276px - 15px * 2); /* don't allow the text area to be wider than the popover */
+  max-width: calc(276px - 15px * 2); /* don't allow the text area to be wider than the popover */
 }
 
 /* sessions menu used by hr_assistant */
 #offers-grid #dropdown-menu #sessions {
-    float: left;
-    display: inline-block;
-    margin: 0 5px;
+  float: left;
+  display: inline-block;
+  margin: 0 5px;
 }
 
 #offers-grid .sessions {
-    margin: 0 0 1.5vh 0;
+  margin: 0 0 1.5vh 0;
 }
 
 #offers-grid .sessions .panel-body {
-    height: calc(35px + 10px + 10px);
-    padding: 10px 15px;
+  height: calc(35px + 10px + 10px);
+  padding: 10px 15px;
 }
 
 #offers-grid .sessions #pay {
-    margin-left: 1vw;
+  margin-left: 1vw;
 }
 
 #offers-grid .sessions #pay input {
-    width: 100px;
+  width: 100px;
 }
 
 #offers-grid #table-total {
-    font-weight: bold;
-    margin-top: 5px;
+  font-weight: bold;
+  margin-top: 5px;
 }
 
 /* instructor view */
 #instr-grid {
-    --border: 1px solid black;
-    --light-bg: #f9f9f9;
-    --dark-bg: #e7e7e7;
-    --ddah-width: 900px;
-    --menu-height: 34px;
-}
+  $border: 1px solid black;
+  $light-bg: #f9f9f9;
+  $dark-bg: #e7e7e7;
+  $ddah-width: 900px;
+  $menu-height: 34px;
 
-#instr-grid #select-menu {
+  #select-menu {
     width: auto;
     float: left;
     margin-right: 1vw;
-}
+  }
 
-#instr-grid #select-menu .panel-heading {
+  #select-menu .panel-heading {
     padding: 10px 15px !important;
     height: 37px;
-}
+  }
 
-#instr-grid #select-menu .panel-body {
+  #select-menu .panel-body {
     padding: 0;
     overflow: auto;
-}
+  }
 
-#instr-grid #templates-menu {
+  #templates-menu {
     /* allow at most 6 templates to show */
     max-height: calc(6 * 30px);
-}
+  }
 
-#instr-grid #offers-menu {
-    max-height: calc(var(--main-div-height) - 2 * 37px - 7 * 30px - 5px);
-}
+  #offers-menu {
+    max-height: calc(#{$main-div-height} - 2 * 37px - 7 * 30px - 5px);
+  }
 
-#instr-grid .applicant-menu {
+  .applicant-menu {
     display: none; /* initially hide all applicant sub-menus */
-}
+  }
 
-#instr-grid #select-menu ul {
+  #select-menu ul {
     list-style: none;
     padding: 0;
     margin: 0;
-}
+  }
 
-#instr-grid #select-menu li {
+  #select-menu li {
     padding: 5px 15px;
     cursor: pointer;
-}
+  }
 
-#instr-grid #select-menu .panel-footer {
+  #select-menu .panel-footer {
     padding: 5px 15px;
     cursor: pointer;
     background-color: #337ab7;
     color: white;
-}
+  }
 
-#instr-grid #select-menu #templates-menu li.active,
-#instr-grid #select-menu .applicant-menu li.active {
+  #select-menu #templates-menu li.active,
+  #select-menu .applicant-menu li.active {
     background-color: #d9edf7;
-}
+  }
 
-#instr-grid #action-menu #submit,
-#instr-grid #action-menu #save {
+  #action-menu #submit,
+  #action-menu #save {
     float: right;
-}
+  }
 
-/* for "no selected course" message */
-#no-selection {
-    width: 50vw;
-    margin: auto;
-    text-align: center;
-    color: #555;
-}
-
-#instr-grid #ddah-menu-container {
-    width: calc(var(--ddah-width) + 60px);
+  #ddah-menu-container {
+    width: calc(#{$ddah-width} + 60px);
     float: left;
-}
+  }
 
-#instr-grid #ddah-container {
-    width: calc(var(--ddah-width) + 60px);
+  #ddah-container {
+    width: calc(#{$ddah-width} + 60px);
     padding: 20px 30px;
-    border: 2px solid var(--dark-bg);
+    border: 2px solid $dark-bg;
     margin-top: 1vh;
 
-    max-height: calc(var(--main-div-height) - var(--menu-height) - 1vh);
+    max-height: calc(#{$main-div-height} - #{$menu-height} - 1vh);
     overflow: auto;
-}
+  }
 
-#instr-grid #ddah-container.disabled {
+  #ddah-container.disabled {
     opacity: 0.8;
-}
+  }
 
-#instr-grid #ddah-container.disabled * {
+  #ddah-container.disabled * {
     pointer-events: none;
-}
+  }
 
-#instr-grid h3 {
+  h3 {
     text-align: center;
     margin: 0 0 1vh 0;
-}
+  }
 
-#instr-grid table + table {
+  table + table {
     margin-top: 2vh;
-}
+  }
 
-#instr-grid table {
-    width: var(--ddah-width);
+  table {
+    width: $ddah-width;
     margin: 0;
     max-width: none;
-}
+  }
 
-#instr-grid table th,
-#instr-grid table td {
+  table th,
+  table td {
     vertical-align: middle;
-}
+  }
 
-#instr-grid .title th {
-    background-color: var(--light-bg);
+  .title th {
+    background-color: $light-bg;
     font-size: large;
     text-align: center;
     padding: 5px;
-}
+  }
 
-/* ddah header */
+  /* ddah header */
 
-#instr-grid #ddah-header {
-    background-color: var(--dark-bg);
-    border: var(--border);
-}
+  #ddah-header {
+    background-color: $dark-bg;
+    border: $border;
+  }
 
-#instr-grid #ddah-header tr:first-child td {
+  #ddah-header tr:first-child td {
     padding-top: 10px;
-}
+  }
 
-#instr-grid #ddah-header tr td {
+  #ddah-header tr td {
     padding: 3px 10px;
-}
+  }
 
-#instr-grid #ddah-header tr:last-child td {
+  #ddah-header tr:last-child td {
     padding-bottom: 10px;
-}
+  }
 
-#instr-grid #ddah-header input[type="text"],
-#instr-grid #ddah-header select {
+  #ddah-header input[type="text"],
+  #ddah-header select {
     width: 175px;
-}
+  }
 
-#instr-grid #ddah-header input[type="number"] {
+  #ddah-header input[type="number"] {
     width: 4em;
-}
+  }
 
-#instr-grid #ddah-header label {
+  #ddah-header label {
     font-weight: normal;
     margin: 0;
-}
+  }
 
-/* ddah allocations table */
+  /* ddah allocations table */
 
-/* allocations table column widths */
-#instr-grid #allocations-table th:first-child,
-/* first column: # of units */
-#instr-grid #allocations-table th:nth-child(4),
-/* fourth column: time/task */
-#instr-grid #allocations-table th:nth-child(5) {
+  /* allocations table column widths */
+  #allocations-table th:first-child,
+    /* first column: # of units */
+  #allocations-table th:nth-child(4),
+    /* fourth column: time/task */
+  #allocations-table th:nth-child(5) {
     /* fifth column: total time */
     width: 100px;
-}
+  }
 
-/* third column: type of unit */
-#instr-grid #allocations-table th:nth-child(3) {
+  /* third column: type of unit */
+  #allocations-table th:nth-child(3) {
     width: 350px;
-}
+  }
 
-#instr-grid #allocations-table .delete-button {
+  #allocations-table .delete-button {
     font-size: 16px;
     color: red;
     background-color: white;
@@ -257,181 +248,190 @@
     cursor: pointer;
     float: right;
     margin-right: -12px;
-}
+  }
 
-#instr-grid #allocations-table thead {
-    background-color: var(--dark-bg);
-}
+  #allocations-table thead {
+    background-color: $dark-bg;
+  }
 
-#instr-grid #allocations-table th,
-#instr-grid #allocations-table td {
+  #allocations-table th,
+  #allocations-table td {
     text-align: center;
-    border: var(--border);
-}
+    border: $border;
+  }
 
-#instr-grid #allocations-table input,
-#instr-grid #allocations-table select {
+  #allocations-table input,
+  #allocations-table select {
     width: 100%;
     height: 100%;
     border: 0;
     background: none;
-}
+  }
 
-#instr-grid #allocations-table tr:last-child {
+  #allocations-table tr:last-child {
     border-top: 3px solid;
-}
+  }
 
-#instr-grid #allocations-table td:last-child {
-    background-color: var(--light-bg);
-}
+  #allocations-table td:last-child {
+    background-color: $light-bg;
+  }
 
-/* ddah training table */
+  /* ddah training table */
 
-#instr-grid #training {
-    border: var(--border);
-}
+  #training {
+    border: $border;
+  }
 
-#instr-grid #training .sub-table {
+  #training .sub-table {
     width: auto;
-}
+  }
 
-#instr-grid #training thead {
+  #training thead {
     border-bottom: 3px solid;
-}
+  }
 
-#instr-grid #training tr,
-#instr-grid #training td {
-    background-color: var(--dark-bg);
-}
+  #training tr,
+  #training td {
+    background-color: $dark-bg;
+  }
 
-#instr-grid #training label {
+  #training label {
     font-weight: normal;
     margin: 0;
-}
+  }
 
-#instr-grid #training .sub-table tr:first-child td {
+  #training .sub-table tr:first-child td {
     padding-top: 10px;
-}
+  }
 
-#instr-grid #training .sub-table tr td {
+  #training .sub-table tr td {
     padding-left: 10px;
     padding-right: 10px;
-}
+  }
 
-#instr-grid #training .sub-table tr:last-child td {
+  #training .sub-table tr:last-child td {
     padding-bottom: 10px;
-}
+  }
 
-/* ddah summary table */
+  /* ddah summary table */
 
-#instr-grid #summary-table thead {
-    background-color: var(--dark-bg);
-}
+  #summary-table thead {
+    background-color: $dark-bg;
+  }
 
-/* second column: total time */
-#instr-grid #summary-table th:nth-child(2) {
+  /* second column: total time */
+  #summary-table th:nth-child(2) {
     width: 100px;
-}
+  }
 
-#instr-grid #summary-table th,
-#instr-grid #summary-table td:nth-child(2) {
+  #summary-table th,
+  #summary-table td:nth-child(2) {
     text-align: center;
-    border: var(--border);
-}
+    border: $border;
+  }
 
-#instr-grid #summary-table td:first-child {
+  #summary-table td:first-child {
     text-align: left;
-    border: var(--border);
+    border: $border;
     font-weight: bold;
-}
+  }
 
-#instr-grid #summary-table tr:last-child {
+  #summary-table tr:last-child {
     border-top: 3px solid;
-}
+  }
 
-#instr-grid #summary-table td:last-child {
-    background-color: var(--light-bg);
-}
+  #summary-table td:last-child {
+    background-color: $light-bg;
+  }
 
-/* ddah signatures table */
+  /* ddah signatures table */
 
-#instr-grid #signatures td {
+  #signatures td {
     width: 300px;
     vertical-align: top;
-}
+  }
 
-#instr-grid #signatures td input {
+  #signatures td input {
     border: 1px solid black;
     padding: 3px;
-}
+  }
 
-#instr-grid #signatures .input-label {
+  #signatures .input-label {
     font-size: x-small;
-}
+  }
 
-#instr-grid #signatures tr + tr td {
+  #signatures tr + tr td {
     padding-top: 1vh;
-}
+  }
 
-#instr-grid #signatures td:first-child {
+  #signatures td:first-child {
     text-align: left;
-}
+  }
 
-#instr-grid #signatures td:nth-child(2) {
+  #signatures td:nth-child(2) {
     text-align: center;
-}
+  }
 
-#instr-grid #signatures td:nth-child(3) {
+  #signatures td:nth-child(3) {
     text-align: right;
-}
+  }
 
-#instr-grid #signatures td:first-child input,
-#instr-grid #signatures td:nth-child(2) input {
+  #signatures td:first-child input,
+  #signatures td:nth-child(2) input {
     width: 220px;
+  }
+
+  #signatures td:nth-child(3) input {
+    width: 120px;
+  }
 }
 
-#instr-grid #signatures td:nth-child(3) input {
-    width: 120px;
+/* for "no selected course" message */
+#no-selection {
+  width: 50vw;
+  margin: auto;
+  text-align: center;
+  color: #555;
 }
 
 /* ddah control panel view */
 
 #ddahs-grid #dropdown-menu {
-    margin-bottom: 1vh;
+  margin-bottom: 1vh;
 }
 
 #ddahs-grid .table-menu > .btn-group:first-child {
-    margin-left: 3vw;
+  margin-left: 3vw;
 }
 
 #ddahs-grid table {
-    margin: 0;
+  margin: 0;
 }
 
 #ddahs-grid .table-body {
-    /* note that this assumes that the header is at most two rows high */
-    max-height: calc(var(--main-div-height) - var(--table-menu-height) - var(--min-row-height) - 25px);
-    overflow: auto;
+  /* note that this assumes that the header is at most two rows high */
+  max-height: calc(#{$main-div-height} - #{$table-menu-height} - #{$min-row-height} - 25px);
+  overflow: auto;
 }
 
 #ddahs-grid .table-container th {
-    text-overflow: ellipsis;
+  text-overflow: ellipsis;
 }
 
 #ddahs-grid .table-container td,
 #ddahs-grid .table-container th {
-    word-break: break-all;
+  word-break: break-all;
 }
 
 #ddahs-grid #table-total {
-    font-weight: bold;
-    margin-top: 5px;
+  font-weight: bold;
+  margin-top: 5px;
 }
 
 #ddahs-grid #dropdown-menu #sessions {
-    float: left;
-    display: inline-block;
-    margin: 0 5px;
+  float: left;
+  display: inline-block;
+  margin: 0 5px;
 }
 
 #drop-down, #drop-down li a{
