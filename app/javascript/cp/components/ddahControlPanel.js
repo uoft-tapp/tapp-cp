@@ -210,7 +210,7 @@ class DdahControlPanel extends React.Component {
         ];
 
         return (
-            <Grid fluid id="ddahs-grid" style={cursorStyle}>
+            <Grid fluid id="ddah-grid" style={cursorStyle}>
                 <ButtonToolbar id="dropdown-menu">
                     <ImportButton {...this.props}/>
                     <ExportForm {...this.props} />
