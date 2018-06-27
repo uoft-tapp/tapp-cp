@@ -8,7 +8,7 @@
 
   .table-body {
     /* note that this assumes that the header is at most one row high */
-    max-height: calc(#{$main-div-height} - #{$applicant-table-menu-height} - #{$min-row-height});
+    max-height: calc(#{$main-div-height} - #{$table-menu-height} - #{$min-row-height});
     overflow: auto;
   }
 }
