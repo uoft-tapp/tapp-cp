@@ -1,41 +1,71 @@
-/* admin control panel view */
+#offers-grid {
+  #dropdown-menu {
+    margin-bottom: 1vh;
+  }
 
-#offers-grid #dropdown-menu {
-  margin-bottom: 1vh;
-}
+  .table-menu > .btn-group:first-child {
+    margin-left: 3vw;
+  }
 
-#offers-grid .table-menu > .btn-group:first-child {
-  margin-left: 3vw;
-}
+  table {
+    margin: 0;
+  }
 
-#offers-grid table {
-  margin: 0;
-}
+  /* for Table in admin view */
+  .sessions ~ .table-container .table-body {
+    /* note that this assumes that the header is at most two rows high */
+    max-height: calc(
+            #{$main-div-height} - #{$table-menu-height} - #{$min-row-height} -
+            #{$sessions-height} - 25px
+    );
+  }
 
-/* for Table in admin view */
-#offers-grid .sessions ~ .table-container .table-body {
-  /* note that this assumes that the header is at most two rows high */
-  max-height: calc(
-          #{$main-div-height} - #{$table-menu-height} - #{$min-row-height} -
-          #{$sessions-height} - 25px
-  );
-}
+  .table-body {
+    /* note that this assumes that the header is at most two rows high */
+    max-height: calc(
+            #{$main-div-height} - #{$table-menu-height} - #{$min-row-height} - 25px
+    );
+    overflow: auto;
+  }
 
-#offers-grid .table-body {
-  /* note that this assumes that the header is at most two rows high */
-  max-height: calc(
-          #{$main-div-height} - #{$table-menu-height} - #{$min-row-height} - 25px
-  );
-  overflow: auto;
-}
+  .table-container {
+    th {
+      text-overflow: ellipsis;
+    }
 
-#offers-grid .table-container th {
-  text-overflow: ellipsis;
-}
+    td, th {
+      word-break: break-all;
+    }
+  }
 
-#offers-grid .table-container td,
-#offers-grid .table-container th {
-  word-break: break-all;
+  /* sessions menu used by hr_assistant */
+  #dropdown-menu #sessions {
+    float: left;
+    display: inline-block;
+    margin: 0 5px;
+  }
+
+  .sessions {
+    margin: 0 0 1.5vh 0;
+
+    .panel-body {
+      height: calc(35px + 10px + 10px);
+      padding: 10px 15px;
+    }
+
+    #pay {
+      margin-left: 1vw;
+
+      input {
+        width: 100px;
+      }
+    }
+  }
+
+  #table-total {
+    font-weight: bold;
+    margin-top: 5px;
+  }
 }
 
 #offer-note-popover .popover-content {
@@ -44,35 +74,6 @@
 
 #offer-note {
   max-width: calc(276px - 15px * 2); /* don't allow the text area to be wider than the popover */
-}
-
-/* sessions menu used by hr_assistant */
-#offers-grid #dropdown-menu #sessions {
-  float: left;
-  display: inline-block;
-  margin: 0 5px;
-}
-
-#offers-grid .sessions {
-  margin: 0 0 1.5vh 0;
-}
-
-#offers-grid .sessions .panel-body {
-  height: calc(35px + 10px + 10px);
-  padding: 10px 15px;
-}
-
-#offers-grid .sessions #pay {
-  margin-left: 1vw;
-}
-
-#offers-grid .sessions #pay input {
-  width: 100px;
-}
-
-#offers-grid #table-total {
-  font-weight: bold;
-  margin-top: 5px;
 }
 
 /* instructor view */
@@ -87,16 +88,40 @@
     width: auto;
     float: left;
     margin-right: 1vw;
-  }
 
-  #select-menu .panel-heading {
-    padding: 10px 15px !important;
-    height: 37px;
-  }
+    .panel-heading {
+      padding: 10px 15px !important;
+      height: 37px;
+    }
 
-  #select-menu .panel-body {
-    padding: 0;
-    overflow: auto;
+    .panel-body {
+      padding: 0;
+      overflow: auto;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      padding: 5px 15px;
+      cursor: pointer;
+    }
+
+    .panel-footer {
+      padding: 5px 15px;
+      cursor: pointer;
+      background-color: #337ab7;
+      color: white;
+    }
+
+    #templates-menu, .applicant-menu {
+      li.active {
+        background-color: #d9edf7;
+      }
+    }
   }
 
   #templates-menu {
@@ -112,32 +137,10 @@
     display: none; /* initially hide all applicant sub-menus */
   }
 
-  #select-menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  #select-menu li {
-    padding: 5px 15px;
-    cursor: pointer;
-  }
-
-  #select-menu .panel-footer {
-    padding: 5px 15px;
-    cursor: pointer;
-    background-color: #337ab7;
-    color: white;
-  }
-
-  #select-menu #templates-menu li.active,
-  #select-menu .applicant-menu li.active {
-    background-color: #d9edf7;
-  }
-
-  #action-menu #submit,
-  #action-menu #save {
-    float: right;
+  #action-menu {
+    #submit, #save {
+      float: right;
+    }
   }
 
   #ddah-menu-container {
@@ -153,14 +156,14 @@
 
     max-height: calc(#{$main-div-height} - #{$menu-height} - 1vh);
     overflow: auto;
-  }
 
-  #ddah-container.disabled {
-    opacity: 0.8;
-  }
+    &.disabled {
+      opacity: 0.8;
 
-  #ddah-container.disabled * {
-    pointer-events: none;
+      * {
+        pointer-events: none;
+      }
+    }
   }
 
   h3 {
@@ -178,9 +181,10 @@
     max-width: none;
   }
 
-  table th,
-  table td {
-    vertical-align: middle;
+  table {
+    th, td {
+      vertical-align: middle;
+    }
   }
 
   .title th {
@@ -195,194 +199,199 @@
   #ddah-header {
     background-color: $dark-bg;
     border: $border;
-  }
 
-  #ddah-header tr:first-child td {
-    padding-top: 10px;
-  }
+    tr:first-child td {
+      padding-top: 10px;
+    }
 
-  #ddah-header tr td {
-    padding: 3px 10px;
-  }
+    tr td {
+      padding: 3px 10px;
+    }
 
-  #ddah-header tr:last-child td {
-    padding-bottom: 10px;
-  }
+    tr:last-child td {
+      padding-bottom: 10px;
+    }
 
-  #ddah-header input[type="text"],
-  #ddah-header select {
-    width: 175px;
-  }
+    input[type="text"],
+    select {
+      width: 175px;
+    }
 
-  #ddah-header input[type="number"] {
-    width: 4em;
-  }
+    input[type="number"] {
+      width: 4em;
+    }
 
-  #ddah-header label {
-    font-weight: normal;
-    margin: 0;
+    label {
+      font-weight: normal;
+      margin: 0;
+    }
   }
 
   /* ddah allocations table */
 
   /* allocations table column widths */
-  #allocations-table th:first-child,
-    /* first column: # of units */
-  #allocations-table th:nth-child(4),
-    /* fourth column: time/task */
-  #allocations-table th:nth-child(5) {
-    /* fifth column: total time */
-    width: 100px;
-  }
+  #allocations-table {
+    th:first-child,   /* first column: # of units */
+    th:nth-child(4),  /* fourth column: time/task */
+    th:nth-child(5) { /* fifth column: total time */
+      width: 100px;
+    }
 
-  /* third column: type of unit */
-  #allocations-table th:nth-child(3) {
-    width: 350px;
-  }
+    /* third column: type of unit */
+    th:nth-child(3) {
+      width: 350px;
+    }
 
-  #allocations-table .delete-button {
-    font-size: 16px;
-    color: red;
-    background-color: white;
-    opacity: 0.75;
-    cursor: pointer;
-    float: right;
-    margin-right: -12px;
-  }
+    .delete-button {
+      font-size: 16px;
+      color: red;
+      background-color: white;
+      opacity: 0.75;
+      cursor: pointer;
+      float: right;
+      margin-right: -12px;
+    }
 
-  #allocations-table thead {
-    background-color: $dark-bg;
-  }
+    thead {
+      background-color: $dark-bg;
+    }
 
-  #allocations-table th,
-  #allocations-table td {
-    text-align: center;
-    border: $border;
-  }
+    th,
+    td {
+      text-align: center;
+      border: $border;
+    }
 
-  #allocations-table input,
-  #allocations-table select {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    background: none;
-  }
+    input,
+    select {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: none;
+    }
 
-  #allocations-table tr:last-child {
-    border-top: 3px solid;
-  }
+    tr:last-child {
+      border-top: 3px solid;
+    }
 
-  #allocations-table td:last-child {
-    background-color: $light-bg;
+    td:last-child {
+      background-color: $light-bg;
+    }
   }
 
   /* ddah training table */
 
   #training {
     border: $border;
-  }
 
-  #training .sub-table {
-    width: auto;
-  }
+    .sub-table {
+      width: auto;
+    }
 
-  #training thead {
-    border-bottom: 3px solid;
-  }
+    thead {
+      border-bottom: 3px solid;
+    }
 
-  #training tr,
-  #training td {
-    background-color: $dark-bg;
-  }
+    tr,
+    td {
+      background-color: $dark-bg;
+    }
 
-  #training label {
-    font-weight: normal;
-    margin: 0;
-  }
+    label {
+      font-weight: normal;
+      margin: 0;
+    }
 
-  #training .sub-table tr:first-child td {
-    padding-top: 10px;
-  }
+    .sub-table {
+      tr:first-child td {
+        padding-top: 10px;
+      }
 
-  #training .sub-table tr td {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
+      tr td {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
 
-  #training .sub-table tr:last-child td {
-    padding-bottom: 10px;
+      tr:last-child td {
+        padding-bottom: 10px;
+      }
+    }
   }
 
   /* ddah summary table */
 
-  #summary-table thead {
-    background-color: $dark-bg;
-  }
+  #summary-table {
+    thead {
+      background-color: $dark-bg;
+    }
 
-  /* second column: total time */
-  #summary-table th:nth-child(2) {
-    width: 100px;
-  }
+    /* second column: total time */
+    th:nth-child(2) {
+      width: 100px;
+    }
 
-  #summary-table th,
-  #summary-table td:nth-child(2) {
-    text-align: center;
-    border: $border;
-  }
+    th,
+    td:nth-child(2) {
+      text-align: center;
+      border: $border;
+    }
 
-  #summary-table td:first-child {
-    text-align: left;
-    border: $border;
-    font-weight: bold;
-  }
+    td:first-child {
+      text-align: left;
+      border: $border;
+      font-weight: bold;
+    }
 
-  #summary-table tr:last-child {
-    border-top: 3px solid;
-  }
+    tr:last-child {
+      border-top: 3px solid;
+    }
 
-  #summary-table td:last-child {
-    background-color: $light-bg;
+    td:last-child {
+      background-color: $light-bg;
+    }
   }
 
   /* ddah signatures table */
+  #signatures {
+    td {
+      width: 300px;
+      vertical-align: top;
+    }
 
-  #signatures td {
-    width: 300px;
-    vertical-align: top;
-  }
+    td input {
+      border: 1px solid black;
+      padding: 3px;
+    }
 
-  #signatures td input {
-    border: 1px solid black;
-    padding: 3px;
-  }
+    .input-label {
+      font-size: x-small;
+    }
 
-  #signatures .input-label {
-    font-size: x-small;
-  }
+    tr + tr td {
+      padding-top: 1vh;
+    }
 
-  #signatures tr + tr td {
-    padding-top: 1vh;
-  }
+    td:first-child {
+      text-align: left;
+    }
 
-  #signatures td:first-child {
-    text-align: left;
-  }
+    td:nth-child(2) {
+      text-align: center;
+    }
 
-  #signatures td:nth-child(2) {
-    text-align: center;
-  }
+    td:nth-child(3) {
+      text-align: right;
+    }
 
-  #signatures td:nth-child(3) {
-    text-align: right;
-  }
+    td:first-child, td:nth-child(2) {
+      input {
+        width: 220px;
+      }
+    }
 
-  #signatures td:first-child input,
-  #signatures td:nth-child(2) input {
-    width: 220px;
-  }
-
-  #signatures td:nth-child(3) input {
-    width: 120px;
+    td:nth-child(3) input {
+      width: 120px;
+    }
   }
 }
 
@@ -396,42 +405,44 @@
 
 /* ddah control panel view */
 
-#ddahs-grid #dropdown-menu {
-  margin-bottom: 1vh;
-}
+#ddahs-grid {
+  #dropdown-menu {
+    margin-bottom: 1vh;
+  }
 
-#ddahs-grid .table-menu > .btn-group:first-child {
-  margin-left: 3vw;
-}
+  .table-menu > .btn-group:first-child {
+    margin-left: 3vw;
+  }
 
-#ddahs-grid table {
-  margin: 0;
-}
+  table {
+    margin: 0;
+  }
 
-#ddahs-grid .table-body {
-  /* note that this assumes that the header is at most two rows high */
-  max-height: calc(#{$main-div-height} - #{$table-menu-height} - #{$min-row-height} - 25px);
-  overflow: auto;
-}
+  .table-body {
+    /* note that this assumes that the header is at most two rows high */
+    max-height: calc(#{$main-div-height} - #{$table-menu-height} - #{$min-row-height} - 25px);
+    overflow: auto;
+  }
 
-#ddahs-grid .table-container th {
-  text-overflow: ellipsis;
-}
+  .table-container th {
+    text-overflow: ellipsis;
+  }
 
-#ddahs-grid .table-container td,
-#ddahs-grid .table-container th {
-  word-break: break-all;
-}
+  .table-container td,
+  .table-container th {
+    word-break: break-all;
+  }
 
-#ddahs-grid #table-total {
-  font-weight: bold;
-  margin-top: 5px;
-}
+  #table-total {
+    font-weight: bold;
+    margin-top: 5px;
+  }
 
-#ddahs-grid #dropdown-menu #sessions {
-  float: left;
-  display: inline-block;
-  margin: 0 5px;
+  #dropdown-menu #sessions {
+    float: left;
+    display: inline-block;
+    margin: 0 5px;
+  }
 }
 
 #drop-down, #drop-down li a{
