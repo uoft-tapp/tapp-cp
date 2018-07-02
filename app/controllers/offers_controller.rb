@@ -91,16 +91,16 @@ class OffersController < ApplicationController
     begin
       params[:offers].each do |id|
         offer = Offer.find(id)
-          if ENV['RAILS_ENV'] != 'test'
-            offer.update_attributes!(link: "/pb/#{offer[:id]}")
-            CpMailer.contract_email(offer.format,"#{ENV["domain"]}#{offer[:link]}").deliver_now!
-          end
-          offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
+        if ENV['RAILS_ENV'] != 'test'
+          offer.update_attributes!(link: "/pb/#{offer[:id]}")
+          CpMailer.contract_email(offer.format, "#{ENV["domain"]}#{offer[:link]}").deliver_now!
+        end
+        offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
       end
-      render status: 200, json: {message: "You've successfully sent out all the contracts."}
+      render status: 200, json: {message: "Contracts successfully sent."}
     rescue Errno::ECONNREFUSED
       puts "rejected"
-      render status: 404, json: {message: "Connection Refused."}
+      render status: 404, json: {message: "Connection refused."}
     end
   end
 
@@ -115,7 +115,7 @@ class OffersController < ApplicationController
       end
       render json: {message: "You've sent the nag emails."}
     rescue Errno::ECONNREFUSED
-      render status: 404, json: {message: "Connection Refused."}
+      render status: 404, json: {message: "Connection refused."}
     end
   end
 
@@ -150,7 +150,7 @@ class OffersController < ApplicationController
       end
       render status: 200, json: {message: "You've successfully sent out all the nag emails."}
     rescue Errno::ECONNREFUSED
-      render status: 404, json: {message: "Connection Refused."}
+      render status: 404, json: {message: "Connection refused."}
     end
   end
 
