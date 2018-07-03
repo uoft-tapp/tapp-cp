@@ -11,7 +11,7 @@ module Authorizer
   end
 
   def cp_access
-    expected_roles = ["cp_admin", "hr_assistant", "instructor"]
+    expected_roles = ["cp_admin", "hr_assistant", "instructor", "applicant"]
     access(expected_roles)
   end
 
@@ -154,6 +154,23 @@ module Authorizer
     end
   end
 
+  def is_applicant
+    if ENV['RAILS_ENV'] == 'production'
+      if get_utorid
+        # Applicant will be neither instructor nor admin nor assistant
+        instructor = Instructor.find_by(utorid: get_utorid)
+        if listed_as(ENV['TAPP_ADMINS']) or listed_as(ENV['CP_ADMINS']) or
+            listed_as(ENV['TAPP_ASSISTANTS']) or listed_as(ENV['HR_ASSISTANTS']) or instructor
+          return nil
+        else
+          return true
+        end
+      else
+        return nil
+      end
+    end
+  end
+
   def utorid_of_applicant_corresponding_to_student_facing_route(params)
     offer = Offer.find(params[:offer_id])
     offer = offer.format
@@ -203,6 +220,10 @@ module Authorizer
       {
         access: is_instructor,
         role: "instructor",
+      },
+      {
+        access: is_applicant,
+        role: "applicant",
       }
     ]
     roles.each do |role|
@@ -217,7 +238,7 @@ module Authorizer
   end
 
   '''
-   assumes that instructor_id is an attribute in the model
+  Assumes that instructor_id is an attribute in the model
   '''
   def correct_instructor(model, instructor, inputs, array)
     if instructor

@@ -391,5 +391,5 @@ export const previewDdahs = (ddahs) => {
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-    return fetchProc.setRole(['cp_admin', 'hr_assistant', 'instructor'], true, appState);
+    return fetchProc.setRole(['cp_admin', 'hr_assistant', 'instructor', 'applicant'], true, appState);
 }

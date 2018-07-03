@@ -68,6 +68,13 @@ class App extends React.Component {
                         <AlertContainer {...this.props} />
                     </div>
                 );
+            case 'applicant':
+                return (
+                    <div>
+                        <p>Applicant role</p>
+                        <AlertContainer {...this.props} />
+                    </div>
+                );
         }
 
         return null;
