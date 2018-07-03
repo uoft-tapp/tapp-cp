@@ -473,8 +473,7 @@ export const setRole = (roles, cp, appState)=>{
       .then(resp => {
           if (resp.development) {
               appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[3]);
-              //appState.selectUserRole(roles[1]);
+              appState.selectUserRole(roles[0]);
               appState.setCurrentUserName('campb128');
               appState.setIsDevelopment(true);
           } else {

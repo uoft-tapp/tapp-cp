@@ -151,7 +151,7 @@ const AssistantRouter = props =>{
           </div>
       </Router>
     );
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(<App />, document.getElementById('root'));

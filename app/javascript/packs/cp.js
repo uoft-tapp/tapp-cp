@@ -69,12 +69,7 @@ class App extends React.Component {
                     </div>
                 );
             case 'applicant':
-                return (
-                    <div>
-                        <p>Applicant role</p>
-                        <AlertContainer {...this.props} />
-                    </div>
-                );
+                return <ApplicantRouter {...this.props} />;
         }
 
         return null;
@@ -100,6 +95,25 @@ const AdminRouter = props =>
             </Switch>
 
             <AlertContainer {...props} />
+        </div>
+    </Router>;
+
+const ApplicantRouter = props =>
+    <Router basename="cp">
+        <div>
+            <Navbar {...props} />
+
+            <Switch>
+                <Route
+                    path={routeConfig.contracts.route}
+                    render={() => <p>Contracts and forms</p>}
+                />
+                <Route
+                    path={routeConfig.history.route}
+                    render={() => <p>History</p>}
+                />
+                <Redirect from="/" to="/contracts" />
+            </Switch>
         </div>
     </Router>;
 

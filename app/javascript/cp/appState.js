@@ -416,6 +416,7 @@ class AppState {
     }
 
     selectUserRole(role) {
+        console.log("set to role:" + role);
         this.set('nav.selectedRole', role);
     }
 

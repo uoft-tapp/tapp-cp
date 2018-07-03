@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import { adminFetchAll, instructorFetchAll } from '../fetch.js'
 
@@ -7,12 +6,8 @@ import { Link } from 'react-router-dom';
 import {
     Navbar,
     Nav,
-    NavItem,
     NavDropdown,
     MenuItem,
-    FormGroup,
-    ControlLabel,
-    FormControl,
 } from 'react-bootstrap';
 
 import { routeConfig } from '../routeConfig.js';
@@ -29,7 +24,6 @@ const ViewTab = props =>
 
 const ViewTabs = props => {
     let activeKey = props.appState.getSelectedNavTab();
-
     return (
         <ul className="nav navbar-nav navbar-left">
             <ViewTab activeKey={activeKey} {...routeConfig.controlPanel} />
@@ -127,21 +121,27 @@ const Auth = props => {
 
 /*** Navbar ***/
 
-const NavbarInst = props =>
-    <Navbar fixedTop fluid>
-        <Navbar.Header id ="app-drop-down">
-          <Navbar.Brand>
-            <NavDropdown id='1' title={<span>CP:TAPP</span>} noCaret >
-              <MenuItem href="/tapp">
-                TAPP
-              </MenuItem>
-            </NavDropdown>
-          </Navbar.Brand>
-        </Navbar.Header>
-        {props.appState.getSelectedUserRole() == 'cp_admin' && <ViewTabs {...props} />}
+const NavbarInst = props => {
+    let isAdmin = props.appState.getSelectedUserRole() == 'cp_admin';
+    let isInstructor = props.appState.getSelectedUserRole() == 'instructor';
+    let isApplicant = props.appState.getSelectedUserRole() == 'applicant';
 
-        <Nav pullRight>
-            {props.appState.getSelectedUserRole() == 'instructor' &&
+    return (
+        <Navbar fixedTop fluid>
+            <Navbar.Header id="app-drop-down">
+                <Navbar.Brand>
+                    {isApplicant && <span>CP:TAPP</span>}
+                    {!isApplicant && <NavDropdown id='1' title={<span>CP:TAPP</span>} noCaret>
+                        <MenuItem href="/tapp">
+                            TAPP
+                        </MenuItem>
+                    </NavDropdown>}
+                </Navbar.Brand>
+            </Navbar.Header>
+            {isAdmin && <ViewTabs {...props} />}
+
+            <Nav pullRight>
+                {isInstructor &&
                 <i
                     className="fa fa-question-circle"
                     style={{
@@ -155,13 +155,15 @@ const NavbarInst = props =>
                     onClick={() => {
                         let popup = window.open();
                         popup.document.open();
-                        popup.document.write(ReactDOMServer.renderToStaticMarkup(<DdahAppendix />));
+                        popup.document.write(ReactDOMServer.renderToStaticMarkup(<DdahAppendix/>));
                     }}
                 />}
-            <Session {...props}/>
-            <Notifications {...props} />
-            <Auth {...props} />
-        </Nav>
-    </Navbar>;
+                {!isApplicant && <Session {...props}/>}
+                {!isApplicant && <Notifications {...props} />}
+                {!isApplicant && <Auth {...props} />}
+            </Nav>
+        </Navbar>
+    );
+};
 
 export { NavbarInst as Navbar };
