@@ -24,12 +24,23 @@ const ViewTab = props =>
 
 const ViewTabs = props => {
     let activeKey = props.appState.getSelectedNavTab();
-    return (
-        <ul className="nav navbar-nav navbar-left">
-            <ViewTab activeKey={activeKey} {...routeConfig.controlPanel} />
-            <ViewTab activeKey={activeKey} {...routeConfig.ddahs} />
-        </ul>
-    );
+    console.log('active key: ' + activeKey);
+    switch (props.appState.getSelectedUserRole()) {
+        case 'cp_admin':
+            return (
+                <ul className="nav navbar-nav navbar-left">
+                    <ViewTab activeKey={activeKey} {...routeConfig.controlPanel} />
+                    <ViewTab activeKey={activeKey} {...routeConfig.ddahs} />
+                </ul>
+            );
+        case 'applicant':
+            return (
+                <ul className="nav navbar-nav navbar-left">
+                    <ViewTab activeKey={activeKey} {...routeConfig.contracts} />
+                    <ViewTab activeKey={activeKey} {...routeConfig.history} />
+                </ul>
+            );
+    }
 };
 
 const Session = props => {
@@ -138,7 +149,7 @@ const NavbarInst = props => {
                     </NavDropdown>}
                 </Navbar.Brand>
             </Navbar.Header>
-            {isAdmin && <ViewTabs {...props} />}
+            {(isAdmin || isApplicant) && <ViewTabs {...props} />}
 
             <Nav pullRight>
                 {isInstructor &&

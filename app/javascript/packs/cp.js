@@ -24,6 +24,8 @@ import { Navbar } from '../cp/components/navbar.js';
 import { AdminControlPanel } from '../cp/components/adminControlPanel.js';
 import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
 import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
+import { Contracts } from '../cp/components/contracts.js';
+import { History } from '../cp/components/history.js';
 
 /*** Main app component ***/
 
@@ -106,11 +108,11 @@ const ApplicantRouter = props =>
             <Switch>
                 <Route
                     path={routeConfig.contracts.route}
-                    render={() => <p>Contracts and forms</p>}
+                    render={() => <Contracts navKey={routeConfig.contracts.id} {...props} />}
                 />
                 <Route
                     path={routeConfig.history.route}
-                    render={() => <p>History</p>}
+                    render={() => <History navKey={routeConfig.history.id} {...props} />}
                 />
                 <Redirect from="/" to="/contracts" />
             </Switch>
