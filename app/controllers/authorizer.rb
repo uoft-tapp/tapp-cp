@@ -73,6 +73,21 @@ module Authorizer
     end
   end
 
+  '''
+  Authentication for applicant role of CP
+  '''
+  def applicant
+    expected_role = ['applicant']
+    if !params[:utorid]
+      access(expected_role)
+    else
+      if ENV['RAILS_ENV'] == 'production'
+        if !has_access(expected_role) or params[:utorid] != session[:utorid]
+          render status: 403, file: 'public/403.html'
+        end
+      end
+    end
+  end
 
   def both_cp_admin_instructor(model, attr_name = :id, array = false)
     if ENV['RAILS_ENV'] == 'production'

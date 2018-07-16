@@ -32,6 +32,7 @@ import { ApplicantModal } from '../tapp/components/applicantModal.js';
 class App extends React.Component {
     constructor(props) {
         super(props);
+        console.log("TAPP constr");
 
         // get current user role and username
         fetchAuth().then(()=> fetchAll());

@@ -721,10 +721,13 @@ class AppState {
 
     fetchAll() {
         let role = this.getSelectedUserRole();
+
         if (role == 'cp_admin' || role == 'hr_assistant') {
             fetch.adminFetchAll();
         } else if (role == 'instructor') {
             fetch.instructorFetchAll();
+        } else if (role == 'applicant') {
+            fetch.applicantFetchAll();
         }
     }
 

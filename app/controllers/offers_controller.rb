@@ -10,6 +10,7 @@ class OffersController < ApplicationController
   before_action only: [:index, :show] do
     either_cp_admin_instructor(true)
   end
+  before_action :applicant, only: [:applicant_get_offers]
 
   def index
     if params[:session_id]
@@ -22,6 +23,10 @@ class OffersController < ApplicationController
       if params[:utorid]
         render json: get_all_offers_for_utorid(params[:utorid], nil)
       else
+        puts session[:roles]
+        if has_access(["cp_admin"])
+          puts session[:roles]
+        end
         render json: get_all_offers(Offer.all)
       end
     end
@@ -29,7 +34,7 @@ class OffersController < ApplicationController
 
   def show
     if params[:utorid]
-      offers = id_array(get_all_offers_for_utorid(params[:utorid]))
+      offers = id_array(get_all_offers_for_utorid(params[:utorid], nil))
       if offers.include?(params[:id])
         offer = Offer.find(params[:id])
         render json: offer.instructor_format
@@ -40,6 +45,18 @@ class OffersController < ApplicationController
       offer = Offer.find(params[:id])
       render json: offer.format
     end
+  end
+
+  def applicant_get_offers
+    offers = []
+    all_offers = Offer.all
+    all_offers.each do |offer|
+      applicant = Applicant.find(offer[:applicant_id])
+      if applicant[:utorid] == params[:utorid]
+        offers.push(offer.format)
+      end
+    end
+    render json: offers
   end
 
   # can update HR status for offers that are accepted or pending
@@ -153,7 +170,6 @@ class OffersController < ApplicationController
       render status: 404, json: {message: "Connection refused."}
     end
   end
-
 
   def combine_contracts_print
     offers = []

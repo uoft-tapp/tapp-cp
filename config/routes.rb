@@ -108,6 +108,7 @@ Rails.application.routes.draw do
   get "/templates/:template_id/preview" => "templates#preview"
 
   # student-facing
+  get "/applicants/:utorid/offers" => "offers#applicant_get_offers"
   get "/pb/:offer_id" => "app#student_view"
   get "/pb/:offer_id/pdf" => "offers#get_contract_student"
   post "/pb/:offer_id/:status" => "offers#set_status_student"

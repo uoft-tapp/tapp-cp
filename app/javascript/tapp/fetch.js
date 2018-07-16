@@ -58,13 +58,11 @@ export const fetchAll = () => {
   switch(role){
     case 'tapp_admin':
       fetchTappAdminAll();
-      console.log("admin");
       break;
     case 'tapp_assistant':
       fetchTappAssistantAll();
       break;
     case 'instructor':
-      console.log("instr");
       fetchInstructorAll(true);
       break;
   }

@@ -37,9 +37,18 @@ const getDdahs = user => getResource(
     user ? '/instructors/' + user + '/ddahs' : '/ddahs',
     fetchProc.onFetchDdahsSuccess, 'ddahs');
 
-const getOffers = user => getResource(
-    user ? '/instructors/' + user + '/offers' : '/offers',
-    fetchProc.onFetchOffersSuccess, 'offers');
+const getOffers = (user, role) => {
+    let route = '/offers';
+    if (user) {
+        if (role == 'instructor') {
+            route = '/instructors/' + user + '/offers';
+        }
+        else if (role == 'applicant') {
+            route = '/applicants/' + user + '/offers';
+        }
+    }
+    getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
+}
 
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
@@ -65,6 +74,7 @@ export const adminFetchAll = () =>  {
       if(!session||session=='N/A')
         appState.setLatestSession();
       getOffers();
+      console.log(appState.get('offers'));
       getDdahs();
       getCourses();
     });
@@ -80,7 +90,7 @@ export const instructorFetchAll = () => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      getOffers(user);
+      getOffers(user, 'instructor');
       getDdahs(user);
       getCourses(user);
     });
@@ -88,6 +98,20 @@ export const instructorFetchAll = () => {
     getDuties();
     getTemplates();
     getTrainings();
+}
+
+export const applicantFetchAll = () => {
+    let user = appState.getCurrentUserName();
+    getSessions().then(()=> {
+        let sessions = appState.getSessionsList();
+        if (!sessions) {
+            appState.setSessionsList(fromJS([]));
+        }
+        let session = appState.getSelectedSession();
+        if (!session || session == 'N/A')
+            appState.setLatestSession();
+
+    });
 }
 
 // import locked assignments from TAPP
