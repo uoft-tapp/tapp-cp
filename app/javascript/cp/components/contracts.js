@@ -1,7 +1,21 @@
 import React from 'react';
 import {
-    Grid
+    Button,
+    Grid,
+    Panel
 } from 'react-bootstrap';
+
+const ContractPanel = props =>
+    //<p>{props.offer.get('course')}</p>;
+    <Panel>
+        <h3>{props.offer.get('course')}</h3>
+        <div>
+            <Button>Details</Button>
+            <Button>DDAH Form</Button>
+        </div>
+
+    </Panel>;
+
 
 class Contracts extends React.Component {
     constructor(props) {
@@ -29,19 +43,17 @@ class Contracts extends React.Component {
             return (
                 <Grid>
                     <div>
-                       <p>No contracts in record.</p>
+                       <h2>Sorry, no contracts in record.</h2>
                     </div>
                 </Grid>
             );
         }
-        else if (offers) {
+        else {
             return (
                 <Grid>
                     <div>
                         {offers.map((val, key) =>
-                            <p>
-                                {val.get('firstName')}
-                            </p>
+                            <ContractPanel offer={val} />
                         )}
                     </div>
                 </Grid>
