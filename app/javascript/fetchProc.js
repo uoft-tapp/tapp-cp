@@ -48,33 +48,34 @@ export const putHelper = (URL, body, appState) => {
     }, appState);
 }
 export const getResource = (route, onSuccess, dataName, setData, mince, state) =>{
-  let appState = state;
-  if(mince){
-    let session = setData?
-      appState.getSelectedSession():appState.get('selectedSession');
-    if(session&&session!='N/A'){
-      route = '/sessions/'+session+route;
-      return getResHelper(route, onSuccess, dataName, setData, appState);
+    let appState = state;
+    if(mince){
+        let session = setData?
+        appState.getSelectedSession():appState.get('selectedSession');
+        if(session&&session!='N/A'){
+            route = '/sessions/'+session+route;
+            console.log("getResource: " + route);
+            return getResHelper(route, onSuccess, dataName, setData, appState);
+        }
+        else{
+            setData? setData([]): appState.set(dataName+'.list', fromJS([]));
+            return appState.setFetchingDataList(dataName, false, true);
+        };
     }
     else{
-      setData? setData([]): appState.set(dataName+'.list', fromJS([]));
-      return appState.setFetchingDataList(dataName, false, true);
-    };
-  }
-  else{
-    return getResHelper(route, onSuccess, dataName, setData, appState);
-  }
+        return getResHelper(route, onSuccess, dataName, setData, appState);
+    }
 }
 function getResHelper(route, onSuccess, dataName, setData, appState){
-  return getHelper(route)
-      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-      .then(onSuccess)
-      .then(data => {
-          setData? setData(data): appState.set(dataName+'.list', fromJS(data));
-          appState.setFetchingDataList(dataName, false, true);
-      })
-      .catch((error) => //appState.setFetchingDataList(dataName, false)
-                        console.error(error));
+    return getHelper(route)
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onSuccess)
+        .then(data => {
+            setData? setData(data): appState.set(dataName+'.list', fromJS(data));
+            appState.setFetchingDataList(dataName, false, true);
+        })
+        .catch((error) => //appState.setFetchingDataList(dataName, false)
+            console.error(error));
 }
 
 /*
@@ -473,9 +474,11 @@ export const setRole = (roles, cp, appState)=>{
       .then(resp => {
           if (resp.development) {
               appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName('campb128');
-              appState.setIsDevelopment(true);
+              appState.selectUserRole(roles[3]);
+              //appState.setCurrentUserName('campb128');
+              //appState.setCurrentUserName('chenjas8');
+              appState.setCurrentUserName('applicant1');
+              //appState.setIsDevelopment(true);
           } else {
               roles = resp.roles.filter(role =>roles.includes(role));
               appState.setCurrentUserRoles(roles);

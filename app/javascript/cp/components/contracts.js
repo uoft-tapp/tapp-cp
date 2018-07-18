@@ -23,13 +23,30 @@ class Contracts extends React.Component {
     }
 
     render() {
-        return (
-            <Grid>
-                <div>
-                    <p>Contracts</p>
-                </div>
-            </Grid>
-        );
+        let offers = this.props.appState.getOffersList();
+        console.log(offers);
+        if (!offers || (offers && offers.size === 0)) {
+            return (
+                <Grid>
+                    <div>
+                       <p>No contracts in record.</p>
+                    </div>
+                </Grid>
+            );
+        }
+        else if (offers) {
+            return (
+                <Grid>
+                    <div>
+                        {offers.map((val, key) =>
+                            <p>
+                                {val.get('firstName')}
+                            </p>
+                        )}
+                    </div>
+                </Grid>
+            );
+        }
     }
 }
 

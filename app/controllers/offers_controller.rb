@@ -23,10 +23,6 @@ class OffersController < ApplicationController
       if params[:utorid]
         render json: get_all_offers_for_utorid(params[:utorid], nil)
       else
-        puts session[:roles]
-        if has_access(["cp_admin"])
-          puts session[:roles]
-        end
         render json: get_all_offers(Offer.all)
       end
     end

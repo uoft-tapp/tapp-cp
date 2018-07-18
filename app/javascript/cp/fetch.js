@@ -42,12 +42,13 @@ const getOffers = (user, role) => {
     if (user) {
         if (role == 'instructor') {
             route = '/instructors/' + user + '/offers';
+            getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
         }
         else if (role == 'applicant') {
             route = '/applicants/' + user + '/offers';
+            getResource(route, fetchProc.onFetchOffersSuccess, 'offers', false);
         }
     }
-    getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
 }
 
 
@@ -74,7 +75,6 @@ export const adminFetchAll = () =>  {
       if(!session||session=='N/A')
         appState.setLatestSession();
       getOffers();
-      console.log(appState.get('offers'));
       getDdahs();
       getCourses();
     });
@@ -110,7 +110,8 @@ export const applicantFetchAll = () => {
         let session = appState.getSelectedSession();
         if (!session || session == 'N/A')
             appState.setLatestSession();
-
+        getOffers(user, 'applicant');
+        // TODO: get DDAH forms if necessary
     });
 }
 

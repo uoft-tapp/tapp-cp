@@ -24,7 +24,6 @@ const ViewTab = props =>
 
 const ViewTabs = props => {
     let activeKey = props.appState.getSelectedNavTab();
-    console.log('active key: ' + activeKey);
     switch (props.appState.getSelectedUserRole()) {
         case 'cp_admin':
             return (
