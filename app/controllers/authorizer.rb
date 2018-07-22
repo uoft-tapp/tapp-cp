@@ -108,11 +108,23 @@ module Authorizer
       if request.env['PATH_INFO'] != '/reenter-session' && !session[:logged_in]
        render file: 'public/logout.html'
       end
+      session[:logged_in] = true
+    else
+      if ENV['RAILS_ENV'] == 'development'
+        if params[:utorid]
+          session[:utorid] = params[:utorid]
+          session[:logged_in] = true
+          set_roles
+        end
+        if session[:logged_in].nil? || session[:logged_in] == false
+          session[:logged_in] = false
+          render file: 'public/login.html'
+        end
+      end
     end
   end
 
   def access(expected_roles)
-    set_roles
     if ENV['RAILS_ENV'] == 'production'
       if !has_role(expected_roles)
         render status: 403, file: 'public/403.html'
@@ -121,7 +133,6 @@ module Authorizer
   end
 
   def has_access(expected_roles)
-    set_roles
     return has_role(expected_roles)
   end
 
@@ -144,7 +155,7 @@ module Authorizer
   def is_instructor
     if get_utorid
       instructor = Instructor.find_by(utorid: get_utorid)
-      return instructor
+      return !instructor.nil?
     else
       return nil
     end
@@ -205,6 +216,10 @@ module Authorizer
       if role[:access]
         session[:roles].push(role[:role])
       end
+    end
+
+    if session[:roles].empty?
+      render file: "public/403.html"
     end
   end
 

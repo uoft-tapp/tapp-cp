@@ -73,8 +73,7 @@ function getResHelper(route, onSuccess, dataName, setData, appState){
           setData? setData(data): appState.set(dataName+'.list', fromJS(data));
           appState.setFetchingDataList(dataName, false, true);
       })
-      .catch((error) => //appState.setFetchingDataList(dataName, false)
-                        console.error(error));
+      .catch((error) => appState.setFetchingDataList(dataName, false))
 }
 
 /*
@@ -471,19 +470,12 @@ export const setRole = (roles, cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          if (resp.development) {
-              appState.setCurrentUserRoles(roles);
-            //   appState.selectUserRole(roles[1]);
-            //   appState.setCurrentUserName('campb128');
-              appState.setIsDevelopment(true);
-          } else {
-              roles = resp.roles.filter(role =>roles.includes(role));
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName(resp.utorid);
-              appState.setIsDevelopment(false);
-          }
-          if(cp) appState.setTaCoordinator(resp.ta_coord);
+        roles = resp.roles.filter(role =>roles.includes(role));
+        appState.setCurrentUserRoles(roles);
+        appState.selectUserRole(roles[0]);
+        appState.setCurrentUserName(resp.utorid);
+        appState.setIsDevelopment(resp.development === true);
+        if(cp) appState.setTaCoordinator(resp.ta_coord);
     });
 }
 export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{

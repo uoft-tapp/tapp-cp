@@ -46,6 +46,14 @@ const getAssignments = (utorid = null) => !utorid?getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList):
   getResource('/instructors/'+utorid+'/assignments', fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
+const getInstructorId = (utorid) => {
+  fetch('/instructors/utorid/' + utorid)
+    .then(response => response.json())
+    .then(responseJson => {
+      appState.setUserId(responseJson.id);
+    })
+    .catch(error => console.error(error));
+} 
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
@@ -97,6 +105,7 @@ const fetchInstructorAll = (instructor = false) => {
         getApplications(utorid);
         getAssignments(utorid);
         getCourses(utorid);
+        getInstructorId(utorid);
       }
       else{
         getApplicants();

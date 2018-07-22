@@ -33,6 +33,12 @@ GEM
       activemodel (= 5.1.6)
       activesupport (= 5.1.6)
       arel (~> 8.0)
+    activerecord-session_store (1.1.1)
+      actionpack (>= 4.0)
+      activerecord (>= 4.0)
+      multi_json (~> 1.11, >= 1.11.2)
+      rack (>= 1.5.2, < 3)
+      railties (>= 4.0)
     activesupport (5.1.6)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
@@ -60,6 +66,9 @@ GEM
     coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
     crass (1.0.4)
+    debase (0.2.2)
+      debase-ruby_core_source (>= 0.10.2)
+    debase-ruby_core_source (0.10.3)
     diff-lcs (1.3)
     erubi (1.7.1)
     execjs (2.7.0)
@@ -172,6 +181,8 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
+    ruby-debug-ide (0.6.1)
+      rake (>= 0.8.1)
     ruby_dep (1.5.0)
     rubyzip (1.2.1)
     sass (3.5.6)
@@ -223,10 +234,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-session_store
   axlsx (~> 3.0.0.pre)
   axlsx_rails
   byebug
   coffee-rails (~> 4.2)
+  debase
   guard
   guard-rspec
   jbuilder (~> 2.5)
@@ -237,6 +250,7 @@ DEPENDENCIES
   rails (~> 5.1.1)
   rake
   rspec-rails (~> 3.5)
+  ruby-debug-ide
   rubyzip (>= 1.2.1)
   sass-rails (~> 5.0)
   spring
@@ -247,4 +261,4 @@ DEPENDENCIES
   webpacker
 
 BUNDLED WITH
-   1.15.4
+   1.16.2
