@@ -33,6 +33,14 @@ const getCourses = () => getResource('/positions',
 const getAssignments = () => getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
+const getInstructorId = (utorid) => {
+  fetch('/instructors/utorid/' + utorid)
+    .then(response => response.json())
+    .then(responseJson => {
+      appState.setUserId(responseJson.id);
+    })
+    .catch(error => console.error(error));
+}
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
@@ -50,7 +58,7 @@ export const fetchAll = () => {
       fetchTappAssistantAll();
       break;
     case 'instructor':
-      fetchInstructorAll();
+      fetchInstructorAll(true);
       break;
   }
 }
@@ -69,7 +77,7 @@ const fetchTappAssistantAll = () => {
     });
 }
 
-const fetchInstructorAll = () => {
+const fetchInstructorAll = (instructor = true) => {
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
@@ -78,10 +86,20 @@ const fetchInstructorAll = () => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      getApplicants();
-      getApplications();
-      getAssignments();
-      getCourses();
+      if(instructor){
+        let utorid = appState.getCurrentUserName();
+        getApplicants(utorid);
+        getApplications(utorid);
+        getAssignments(utorid);
+        getCourses(utorid);
+        getInstructorId(utorid);
+      }
+      else{
+        getApplicants();
+        getApplications();
+        getAssignments();
+        getCourses();
+      }
     });
 }
 /* Task-specific resource modifiers */

@@ -272,7 +272,16 @@ const NavbarInst = props =>
             {(props.role=='tapp_admin')||(props.role=='instructor')?<Session {...props} />:''}
             {props.role=='tapp_admin'?<Round {...props} />:''}
             <Notifications {...props} />
-            <Auth {...props} />
+            <MenuItem
+                onClick={() => {
+                    var form = document.createElement('form');
+                    form.action = '/logout';
+                    form.method = 'post';
+                    document.body.append(form);
+                    form.submit();
+                }}>
+                Logout
+            </MenuItem>
         </Nav>
     </Navbar>;
 

@@ -3,9 +3,6 @@ Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
   get '/cp/(*z)', to: "app#cp"
   get '/roles', to: "app#roles"
-  get '/development', to: "app#is_development"
-  get '/development/set_utorid/:utorid', to: "app#set_utorid"
-  get '/development/get_admins', to: "app#get_admins"
 
   post '/logout', to: "app#logout"
   post '/reenter-session', to: "app#reenter_session"
@@ -74,6 +71,7 @@ Rails.application.routes.draw do
   post "/import/enrolment", to: "import#enrolment"
   post "/import/instructors", to: "import#instructors"
   post '/email-assignments', to: "assignments#email_assignments"
+  get "instructors/show/:id", to: "instructor#show"
 
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"

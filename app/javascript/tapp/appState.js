@@ -17,6 +17,10 @@ const initialState = {
         notifications: [],
     },
 
+    userId: null,
+
+    isDevelopment: null,
+
     // list of UI alerts (string can contain HTML, but be careful because it is not sanitized!)
     alerts: [],
 
@@ -420,6 +424,14 @@ class AppState {
 
     selectUserRole(role) {
         this.set('nav.selectedRole', role);
+    }
+
+    setUserId(id) {
+        this.set('userId', id);
+    }
+
+    getUserId() {
+        return this.get('userId');
     }
 
     // set the course panel layout in the ABC view
@@ -1139,8 +1151,9 @@ class AppState {
     }
 
     getInstructorsList(fullData = false) {
-        if(fullData)
-          return this.get('instructors.list');
+        if(fullData) {
+            return this.get('instructors.list');
+        }
         else {
           let instructors = this.get('instructors.list');
           let list = {};
