@@ -468,13 +468,17 @@ export const importData = (route, data, fetch, appState) =>{
         else appState.setImporting(false);
     });
 }
-export const setRole = (roles, cp, appState)=>{
+export const setRole = (cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          //currRoles = roles.filter(role => resp.roles.includes(role));
+          console.log(resp.roles);
           appState.setCurrentUserRoles(resp.roles);
-          appState.selectUserRole(resp.roles[0]);
+          if (cp && resp.roles.length > 1) { // cp_admin
+              appState.selectUserRole(resp.roles[1]); // set to cp_admin
+          } else {
+              appState.selectUserRole(resp.roles[0]);
+          }
           appState.setCurrentUserName(resp.utorid);
           appState.setIsDevelopment(resp.development === true);
           if(cp) appState.setTaCoordinator(resp.ta_coord);

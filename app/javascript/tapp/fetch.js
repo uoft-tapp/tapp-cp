@@ -249,7 +249,7 @@ export const createInstructor = (instructor) => {
 // get current user role and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-  return fetchProc.setRole(['tapp_admin', 'instructor', 'tapp_assistant'], false, appState);
+    return fetchProc.setRole(false, appState);
 }
 
 export const emailAssignments = (code, round, key) => {
