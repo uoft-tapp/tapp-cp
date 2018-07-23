@@ -44,6 +44,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'activerecord-session_store'
   # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
@@ -52,6 +53,9 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'guard'
   gem 'guard-rspec', require: false
+  # to support rubymine  debugging “remote”
+  gem 'debase'
+  gem 'ruby-debug-ide'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

@@ -472,20 +472,11 @@ export const setRole = (roles, cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          if (resp.development) {
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName('campb128');
-              //appState.setCurrentUserName('chenjas8');
-              //appState.setCurrentUserName('applicant1');
-              appState.setIsDevelopment(true);
-          } else {
-              roles = resp.roles.filter(role =>roles.includes(role));
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName(resp.utorid);
-              appState.setIsDevelopment(false);
-          }
+          //currRoles = roles.filter(role => resp.roles.includes(role));
+          appState.setCurrentUserRoles(resp.roles);
+          appState.selectUserRole(resp.roles[0]);
+          appState.setCurrentUserName(resp.utorid);
+          appState.setIsDevelopment(resp.development === true);
           if(cp) appState.setTaCoordinator(resp.ta_coord);
     });
 }

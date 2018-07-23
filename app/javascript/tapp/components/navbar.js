@@ -223,75 +223,6 @@ const Notifications = props => {
     );
 };
 
-const Auth = props => {
-    let roles = props.getCurrentUserRoles(),
-        role = props.getSelectedUserRole(),
-        name = props.getCurrentUserName(),
-        developmentMode = props.getIsDevelopment();
-    let utorid_input = null;
-    let utorid_field;
-    
-    if (developmentMode) {
-        utorid_field = (
-            <MenuItem disabled>
-                <FormGroup>
-                    <FormControl
-                        placeholder="Type instructor's utorid"
-                        type="text"
-                        inputRef={input => utorid_input = input}
-                        onKeyPress={event => {
-                            if (event.key === "Enter") {
-                                if (utorid_input) {
-                                    is_valid_instructor(utorid_input.value, props).then(responseJson => {
-                                        var valid = responseJson != null;
-                                        if (valid) {
-                                            props.setCurrentUserName(utorid_input.value);
-                                            props.selectUserRole("instructor");
-                                            fetchAll();
-                                            ReactDOM.findDOMNode(utorid_input).reset();
-                                        } else {
-                                            console.error("Instructor with utorid: " + utorid_input.value +" does not exist");
-                                        }
-                                    });
-                                }
-                            }
-                        }}
-                    />
-                </FormGroup>
-            </MenuItem>
-            
-        );
-    }
-    
-    return (
-        <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
-            {roles.map(
-                r =>
-                    role != r &&
-                    <MenuItem key={'switch-' + r} onClick={() => {
-                        props.selectUserRole(r);
-                        fetchAll();
-                    }}>
-                        Switch to {r} role
-                    </MenuItem>
-            )}
-            
-            {utorid_field}
-            
-            <MenuItem
-                onClick={() => {
-                    var form = document.createElement('form');
-                    form.action = '/logout';
-                    form.method = 'post';
-                    document.body.append(form);
-                    form.submit();
-                }}>
-                Logout
-            </MenuItem>
-        </NavDropdown>
-    );
-};
-
 /*** Navbar ***/
 
 const NavbarInst = props =>
@@ -314,7 +245,16 @@ const NavbarInst = props =>
             {(props.role=='tapp_admin')||(props.role=='instructor')?<Session {...props} />:''}
             {props.role=='tapp_admin'?<Round {...props} />:''}
             <Notifications {...props} />
-            <Auth {...props} />
+            <MenuItem
+                onClick={() => {
+                    var form = document.createElement('form');
+                    form.action = '/logout';
+                    form.method = 'post';
+                    document.body.append(form);
+                    form.submit();
+                }}>
+                Logout
+            </MenuItem>
         </Nav>
     </Navbar>;
 

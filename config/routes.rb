@@ -74,6 +74,7 @@ Rails.application.routes.draw do
   post "/import/enrolment", to: "import#enrolment"
   post "/import/instructors", to: "import#instructors"
   post '/email-assignments', to: "assignments#email_assignments"
+  get "instructors/show/:id", to: "instructor#show"
 
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"

@@ -16,6 +16,8 @@ const initialState = {
         // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
         notifications: [],
     },
+
+    userId: null,
     
     isDevelopment: null,
 
@@ -429,8 +431,15 @@ class AppState {
     }
 
     selectUserRole(role) {
-        console.log("set to role: " + role);
         this.set('nav.selectedRole', role);
+    }
+
+    setUserId(id) {
+        this.set('userId', id);
+    }
+
+    getUserId() {
+        return this.get('userId');
     }
 
     // set the course panel layout in the ABC view
@@ -1172,8 +1181,9 @@ class AppState {
     }
 
     getInstructorsList(fullData = false) {
-        if(fullData)
-          return this.get('instructors.list');
+        if(fullData) {
+            return this.get('instructors.list');
+        }
         else {
           let instructors = this.get('instructors.list');
           let list = {};
