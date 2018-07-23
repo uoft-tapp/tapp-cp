@@ -5,16 +5,34 @@ import {
     Panel
 } from 'react-bootstrap';
 
-const ContractPanel = props =>
-    //<p>{props.offer.get('course')}</p>;
-    <Panel>
-        <h3>{props.offer.get('course')}</h3>
-        <div>
-            <Button>Details</Button>
-            <Button>DDAH Form</Button>
-        </div>
+const ContractPanel = props => {
+    let instructors = [];
+    props.offer.get('instructors').map(val => instructors.push(val));
 
-    </Panel>;
+    let instructorString = "";
+    if (instructors.length) {
+        instructorString += " with instructor" + ((instructors.length > 1) ? "s " : " ");
+        instructors.map((instructor, i) => {
+            instructorString += instructor.get("name");
+            if (i < instructors.length - 1) {
+                instructorString += ", ";
+            }
+        });
+    }
+
+    return (
+        <Panel bsStyle="primary">
+            <Panel.Heading>
+                <Panel.Title>{props.offer.get('course') + instructorString}</Panel.Title>
+            </Panel.Heading>
+            <div>
+                <Button>Details</Button>
+                <Button>DDAH Form</Button>
+            </div>
+
+        </Panel>
+    );
+}
 
 
 class Contracts extends React.Component {
@@ -38,12 +56,11 @@ class Contracts extends React.Component {
 
     render() {
         let offers = this.props.appState.getOffersList();
-        console.log(offers);
         if (!offers || (offers && offers.size === 0)) {
             return (
                 <Grid>
                     <div>
-                       <h2>Sorry, no contracts in record.</h2>
+                       <h3>Sorry, you have no offers on record.</h3>
                     </div>
                 </Grid>
             );
@@ -52,7 +69,10 @@ class Contracts extends React.Component {
             return (
                 <Grid>
                     <div>
-                        {offers.map((val, key) =>
+                        <h3>Your teaching assistant offers</h3>
+                    </div>
+                    <div>
+                        {offers.map(val =>
                             <ContractPanel offer={val} />
                         )}
                     </div>

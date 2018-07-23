@@ -319,6 +319,35 @@ export const onFetchOffersSuccess = (resp) => {
     return offers;
 }
 
+export const onFetchApplicantOffersSuccess = (resp) => {
+    let offers = {};
+    resp.forEach(offer => {
+        console.log(offer);
+        offers[offer.id] = {
+            applicantId: offer.applicant_id,
+            firstName: offer.applicant.first_name,
+            lastName: offer.applicant.last_name,
+            studentNumber: offer.applicant.student_number,
+            email: offer.applicant.email,
+            utorid: offer.applicant.utorid,
+            course: offer.position,
+            position: offer.position_id,
+            hours: offer.hours,
+            status: offer.status,
+            hrStatus: offer.hr_status,
+            ddahStatus: offer.ddah_status,
+            sentAt: offer.send_date,
+            note: offer.commentary,
+            ddahSendDate: offer.ddah_send_date,
+            instructors: offer.instructors,
+            session: offer.session,
+            start_date: offer.start_date,
+            updated_at: offer.updated_at,
+        };
+    });
+    return offers;
+}
+
 export const onFetchSessionsSuccess = (resp)=>{
     let sessions = {};
     resp.forEach(session => {
@@ -474,11 +503,11 @@ export const setRole = (roles, cp, appState)=>{
       .then(resp => {
           if (resp.development) {
               appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName('campb128');
+              appState.selectUserRole(roles[3]);
+              //appState.setCurrentUserName('campb128');
               //appState.setCurrentUserName('chenjas8');
-              //appState.setCurrentUserName('applicant1');
-              appState.setIsDevelopment(true);
+              appState.setCurrentUserName('applicant13');
+              //appState.setIsDevelopment(true);
           } else {
               roles = resp.roles.filter(role =>roles.includes(role));
               appState.setCurrentUserRoles(roles);

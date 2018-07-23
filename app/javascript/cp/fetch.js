@@ -46,7 +46,7 @@ const getOffers = (user, role) => {
         }
         else if (role == 'applicant') {
             route = '/applicants/' + user + '/offers';
-            getResource(route, fetchProc.onFetchOffersSuccess, 'offers', false);
+            getResource(route, fetchProc.onFetchApplicantOffersSuccess, 'offers', false);
         }
     } else {
         getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
