@@ -16,6 +16,8 @@ const initialState = {
         notifications: [],
     },
 
+    isDevelopment: false,
+
     // list of UI alerts (string can contain HTML, but be careful because it is not sanitized!)
     alerts: [],
 
@@ -418,6 +420,10 @@ class AppState {
     selectUserRole(role) {
         console.log("set to role: " + role);
         this.set('nav.selectedRole', role);
+    }
+
+    setIsDevelopment(bool) {
+        this.set('isDevelopment', bool);
     }
 
     setCurrentUserName(user) {

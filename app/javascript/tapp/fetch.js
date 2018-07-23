@@ -11,7 +11,7 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName, setData, mince=true) =>
+const getResource = (route, onSuccess, dataName, setData, mince=true) => 
   fetchProc.getResource(route, onSuccess, dataName, setData, mince, appState);
 export const is_valid_instructor = (utorid, appState) => {
 
@@ -46,6 +46,14 @@ const getAssignments = (utorid = null) => !utorid?getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList):
   getResource('/instructors/'+utorid+'/assignments', fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
+const getInstructorId = (utorid) => {
+  fetch('/instructors/utorid/' + utorid)
+    .then(response => response.json())
+    .then(responseJson => {
+      appState.setUserId(responseJson.id);
+    })
+    .catch(error => console.error(error));
+} 
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
@@ -97,6 +105,7 @@ const fetchInstructorAll = (instructor = false) => {
         getApplications(utorid);
         getAssignments(utorid);
         getCourses(utorid);
+        getInstructorId(utorid);
       }
       else{
         getApplicants();
@@ -240,7 +249,7 @@ export const createInstructor = (instructor) => {
 // get current user role and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-  return fetchProc.setRole(['tapp_admin', 'instructor', 'tapp_assistant'], false, appState);
+    return fetchProc.setRole(false, appState);
 }
 
 export const emailAssignments = (code, round, key) => {

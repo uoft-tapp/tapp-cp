@@ -13,6 +13,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { Radio, DropdownButton, MenuItem, Button, Alert } from 'react-bootstrap'
 
 import { appState } from '../tapp/appState.js';
 import { fetchAll, fetchAuth } from '../tapp/fetch.js';
@@ -34,6 +35,7 @@ class App extends React.Component {
         super(props);
         // get current user role and username
         fetchAuth().then(()=> fetchAll());
+
     }
 
     componentDidMount() {
@@ -151,6 +153,7 @@ const AssistantRouter = props =>{
       </Router>
     );
 };
+
 
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(<App />, document.getElementById('root'));

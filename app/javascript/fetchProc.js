@@ -497,24 +497,18 @@ export const importData = (route, data, fetch, appState) =>{
         else appState.setImporting(false);
     });
 }
-export const setRole = (roles, cp, appState)=>{
+export const setRole = (cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          if (resp.development) {
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[3]);
-              //appState.setCurrentUserName('campb128');
-              //appState.setCurrentUserName('chenjas8');
-              appState.setCurrentUserName('applicant13');
-              //appState.setIsDevelopment(true);
+          appState.setCurrentUserRoles(resp.roles);
+          if (cp && resp.roles.length > 1) { // cp_admin
+              appState.selectUserRole(resp.roles[1]); // set to cp_admin
           } else {
-              roles = resp.roles.filter(role =>roles.includes(role));
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName(resp.utorid);
-              appState.setIsDevelopment(false);
+              appState.selectUserRole(resp.roles[0]);
           }
+          appState.setCurrentUserName(resp.utorid);
+          appState.setIsDevelopment(resp.development === true);
           if(cp) appState.setTaCoordinator(resp.ta_coord);
     });
 }
