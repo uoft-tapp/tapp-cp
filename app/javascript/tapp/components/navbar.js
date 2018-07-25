@@ -2,10 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown, MenuItem, FormGroup } from 'react-bootstrap';
+import FormControl from 'react-bootstrap/lib/FormControl';
 
 import { routeConfig } from '../routeConfig.js';
 import { roundColourConfig } from '../roundColourConfig.js';
+import { fetchAll, is_valid_instructor } from '../fetch.js';
 
 /*** Navbar ABC view layout icons ***/
 import img20 from '../img/layout-20.png';
@@ -221,35 +223,6 @@ const Notifications = props => {
     );
 };
 
-const Auth = props => {
-    let roles = props.getCurrentUserRoles(),
-        role = props.getSelectedUserRole(),
-        name = props.getCurrentUserName();
-
-    return (
-        <NavDropdown title={role + ':' + name} id="nav-auth-dropdown">
-            {roles.map(
-                r =>
-                    role != r &&
-                    <MenuItem key={'switch-' + r} onClick={() => props.selectUserRole(r)}>
-                        Switch to {r} role
-                    </MenuItem>
-            )}
-
-            <MenuItem
-                onClick={() => {
-                    var form = document.createElement('form');
-                    form.action = '/logout';
-                    form.method = 'post';
-                    document.body.append(form);
-                    form.submit();
-                }}>
-                Logout
-            </MenuItem>
-        </NavDropdown>
-    );
-};
-
 /*** Navbar ***/
 
 const NavbarInst = props =>
@@ -272,7 +245,16 @@ const NavbarInst = props =>
             {(props.role=='tapp_admin')||(props.role=='instructor')?<Session {...props} />:''}
             {props.role=='tapp_admin'?<Round {...props} />:''}
             <Notifications {...props} />
-            <Auth {...props} />
+            <MenuItem
+                onClick={() => {
+                    var form = document.createElement('form');
+                    form.action = '/logout';
+                    form.method = 'post';
+                    document.body.append(form);
+                    form.submit();
+                }}>
+                Logout
+            </MenuItem>
         </Nav>
     </Navbar>;
 

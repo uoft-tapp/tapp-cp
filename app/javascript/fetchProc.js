@@ -48,32 +48,34 @@ export const putHelper = (URL, body, appState) => {
     }, appState);
 }
 export const getResource = (route, onSuccess, dataName, setData, mince, state) =>{
-  let appState = state;
-  if(mince){
-    let session = setData?
-      appState.getSelectedSession():appState.get('selectedSession');
-    if(session&&session!='N/A'){
-      route = '/sessions/'+session+route;
-      return getResHelper(route, onSuccess, dataName, setData, appState);
+    let appState = state;
+    if(mince){
+        let session = setData?
+        appState.getSelectedSession():appState.get('selectedSession');
+        if(session&&session!='N/A'){
+            route = '/sessions/'+session+route;
+            console.log("getResource: " + route);
+            return getResHelper(route, onSuccess, dataName, setData, appState);
+        }
+        else{
+            setData? setData([]): appState.set(dataName+'.list', fromJS([]));
+            return appState.setFetchingDataList(dataName, false, true);
+        };
     }
     else{
-      setData? setData([]): appState.set(dataName+'.list', fromJS([]));
-      return appState.setFetchingDataList(dataName, false, true);
-    };
-  }
-  else{
-    return getResHelper(route, onSuccess, dataName, setData, appState);
-  }
+        return getResHelper(route, onSuccess, dataName, setData, appState);
+    }
 }
 function getResHelper(route, onSuccess, dataName, setData, appState){
-  return getHelper(route)
-      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-      .then(onSuccess)
-      .then(data => {
-          setData? setData(data): appState.set(dataName+'.list', fromJS(data));
-          appState.setFetchingDataList(dataName, false, true);
-      })
-      .catch(() => appState.setFetchingDataList(dataName, false));
+    return getHelper(route)
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onSuccess)
+        .then(data => {
+            setData? setData(data): appState.set(dataName+'.list', fromJS(data));
+            appState.setFetchingDataList(dataName, false, true);
+        })
+        .catch((error) => //appState.setFetchingDataList(dataName, false)
+            console.error(error));
 }
 
 /*
@@ -131,7 +133,9 @@ export const onFetchApplicationsSuccess = (resp) => {
             prefs: (function(prefs) {
                 return prefs.map(pref => ({
                     positionId: pref.position_id,
+                    applicationId: pref.application_id,
                     preferred: pref.rank == 1,
+                    instructorPref: pref.instructor_pref,
                 }));
             })(app.preferences),
             rawPrefs: app.raw_prefs,
@@ -464,20 +468,19 @@ export const importData = (route, data, fetch, appState) =>{
         else appState.setImporting(false);
     });
 }
-export const setRole = (roles, cp, appState)=>{
+export const setRole = (cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          if (resp.development) {
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName('zaleskim');
+          console.log(resp.roles);
+          appState.setCurrentUserRoles(resp.roles);
+          if (cp && resp.roles.length > 1) { // cp_admin
+              appState.selectUserRole(resp.roles[1]); // set to cp_admin
           } else {
-              roles = resp.roles.filter(role =>roles.includes(role));
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName(resp.utorid);
+              appState.selectUserRole(resp.roles[0]);
           }
+          appState.setCurrentUserName(resp.utorid);
+          appState.setIsDevelopment(resp.development === true);
           if(cp) appState.setTaCoordinator(resp.ta_coord);
     });
 }

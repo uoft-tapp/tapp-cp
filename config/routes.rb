@@ -20,6 +20,9 @@ Rails.application.routes.draw do
   scope '/sessions/:session_id/instructors/:utorid' do
     get "offers", to: "offers#index"
     get "positions", to: "positions#index"
+    get "applicants", to: "applicants#index"
+    get "applications", to: "applications#index"
+    get "assignments", to: "assignments#index"
     get "ddahs", to: "ddahs#index"
   end
   resources :applicants do
@@ -27,7 +30,7 @@ Rails.application.routes.draw do
     resources :applications, only: [:index]
   end
   resources :assignments, only: [:index, :show]
-  resources :applications, only: [:index, :show]
+  resources :applications, only: [:index, :show, :update]
   resources :positions
   resources :instructors
 
@@ -71,6 +74,7 @@ Rails.application.routes.draw do
   post "/import/enrolment", to: "import#enrolment"
   post "/import/instructors", to: "import#instructors"
   post '/email-assignments', to: "assignments#email_assignments"
+  get "instructors/show/:id", to: "instructor#show"
 
   # CP routes
   post "offers/can-send-contract" => "offers#can_send_contract"
@@ -105,6 +109,7 @@ Rails.application.routes.draw do
   get "/templates/:template_id/preview" => "templates#preview"
 
   # student-facing
+  get "/applicants/:utorid/offers" => "offers#applicant_get_offers"
   get "/pb/:offer_id" => "app#student_view"
   get "/pb/:offer_id/pdf" => "offers#get_contract_student"
   post "/pb/:offer_id/:status" => "offers#set_status_student"
