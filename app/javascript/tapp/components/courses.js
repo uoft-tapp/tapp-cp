@@ -38,7 +38,11 @@ class Courses extends React.Component {
                 <Panel id="course-form">
                     <ListGroup fill>
                         {courses.map(([key, course]) =>
-                            <CourseForm key={key} courseId={key} course={course} {...this.props} />
+                            <CourseForm key={key}
+                                        courseId={key}
+                                        course={course}
+                                        {...this.props}
+                                        />
                         )}
                     </ListGroup>
                 </Panel>
