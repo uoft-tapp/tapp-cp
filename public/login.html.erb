@@ -36,7 +36,13 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <form action=<%request.headers['PATH_INFO']%>>
+      utorID:<br>
+      <input type="text" name="utorid" value="">
+      <br>
+      <input type="submit" value="Submit" onSubmit="login()">
+    </form>
+
 
     <footer>
       <div class="container-fluid">

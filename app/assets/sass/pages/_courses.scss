@@ -14,6 +14,13 @@
   overflow: auto;
 }
 
+#course-form .expand-button {
+  border: none;
+  background-color: inherit;
+  padding: 5px 5px 0px 5px;
+  margin: 10px 10px 0px 10px;
+}
+
 /* for CourseForm */
 .course-panel .fa-envelope-o{
   float: left;
@@ -29,6 +36,7 @@
   $col-7-width:       240px; /* instructor form */
 
   width: 100%;
+  margin-top: 10px;
 
   td {
     vertical-align: top;
@@ -45,6 +53,14 @@
   .col-3 form + form,
   .col-5 form + form {
     margin-top: 5px;
+  }
+
+  .col-half {
+    width: 50%;
+  }
+
+  .long-text {
+    height: 250px;
   }
 
   /* left padding for all but the left column */
