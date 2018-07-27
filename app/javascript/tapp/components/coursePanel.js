@@ -67,7 +67,7 @@ class CoursePanel extends React.Component {
                 // icon is displayed beside last name if applicant has associated notes
                 data: p =>
                     <span
-                        className="highlightOnHover"
+                        className="highlight"
                         onClick={() => props.selectApplicant(p.applicantId)}>
                         {p.applicant.lastName}&nbsp;
                         {p.applicant.notes && <i className="fa fa-paperclip" />}

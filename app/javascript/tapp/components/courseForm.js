@@ -22,7 +22,7 @@ class CourseForm extends React.Component {
         return (
             <ListGroupItem key={this.props.courseId}>
                 <a name={this.props.courseId} />
-                <table className="form_table">
+                <table className="form-table">
                     <tbody>
                         <tr>
                             <td className="col-1">
@@ -187,7 +187,7 @@ class CourseForm extends React.Component {
                             <td className="col-7">
                                 <p>
                                     <b>Instructors
-                                     <i className="fa fa-pencil instructor-modal-opener clickable"
+                                     <i className="fa fa-pencil button icon"
                                       title="Open Instructor Editor"
                                       onClick={()=> this.props.showInstructorModal()}></i>
                                     </b>
@@ -240,7 +240,7 @@ class ExpandableDescriptions extends React.Component {
 class Descriptions extends React.Component {
     render() {
         return (
-            <table className="form_table">
+            <table className="form-table">
                 <tbody>
                 <tr>
                     <td className="col-half">
@@ -326,7 +326,7 @@ class InstructorForm extends React.Component {
 
     render() {
         return (
-            <div className="instructor_form" onClick={() => this.input.focus()}>
+            <div className="instructor-form" onClick={() => this.input.focus()}>
                 {this.props.instructors.map((instructor, key) =>
                     <Badge key={key}>
                         {this.props.instructor_data[instructor]}

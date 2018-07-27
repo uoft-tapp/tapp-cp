@@ -130,7 +130,6 @@ const Auth = props => {
 };
 
 /*** Navbar ***/
-
 const NavbarInst = props => {
     let isAdmin = props.appState.getSelectedUserRole() == 'cp_admin';
     let isInstructor = props.appState.getSelectedUserRole() == 'instructor';
@@ -138,7 +137,7 @@ const NavbarInst = props => {
 
     return (
         <Navbar fixedTop fluid>
-            <Navbar.Header id="app-drop-down">
+            <Navbar.Header id="drop-down">
                 <Navbar.Brand>
                     {isApplicant && <span>CP:TAPP</span>}
                     {!isApplicant && <NavDropdown id='1' title={<span>CP:TAPP</span>} noCaret>
@@ -152,8 +151,7 @@ const NavbarInst = props => {
 
             <Nav pullRight>
                 {isInstructor &&
-                <i
-                    className="fa fa-question-circle"
+                <i className="fa fa-question-circle"
                     style={{
                         cursor: 'pointer',
                         fontSize: '20px',

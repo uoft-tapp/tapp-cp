@@ -11,13 +11,13 @@ class InstructorModal extends React.Component {
               selectedTab = this.props.getSelectedTabFromModal();
 
           return (
-              <Modal id="instructor-modal" show={true} onHide={() => this.props.hideInstructorModal()}>
+              <Modal className="_modal instructor" show={true} onHide={() => this.props.hideInstructorModal()}>
                 <Form horizontal>
                   <Modal.Header>
                       <Modal.Title>
                           Instructor Editor
                           <span className="text-muted" style={{ float: 'right' }}>
-                              <i className="fa fa-times clickable"
+                              <i className="fa fa-times button"
                                   style={{ fontSize: '18px' }}
                                   onClick={() => this.props.hideInstructorModal()}
                               />
@@ -64,13 +64,13 @@ class InstructorModal extends React.Component {
 
 const CreateInstructor = props =>(
   <Tab.Pane eventKey="create">
-      <FormFormat cid='instructor-utorid' type='text'
-        label='Utorid'
-        placeholder='Utorid'
-        value={props.getInstructorDataFromModal('utorid')}
-        update={event=>props.setInstructorDataFromModal('utorid', event.target.value)}
-        {...props}/>
-      <InstructorForm {...props}/>
+    <FormFormat cid='instructor-utorid' type='text'
+      label='Utorid'
+      placeholder='Utorid'
+      value={props.getInstructorDataFromModal('utorid')}
+      update={event=>props.setInstructorDataFromModal('utorid', event.target.value)}
+      {...props}/>
+    <InstructorForm {...props}/>
   </Tab.Pane>
 );
 
@@ -114,14 +114,14 @@ const FormFormat = props =>(
     </Col>
     <Col sm={9}>
       {(props.type=='dropdown')?
-      <div id='instructor-modal-utorid-row'>
-      <DropdownButton key='1' id={props.cid}
-        bsStyle='default'
-        title={props.placeholder}
-        onSelect={props.update}>
-        {props.body}
-      </DropdownButton>
-      <i className='fa fa-trash' onClick={()=>props.deleteInstructor()}></i>
+      <div>
+        <DropdownButton key='1' id={props.cid}
+          bsStyle='default'
+          title={props.placeholder}
+          onSelect={props.update}>
+          {props.body}
+        </DropdownButton>
+        <i className='fa fa-trash' onClick={()=>props.deleteInstructor()}></i>
       </div>:
       <FormControl type={props.type}
         placeholder={props.placeholder}

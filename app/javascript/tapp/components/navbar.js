@@ -227,7 +227,7 @@ const Notifications = props => {
 
 const NavbarInst = props =>
     <Navbar fixedTop fluid>
-        <Navbar.Header id ="app-drop-down">
+        <Navbar.Header id="drop-down">
           <Navbar.Brand>
             <NavDropdown title={<span>TAPP</span>} noCaret id="1">
               <MenuItem href="/cp" id="1">

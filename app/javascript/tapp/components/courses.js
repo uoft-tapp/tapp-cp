@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Grid, Panel, ListGroup } from 'react-bootstrap';
 import { CourseList } from './courseList.js';
 import { CourseForm } from './courseForm.js';
