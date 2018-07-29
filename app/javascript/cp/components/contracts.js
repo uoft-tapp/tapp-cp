@@ -11,7 +11,7 @@ import { Contract } from './contract.js';
 
 const ContractPanel = props => {
     let instructors = [];
-    props.offer.get('instructors').map(val => instructors.push(val));
+    props.offer.get('instructors').map(instructor => instructors.push(instructor));
 
     let instructorString = "";
     if (instructors.length) {
@@ -57,11 +57,16 @@ class ContractsList extends React.Component {
 
     render() {
         if (this.state.contractSelected) {
-            return <Redirect to={routeConfig.contracts.route + "/" + this.state.contractSelected} />;
+            return (
+                <Redirect
+                    to={routeConfig.contracts.route + "/" + this.state.contractSelected}
+                />
+            );
         }
 
         let offers = this.props.appState.getOffersList();
 
+        // TODO: Show loader spinner when !offers
         if (!offers || (offers && offers.size === 0)) {
             return (
                 <Grid>
@@ -78,9 +83,9 @@ class ContractsList extends React.Component {
                         <h3>Your teaching assistant offers</h3>
                     </div>
                     <div>
-                        {offers.map((val, id) =>
+                        {offers.map((offer, id) =>
                             <ContractPanel
-                                offer={val}
+                                offer={offer}
                                 selectContract={() => this.selectContract(id)}
                             />
                         )}
