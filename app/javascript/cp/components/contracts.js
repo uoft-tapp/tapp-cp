@@ -4,6 +4,10 @@ import {
     Grid,
     Panel
 } from 'react-bootstrap';
+import { Switch, Redirect, Route } from 'react-router-dom';
+
+import { routeConfig } from '../routeConfig.js';
+import { Contract } from './contract.js';
 
 const ContractPanel = props => {
     let instructors = [];
@@ -26,12 +30,65 @@ const ContractPanel = props => {
                 <Panel.Title>{props.offer.get('course') + instructorString}</Panel.Title>
             </Panel.Heading>
             <div>
-                <Button>Details</Button>
-                <Button>DDAH Form</Button>
+                <Button onClick={() => props.selectContract()}>
+                    Contract
+                </Button>
+                <Button>
+                    DDAH Form
+                </Button>
             </div>
-
         </Panel>
     );
+}
+
+class ContractsList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            contractSelected: 0
+        };
+    }
+
+    selectContract(id) {
+        this.setState({
+            contractSelected: id
+        });
+    }
+
+    render() {
+        if (this.state.contractSelected) {
+            return <Redirect to={routeConfig.contracts.route + "/" + this.state.contractSelected} />;
+        }
+
+        let offers = this.props.appState.getOffersList();
+
+        if (!offers || (offers && offers.size === 0)) {
+            return (
+                <Grid>
+                    <div>
+                       <h3>Sorry, you have no offers on record.</h3>
+                    </div>
+                </Grid>
+            );
+        }
+        else {
+            return (
+                <Grid>
+                    <div>
+                        <h3>Your teaching assistant offers</h3>
+                    </div>
+                    <div>
+                        {offers.map((val, id) =>
+                            <ContractPanel
+                                offer={val}
+                                selectContract={() => this.selectContract(id)}
+                            />
+                        )}
+                    </div>
+                </Grid>
+            );
+        }
+    }
 }
 
 
@@ -55,30 +112,21 @@ class Contracts extends React.Component {
     }
 
     render() {
-        let offers = this.props.appState.getOffersList();
-        if (!offers || (offers && offers.size === 0)) {
-            return (
-                <Grid>
-                    <div>
-                       <h3>Sorry, you have no offers on record.</h3>
-                    </div>
-                </Grid>
-            );
-        }
-        else {
-            return (
-                <Grid>
-                    <div>
-                        <h3>Your teaching assistant offers</h3>
-                    </div>
-                    <div>
-                        {offers.map(val =>
-                            <ContractPanel offer={val} />
-                        )}
-                    </div>
-                </Grid>
-            );
-        }
+        return (
+            <div>
+                <Switch>
+                    <Route
+                        path={routeConfig.contracts.route + '/:id'}
+                        // Pass in appState props and route matching props
+                        render={(props) => <Contract {...this.props} {...props} />}
+                    />
+                    <Route
+                        path={routeConfig.contracts.route}
+                        render={() => <ContractsList {...this.props} />}
+                    />
+                </Switch>
+            </div>
+        );
     }
 }
 

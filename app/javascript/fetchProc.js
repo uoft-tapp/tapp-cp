@@ -322,7 +322,6 @@ export const onFetchOffersSuccess = (resp) => {
 export const onFetchApplicantOffersSuccess = (resp) => {
     let offers = {};
     resp.forEach(offer => {
-        console.log(offer);
         offers[offer.id] = {
             applicantId: offer.applicant_id,
             firstName: offer.applicant.first_name,
