@@ -44,22 +44,14 @@ const ContractPanel = props => {
 class ContractsList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            contractSelected: 0
-        };
-    }
-
-    selectContract(id) {
-        this.setState({
-            contractSelected: id
-        });
     }
 
     render() {
-        if (this.state.contractSelected) {
+        console.log(this.props.contractSelected);
+        if (this.props.contractSelected) {
             return (
                 <Redirect
-                    to={routeConfig.contracts.route + "/" + this.state.contractSelected}
+                    to={routeConfig.contracts.route + "/" + this.props.contractSelected}
                 />
             );
         }
@@ -86,7 +78,7 @@ class ContractsList extends React.Component {
                         {offers.map((offer, id) =>
                             <ContractPanel
                                 offer={offer}
-                                selectContract={() => this.selectContract(id)}
+                                selectContract={() => this.props.selectContract(id)}
                             />
                         )}
                     </div>
@@ -100,6 +92,9 @@ class ContractsList extends React.Component {
 class Contracts extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            contractSelected: 0
+        };
     }
 
     selectThisTab() {
@@ -116,18 +111,46 @@ class Contracts extends React.Component {
         this.selectThisTab();
     }
 
+    selectContract(id) {
+        this.setState({
+            contractSelected: id
+        });
+    }
+
+    closeContractWindow() {
+        this.setState({
+            contractSelected: 0
+        });
+        this.props.history.push(routeConfig.contracts.route);
+    }
+
     render() {
         return (
             <div>
                 <Switch>
                     <Route
                         path={routeConfig.contracts.route + '/:id'}
-                        // Pass in appState props and route matching props
-                        render={(props) => <Contract {...this.props} {...props} />}
+                        render={(props) => {
+                            return (
+                                <Contract
+                                    {...this.props}
+                                    {...props} // Route matching props
+                                    closeContractWindow={() => this.closeContractWindow()}
+                                />
+                            );
+                        }}
                     />
                     <Route
                         path={routeConfig.contracts.route}
-                        render={() => <ContractsList {...this.props} />}
+                        render={() => {
+                            return (
+                                <ContractsList
+                                    {...this.props}
+                                    contractSelected={this.state.contractSelected}
+                                    selectContract={(id) => this.selectContract(id)}
+                                />
+                            );
+                        }}
                     />
                 </Switch>
             </div>

@@ -3,6 +3,9 @@ import {
     Grid,
     Panel,
 } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
+
+import { routeConfig } from '../routeConfig';
 
 const InvalidContract = props => {
     return (
@@ -42,7 +45,15 @@ class Contract extends React.Component {
             <Grid>
                 <Panel>
                     <Panel.Heading>
-                        <Panel.Title>{offer.get('course')}</Panel.Title>
+                        <Panel.Title>
+                            {offer.get('course')}
+                            <button className="close-button"
+                                    style={{float: "right"}}
+                                    onClick={() => this.props.closeContractWindow()}>
+                                <span className="glyphicon glyphicon-remove">
+                                </span>
+                            </button>
+                        </Panel.Title>
                     </Panel.Heading>
                 </Panel>
             </Grid>
