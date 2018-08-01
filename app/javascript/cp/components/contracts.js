@@ -54,7 +54,6 @@ class ContractsList extends React.Component {
     }
 
     render() {
-        console.log(this.props.contractSelected);
         if (this.props.contractSelected) {
             return (
                 <Redirect
