@@ -330,7 +330,7 @@ export const onFetchApplicantOffersSuccess = (resp) => {
             email: offer.applicant.email,
             utorid: offer.applicant.utorid,
             course: offer.position,
-            position: offer.position_id,
+            position: offer.position,
             hours: offer.hours,
             status: offer.status,
             hrStatus: offer.hr_status,
@@ -340,7 +340,8 @@ export const onFetchApplicantOffersSuccess = (resp) => {
             ddahSendDate: offer.ddah_send_date,
             instructors: offer.instructors,
             session: offer.session,
-            start_date: offer.start_date,
+            startDate: offer.start_date,
+            endDate: offer.end_date,
             updated_at: offer.updated_at,
         };
     });

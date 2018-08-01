@@ -9,13 +9,13 @@ import { Switch, Redirect, Route } from 'react-router-dom';
 import { routeConfig } from '../routeConfig.js';
 import { Contract } from './contract.js';
 
-const ContractPanel = props => {
+function getInstructorString(offer) {
     let instructors = [];
-    props.offer.get('instructors').map(instructor => instructors.push(instructor));
+    offer.get('instructors').map(instructor => instructors.push(instructor));
 
     let instructorString = "";
     if (instructors.length) {
-        instructorString += " with instructor" + ((instructors.length > 1) ? "s " : " ");
+        instructorString += "Professor" + ((instructors.length > 1) ? "s " : " ");
         instructors.map((instructor, i) => {
             instructorString += instructor.get("name");
             if (i < instructors.length - 1) {
@@ -23,7 +23,14 @@ const ContractPanel = props => {
             }
         });
     }
+    return instructorString;
+}
 
+const ContractPanel = props => {
+    let instructorString = getInstructorString(props.offer);
+    if (instructorString) {
+        instructorString = " with " + instructorString;
+    }
     return (
         <Panel bsStyle="primary">
             <Panel.Heading>
@@ -158,4 +165,4 @@ class Contracts extends React.Component {
     }
 }
 
-export { Contracts };
+export { Contracts, getInstructorString };

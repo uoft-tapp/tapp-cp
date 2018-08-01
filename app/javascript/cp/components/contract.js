@@ -2,10 +2,10 @@ import React from 'react';
 import {
     Grid,
     Panel,
+    Well,
 } from 'react-bootstrap';
-import { Redirect } from 'react-router-dom';
 
-import { routeConfig } from '../routeConfig';
+import { getInstructorString } from "./contracts.js";
 
 const InvalidContract = props => {
     return (
@@ -16,6 +16,36 @@ const InvalidContract = props => {
         </Grid>
     );
 }
+
+const Letter = props => {
+    let pay = props.session.get('pay');
+    // TODO: remove following increment
+    pay += 1;
+    let salary = pay * props.offer.get('hours');
+    let vacationSalary = salary * 0.04;
+    console.log(pay);
+    console.log(salary);
+
+    return (
+        <div>
+            <p>
+                Dear {props.offer.get('firstName')} {props.offer.get('lastName')},
+            </p>
+            <p>
+                I am pleased to offer you an appointment as a Teaching Assistant in the Department of Computer Science.
+                The starting date of your appointment will be <b>{props.offer.get('startDate')}</b> and
+                this appointment will end on <b>{props.offer.get('endDate')}</b> with no further notice to you.
+            </p>
+            <p>
+                Your appointment will be for <b>{props.offer.get('hours')}</b> hours for <b>{props.offer.get('position')}</b>,
+                supervised by {getInstructorString(props.offer)}. You will be paid in equal instalments, once per month for
+                the period of your appointment. Your salary will be paid by direct deposit. Your total salary is
+                ${salary} plus 4% vacation pay of ${vacationSalary} for a total of ${salary + vacationSalary}.
+            </p>
+        </div>
+    );
+}
+
 
 class Contract extends React.Component {
     constructor(props) {
@@ -41,6 +71,9 @@ class Contract extends React.Component {
             return <InvalidContract />;
         }
 
+        let session = offer.get('session');
+        let position = offer.get('position');
+
         return (
             <Grid>
                 <Panel>
@@ -55,6 +88,17 @@ class Contract extends React.Component {
                             </button>
                         </Panel.Title>
                     </Panel.Heading>
+                    <Panel.Body>
+                        <div>
+                            <h3>University of Toronto</h3>
+                            <p>
+                                <i>Toronto, Canada M5S 3G4</i>
+                            </p>
+                        </div>
+                        <Well>
+                            <Letter offer={offer} session={session} position={position}/>
+                        </Well>
+                    </Panel.Body>
                 </Panel>
             </Grid>
         );

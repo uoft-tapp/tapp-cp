@@ -6,7 +6,7 @@ import * as fetch from './fetch.js';
 const initialState = {
     // navbar component
     nav: {
-        roles: [], // array of { 'cp_admin', 'hr_assistant', 'instructor' }
+        roles: [], // array of { 'cp_admin', 'hr_assistant', 'instructor', 'applicant' }
         selectedRole: null,
         user: null,
 
