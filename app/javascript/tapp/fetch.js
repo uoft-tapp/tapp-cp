@@ -34,6 +34,17 @@ const getApplicants = (utorid = null) => !utorid?getResource('/applicants',
   fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList):
   getResource('/instructors/'+utorid+'/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
+// const getApplicants = (selectedRole) => {
+//   if (selectedRole == "tapp_admin") {
+//     getResource('/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
+//   } else if (selectedRole == "instructor") {
+//     getResource('/instructors/'+utorid+'/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
+//   } else {
+//     console.error("invalid role");
+//   }
+//   console.log(selectedRole)
+// }
+
 const getApplications = (utorid = null) => !utorid?getResource('/applications',
   fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList):
   getResource('/instructors/'+utorid+'/applications', fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
@@ -99,6 +110,7 @@ const fetchInstructorAll = (instructor = false) => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
+      // getApplicants(appState.getSelectedUserRole());
       if(instructor){
         let utorid = appState.getCurrentUserName();
         getApplicants(utorid);

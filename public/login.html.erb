@@ -36,7 +36,8 @@
   </head>
 
   <body>
-    <form action=<%request.headers['PATH_INFO']%>>
+    <% print request.headers['PATH_INFO'] %>
+    <form action='/tapp'>
       utorID:<br>
       <input type="text" name="utorid" value="">
       <br>

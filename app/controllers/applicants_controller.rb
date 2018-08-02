@@ -1,17 +1,20 @@
 class ApplicantsController < ApplicationController
-  protect_from_forgery with: :null_session
+  # protect_from_forgery with: :null_session
+  skip_before_action :verify_authenticity_token
   include Authorizer
-  before_action :tapp_admin
+  before_action :admin_or_instructor
 
 '''
   index #GET
     /applicants/
 '''
   def index
-    if params[:session_id]
-      render json: applicants_from_session(params[:session_id], params[:utorid])
-    else
+    if session[:roles].include?("tapp_admin")
       render json: Applicant.all
+    elsif params[:session_id]
+      render json: applicants_from_session(params[:session_id], session[:utorid])
+    else
+      render file: 'public/403.html'
     end
   end
 

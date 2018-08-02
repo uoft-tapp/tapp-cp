@@ -2,7 +2,7 @@ class ApplicationsController < ApplicationController
   skip_before_action :verify_authenticity_token
   include Authorizer
   include Model
-  before_action :tapp_admin
+  before_action :admin_or_instructor
 
 '''
   index #GET

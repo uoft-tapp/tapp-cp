@@ -21,10 +21,12 @@ export const getHelper = (URL, appState) => {
     }, appState);
 }
 export const postHelper = (URL, body, appState) => {
+    var token = document.getElementsByName('csrf-token')[0].content;
     return fetchHelper(URL, {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
+            'X-CSRF-Token': token
         },
         method: 'POST',
         body: JSON.stringify(body),
@@ -32,15 +34,21 @@ export const postHelper = (URL, body, appState) => {
     }, appState);
 }
 export const deleteHelper = (URL, appState) => {
+    var token = document.getElementsByName('csrf-token')[0].content;
     return fetchHelper(URL, {
+        headers: {
+            'X-CSRF-Token': token,
+        },
         method: 'DELETE',
         credentials: 'include',
     }, appState);
 }
 export const putHelper = (URL, body, appState) => {
+    var token = document.getElementsByName('csrf-token')[0].content;
     return fetchHelper(URL, {
         headers: {
             'Content-Type': 'application/json; charset=utf-8',
+            'X-CSRF-Token': token,
         },
         method: 'PUT',
         body: JSON.stringify(body),
@@ -480,6 +488,7 @@ export const setRole = (cp, appState)=>{
               appState.selectUserRole(resp.roles[0]);
           }
           appState.setCurrentUserName(resp.utorid);
+          console.log("utorid set to:" + resp.utorid);
           appState.setIsDevelopment(resp.development === true);
           if(cp) appState.setTaCoordinator(resp.ta_coord);
     });

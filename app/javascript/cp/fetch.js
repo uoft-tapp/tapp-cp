@@ -84,6 +84,7 @@ export const adminFetchAll = () =>  {
 
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
+    console.log("before fetch: " + user);
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
@@ -98,7 +99,7 @@ export const instructorFetchAll = () => {
     });
     getCategories();
     getDuties();
-    getTemplates();
+    getTemplates(user);
     getTrainings();
 }
 
