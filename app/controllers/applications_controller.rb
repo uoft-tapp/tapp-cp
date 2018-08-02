@@ -1,7 +1,7 @@
 class ApplicationsController < ApplicationController
   include Authorizer
   include Model
-  before_action :tapp_admin
+  before_action :admin_or_instructor
 
 '''
   index #GET

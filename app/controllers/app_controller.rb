@@ -59,36 +59,12 @@ class AppController < ApplicationController
     session[:utorid] = nil
     session[:roles] = nil
     render file: 'public/logout.html'
-    # redirect_back(fallback_location: request.referrer)
-  end
-
-  def reenter_session
-    session[:logged_in] = true
   end
 
   def is_development
     render json: {development: ENV['RAILS_ENV']}
   end
 
-  def set_utorid
-    # puts "set_utorid: " + session[:utorid]
-    if ENV['RAILS_ENV'] == 'development'
-      session[:utorid] = nil
-      session[:utorid] = params[:utorid]
-      set_roles
-    end
-    puts "set_utorid end : " + session[:utorid]
-  end
+  
 
-  def get_admins
-    if ENV['RAILS_ENV'] == 'development'
-      render json: {admins: ENV['TAPP_ADMINS'].split(',')}
-    else
-      render status: 403, json: {message: "not authorized"}
-    end
-  end
-
-  def get_role
-    render json: {role: session[:roles], utorid: session[:utorid]}
-  end
 end

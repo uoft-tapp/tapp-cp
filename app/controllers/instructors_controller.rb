@@ -1,7 +1,7 @@
 class InstructorsController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
-  before_action :tapp_admin
+  before_action :admin_or_instructor
 
   def index
     instructors = Instructor.all

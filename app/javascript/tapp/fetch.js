@@ -24,8 +24,9 @@ const getInstructors = () => getResource('/instructors',
 const getApplicants = () => getResource('/applicants',
   fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
-const getApplications = () => getResource('/applications',
-  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
+const getApplications = (utorid = null) => !utorid?getResource('/applications',
+  fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList):
+  getResource('/instructors/'+utorid+'/applications', fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList);
 
 const getCourses = () => getResource('/positions',
   fetchProc.onFetchTappCoursesSuccess, 'courses', appState.setCoursesList);
@@ -86,6 +87,7 @@ const fetchInstructorAll = (instructor = true) => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
+      // getApplicants(appState.getSelectedUserRole());
       if(instructor){
         let utorid = appState.getCurrentUserName();
         getApplicants(utorid);

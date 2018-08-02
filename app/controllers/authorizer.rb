@@ -20,6 +20,11 @@ module Authorizer
     access(expected_roles)
   end
 
+  def admin_or_instructor
+    expected_roles = ["tapp_admin", "instructor"]
+    access(expected_roles)
+  end
+
   def cp_admin(hr_assistant = false)
     if hr_assistant
       expected_roles = ["cp_admin", "hr_assistant"]
@@ -39,10 +44,10 @@ module Authorizer
       access(expected_roles)
     else
       if ENV['RAILS_ENV'] == 'production'
-        expected_roles = ["instructor"]
+        expected_roles = ["tapp_admin", "instructor"]
         if has_access(expected_roles)
           if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
-	    render status: 403, file: 'public/403.html'
+	          render status: 403, file: 'public/403.html'
           end
         else
           render status: 403, file: 'public/403.html'
@@ -115,6 +120,7 @@ module Authorizer
           session[:utorid] = params[:utorid]
           session[:logged_in] = true
           set_roles
+          return
         end
         if session[:logged_in].nil? || session[:logged_in] == false
           session[:logged_in] = false
@@ -125,11 +131,11 @@ module Authorizer
   end
 
   def access(expected_roles)
-    if ENV['RAILS_ENV'] == 'production'
+    # if ENV['RAILS_ENV'] == 'production'
       if !has_role(expected_roles)
         render status: 403, file: 'public/403.html'
       end
-    end
+    # end
   end
 
   def has_access(expected_roles)
@@ -137,6 +143,7 @@ module Authorizer
   end
 
   def has_role(expected_roles)
+    puts "wtf?" + session[:utorid]
     session[:roles].each do |role|
       expected_roles.each do |expected|
         if expected == role
@@ -156,6 +163,22 @@ module Authorizer
     if get_utorid
       instructor = Instructor.find_by(utorid: get_utorid)
       return !instructor.nil?
+    else
+      return nil
+    end
+  end
+
+  def is_applicant
+    if get_utorid
+      # Applicant will be neither instructor nor admin nor assistant
+      instructor = Instructor.find_by(utorid: get_utorid)
+      if listed_as(ENV['TAPP_ADMINS']) or listed_as(ENV['CP_ADMINS']) or
+          listed_as(ENV['TAPP_ASSISTANTS']) or listed_as(ENV['HR_ASSISTANTS']) or instructor
+        return nil
+      # TODO: check if applicant
+      else
+        return nil
+      end
     else
       return nil
     end
@@ -217,9 +240,13 @@ module Authorizer
         session[:roles].push(role[:role])
       end
     end
-
+    puts session[:roles]
     if session[:roles].empty?
-      render file: "public/403.html"
+      puts "empty!!!!!!!"
+      session[:logged_in] = false
+      session[:utorid] = nil
+      render file: "public/login.html" and return
+      puts "shouldn't happen"
     end
   end
 

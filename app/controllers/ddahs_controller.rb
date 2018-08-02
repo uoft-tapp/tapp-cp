@@ -94,7 +94,7 @@ class DdahsController < ApplicationController
       tutorial_category: ddah[:tutorial_category],
       department: ddah[:department],
       scaling_learning: ddah[:scaling_learning],
-      position_id: position[:id],
+      # position_id: position[:id],
     }
     template = Template.create!(data)
     copy_allocations(template, ddah.allocations, :ddah_id, :template_id)
