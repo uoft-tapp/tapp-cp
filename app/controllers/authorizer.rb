@@ -16,7 +16,7 @@ module Authorizer
   end
 
   def app_access
-    expected_roles = ["tapp_admin","cp_admin", "tapp_assistant", "hr_assistant", "instructor"]
+    expected_roles = ["tapp_admin","cp_admin", "tapp_assistant", "hr_assistant", "instructor", "applicant"]
     access(expected_roles)
   end
 
@@ -177,7 +177,7 @@ module Authorizer
         return nil
       # TODO: check if applicant
       else
-        return nil
+        return listed_as("applicant1,applicant2,applicant3")
       end
     else
       return nil
@@ -233,6 +233,11 @@ module Authorizer
       {
         access: is_instructor,
         role: "instructor",
+      },
+      {
+        access: is_applicant,
+
+        role: "applicant",
       }
     ]
     roles.each do |role|
