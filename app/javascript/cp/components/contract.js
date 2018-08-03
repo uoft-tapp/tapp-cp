@@ -223,40 +223,38 @@ class Contract extends React.Component {
         return (
             <Grid>
                 <Panel>
-                    <Panel.Heading>
-                        <Panel.Title>
+                    <div>
+                        <h3>
                             Teaching Assistant Contract for {offer.get('course')}
-                            <button className="close-button"
-                                    style={{float: "right"}}
-                                    onClick={() => this.props.closeContractWindow()}>
-                                <span className="glyphicon glyphicon-remove">
-                                </span>
-                            </button>
-                        </Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body>
-                        <div>
-                            <h1>University of Toronto</h1>
-                            <p>
-                                <i>Toronto, Canada M5S 3G4</i>
-                            </p>
-                        </div>
-                        <Well>
-                            <Letter offer={offer} session={session} position={position}/>
-                        </Well>
-                        <Well>
-                            <Training />
-                        </Well>
-                        <Well>
-                            <Payroll />
-                        </Well>
-                        <Well>
-                            <Policies />
-                        </Well>
-                        <Well>
-                            <Accessibility />
-                        </Well>
-                    </Panel.Body>
+                        </h3>
+                        <button className="close-button"
+                                style={{float: "right"}}
+                                onClick={() => this.props.closeContractWindow()}>
+                            <span className="glyphicon glyphicon-remove">
+                            </span>
+                        </button>
+                    </div>
+                    <div>
+                        <h1>University of Toronto</h1>
+                        <p>
+                            <i>Toronto, Canada M5S 3G4</i>
+                        </p>
+                    </div>
+                    <Well>
+                        <Letter offer={offer} session={session} position={position}/>
+                    </Well>
+                    <Well>
+                        <Training />
+                    </Well>
+                    <Well>
+                        <Payroll />
+                    </Well>
+                    <Well>
+                        <Policies />
+                    </Well>
+                    <Well>
+                        <Accessibility />
+                    </Well>
                 </Panel>
             </Grid>
         );

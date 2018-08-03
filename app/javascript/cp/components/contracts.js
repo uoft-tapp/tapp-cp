@@ -33,9 +33,7 @@ const ContractPanel = props => {
     }
     return (
         <Panel bsStyle="primary">
-            <Panel.Heading>
-                <Panel.Title>{props.offer.get('course') + instructorString}</Panel.Title>
-            </Panel.Heading>
+            {props.offer.get('course') + instructorString}
             <div>
                 <Button onClick={() => props.selectContract()}>
                     Contract
