@@ -76,15 +76,7 @@
   </div>
   <script>
   function login(){
-    fetch("/tapp", {
-      headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-      },
-      method: 'GET',
-      credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
-    }).then(function(res){
-      location.reload();
-    });
+    window.location.href="/cp";
   }
   </script>
 </body>
