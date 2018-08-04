@@ -33,7 +33,9 @@ const ContractPanel = props => {
     }
     return (
         <Panel bsStyle="primary">
-            {props.offer.get('course') + instructorString}
+            <p>
+                {props.offer.get('course') + instructorString}
+            </p>
             <div>
                 <Button onClick={() => props.selectContract()}>
                     Contract
@@ -61,6 +63,7 @@ class ContractsList extends React.Component {
         }
 
         let offers = this.props.appState.getOffersList();
+        let ddahs = this.props.appState.getDdahsList();
 
         // TODO: Show loader spinner when !offers
         if (!offers || (offers && offers.size === 0)) {
@@ -72,23 +75,32 @@ class ContractsList extends React.Component {
                 </Grid>
             );
         }
-        else {
-            return (
-                <Grid>
-                    <div>
-                        <h3>Your teaching assistant offers</h3>
-                    </div>
-                    <div>
-                        {offers.map((offer, id) =>
+
+        return (
+            <Grid>
+                <div>
+                    <h3>Your teaching assistant offers</h3>
+                </div>
+                <div>
+                    {offers.map((offer, id) => {
+                        // Find corresponding ddah
+                        let ddah = null;
+                        ddahs.map(d => {
+                           if (d.get('offer') === id) {
+                               ddah = d;
+                           }
+                        });
+                        return (
                             <ContractPanel
                                 offer={offer}
+                                ddah={ddah}
                                 selectContract={() => this.props.selectContract(id)}
                             />
-                        )}
-                    </div>
-                </Grid>
-            );
-        }
+                        );
+                    })}
+                </div>
+            </Grid>
+        );
     }
 }
 

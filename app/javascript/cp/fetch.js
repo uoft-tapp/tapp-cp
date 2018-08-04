@@ -33,9 +33,22 @@ const getCourses = (user = null) => getResource(
     ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
     fetchProc.onFetchCpCoursesSuccess, 'courses');
 
-const getDdahs = user => getResource(
-    user ? '/instructors/' + user + '/ddahs' : '/ddahs',
-    fetchProc.onFetchDdahsSuccess, 'ddahs');
+const getDdahs = (user, role) => {
+    let route = '/ddahs';
+    if (user) {
+        if (role == 'instructor') {
+            route = '/instructors/' + user + '/ddahs';
+            getResource(route, fetchProc.onFetchDdahsSuccess, 'ddahs');
+        }
+        else if (role == 'applicant') {
+            route = '/applicants/' + user + '/ddahs';
+            // Create new function onFetchApplicantDdahsSuccess if different data needed
+            getResource(route, fetchProc.onFetchDdahsSuccess, 'ddahs', false);
+        }
+    } else {
+        getResource(route, fetchProc.onFetchDdahsSuccess, 'ddahs');
+    }
+}
 
 const getOffers = (user, role) => {
     let route = '/offers';
@@ -93,7 +106,7 @@ export const instructorFetchAll = () => {
       if(!session||session=='N/A')
         appState.setLatestSession();
       getOffers(user, 'instructor');
-      getDdahs(user);
+      getDdahs(user, 'instructor');
       getCourses(user);
     });
     getCategories();
@@ -113,7 +126,7 @@ export const applicantFetchAll = () => {
         if (!session || session == 'N/A')
             appState.setLatestSession();
         getOffers(user, 'applicant');
-        // TODO: get DDAH forms if necessary
+        getDdahs(user, 'applicant');
     });
 }
 
@@ -342,7 +355,7 @@ export const createDdah = (offer) => {
     // although the template and ddah models have a relationship in the database, they do not have a
     // relationship in the front-end, and so we do not 'use a template' in this way to create a ddah
     return postData('/instructors/' + user + '/ddahs', { use_template: false, offer_id: offer },()=> {
-      if(fetch) getDdahs(user);
+      if(fetch) getDdahs(user, 'instructor');
     },null,
     res => {
       fetch = false;
@@ -354,7 +367,7 @@ export const createDdah = (offer) => {
 export const updateDdah = (id, ddahData) => {
     let user = appState.getCurrentUserName();
     return putData('/instructors/' + user + '/ddahs/' + id, ddahData, () => {
-      getDdahs(user);
+      getDdahs(user, 'instructor');
     });
 }
 
@@ -366,8 +379,8 @@ export const submitDdah = (signature, ddah) => {
     // already been verified with '/ddahs/status/can-finish'
     // however, in the current interface, only one ddah can be submitted at a time
     postData('/ddahs/status/finish', { signature: signature, ddahs: [ddah] }, () => {
-        getDdahs(user);
-        getOffers(user);
+        getDdahs(user, 'instructor');
+        getOffers(user, 'instructor');
     });
 }
 
