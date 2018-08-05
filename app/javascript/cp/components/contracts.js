@@ -2,7 +2,9 @@ import React from 'react';
 import {
     Button,
     Grid,
-    Panel
+    OverlayTrigger,
+    Panel,
+    Tooltip,
 } from 'react-bootstrap';
 import { Switch, Redirect, Route } from 'react-router-dom';
 
@@ -31,18 +33,36 @@ const ContractPanel = props => {
     if (instructorString) {
         instructorString = " with " + instructorString;
     }
+
+    const tooltip = (
+        <Tooltip id="tooltip">
+            The <i>Description of Duties And Hours</i> form for this offer has not yet been sent to you.
+        </Tooltip>
+    );
+
     return (
         <Panel bsStyle="primary">
             <p>
                 {props.offer.get('course') + instructorString}
             </p>
             <div>
-                <Button onClick={() => props.selectContract()}>
-                    Contract
-                </Button>
-                <Button>
-                    DDAH Form
-                </Button>
+                <div style={{display: 'inline-block'}}>
+                    <Button onClick={() => props.selectContract()}>
+                        Contract
+                    </Button>
+                </div>
+                <div style={{display: 'inline-block'}}>
+                    {!props.ddah && <OverlayTrigger placement="bottom" overlay={tooltip}>
+                        <div style={{cursor: 'not-allowed'}}>
+                            <Button style={{pointerEvents: 'none'}} disabled>
+                                DDAH Form
+                            </Button>
+                        </div>
+                    </OverlayTrigger>}
+                    {props.ddah && <Button>
+                        DDAH Form
+                    </Button>}
+                </div>
             </div>
         </Panel>
     );

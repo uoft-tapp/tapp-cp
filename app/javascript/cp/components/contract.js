@@ -1,5 +1,9 @@
 import React from 'react';
 import {
+    Button,
+    ControlLabel,
+    FormControl,
+    FormGroup,
     Grid,
     Panel,
     Well,
@@ -19,7 +23,6 @@ const InvalidContract = props => {
 
 const Letter = props => {
     let pay = props.session.get('pay');
-    pay += 1; // TODO: remove this increment
     let salary = pay * props.offer.get('hours');
     let vacationSalary = salary * 0.04;
 
@@ -63,7 +66,6 @@ const Letter = props => {
 }
 
 const Training = props => {
-    let coordinator = "Karen Reid"; // TODO: get from ENV file somehow and add email
 
     return (
         <div>
@@ -92,7 +94,7 @@ const Training = props => {
                 (Unit 1) Collective Agreement. If this is not your first appointment, you may still be owed one or
                 more subsequent appointments under the aforementioned Article. If this is the case, you may consult
                 the letter you received last April, where your appointment status was summarized. Please feel free
-                to contact {coordinator} to see how various guarantees fit together.
+                to contact {props.coordinator} to see how various guarantees fit together.
             </p>
             <p>
                 You should contact your supervisor as soon as possible to discuss any questions you have about your
@@ -107,7 +109,7 @@ const Training = props => {
                 this offer, please advise me immediately.
             </p>
             <p>
-                If you have any questions, please contact {coordinator}.
+                If you have any questions, please contact {props.coordinator}.
             </p>
         </div>
     );
@@ -192,6 +194,51 @@ const Accessibility = props => {
     )
 }
 
+class Signature extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: "",
+        }
+    }
+
+    validateName() {
+        return 'success';
+    }
+
+    handleNameChange(e) {
+        this.setState({ name: e.target.value });
+        console.log(this.state.name);
+    }
+
+    render() {
+        return (
+            <div>
+                <div>
+                    <p>Yours sincerely,</p>
+                    <p><b>{this.props.coordinator}</b></p>
+                    <p>Designated Authority, TA Coordinator <br /> Computer Science</p>
+                </div>
+                <form>
+                    <FormGroup
+                        controlId="formName"
+                        validationState={this.validateName()}
+                    >
+                        <ControlLabel>Digital signature</ControlLabel>
+                        <FormControl
+                            type="text"
+                            value={this.state.name}
+                            placeholder="Enter your first and last name as it appears on ACORN"
+                            onChange={(e) => this.handleNameChange(e)}
+                        />
+                    </FormGroup>
+                    <Button>I accept this offer</Button>
+                </form>
+            </div>
+        );
+    }
+}
+
 
 class Contract extends React.Component {
     constructor(props) {
@@ -219,6 +266,8 @@ class Contract extends React.Component {
 
         let session = offer.get('session');
         let position = offer.get('position');
+        // TODO: get TA coordinator from Rails ENV somehow
+        let coordinator = "Karen Reid";
 
         return (
             <Grid>
@@ -226,13 +275,13 @@ class Contract extends React.Component {
                     <div>
                         <h3>
                             Teaching Assistant Contract for {offer.get('course')}
-                        </h3>
-                        <button className="close-button"
+                            <button className="close-button"
                                 style={{float: "right"}}
                                 onClick={() => this.props.closeContractWindow()}>
                             <span className="glyphicon glyphicon-remove">
                             </span>
                         </button>
+                        </h3>
                     </div>
                     <div>
                         <h1>University of Toronto</h1>
@@ -244,7 +293,7 @@ class Contract extends React.Component {
                         <Letter offer={offer} session={session} position={position}/>
                     </Well>
                     <Well>
-                        <Training />
+                        <Training coordinator={coordinator}/>
                     </Well>
                     <Well>
                         <Payroll />
@@ -255,6 +304,8 @@ class Contract extends React.Component {
                     <Well>
                         <Accessibility />
                     </Well>
+
+                    <Signature coordinator={coordinator}/>
                 </Panel>
             </Grid>
         );
