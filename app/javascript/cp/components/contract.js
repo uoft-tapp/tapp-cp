@@ -1,6 +1,7 @@
 import React from 'react';
 import {
     Button,
+    Checkbox,
     ControlLabel,
     FormControl,
     FormGroup,
@@ -199,16 +200,35 @@ class Signature extends React.Component {
         super(props);
         this.state = {
             name: "",
+            nameValid: false,
+            checkBoxChecked: false,
         }
     }
 
-    validateName() {
-        return 'success';
+    validateName(name) {
+        return name === this.props.offer.get("firstName") + " " + this.props.offer.get("lastName");
+    }
+
+    validateNameInput(name) {
+        if (this.validateName(name))
+            return 'success';
+        else
+            return 'error';
     }
 
     handleNameChange(e) {
-        this.setState({ name: e.target.value });
-        console.log(this.state.name);
+        this.setState({
+            nameValid: this.validateName(e.target.value),
+            name: e.target.value,
+        });
+    }
+
+    handleCheckBoxChange() {
+        this.setState({ checkBoxChecked: !this.state.checkBoxChecked });
+    }
+
+    acceptOffer() {
+        console.log("Offer accept button pressed");
     }
 
     render() {
@@ -220,9 +240,15 @@ class Signature extends React.Component {
                     <p>Designated Authority, TA Coordinator <br /> Computer Science</p>
                 </div>
                 <form>
+                    <Checkbox
+                        checked={this.state.accept}
+                        onChange={(e) => this.handleCheckBoxChange(e)}
+                    >
+                        I have thoroughly read and agree to all the clauses of this offer.
+                    </Checkbox>
                     <FormGroup
                         controlId="formName"
-                        validationState={this.validateName()}
+                        validationState={this.validateNameInput(this.state.name)}
                     >
                         <ControlLabel>Digital signature</ControlLabel>
                         <FormControl
@@ -232,7 +258,12 @@ class Signature extends React.Component {
                             onChange={(e) => this.handleNameChange(e)}
                         />
                     </FormGroup>
-                    <Button>I accept this offer</Button>
+                    <Button
+                        onClick={() => this.acceptOffer()}
+                        disabled={!(this.state.checkBoxChecked && this.state.nameValid)}
+                    >
+                        I accept this offer
+                    </Button>
                 </form>
             </div>
         );
@@ -305,7 +336,7 @@ class Contract extends React.Component {
                         <Accessibility />
                     </Well>
 
-                    <Signature coordinator={coordinator}/>
+                    <Signature offer={offer} coordinator={coordinator}/>
                 </Panel>
             </Grid>
         );
