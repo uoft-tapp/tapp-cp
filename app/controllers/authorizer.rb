@@ -190,9 +190,8 @@ module Authorizer
       if listed_as(ENV['TAPP_ADMINS']) or listed_as(ENV['CP_ADMINS']) or
           listed_as(ENV['TAPP_ASSISTANTS']) or listed_as(ENV['HR_ASSISTANTS']) or instructor
         return nil
-      # TODO: check if applicant
-      else 
-        return listed_as("applicant1,applicant2,applicant3")
+      else
+        return true
       end
     else
       return nil
