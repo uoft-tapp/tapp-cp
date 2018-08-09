@@ -7,7 +7,12 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
-import '../cp-styles';
+import 'bootstrap';  // for the js
+import '../spreadsheetddah-styles';  // only for webpacker to watch changes ??..
+// import '~bootstrap/dist/css/bootstrap';
+// import '../assets/stylesheets/cp';
+// import '../assets/stylesheets/spreadsheetddah';  // Nige
+// import 'bootstrap/dist/js/bootstrap';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -21,13 +26,16 @@ import { fetchAuth } from '../cp/fetch.js';
 
 import { routeConfig } from '../cp/routeConfig.js';
 import { Navbar } from '../cp/components/navbar.js';
-import { AdminControlPanel } from '../cp/components/adminControlPanel.js';
-import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
-import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
-import { Contracts } from '../cp/components/contracts.js';
-import { History } from '../cp/components/history.js';
+// import { AdminControlPanel } from '../cp/components/adminControlPanel.js';
+// import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
+// import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
+import { DdahSpreadsheet } from '../cp/components/ddahSpreadsheet.js';
+import { DdahForm } from '../cp/components/ddahForm2.js';
+
+import { mockDdahData } from '../mock_ddah_data.js';  // temporary  .
 
 /*** Main app component ***/
+
 
 class App extends React.Component {
     constructor(props) {
@@ -48,7 +56,6 @@ class App extends React.Component {
 
         // this should only happen before we have fetched the current auth information
         if (user == null) {
-            console.log('CP App nullCheck of user failed...');
             return <div id="loader" />;
         }
 
@@ -59,7 +66,10 @@ class App extends React.Component {
                 return (
                     <div>
                         <Navbar {...this.props} />
-                        <AdminControlPanel {...this.props} />
+                        <main id="ddah-container">
+                            <DdahSpreadsheet mockDdahData={mockDdahData} />
+                            <DdahForm mockDdahData={mockDdahData} />
+                        </main>
                         <AlertContainer {...this.props} />
                     </div>
                 );
@@ -67,12 +77,13 @@ class App extends React.Component {
                 return (
                     <div>
                         <Navbar {...this.props} />
-                        <InstrControlPanel {...this.props} />
+                        <main id="ddah-container">
+                            <DdahSpreadsheet mockDdahData={mockDdahData} />
+                            <DdahForm mockDdahData={mockDdahData} />
+                        </main>
                         <AlertContainer {...this.props} />
                     </div>
                 );
-            case 'applicant':
-                return <ApplicantRouter {...this.props} />;
         }
 
         return null;
@@ -83,40 +94,11 @@ const AdminRouter = props =>
     <Router basename="cp">
         <div>
             <Navbar {...props} />
-
-            <Switch>
-                <Route
-                    path={routeConfig.controlPanel.route}
-                    render={() =>
-                        <AdminControlPanel navKey={routeConfig.controlPanel.id} {...props} />}
-                />
-                <Route
-                    path={routeConfig.ddahs.route}
-                    render={() => <DdahControlPanel navKey={routeConfig.ddahs.id} {...props} />}
-                />
-                <Redirect from="/" to="/controlpanel" />
-            </Switch>
-
+            <main id="ddah-container">
+                <DdahSpreadsheet mockDdahData={mockDdahData} />
+                <DdahForm mockDdahData={mockDdahData} />
+            </main>
             <AlertContainer {...props} />
-        </div>
-    </Router>;
-
-const ApplicantRouter = props =>
-    <Router basename="cp">
-        <div>
-            <Navbar {...props} />
-
-            <Switch>
-                <Route
-                    path={routeConfig.contracts.route}
-                    render={() => <Contracts navKey={routeConfig.contracts.id} {...props} />}
-                />
-                <Route
-                    path={routeConfig.history.route}
-                    render={() => <History navKey={routeConfig.history.id} {...props} />}
-                />
-                <Redirect from="/" to="/contracts" />
-            </Switch>
         </div>
     </Router>;
 

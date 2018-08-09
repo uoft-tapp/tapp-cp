@@ -62,11 +62,17 @@ class PositionsController < ApplicationController
 
   def get_all_positions_for_utorid(utorid, session = nil)
     positions = []
-    all_positions = positions_from_session(session, utorid)
-    all_positions.each do |position|
-      position.instructors.each do |instructor|
-        if instructor[:utorid] == utorid
-          positions.push(position)
+    # TODO: change positions_from_session
+    all_positions = positions_from_session(session)
+    if all_positions
+      all_positions.each do |position|
+        # temporary, dev: positions table doesn't have an instructors column:
+        if position[:instructors]
+          position[:instructors].each do |instructor|
+            if instructor[:utorid] == utorid
+              positions.push(position)
+            end
+          end
         end
       end
     end

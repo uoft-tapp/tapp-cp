@@ -483,7 +483,7 @@ export const setRole = (cp, appState)=>{
           console.log(resp.roles);
           appState.setCurrentUserRoles(resp.roles);
           if (cp && resp.roles.length > 1) { // cp_admin
-              appState.selectUserRole(resp.roles[1]); // set to cp_admin
+              appState.selectUserRole(resp.roles[0]); // (set to cp_admin), ["cp_admin", "hr_assistant", "instructor"]
           } else {
               appState.selectUserRole(resp.roles[0]);
           }

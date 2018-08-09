@@ -17,6 +17,7 @@ class InstrControlPanel extends React.Component {
     render() {
         let nullCheck = this.props.appState.instrAnyNull();
         if (nullCheck) {
+            console.log('InstrControlPanel nullCheck of instructor failed...');
             return <div id="loader" />;
         }
 

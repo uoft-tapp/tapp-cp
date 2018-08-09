@@ -1,0 +1,304 @@
+/*//////////////////////////////////////////////////////////////////////////
+// Override Global (non-DDAH-specific) Bootstrap Styles
+//////////////////////////////////////////////////////////////////////////*/
+
+.table {
+  margin-bottom: 5px;
+}
+
+.well, .panel {
+  margin-bottom: var(--card-spacing);
+}
+
+.panel {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+  page-break-inside: avoid;
+}
+
+.panel-heading {
+  padding-left: var(--card-spacing);
+}
+
+.panel-body {
+  padding: var(--card-spacing);
+}
+
+.help-block {
+  margin-top: 0;
+  font-size: 80%;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+.form-control {
+  height: 28px;
+  padding: 3px 6px;
+  font-size: inherit;
+}
+
+.list-group-item-condensed {
+  padding: 5px var(--card-spacing);
+  display: inline-block;
+  width: 100%;
+}
+
+.list-group {
+  margin-bottom: 0;
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////
+// DDAH + DDAH SPREADHSEET Styles
+//////////////////////////////////////////////////////////////////////////*/
+
+ main#ddah-container {
+    width: fit-content;
+    margin-top: 50px;
+    background-color: #e4e4e4;
+    font-size: 12px;
+ }
+
+ header h3 {
+     text-align: center;
+ }
+
+input[type="radio"] {
+    cursor: pointer;
+}
+
+#course-overview {
+  /*span .glyphicon {
+      margin-right: 4px;
+  }*/
+}
+#course-overview #course-code {
+  font-size: 130%;
+  text-transform: uppercase;
+}
+#course-overview #course-title {
+  font-size: 160%;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+#course-overview span {
+  margin-right: 16px;
+}
+
+#course-details {
+  border-left: 1px solid #b9b9b9;
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////
+// DDAH Styles
+//////////////////////////////////////////////////////////////////////////*/
+
+#dcs-logo-ddah {
+  max-height: var(--ta-info-height);
+  background: white;
+  border-radius: 5px;
+}
+
+section#ta-person {
+  min-height: var(--ta-info-height);
+}
+section#ta-person #ta-info {
+  min-height: var(--ta-info-height);
+}
+section#ta-person #ta-name {
+  font-weight: bold;
+  margin: 0;
+  white-space: nowrap;
+  line-height: var(--ta-info-height);
+}
+
+@media screen and (max-width: 500px) {
+  table#duty-table {
+    width: 100%;
+    margin-bottom: 15px;
+    overflow-y: hidden;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    border: 1px solid #ddd;
+    min-height: 0.01%;
+    overflow-x: auto;
+  }
+}
+table#duty-table tbody tr:not(.duty-heading) td:first-of-type {
+  text-align: center;
+}
+
+#duty-table > tbody > tr > td, #duty-table > tbody > tr > th, #duty-table > tfoot > tr > td, #duty-table > tfoot > tr > th, #duty-table > thead > tr > td, #duty-table > thead > tr > th {
+  padding: 5px 8px;
+  line-height: initial;
+}
+
+tr.duty-heading {
+  text-transform: uppercase;
+  background-color: #dff0d8;
+}
+
+.duty-heading .total {
+  font-weight: bold;
+}
+
+tbody .row-total {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.row-total td {
+  border-top: 1px solid #000000 7a !important;
+}
+
+.panel .worksheet-footer {
+  text-align: right;
+}
+
+.form-label-heading {
+  font-weight: bold;
+}
+
+#tutorial-category .checkbox, .radio {
+  margin: 3px 0;
+}
+
+#signature-block {
+  border: 2px solid #000000 94;
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////
+ // Override Global (DDAH-specific) Bootstrap Styles
+ //////////////////////////////////////////////////////////////////////////*/
+
+
+
+/*//////////////////////////////////////////////////////////////////////////
+// Print Styles for DDAH Form
+//////////////////////////////////////////////////////////////////////////*/
+
+@media print {
+  *, :after, :before {
+    background: initial !important;
+    -webkit-box-shadow: initial !important;
+    box-shadow: initial !important;
+  }
+
+  .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+    position: relative;
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
+    float: left;
+  }
+
+  .col-sm-12 {
+    width: 100%;
+  }
+
+  .col-sm-11 {
+    width: 91.66666667%;
+  }
+
+  .col-sm-10 {
+    width: 83.33333333%;
+  }
+
+  .col-sm-9 {
+    width: 75%;
+  }
+
+  .col-sm-8 {
+    width: 66.66666667%;
+  }
+
+  .col-sm-7 {
+    width: 58.33333333%;
+  }
+
+  .col-sm-6 {
+    width: 50%;
+  }
+
+  .col-sm-5 {
+    width: 41.66666667%;
+  }
+
+  .col-sm-4 {
+    width: 33.33333333%;
+  }
+
+  .col-sm-3 {
+    width: 25%;
+  }
+
+  .col-sm-2 {
+    width: 16.66666667%;
+  }
+
+  .col-sm-1 {
+    width: 8.33333333%;
+  }
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////
+// DDAH SPREADSHEET Styles
+//////////////////////////////////////////////////////////////////////////*/
+
+#dcs-logo-spreadsheet {
+  width: 20%;
+  margin: 0 auto;
+  margin-top: 60px;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+}
+
+#ddah-spreadsheet .label {
+  display: block;
+  font-size: 90%;
+}
+#ddah-spreadsheet tbody td:first-of-type {
+  text-align: center;
+}
+#ddah-spreadsheet input {
+  background: #ffffff69;
+  min-width: 26px;
+  /* sanity check */
+}
+
+.copy-paste-action {
+  margin: 4px 0 0 0;
+}
+
+#new-task-action {
+  float: right;
+}
+
+#new-task-action span.glyphicon {
+    padding-right: 3px;
+}
+
+
+/*//////////////////////////////////////////////////////////////////////////
+// Override Global (DDAH_SPREADSHEET-specific) Bootstrap Styles
+//////////////////////////////////////////////////////////////////////////*/
+
+.container-fluid.container-fit {
+    width: fit-content !important;  /*override CP style, 100%*/
+}
+
+.modal-dialog {
+    width: 90%;
+}
+
+#task-selection-modal .list-group .list-group-item {
+    padding: 3px 8px;
+}

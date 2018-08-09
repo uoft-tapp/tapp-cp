@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <title> CP </title>
+    <title> Spreadsheet + DDAH Form </title>
 
     <%= csrf_meta_tags %>
 
@@ -20,22 +20,29 @@
         ]
       %>
     <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
-    <%= javascript_pack_tag 'cp' %>
-    <%= stylesheet_pack_tag 'cp' %>
-    <%= javascript_pack_tag 'polyfill-css' %>
+
+    <!-- Bootstrap JS -->
+    <!-- TEMPORARY jquery? -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 
     <% if ENV['RAILS_ENV'] == 'development' %>
       <!-- For development in Windows -->
       <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
       <!-- For development on Mac -->
       <% @pack_url = "#{request.base_url}/packs/" %>
-      <script src="<%= @pack_url %>cp.js?v=<%= DateTime.now %>"></script>
-      <link rel="stylesheet" media="screen" href="<%= @pack_url %>cp.css?v=<%= DateTime.now %>">
+
+      <!-- Force react and css to never be cached, in development only: -->
+      <script src="<%= @pack_url %>spreadsheetddah.js?v=<%= DateTime.now %>"></script>
+      <link rel="stylesheet" media="screen" href="<%= @pack_url %>spreadsheetddah.css?v=<%= DateTime.now %>">
       <script src="<%= @pack_url %>polyfill-css.js?v=<%= DateTime.now %>"></script>
+    <% else %>
+        <%= javascript_pack_tag 'spreadsheetddah' %>
+        <%= stylesheet_pack_tag 'spreadsheetddah' %>
+        <%= javascript_pack_tag 'polyfill-css' %>
     <% end %>
 
     <!-- FA icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
   </head>
 
   <body>

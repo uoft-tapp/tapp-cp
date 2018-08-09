@@ -1,7 +1,7 @@
 class Position < ApplicationRecord
   has_many :assignments
   has_many :preferences
-  has_and_belongs_to_many :instructors
+  has_and_belongs_to_many :instructors  # not reflected in psql output.
   belongs_to :session
   validates_uniqueness_of :position, scope: :round_id
   include Model
