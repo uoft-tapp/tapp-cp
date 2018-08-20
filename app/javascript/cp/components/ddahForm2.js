@@ -93,7 +93,7 @@ class DdahForm extends React.Component {
             trainings.push(
                 <div className="checkbox">
                     <label>
-                        <input id="{this.props.mockDdahData.training[i].id}" type="checkbox" value="{this.props.mockDdahData.training[i].id}" />
+                        <input id={this.props.mockDdahData.training[i].id} type="checkbox" value={this.props.mockDdahData.training[i].id} />
                         {this.props.mockDdahData.training[i].name}. x
                     </label>
                 </div>
