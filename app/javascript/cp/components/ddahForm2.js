@@ -1,93 +1,13 @@
 import React from 'react';
 import {
-    // Grid,
-    // ButtonToolbar,
-    // ButtonGroup,
-    // Button,
-    // PanelGroup,
     Panel,
-    // Well,
-    // DropdownButton,
-    // MenuItem,
-    // OverlayTrigger,
 } from 'react-bootstrap';
 
-
-function CourseInfoHeader(props) {
-    return (
-        <div className="panel panel-default">
-            <div className="panel-body">
-                <div className="row">
-
-                    <section className="col-xs-8" id="course-overview">
-                        <span id="course-code">
-                            {props.mockDdahData.course_data.code}
-                        </span>
-
-                        <span id="course-prof">
-                            {/*Profname Profferson*/}
-                            {props.mockDdahData.course_data.prof}
-                        </span>
-
-                        <div id="course-title">
-                            {/*Introduction to Computer Programming*/}
-                            {props.mockDdahData.course_data.name}
-                        </div>
-
-                    </section>
-
-                    <section className="col-xs-4" id="course-details">
-
-                        <form className="form-horizontal">
-
-                            <div className="form-group form-group-sm">
-                              <label className="col-xs-7 control-label">Expected Enrollment</label>
-                              <div className="col-xs-3">
-                                  <p className="form-control-static">{props.mockDdahData.course_data.enrollment}</p>
-                              </div>
-                            </div>
-
-                            <div className="form-group form-group-sm">
-                              <label className="col-xs-7 control-label">Est. Enrollment / TA</label>
-                              <div className="col-xs-3">
-                                  <p className="form-control-static">{props.mockDdahData.course_data.enrollment_rate}</p>
-                              </div>
-                            </div>
-
-                        </form>
-
-                    </section>
-
-                </div>
-            </div>
-        </div>
-    );
-}
-
-
 class DdahForm extends React.Component {
-    // constructor(props) {
-    //     super(props);
-    //     // this.state = {};
-    //     console.log('Form constructor ran.');
-    //     // console.log(this.props.mockDdahData.training.length)
-    //     // console.log(this.props);
-    //     // console.log(this.props.mockDdahData.course_data);
-    //     // console.log(this.props.mockDdahData.ta_name);
-    //     // console.log(this.props.mockDdahData.ddahs_entries);
-    //     // console.log(this.props.mockDdahData.duty_tasks);
-    //     // console.log(this.props.mockDdahData.training);
-    //     // console.log(this.props.mockDdahData.tutorial_category);
-
-    //     // instructorFetchAll
-    // }
-
     render() {
-        // const role = this.props.appState.getSelectedUserRole();
-        // console.log(this.props.appState.getTemplatesList());
-
         let signatures = this.props.mockDdahData.signatures;
         let review_signatures = this.props.mockDdahData.mid_course_review_changes;
+
         return (
             <div id="ddah-form" className="container-fluid container-fit">
                 <header>
@@ -276,73 +196,104 @@ class DdahForm extends React.Component {
                     </div>
 
                 </div>
-
-
-                <section id="signature-block" className="panel panel-default panel-warning">
-                    <div className="panel-body bg-warning">
-                        {Object.keys(signatures).map(key=>
-                            <div className="row">
-                                <div className="col-sm-12">
-                                    <p className="form-label-heading">{signatures[key].title}</p>
-                                </div>
-                                <div className="signatures-col col-sm-5">
-                                    <div className="form-group">
-                                        <input type="text" className="form-control" value={signatures[key].name}/>
-                                        <span className="help-block">Prepared by (Supervisor)</span>
-                                    </div>
-                                </div>
-                                <div className="signatures-col col-sm-4">
-                                    <div className="form-group">
-                                        <input type="text" className="form-control" value={signatures[key].signature_initials}/>
-                                        <span className="help-block">SIGNATURE / INITIAL</span>
-                                    </div>
-                                </div>
-                                <div className="signatures-col col-sm-3">
-                                    <div className="form-group">
-                                        <input type="text" className="form-control" value={signatures[key].date}/>
-                                        <span className="help-block">Date</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-
-                    <div className="panel-footer">
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <h6>Mid-Course Review Changes (if any **)</h6>
-                            </div>
-
-                            <div className="col-sm-12">
-                                {Object.keys(review_signatures).map(key=>
-                                    <div className="row">
-                                        <div className="course-change-col col-sm-4">
-                                            <p className="form-label-heading form-control-static pull-right">{review_signatures[key].title}</p>
-                                        </div>
-                                        <div className="course-change-col col-sm-4">
-                                            <div className="form-group">
-                                                <input type="text" className="form-control" value={review_signatures[key].signature_initials}/>
-                                                <span className="help-block">SIGNATURE / INITIAL</span>
-                                            </div>
-                                        </div>
-                                        <div className="course-change-col col-sm-3">
-                                            <div className="form-group">
-                                                <input type="text" className="form-control" value={review_signatures[key].date}/>
-                                                <span className="help-block">Date</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                </section>
+                <SignatureBlock {... this.props} />
             </div>
         );
     }
 }
+
+const SignatureBlock = props =>(
+  <section id="signature-block" className="panel panel-default panel-warning">
+      <div className="panel-body bg-warning">
+          {Object.keys(props.signatures).map(key=>
+            <Signature signature={props.signature[key]} {...props} />
+          )}
+      </div>
+      <div className="panel-footer">
+          <div className="row">
+              <div className="col-sm-12">
+                  <h6>Mid-Course Review Changes (if any **)</h6>
+              </div>
+              <div className="col-sm-12">
+                  {Object.keys(props.review_signatures).map(key=>
+                    <ReviewSignature review_signature={props.review_signature[key]} {...props} />
+                  )}
+              </div>
+          </div>
+      </div>
+  </section>
+);
+
+const Signature = props =>(
+  <div className="row">
+      <div className="col-sm-12">
+          <p className="form-label-heading">{props.signature.title}</p>
+      </div>
+      <SignatureInput col_name='signatures' col_size='5'
+         help_block='Prepared by (Supervisor)'
+         value={props.signature.name}/>
+      <SignatureInput col_name='signatures' col_size='4'
+         help_block='SIGNATURE / INITIAL'
+         value={props.signature.signature_initials}/>
+      <SignatureInput col_name='signatures' col_size='3'
+         help_block='Date'
+         value={props.signature.date}/>
+  </div>
+);
+
+const ReviewSignature = props =>(
+  <div className="row">
+      <div className="course-change-col col-sm-4">
+          <p className="form-label-heading form-control-static pull-right">{props.review_signature.title}</p>
+      </div>
+      <SignatureInput col_name='course-change' col_size='4'
+        help_block='SIGNATURE / INITIAL'
+        value={props.review_signature.signature_initials}/>
+      <SignatureInput col_name='course-change' col_size='3'
+        help_block='Date'
+        value={props.review_signature.date}/>
+  </div>
+);
+
+const SignatureInput = props =>(
+  <div className={props.col_name +'-col col-sm-'+props.col_size}>
+      <div className="form-group">
+          <input type="text" className="form-control" value={props.value}/>
+          <span className="help-block">{props.help_block}</span>
+      </div>
+  </div>
+);
+
+const CourseInfoHeader = props => (
+  <div className="panel panel-default">
+    <div className="panel-body">
+        <div className="row">
+            <section className="col-xs-8">
+                <span>{props.mockDdahData.course_data.code}</span>
+                <span>{props.mockDdahData.course_data.prof}</span>
+                <div>{props.mockDdahData.course_data.name}</div>
+            </section>
+
+            <section className="col-xs-4">
+                <form className="form-horizontal">
+                    <div className="form-group form-group-sm">
+                      <label className="col-xs-7 control-label">Expected Enrollment</label>
+                      <div className="col-xs-3">
+                          <p className="form-control-static">{props.mockDdahData.course_data.enrollment}</p>
+                      </div>
+                    </div>
+                    <div className="form-group form-group-sm">
+                      <label className="col-xs-7 control-label">Est. Enrollment / TA</label>
+                      <div className="col-xs-3">
+                          <p className="form-control-static">{props.mockDdahData.course_data.enrollment_rate}</p>
+                      </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>
+);
 
 
 export { DdahForm, CourseInfoHeader };

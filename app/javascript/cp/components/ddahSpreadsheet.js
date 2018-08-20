@@ -1,53 +1,19 @@
 import React from 'react';
 import {
-    // Grid,
-    // ButtonToolbar,
-    // ButtonGroup,
-    // Button,
-    // PanelGroup,
     Panel,
     Nav,
     NavItem,
-    // Well,
-    // DropdownButton,
-    // MenuItem,
-    // OverlayTrigger,
 } from 'react-bootstrap';
-
 import { CourseInfoHeader } from './ddahForm2.js';
 
-
 class DdahSpreadsheet extends React.Component {
-    // constructor(props) {
-    //     super(props);
-    //     // this.state = {};
-    //     console.log('Spreadsheet constructor ran.');
-    //     // console.log(this.props);
-    //     console.log(this.props.mockDdahData.course_data);
-    //     console.log(this.props.mockDdahData.ta_name);
-    //     console.log(this.props.mockDdahData.ddahs_entries);
-    //     console.log(this.props.mockDdahData.duty_tasks);
-    //     console.log(this.props.mockDdahData.training);
-    //     // console.log(this.props.mockDdahData.tutorial_category);
-    // }
-
     render() {
         // const role = this.props.appState.getSelectedUserRole();
-        console.log(this.props.appState.getCoursesList());
+        // console.log(this.props.appState.getCoursesList());
         //console.log(this.props.appState.getSessionCourse());
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
-                <Nav bsStyle="tabs" justified activeKey={1}>
-                    <NavItem eventKey={1}>item 1</NavItem>
-                    <NavItem eventKey={2}>item 2</NavItem>
-                    <NavItem eventKey={3} disabled>item 3</NavItem>
-                    <NavItem eventKey={4} disabled>item 4</NavItem>
-                </Nav>
-
-                {/*<header>
-                    <h3>DDAH Spreadsheet</h3>
-                </header>*/}
-
+                <DdahCourseTabs {...this.props}/>
                 <div className="panel panel-default">
                     <div className="panel-body">
                         <table id="ddah-spreadsheet" className="table table-hover">
@@ -237,53 +203,6 @@ class DdahSpreadsheet extends React.Component {
                 <CourseInfoHeader {...this.props} />
 
 
-                {/*
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= asset_url('dcs_logo_blue_big.jpg') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= asset_url('images/dcs_logo_blue_big.jpg') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src={"<%= asset_url('dcs_logo_blue_big.jpg') %>"} />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src={"<%= asset_url('images/dcs_logo_blue_big.jpg') %>"} />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= image_path('dcs_logo_blue_big.png') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= image_path('images/dcs_logo_blue_big.png') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= asset_path('dcs_logo_blue_big.jpg') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= asset_path('images/dcs_logo_blue_big.jpg') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= asset_pack_path('dcs_logo_blue_big.jpg') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="<%= asset_pack_path('images/dcs_logo_blue_big.jpg') %>" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src={"<%= asset_pack_path('dcs_logo_blue_big.jpg') %>"} />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src={"<%= asset_pack_path('images/dcs_logo_blue_big.jpg') %>"} />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="../../../assets/images/dcs_logo_blue_big.jpg" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="assets/images/dcs_logo_blue_big.jpg" />
-
-                <img id="dcs-logo-spreadsheet" className="img-responsive" src="../../../assets/images/dcs_logo_blue_big.jpg" />
-
-                <img src="<%= asset_pack_path 'images/dcs_logo_blue_big.jpg' %>" />
-
-                <img src="<%= asset_path 'images/dcs_logo_blue_big.jpg' %>" />
-
-                <img src="<%= asset_path 'images/dcs_logo_blue_big.jpg' %>" />
-
-                <img src="/assets/images/dcs_logo_blue_big.jpg" />
-
-                <img src="/images/dcs_logo_blue_big.jpg" />
-
-                <img src="/images/dcs_logo_blue_big.jpg" />
-                */}
-
-
-
-
                 {/*THE REAL ONE*/}
 
                 <div id="newTaskModal" className="modal fade" tabIndex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
@@ -435,5 +354,13 @@ class DdahSpreadsheet extends React.Component {
     }
 }
 
+const DdahCourseTabs = props =>(
+  <Nav bsStyle="tabs" justified activeKey={1}>
+      <NavItem eventKey={1}>item 1</NavItem>
+      <NavItem eventKey={2}>item 2</NavItem>
+      <NavItem eventKey={3} disabled>item 3</NavItem>
+      <NavItem eventKey={4} disabled>item 4</NavItem>
+  </Nav>
+);
 
 export { DdahSpreadsheet };

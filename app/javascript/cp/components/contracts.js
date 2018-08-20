@@ -38,7 +38,6 @@ class Contracts extends React.Component {
 
     render() {
         let offers = this.props.appState.getOffersList();
-        console.log(offers);
         if (!offers || (offers && offers.size === 0)) {
             return (
                 <Grid>

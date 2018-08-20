@@ -427,7 +427,6 @@ class AppState {
     }
 
     selectUserRole(role) {
-        console.log("set to role: " + role);
         this.set('nav.selectedRole', role);
     }
 
@@ -736,7 +735,6 @@ class AppState {
 
     fetchAll() {
         let role = this.getSelectedUserRole();
-        console.log('role: ' + role);
 
         if (role == 'cp_admin' || role == 'hr_assistant') {
             fetch.adminFetchAll();
