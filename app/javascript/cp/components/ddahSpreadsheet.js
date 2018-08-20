@@ -6,6 +6,8 @@ import {
     // Button,
     // PanelGroup,
     Panel,
+    Nav,
+    NavItem,
     // Well,
     // DropdownButton,
     // MenuItem,
@@ -31,11 +33,20 @@ class DdahSpreadsheet extends React.Component {
 
     render() {
         // const role = this.props.appState.getSelectedUserRole();
+        console.log(this.props.appState.getCoursesList());
+        //console.log(this.props.appState.getSessionCourse());
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
-                <header>
+                <Nav bsStyle="tabs" justified activeKey={1}>
+                    <NavItem eventKey={1}>item 1</NavItem>
+                    <NavItem eventKey={2}>item 2</NavItem>
+                    <NavItem eventKey={3} disabled>item 3</NavItem>
+                    <NavItem eventKey={4} disabled>item 4</NavItem>
+                </Nav>
+
+                {/*<header>
                     <h3>DDAH Spreadsheet</h3>
-                </header>
+                </header>*/}
 
                 <div className="panel panel-default">
                     <div className="panel-body">

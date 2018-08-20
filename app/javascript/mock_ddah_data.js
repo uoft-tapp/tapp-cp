@@ -246,22 +246,18 @@ const mockDdahData = {
     training: [
         {
             name: "Requires training for scaling learning activities to size of tutorial.",
-            id: "training-scaling",
             checked: false
         },
         {
             name: "Attending Health and Safety training session",
-            id: "training-health",
             checked: false
         },
         {
             name: "Meeting with supervisor",
-            id: "training-meeting",
             checked: true
         },
         {
             name: "Adapting Teaching Techniques (ATT) (scaling learning activities)",
-            id: "training-adapting",
             checked: false
         },
     ],
@@ -270,22 +266,18 @@ const mockDdahData = {
     tutorial_category: [
         {
             name: "Discussion-based Tutorial",
-            id: "tutorial-discussion",
             checked: false
         },
         {
             name: "Skill Development Tutorial",
-            id: "tutorial-skills",
             checked: true
         },
         {
             name: "Review and Q&A Session",
-            id: "tutorial-review",
             checked: false
         },
         {
             name: "Laboratory/Practical",
-            id: "tutorial-lab",
             checked: false
         },
     ],
@@ -294,16 +286,19 @@ const mockDdahData = {
     signatures: {
         supervisor: {
             name: "Profname Profferson",
+            title: "Supervisor",
             signature_initials: "imported by TA coord. for PP",
             date: "May 03, 2018"
         },
         authority: {
             name: "Karen Reid",
+            title: "Chair/Designated Authority",
             signature_initials: "KR",
             date: "May 02, 2018"
         },
         ta: {
             name: "Studentlonglongname Studerson",
+            title: "Teaching Assistant",
             signature_initials: "SS",
             date: "May 04, 2018"
         }
@@ -311,17 +306,17 @@ const mockDdahData = {
 
     mid_course_review_changes: {
         supervisor: {
-            name: "",
+            title: "Supervisor",
             signature_initials: "imported by TA coord. for PP",
             date: "June 02, 2018"
         },
         authority: {
-            name: "",
+            title: "Chair/Designated Authority",
             signature_initials: "KR",
             date: "June 01, 2018"
         },
         ta: {
-            name: "",
+            title: "Teaching Assistant",
             signature_initials: "SS",
             date: "June 03, 2018"
         }

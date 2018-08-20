@@ -55,7 +55,6 @@ class App extends React.Component {
             console.log('CP App nullCheck of user failed...');
             return <div id="loader" />;
         }
-        console.log("CP before checking role");
 
         switch (role){
             case 'cp_admin':
@@ -110,8 +109,8 @@ const InstrRouter = props =>(
                     path={routeConfig.sheet.route}
                     render={() =>
                         <main id="ddah-container" navKey={routeConfig.sheet.id} {...props}>
-                            <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
-                            <DdahForm {...this.props} mockDdahData={mockDdahData} />
+                            <DdahSpreadsheet {...props} mockDdahData={mockDdahData} />
+                            <DdahForm {...props} mockDdahData={mockDdahData} />
                         </main>
                 }/>
                 <Redirect from="/" to="/sheet" />

@@ -66,44 +66,28 @@ function CourseInfoHeader(props) {
 
 
 class DdahForm extends React.Component {
-    constructor(props) {
-        super(props);
-        // this.state = {};
-        console.log('Form constructor ran.');
-        // console.log(this.props.mockDdahData.training.length)
-        // console.log(this.props);
-        // console.log(this.props.mockDdahData.course_data);
-        // console.log(this.props.mockDdahData.ta_name);
-        // console.log(this.props.mockDdahData.ddahs_entries);
-        // console.log(this.props.mockDdahData.duty_tasks);
-        // console.log(this.props.mockDdahData.training);
-        // console.log(this.props.mockDdahData.tutorial_category);
+    // constructor(props) {
+    //     super(props);
+    //     // this.state = {};
+    //     console.log('Form constructor ran.');
+    //     // console.log(this.props.mockDdahData.training.length)
+    //     // console.log(this.props);
+    //     // console.log(this.props.mockDdahData.course_data);
+    //     // console.log(this.props.mockDdahData.ta_name);
+    //     // console.log(this.props.mockDdahData.ddahs_entries);
+    //     // console.log(this.props.mockDdahData.duty_tasks);
+    //     // console.log(this.props.mockDdahData.training);
+    //     // console.log(this.props.mockDdahData.tutorial_category);
 
-        // instructorFetchAll
-    }
+    //     // instructorFetchAll
+    // }
 
     render() {
         // const role = this.props.appState.getSelectedUserRole();
-        // console.log(this.props.getTemplatesList());
-        console.log('signatures0');
-        console.log(this.props.mockDdahData.signatures);
+        // console.log(this.props.appState.getTemplatesList());
 
-        // var trainings = [];
-        for (var i = 0; i < this.props.mockDdahData.signatures.length; i++) {
-
-            console.log('signatures');
-            console.log(this.props.mockDdahData.signatures[i]);
-            console.log(this.props.mockDdahData.signatures[i].name);
-            console.log(this.props.mockDdahData.signatures[i].signature_initials);
-            console.log(this.props.mockDdahData.signatures[i].date);
-
-            // this.props.mockDdahData.training[i]
-            // this.props.mockDdahData.training[i].name
-            // this.props.mockDdahData.training[i].id
-            // checked={this.props.mockDdahData.training[i].checked ? "checked" : "''"}
-            // console.log('checked:', this.props.mockDdahData.training[i].checked);
-        }
-
+        let signatures = this.props.mockDdahData.signatures;
+        let review_signatures = this.props.mockDdahData.mid_course_review_changes;
         return (
             <div id="ddah-form" className="container-fluid container-fit">
                 <header>
@@ -258,7 +242,7 @@ class DdahForm extends React.Component {
                                 {this.props.mockDdahData.training.map((item, i)=>
                                     <div className="checkbox" key={'training' + i}>
                                         <label>
-                                            <input id={item.id} name="trainings" type="checkbox" value={item.id} defaultChecked={item.checked} />
+                                            <input name="trainings" type="checkbox" value={item.id} defaultChecked={item.checked} />
                                             {item.name}
                                         </label>
                                     </div>
@@ -278,7 +262,7 @@ class DdahForm extends React.Component {
                                 <div className="list-group-item list-group-item-condensed" key={'tutorial' + i}>
                                     <div className="radio">
                                         <label>
-                                            <input id={item.id} name="tutorial-category" type="radio" defaultChecked={item.checked} value=""/>
+                                            <input name="tutorial-category" type="radio" defaultChecked={item.checked} value=""/>
                                             {item.name}
                                         </label>
                                     </div>
@@ -292,86 +276,32 @@ class DdahForm extends React.Component {
 
 
                 <section id="signature-block" className="panel panel-default panel-warning">
-
-
                     <div className="panel-body bg-warning">
-
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <p className="form-label-heading">Supervisor</p>
-                            </div>
-
-                            <div className="signatures-col col-sm-5">
-                                <div className="form-group">
-                                    <input id="supervisorName" type="text" className="form-control" value="Profname Profferson"/>
-                                    <span className="help-block">Prepared by (Supervisor)</span>
+                        {Object.keys(signatures).map(key=>
+                            <div className="row">
+                                <div className="col-sm-12">
+                                    <p className="form-label-heading">{signatures[key].title}</p>
+                                </div>
+                                <div className="signatures-col col-sm-5">
+                                    <div className="form-group">
+                                        <input type="text" className="form-control" value={signatures[key].name}/>
+                                        <span className="help-block">Prepared by (Supervisor)</span>
+                                    </div>
+                                </div>
+                                <div className="signatures-col col-sm-4">
+                                    <div className="form-group">
+                                        <input type="text" className="form-control" value={signatures[key].signature_initials}/>
+                                        <span className="help-block">SIGNATURE / INITIAL</span>
+                                    </div>
+                                </div>
+                                <div className="signatures-col col-sm-3">
+                                    <div className="form-group">
+                                        <input type="text" className="form-control" value={signatures[key].date}/>
+                                        <span className="help-block">Date</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="signatures-col col-sm-4">
-                                <div className="form-group">
-                                    <input id="supervisorSig" type="text" className="form-control" value="imported by TA coord. for PP"/>
-                                    <span className="help-block">SIGNATURE / INITIAL</span>
-                                </div>
-                            </div>
-                            <div className="signatures-col col-sm-3">
-                                <div className="form-group">
-                                    <input id="supervisorDate" type="text" className="form-control" value="May 20, 2018"/>
-                                    <span className="help-block">Date</span>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <p className="form-label-heading">Chair/Designated Authority</p>
-                            </div>
-
-                            <div className="signatures-col col-sm-5">
-                                <div className="form-group">
-                                    <input id="taCoordinatorName" type="text" className="form-control" value="Karen Reid"/>
-                                    <span className="help-block">Approved by (Chair / Designated Authority)</span>
-                                </div>
-                            </div>
-                            <div className="signatures-col col-sm-4">
-                                <div className="form-group">
-                                    <input id="taCoordinatorSig" type="text" className="form-control" value="KR"/>
-                                    <span className="help-block">SIGNATURE / INITIAL</span>
-                                </div>
-                            </div>
-                            <div className="signatures-col col-sm-3">
-                                <div className="form-group">
-                                    <input id="taCoordinatorDate" type="text" className="form-control" value="August 31, 2018"/>
-                                    <span className="help-block">Date</span>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <p className="form-label-heading">Teaching Assistant</p>
-                            </div>
-
-                            <div className="signatures-col col-sm-5">
-                                <div className="form-group">
-                                    <input id="teachingAssistantName" type="text" className="form-control" value="Studentlonglongname Studerson"/>
-                                    <span className="help-block">Accepted by (Teaching Assistant)</span>
-                                </div>
-                            </div>
-                            <div className="signatures-col col-sm-4">
-                                <div className="form-group">
-                                    <input id="teachingAssistantSig" type="text" className="form-control" value="SS"/>
-                                    <span className="help-block">SIGNATURE / INITIAL</span>
-                                </div>
-                            </div>
-                            <div className="signatures-col col-sm-3">
-                                <div className="form-group">
-                                    <input id="teachingAssistantDate" type="text" className="form-control" value="June 1, 2018"/>
-                                    <span className="help-block">Date</span>
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
 
@@ -382,65 +312,26 @@ class DdahForm extends React.Component {
                             </div>
 
                             <div className="col-sm-12">
-                                <div className="row">
-                                    <div className="course-change-col col-sm-4">
-                                        <p className="form-label-heading form-control-static pull-right">Supervisor</p>
-                                    </div>
-
-                                    <div className="course-change-col col-sm-4">
-                                        <div className="form-group">
-                                            <input id="supervisorSigReview" type="text" className="form-control" value="PP"/>
-                                            <span className="help-block">SIGNATURE / INITIAL</span>
+                                {Object.keys(review_signatures).map(key=>
+                                    <div className="row">
+                                        <div className="course-change-col col-sm-4">
+                                            <p className="form-label-heading form-control-static pull-right">{review_signatures[key].title}</p>
+                                        </div>
+                                        <div className="course-change-col col-sm-4">
+                                            <div className="form-group">
+                                                <input type="text" className="form-control" value={review_signatures[key].signature_initials}/>
+                                                <span className="help-block">SIGNATURE / INITIAL</span>
+                                            </div>
+                                        </div>
+                                        <div className="course-change-col col-sm-3">
+                                            <div className="form-group">
+                                                <input type="text" className="form-control" value={review_signatures[key].date}/>
+                                                <span className="help-block">Date</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="course-change-col col-sm-3">
-                                        <div className="form-group">
-                                            <input id="supervisorDateReview" type="text" className="form-control" value="June 1, 2018"/>
-                                            <span className="help-block">Date</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row">
-                                    <div className="course-change-col col-sm-4">
-                                        <p className="form-label-heading form-control-static pull-right">Chair/Designated Authority</p>
-                                    </div>
-
-                                    <div className="course-change-col col-sm-4">
-                                        <div className="form-group">
-                                            <input id="taCoordinatorSigReview" type="text" className="form-control" value="KR"/>
-                                            <span className="help-block">SIGNATURE / INITIAL</span>
-                                        </div>
-                                    </div>
-                                    <div className="course-change-col col-sm-3">
-                                        <div className="form-group">
-                                            <input id="taCoordinatorDateReview" type="text" className="form-control" value="June 1, 2018"/>
-                                            <span className="help-block">Date</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row">
-                                    <div className="course-change-col col-sm-4">
-                                        <p className="form-label-heading form-control-static pull-right">Teaching Assistant</p>
-                                    </div>
-
-                                    <div className="course-change-col col-sm-4">
-                                        <div className="form-group">
-                                            <input id="teachingAssistantSigReview" type="text" className="form-control" value="SM"/>
-                                            <span className="help-block">SIGNATURE / INITIAL</span>
-                                        </div>
-                                    </div>
-                                    <div className="course-change-col col-sm-3">
-                                        <div className="form-group">
-                                            <input id="teachingAssistantDateReview" type="text" className="form-control" value="June 1, 2018"/>
-                                            <span className="help-block">Date</span>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                )}
                             </div>
-
                         </div>
                     </div>
 
