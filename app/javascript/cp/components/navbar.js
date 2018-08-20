@@ -153,10 +153,12 @@ const NavbarInst = props =>
                         popup.document.write(ReactDOMServer.renderToStaticMarkup(<DdahAppendix />));
                     }}
                 />}
-            <Session {...props}/>
-            <Notifications {...props} />
-            <Auth {...props} />
-        </Nav>
-    </Navbar>;
+                {!isApplicant && <Session {...props}/>}
+                {!isApplicant && <Notifications {...props} />}
+                <Auth {...props} />
+            </Nav>
+        </Navbar>
+    );
+};
 
 export { NavbarInst as Navbar };
