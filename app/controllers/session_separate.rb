@@ -42,7 +42,13 @@ module SessionSeparate
   def positions_from_session(session = nil)
     if session
       sql = "SELECT * FROM positions p WHERE p.session_id=#{session} ORDER BY p.id"
-      return get_plain_table_data(Position.all.includes(:instructors), sql)
+      if !utorid
+        return get_plain_table_data(Position.all.includes(:instructors), sql)
+      else
+        instructor_select = "SELECT id FROM instructors WHERE utorid='#{utorid}'"
+        instr_position_select = "SELECT a.position_id position_id FROM instructors_positions a, (#{instructor_select}) b WHERE a.instructor_id=b.id"
+        return "SELECT a.id id FROM positions a, (#{instr_position_select}) b WHERE a.id=b.position_id"
+      end
     else
       sql = "SELECT * FROM positions p ORDER BY p.id"
       return get_plain_table_data(Position.all, sql).format

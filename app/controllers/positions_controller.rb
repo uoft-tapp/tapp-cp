@@ -74,7 +74,7 @@ class PositionsController < ApplicationController
 
   def get_all_positions_for_utorid(utorid, session = nil)
     positions = []
-    all_positions = positions_from_session(session)
+    all_positions = positions_from_session(session, utorid)
     all_positions.each do |position|
       position[:instructors].each do |instructor|
         if instructor[:utorid] == utorid

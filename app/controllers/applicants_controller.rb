@@ -9,10 +9,8 @@ class ApplicantsController < ApplicationController
     /applicants/
 '''
   def index
-    if params[:session_id]
+    if session[:roles].include?("tapp_admin")
       render json: applicants_from_session(params[:session_id])
-    else
-      render json: Applicant.all
     elsif params[:session_id]
       render json: applicants_from_session(params[:session_id], session[:utorid])
     else
