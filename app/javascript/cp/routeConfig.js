@@ -23,6 +23,11 @@ const routeConfig = {
         route: '/history',
         id: 'history',
     },
+    sheet: {
+        label: 'DDAH Spreadsheet and Form',
+        route: '/sheet',
+        id: 'sheet',
+    },
 };
 
 export { routeConfig };

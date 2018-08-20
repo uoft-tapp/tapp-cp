@@ -67,8 +67,8 @@ class App extends React.Component {
                     <div>
                         <Navbar {...this.props} />
                         <main id="ddah-container">
-                            <DdahSpreadsheet mockDdahData={mockDdahData} />
-                            <DdahForm mockDdahData={mockDdahData} />
+                            <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
+                            <DdahForm {...this.props} mockDdahData={mockDdahData} />
                         </main>
                         <AlertContainer {...this.props} />
                     </div>
@@ -78,8 +78,8 @@ class App extends React.Component {
                     <div>
                         <Navbar {...this.props} />
                         <main id="ddah-container">
-                            <DdahSpreadsheet mockDdahData={mockDdahData} />
-                            <DdahForm mockDdahData={mockDdahData} />
+                            <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
+                            <DdahForm {...this.props} mockDdahData={mockDdahData} />
                         </main>
                         <AlertContainer {...this.props} />
                     </div>
@@ -95,8 +95,8 @@ const AdminRouter = props =>
         <div>
             <Navbar {...props} />
             <main id="ddah-container">
-                <DdahSpreadsheet mockDdahData={mockDdahData} />
-                <DdahForm mockDdahData={mockDdahData} />
+                <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
+                <DdahForm {...this.props} mockDdahData={mockDdahData} />
             </main>
             <AlertContainer {...props} />
         </div>

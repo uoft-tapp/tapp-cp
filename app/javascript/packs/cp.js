@@ -26,6 +26,8 @@ import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
 import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
 import { Contracts } from '../cp/components/contracts.js';
 import { History } from '../cp/components/history.js';
+import { DdahSpreadsheet } from '../cp/components/ddahSpreadsheet.js';
+import { DdahForm } from '../cp/components/ddahForm2.js';
 
 /*** Main app component ***/
 
@@ -67,7 +69,11 @@ class App extends React.Component {
                 return (
                     <div>
                         <Navbar {...this.props} />
-                        <InstrControlPanel {...this.props} />
+
+                        <main id="ddah-container">
+                            <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
+                            <DdahForm {...this.props} mockDdahData={mockDdahData} />
+                        </main>
                         <AlertContainer {...this.props} />
                     </div>
                 );
