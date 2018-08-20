@@ -237,8 +237,12 @@ const mockDdahData = {
     },
 
     // DDAH form:
+    // ================================================
+
+    // done
     ta_name: "Studentlonglongname Studerson",
 
+    // done
     training: [
         {
             name: "Requires training for scaling learning activities to size of tutorial.",
@@ -262,26 +266,30 @@ const mockDdahData = {
         },
     ],
 
+    // done
     tutorial_category: [
         {
             name: "Discussion-based Tutorial",
+            id: "tutorial-discussion",
             checked: false
         },
         {
             name: "Skill Development Tutorial",
+            id: "tutorial-skills",
             checked: true
         },
         {
             name: "Review and Q&A Session",
+            id: "tutorial-review",
             checked: false
         },
         {
             name: "Laboratory/Practical",
+            id: "tutorial-lab",
             checked: false
         },
     ],
 
-    // signatures: "nooo"
 
     signatures: {
         supervisor: {
@@ -298,23 +306,24 @@ const mockDdahData = {
             name: "Studentlonglongname Studerson",
             signature_initials: "SS",
             date: "May 04, 2018"
+        }
+    },
+
+    mid_course_review_changes: {
+        supervisor: {
+            name: "",
+            signature_initials: "imported by TA coord. for PP",
+            date: "June 02, 2018"
         },
-        mid_course_review_changes: {
-            supervisor: {
-                name: "",
-                signature_initials: "imported by TA coord. for PP",
-                date: "June 02, 2018"
-            },
-            authority: {
-                name: "",
-                signature_initials: "KR",
-                date: "June 01, 2018"
-            },
-            ta: {
-                name: "",
-                signature_initials: "SS",
-                date: "June 03, 2018"
-            }
+        authority: {
+            name: "",
+            signature_initials: "KR",
+            date: "June 01, 2018"
+        },
+        ta: {
+            name: "",
+            signature_initials: "SS",
+            date: "June 03, 2018"
         }
     }
 }

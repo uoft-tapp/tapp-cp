@@ -40,6 +40,7 @@ const initialState = {
     },
 
     selectedDdahData: { type: null, id: null },
+    selectedTemplate: null,
 
     /** DB data **/
     categories: { fetching: 0, list: null },
@@ -110,6 +111,14 @@ class AppState {
     /************************************
      ** view state getters and setters **
      ************************************/
+
+    getSelectedTemplate(){
+        return this.get('selectedTemplate');
+    }
+
+    setSetSelectedTemplate(template_id){
+        this.set('selectedTemplate', template_id);
+    }
 
     // add a row to the ddah worksheet
     addAllocation() {

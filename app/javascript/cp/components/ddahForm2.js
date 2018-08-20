@@ -70,39 +70,39 @@ class DdahForm extends React.Component {
         super(props);
         // this.state = {};
         console.log('Form constructor ran.');
-        console.log(this.props.mockDdahData.training.length)
+        // console.log(this.props.mockDdahData.training.length)
         // console.log(this.props);
         // console.log(this.props.mockDdahData.course_data);
         // console.log(this.props.mockDdahData.ta_name);
         // console.log(this.props.mockDdahData.ddahs_entries);
-        console.log(this.props.mockDdahData.duty_tasks);
-        console.log(this.props.mockDdahData.training);
+        // console.log(this.props.mockDdahData.duty_tasks);
+        // console.log(this.props.mockDdahData.training);
         // console.log(this.props.mockDdahData.tutorial_category);
+
+        // instructorFetchAll
     }
 
     render() {
         // const role = this.props.appState.getSelectedUserRole();
+        // console.log(this.props.getTemplatesList());
+        console.log('signatures0');
+        console.log(this.props.mockDdahData.signatures);
 
-        var trainings = [];
-        for (var i = 0; i < this.props.mockDdahData.training.length; i++) {
+        // var trainings = [];
+        for (var i = 0; i < this.props.mockDdahData.signatures.length; i++) {
+
+            console.log('signatures');
+            console.log(this.props.mockDdahData.signatures[i]);
+            console.log(this.props.mockDdahData.signatures[i].name);
+            console.log(this.props.mockDdahData.signatures[i].signature_initials);
+            console.log(this.props.mockDdahData.signatures[i].date);
+
             // this.props.mockDdahData.training[i]
             // this.props.mockDdahData.training[i].name
             // this.props.mockDdahData.training[i].id
-            // checked = {this.props.mockDdahData.training[i].checked ? "checked" : "''"}
-
-            trainings.push(
-                <div className="checkbox">
-                    <label>
-                        <input id={this.props.mockDdahData.training[i].id} type="checkbox" value={this.props.mockDdahData.training[i].id} />
-                        {this.props.mockDdahData.training[i].name}. x
-                    </label>
-                </div>
-            );
+            // checked={this.props.mockDdahData.training[i].checked ? "checked" : "''"}
+            // console.log('checked:', this.props.mockDdahData.training[i].checked);
         }
-
-        console.log(trainings);
-
-
 
         return (
             <div id="ddah-form" className="container-fluid container-fit">
@@ -254,35 +254,16 @@ class DdahForm extends React.Component {
                             <h3 className="panel-title">Training</h3>
                           </div>
                           <div className="panel-body">
-
                               <div className="list-group">
-
-                                  <div className="checkbox">
-                                      <label>
-                                          <input id="training-scaling" type="checkbox" value=""/>
-                                          Requires training for scaling learning activities to size of tutorial.
-                                      </label>
-                                  </div>
-                                  <div className="checkbox">
-                                      <label>
-                                          <input id="training-health" type="checkbox" value=""/>
-                                          Attending Health and Safety training session
-                                      </label>
-                                  </div>
-                                  <div className="checkbox">
-                                      <label>
-                                          <input id="training-meeting" type="checkbox" value=""/>
-                                          Meeting with supervisor
-                                      </label>
-                                  </div>
-                                  <div className="checkbox">
-                                      <label>
-                                          <input id="training-adapting" type="checkbox" value=""/>
-                                          Adapting Teaching Techniques (ATT) (scaling learning activities)
-                                      </label>
-                                  </div>
+                                {this.props.mockDdahData.training.map((item, i)=>
+                                    <div className="checkbox" key={'training' + i}>
+                                        <label>
+                                            <input id={item.id} name="trainings" type="checkbox" value={item.id} defaultChecked={item.checked} />
+                                            {item.name}
+                                        </label>
+                                    </div>
+                                )}
                               </div>
-
                           </div>
                         </div>
                     </div>
@@ -293,41 +274,16 @@ class DdahForm extends React.Component {
                             <h3 className="panel-title">Tutorial Category (1 primary activity)</h3>
                           </div>
                           <div className="list-group">
-                              <div className="list-group-item list-group-item-condensed">
-                                  <div className="radio">
-                                      <label>
-                                          <input id="tutorial-discussion" name="tutorial-category" type="radio" value=""/>
-                                          Discussion-based Tutorial
-                                      </label>
-                                  </div>
-
-                              </div>
-                              <div className="list-group-item list-group-item-condensed">
-                                  <div className="radio">
-                                      <label>
-                                          <input id="tutorial-skills" name="tutorial-category" type="radio" value="" checked={true}/>
-                                          Skill Development Tutorial
-                                      </label>
-                                  </div>
-
-                              </div>
-                              <div className="list-group-item list-group-item-condensed">
-                                  <div className="radio">
-                                      <label>
-                                          <input id="tutorial-review" name="tutorial-category" type="radio" value=""/>
-                                          Review and Q&A Session
-                                      </label>
-                                  </div>
-                              </div>
-                              <div className="list-group-item list-group-item-condensed">
-                                  <div className="radio">
-                                      <label>
-                                          <input id="tutorial-lab" name="tutorial-category" type="radio" value=""/>
-                                           Laboratory/Practical
-                                      </label>
-                                  </div>
-
-                              </div>
+                            {this.props.mockDdahData.tutorial_category.map((item, i)=>
+                                <div className="list-group-item list-group-item-condensed" key={'tutorial' + i}>
+                                    <div className="radio">
+                                        <label>
+                                            <input id={item.id} name="tutorial-category" type="radio" defaultChecked={item.checked} value=""/>
+                                            {item.name}
+                                        </label>
+                                    </div>
+                                </div>
+                            )}
                           </div>
                         </div>
                     </div>
