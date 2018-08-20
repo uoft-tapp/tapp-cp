@@ -124,6 +124,7 @@ module Authorizer
         end
         if session[:logged_in].nil? || session[:logged_in] == false
           session[:logged_in] = false
+          @existing_users = get_system_utorids
           render file: 'public/login.html'
         end
       end
@@ -287,6 +288,38 @@ module Authorizer
     else
        return data[:instructor_id] == instructor[:id]
     end
+  end
+
+  def get_system_utorids
+    env_positions = ['TAPP_ADMINS', 'CP_ADMINS', 'HR_ASSISTANTS', 'TAPP_ASSISTANTS']
+    env_utorids = get_env_utorids(env_positions)
+    applicant_utorids = get_db_utorids(Applicant.all)
+    instructor_utorids = get_db_utorids(Instructor.all)
+    combine_utorid_lists([env_utorids ,applicant_utorids, instructor_utorids])
+  end
+
+  def get_db_utorids(data)
+    list = []
+    data.each do |item|
+      list.push(item[:utorid])
+    end
+    return list
+  end
+
+  def get_env_utorids(env_user_types)
+    env_utorids = []
+    env_user_types.each do |type|
+      env_utorids.push(ENV[type].split(','))
+    end
+    return combine_utorid_lists(env_utorids)
+  end
+
+  def combine_utorid_lists(all_lists)
+    new_list = []
+    all_lists.each do |list|
+      new_list = new_list + list
+    end
+    return new_list.uniq
   end
 
 end
