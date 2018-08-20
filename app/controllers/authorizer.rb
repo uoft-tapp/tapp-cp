@@ -159,7 +159,6 @@ module Authorizer
   end
 
   def has_role(expected_roles)
-    puts "wtf?" + session[:utorid]
     session[:roles].each do |role|
       expected_roles.each do |expected|
         if expected == role
@@ -260,13 +259,10 @@ module Authorizer
         session[:roles].push(role[:role])
       end
     end
-    puts session[:roles]
     if session[:roles].empty?
-      puts "empty!!!!!!!"
       session[:logged_in] = false
       session[:utorid] = nil
       render file: "public/login.html" and return
-      puts "shouldn't happen"
     end
   end
 
