@@ -193,7 +193,10 @@ class DdahForm extends React.Component {
 
 
                               <tr className="duty-heading">
-                                  <th colSpan="4">Contact Time</th>
+                                  <th>Contact Time</th>
+                                  <th></th>
+                                  <th></th>
+                                  <th></th>
                                   <td className="total">15</td>
                               </tr>
                               <tr className="">

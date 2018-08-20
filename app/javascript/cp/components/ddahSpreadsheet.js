@@ -18,18 +18,18 @@ import { CourseInfoHeader } from './ddahForm2.js';
 
 
 class DdahSpreadsheet extends React.Component {
-    constructor(props) {
-        super(props);
-        // this.state = {};
-        console.log('Spreadsheet constructor ran.');
-        // console.log(this.props);
-        console.log(this.props.mockDdahData.course_data);
-        console.log(this.props.mockDdahData.ta_name);
-        console.log(this.props.mockDdahData.ddahs_entries);
-        console.log(this.props.mockDdahData.duty_tasks);
-        console.log(this.props.mockDdahData.training);
-        // console.log(this.props.mockDdahData.tutorial_category);
-    }
+    // constructor(props) {
+    //     super(props);
+    //     // this.state = {};
+    //     console.log('Spreadsheet constructor ran.');
+    //     // console.log(this.props);
+    //     console.log(this.props.mockDdahData.course_data);
+    //     console.log(this.props.mockDdahData.ta_name);
+    //     console.log(this.props.mockDdahData.ddahs_entries);
+    //     console.log(this.props.mockDdahData.duty_tasks);
+    //     console.log(this.props.mockDdahData.training);
+    //     // console.log(this.props.mockDdahData.tutorial_category);
+    // }
 
     render() {
         // const role = this.props.appState.getSelectedUserRole();
