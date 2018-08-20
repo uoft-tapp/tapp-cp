@@ -64,11 +64,8 @@ module SessionSeparate
     if session
       sql = "SELECT * FROM positions p WHERE p.session_id=#{session} ORDER BY p.id"
       if !utorid
-        p "include instructors"
-        #return get_plain_table_data(Position.all.includes(:instructors), sql)
-        return Position.all.includes(:instructors)
+        return get_plain_table_data(Position.all.includes(:instructors), sql)
       else
-        p "doesn't include instructors"
         instructor_select = "SELECT id FROM instructors WHERE utorid='#{utorid}'"
         instr_position_select = "SELECT a.position_id position_id FROM instructors_positions a, (#{instructor_select}) b WHERE a.instructor_id=b.id"
         return "SELECT a.id id FROM positions a, (#{instr_position_select}) b WHERE a.id=b.position_id"
