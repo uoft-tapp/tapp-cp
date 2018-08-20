@@ -7,6 +7,7 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
+import 'bootstrap';  // for the js ??
 import '../cp-styles';
 
 import React from 'react';
@@ -28,6 +29,7 @@ import { Contracts } from '../cp/components/contracts.js';
 import { History } from '../cp/components/history.js';
 import { DdahSpreadsheet } from '../cp/components/ddahSpreadsheet.js';
 import { DdahForm } from '../cp/components/ddahForm2.js';
+import { mockDdahData } from '../mock_ddah_data.js';  // temporary  .
 
 /*** Main app component ***/
 
@@ -53,6 +55,7 @@ class App extends React.Component {
             console.log('CP App nullCheck of user failed...');
             return <div id="loader" />;
         }
+        console.log("CP before checking role");
 
         switch (role){
             case 'cp_admin':
@@ -66,17 +69,7 @@ class App extends React.Component {
                     </div>
                 );
             case 'instructor':
-                return (
-                    <div>
-                        <Navbar {...this.props} />
-
-                        <main id="ddah-container">
-                            <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
-                            <DdahForm {...this.props} mockDdahData={mockDdahData} />
-                        </main>
-                        <AlertContainer {...this.props} />
-                    </div>
-                );
+                return <InstrRouter {...this.props} />;
             case 'applicant':
                 return <ApplicantRouter {...this.props} />;
         }
@@ -106,6 +99,28 @@ const AdminRouter = props =>
             <AlertContainer {...props} />
         </div>
     </Router>;
+
+const InstrRouter = props =>(
+   <Router basename="cp">
+        <div>
+            <Navbar {...props} />
+
+            <Switch>
+                <Route
+                    path={routeConfig.sheet.route}
+                    render={() =>
+                        <main id="ddah-container" navKey={routeConfig.sheet.id} {...props}>
+                            <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
+                            <DdahForm {...this.props} mockDdahData={mockDdahData} />
+                        </main>
+                }/>
+                <Redirect from="/" to="/sheet" />
+            </Switch>
+
+            <AlertContainer {...props} />
+        </div>
+    </Router>
+);
 
 const ApplicantRouter = props =>
     <Router basename="cp">

@@ -7,7 +7,7 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
-import 'bootstrap';  // for the js
+// import 'bootstrap';  // for the js
 import '../spreadsheetddah-styles';  // only for webpacker to watch changes ??..
 // import '~bootstrap/dist/css/bootstrap';
 // import '../assets/stylesheets/cp';

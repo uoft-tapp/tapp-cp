@@ -82,8 +82,8 @@ function getResHelper(route, onSuccess, dataName, setData, appState){
             setData? setData(data): appState.set(dataName+'.list', fromJS(data));
             appState.setFetchingDataList(dataName, false, true);
         })
-        .catch((error) => //appState.setFetchingDataList(dataName, false)
-            console.error(error));
+        .catch((error) => appState.setFetchingDataList(dataName, false));
+            //console.error(error));
 }
 
 /*
@@ -483,7 +483,8 @@ export const setRole = (cp, appState)=>{
           console.log(resp.roles);
           appState.setCurrentUserRoles(resp.roles);
           if (cp && resp.roles.length > 1) { // cp_admin
-              appState.selectUserRole(resp.roles[0]); // (set to cp_admin), ["cp_admin", "hr_assistant", "instructor"]
+              console.log('admin');
+              appState.selectUserRole(resp.roles[1]); // (set to cp_admin), ["tapp_admin", "cp_admin", "instructor"]
           } else {
               appState.selectUserRole(resp.roles[0]);
           }
