@@ -27,9 +27,7 @@ import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
 import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
 import { Contracts } from '../cp/components/contracts.js';
 import { History } from '../cp/components/history.js';
-import { DdahSpreadsheet } from '../cp/components/ddahSpreadsheet.js';
-import { DdahForm } from '../cp/components/ddahForm2.js';
-import { mockDdahData } from '../mock_ddah_data.js';  // temporary  .
+import { DdahEditor } from '../cp/components/ddahEditor.js';
 
 /*** Main app component ***/
 
@@ -52,7 +50,6 @@ class App extends React.Component {
 
         // this should only happen before we have fetched the current auth information
         if (user == null) {
-            console.log('CP App nullCheck of user failed...');
             return <div id="loader" />;
         }
 
@@ -107,12 +104,7 @@ const InstrRouter = props =>(
             <Switch>
                 <Route
                     path={routeConfig.sheet.route}
-                    render={() =>
-                        <main id="ddah-container" navKey={routeConfig.sheet.id} {...props}>
-                            <DdahSpreadsheet {...props} mockDdahData={mockDdahData} />
-                            <DdahForm {...props} mockDdahData={mockDdahData} />
-                        </main>
-                }/>
+                    render={() => <DdahEditor navKey={routeConfig.sheet.id} {...props}/>}/>
                 <Redirect from="/" to="/sheet" />
             </Switch>
 

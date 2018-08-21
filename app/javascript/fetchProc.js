@@ -62,7 +62,6 @@ export const getResource = (route, onSuccess, dataName, setData, mince, state) =
         appState.getSelectedSession():appState.get('selectedSession');
         if(session&&session!='N/A'){
             route = '/sessions/'+session+route;
-            console.log("getResource: " + route);
             return getResHelper(route, onSuccess, dataName, setData, appState);
         }
         else{
@@ -83,7 +82,6 @@ function getResHelper(route, onSuccess, dataName, setData, appState){
             appState.setFetchingDataList(dataName, false, true);
         })
         .catch((error) => appState.setFetchingDataList(dataName, false));
-            //console.error(error));
 }
 
 /*
@@ -480,16 +478,13 @@ export const setRole = (cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          console.log(resp.roles);
           appState.setCurrentUserRoles(resp.roles);
           if (cp && resp.roles.length > 1) { // cp_admin
-              console.log('admin');
               appState.selectUserRole(resp.roles[1]); // (set to cp_admin), ["tapp_admin", "cp_admin", "instructor"]
           } else {
               appState.selectUserRole(resp.roles[0]);
           }
           appState.setCurrentUserName(resp.utorid);
-          console.log("utorid set to:" + resp.utorid);
           appState.setIsDevelopment(resp.development === true);
           if(cp) appState.setTaCoordinator(resp.ta_coord);
     });

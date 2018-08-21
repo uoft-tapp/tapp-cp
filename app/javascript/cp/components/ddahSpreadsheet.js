@@ -355,11 +355,12 @@ class DdahSpreadsheet extends React.Component {
 }
 
 const DdahCourseTabs = props =>(
-  <Nav bsStyle="tabs" justified activeKey={1}>
-      <NavItem eventKey={1}>item 1</NavItem>
-      <NavItem eventKey={2}>item 2</NavItem>
-      <NavItem eventKey={3} disabled>item 3</NavItem>
-      <NavItem eventKey={4} disabled>item 4</NavItem>
+  <Nav bsStyle="tabs" justified activeKey={1} defaultValue={1}
+    onChange={event=>console.log(event.target.value)}>
+      <NavItem key={1}>item 1</NavItem>
+      <NavItem key={2}>item 2</NavItem>
+      <NavItem key={3} disabled>item 3</NavItem>
+      <NavItem key={4} disabled>item 4</NavItem>
   </Nav>
 );
 

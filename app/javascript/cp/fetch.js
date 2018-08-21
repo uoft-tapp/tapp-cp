@@ -84,7 +84,7 @@ export const adminFetchAll = () =>  {
 
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
-\    getSessions().then(()=>{
+    getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
         appState.setSessionsList(fromJS([]));

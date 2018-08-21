@@ -7,6 +7,7 @@ import {
     Navbar,
     Nav,
     NavDropdown,
+    NavItem,
     MenuItem,
 } from 'react-bootstrap';
 
@@ -37,6 +38,12 @@ const ViewTabs = props => {
                 <ul className="nav navbar-nav navbar-left">
                     <ViewTab activeKey={activeKey} {...routeConfig.contracts} />
                     <ViewTab activeKey={activeKey} {...routeConfig.history} />
+                </ul>
+            );
+        case 'instructor':
+            return(
+                <ul className="nav navbar-nav navbar-left">
+                    <ViewTab activeKey={activeKey} {...routeConfig.sheet} />
                 </ul>
             );
     }
@@ -129,6 +136,26 @@ const Auth = props => {
     );
 };
 
+const DdahHelp = props =>(
+  <NavItem>
+      <i className="fa fa-question-circle"
+          style={{
+              cursor: 'pointer',
+              fontSize: '20px',
+              float: 'left',
+              padding: '15px 5px',
+              color: '#5bc0de',
+          }}
+          title="List of Suggested Tasks and Teaching Techniques"
+          onClick={() => {
+              let popup = window.open();
+              popup.document.open();
+              popup.document.write(ReactDOMServer.renderToStaticMarkup(<DdahAppendix/>));
+          }}
+      />
+  </NavItem>
+);
+
 /*** Navbar ***/
 const NavbarInst = props => {
     let isAdmin = props.appState.getSelectedUserRole() == 'cp_admin';
@@ -147,25 +174,10 @@ const NavbarInst = props => {
                     </NavDropdown>}
                 </Navbar.Brand>
             </Navbar.Header>
-            {(isAdmin || isApplicant) && <ViewTabs {...props} />}
+            <ViewTabs {...props} />
 
             <Nav pullRight>
-                {isInstructor &&
-                <i className="fa fa-question-circle"
-                    style={{
-                        cursor: 'pointer',
-                        fontSize: '20px',
-                        float: 'left',
-                        padding: '15px 5px',
-                        color: '#5bc0de',
-                    }}
-                    title="List of Suggested Tasks and Teaching Techniques"
-                    onClick={() => {
-                        let popup = window.open();
-                        popup.document.open();
-                        popup.document.write(ReactDOMServer.renderToStaticMarkup(<DdahAppendix/>));
-                    }}
-                />}
+                {isInstructor && <DdahHelp {...props} /> }
                 {!isApplicant && <Session {...props}/>}
                 {!isApplicant && <Notifications {...props} />}
                 <Auth {...props} />
