@@ -137,7 +137,7 @@ const Auth = props => {
 };
 
 const DdahHelp = props =>(
-  <NavItem>
+  <NavItem style={{margin: '0', padding: '0'}}>
       <i className="fa fa-question-circle"
           style={{
               cursor: 'pointer',

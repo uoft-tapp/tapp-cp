@@ -3,8 +3,10 @@ import {
     Panel,
     Nav,
     NavItem,
+    Button
 } from 'react-bootstrap';
 import { CourseInfoHeader } from './ddahForm2.js';
+import { DdahTaskSelector } from './ddahTaskSelector.js';
 
 class DdahSpreadsheet extends React.Component {
     render() {
@@ -20,8 +22,10 @@ class DdahSpreadsheet extends React.Component {
                             <thead>
                                 <tr>
                                     <th>
-                                        <button type="button" className="copy-paste-action btn btn-primary btn-xs" title="Copy task hours in a selected row">Copy</button>
-                                        <button type="button" className="copy-paste-action btn btn-info btn-xs" title="Paste task hours to selected row">Paste</button>
+                                        <Button className="copy-paste-action" bsStyle='primary' bsSize='xsmall'
+                                          title="Copy task hours in a selected row">Copy</Button>
+                                        <Button className="copy-paste-action" bsStyle='info' bsSize='xsmall'
+                                          title="Paste task hours to selected row">Paste</Button>
                                     </th>
                                     <th>Name</th>
                                     <th>utorid</th>
@@ -67,13 +71,8 @@ class DdahSpreadsheet extends React.Component {
                                     </th>
 
                                     <th>
-                                        <button type="button" data-toggle="modal" data-target="#newTaskModal" id="new-task-action" className="btn btn-success btn-sm">
-                                            New Task
-                                            <br/>
-                                            <span className="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                                            <span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-                                        </button>
-                                    </th>
+                                        <NewTaskButton {...this.props} onClick={()=>this.props.appState.setTaskSelectorOpen(true)}/>
+                                        </th>
 
                                 </tr>
                             </thead>
@@ -136,46 +135,14 @@ class DdahSpreadsheet extends React.Component {
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" className="btn btn-warning btn-xs">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
-                                        </button>
-                                    </td>
+                                    <RemoveButton {...this.props} />
+                                    <RemoveButton {...this.props} />
+                                    <RemoveButton {...this.props} />
+                                    <RemoveButton {...this.props} />
+                                    <RemoveButton {...this.props} />
+                                    <RemoveButton {...this.props} />
+                                    <RemoveButton {...this.props} />
+                                    <RemoveButton {...this.props} />
                                 </tr>
                             </tfoot>
 
@@ -183,172 +150,9 @@ class DdahSpreadsheet extends React.Component {
                     </div>
                 </div>
 
-
-                <div className="panel panel-default">
-                    <div className="panel-body">
-                        <div className="row">
-
-                            <section className="col-xs-6">
-                                <button type="button" className="btn btn-primary btn-block">Import</button>
-                            </section>
-
-                            <section className="col-xs-6">
-                                <button type="button" className="btn btn-default btn-block">Export</button>
-                            </section>
-                        </div>
-                    </div>
-                </div>
-
-
+                <DdahImportExporter {...this.props} />
                 <CourseInfoHeader {...this.props} />
-
-
-                {/*THE REAL ONE*/}
-
-                <div id="newTaskModal" className="modal fade" tabIndex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-                    <div className="modal-dialog modal-sm">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">×</span><span className="sr-only">Close</span></button>
-                                <h4 className="modal-title" id="myModalLabel">Modal title</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                {/*<!-- MOCK UP -->*/}
-
-                <div id="task-selection-modal" className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">×</span><span className="sr-only">Close</span></button>
-                            <h3 className="modal-title" id="myModalLabel">Select Task</h3>
-                        </div>
-
-                        <div className="modal-body">
-
-                            <div className="row">
-                                <section className="col-sm-3">
-                                    <h4>Grading</h4>
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">14</span> Assignment Grading </button>
-                                        <button className="list-group-item"> <span className="badge">2</span> Test Grading </button>
-                                        <button className="list-group-item"> <span className="badge">1</span> Final Exam Grading </button>
-                                        <button className="list-group-item"> <span className="badge">1</span> Quiz Marking </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> Demo Grading </button>
-                                    </ul>
-                                </section>
-
-                                <section className="col-sm-3">
-                                    <h4>Preparation</h4>
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">2</span> Prep Time for Tutorials </button>
-                                        <button className="list-group-item"> <span className="badge">2</span> Meeting with Supervisor </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> .  </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                    </ul>
-                                </section>
-
-                                <section className="col-sm-3">
-                                    <h4>Contact Time</h4>
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">12</span> Office Hours </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> .  </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                    </ul>
-                                </section>
-
-                                <section className="col-sm-3">
-                                    <h4>Training</h4>
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> .  </button>
-                                    </ul>
-                                </section>
-                            </div>
-
-                            <hr />
-
-                            <h4>Other Duties</h4>
-
-                            <div className="row">
-
-                                <section className="col-sm-3">
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> .  </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                    </ul>
-                                </section>
-
-                                <section className="col-sm-3">
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> .  </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                    </ul>
-                                </section>
-
-                                <section className="col-sm-3">
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> .  </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                    </ul>
-                                </section>
-
-                                <section className="col-sm-3">
-
-                                    <ul className="list-group">
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> . </button>
-                                        <button className="list-group-item"> <span className="badge">0</span> .  </button>
-                                    </ul>
-                                </section>
-                            </div>
-
-
-                            <br />
-
-                            <div className="input-group input-group-sm">
-
-                                {/*<!-- <form className="form-inline"> -->*/}
-                                {/*<!-- <div className="form-group"> -->*/}
-
-                                <span className="input-group-addon">Create New Duty:</span>
-
-                                <input type="text" className="form-control" placeholder="Enter Name of Task/Duty" aria-describedby="sizing-addon1"/>
-
-                                <span className="input-group-btn">
-                                    <button className="btn btn-primary" type="button">Save</button>
-                                </span>
-
-                                {/*<!-- </div> -->*/}
-                                {/*<!-- </form>  -->*/}
-                            </div>
-
-                        </div>
-
-                        <div className="modal-footer">
-                            {/*<!-- <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary">Save changes</button> -->*/}
-                        </div>
-                    </div>
-                </div>
-
+                <DdahTaskSelector {...this.props}/>
             </div>
         );
     }
@@ -362,6 +166,37 @@ const DdahCourseTabs = props =>(
       <NavItem key={3} disabled>item 3</NavItem>
       <NavItem key={4} disabled>item 4</NavItem>
   </Nav>
+);
+
+const NewTaskButton = props =>(
+  <Button bsStyle='success' bsSize='small' onClick={props.onClick}>
+      New Task
+      <br/>
+      <span className="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+      <span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+  </Button>
+);
+
+const RemoveButton = props =>(
+  <td>
+    <Button bsSize='xsmall' bsStyle='warning'>
+        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        Remove
+    </Button>
+  </td>
+);
+
+const DdahImportExporter = props =>(
+  <Panel>
+    <div className="row">
+        <section className="col-xs-6">
+            <Button bsStyle='primary' block>Import</Button>
+        </section>
+        <section className="col-xs-6">
+            <Button block>Export</Button>
+        </section>
+    </div>
+  </Panel>
 );
 
 export { DdahSpreadsheet };

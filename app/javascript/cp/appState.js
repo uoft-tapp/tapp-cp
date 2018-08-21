@@ -41,6 +41,7 @@ const initialState = {
 
     selectedDdahData: { type: null, id: null },
     selectedTemplate: null,
+    taskSelectorOpen: false,
 
     /** DB data **/
     categories: { fetching: 0, list: null },
@@ -111,6 +112,13 @@ class AppState {
     /************************************
      ** view state getters and setters **
      ************************************/
+
+    getTaskSelectorOpen(){
+      return this.get('taskSelectorOpen');
+    }
+    setTaskSelectorOpen(open){
+      return this.set('taskSelectorOpen', open);
+    }
 
     getSelectedTemplate(){
         return this.get('selectedTemplate');
