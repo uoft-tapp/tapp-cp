@@ -137,13 +137,13 @@ const Auth = props => {
 };
 
 const DdahHelp = props =>(
-  <NavItem style={{margin: '0', padding: '0'}}>
+  <NavItem>
       <i className="fa fa-question-circle"
           style={{
               cursor: 'pointer',
               fontSize: '20px',
               float: 'left',
-              padding: '15px 5px',
+              padding: '0px 5px 15px 5px',
               color: '#5bc0de',
           }}
           title="List of Suggested Tasks and Teaching Techniques"
