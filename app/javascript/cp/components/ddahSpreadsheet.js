@@ -1,156 +1,92 @@
 import React from 'react';
-import {
-    Panel,
-    Nav,
-    NavItem,
-    Button
-} from 'react-bootstrap';
+import { Panel, Nav, NavItem, Button } from 'react-bootstrap';
 import { CourseInfoHeader } from './ddahForm2.js';
 import { DdahTaskSelector } from './ddahTaskSelector.js';
 
 class DdahSpreadsheet extends React.Component {
+    getAllTasks(ddahs){
+      let tasks = {}
+      ddahs.forEach(ddah=>{
+        let allocations = ddah.duty_allocations;
+        let duties = Object.keys(allocations);
+        duties.forEach(duty=>{
+          let duty_name = allocations[duty].heading;
+          if(!tasks[duty_name])
+            tasks[duty_name] = {}
+          allocations[duty].items.forEach(allocation=>{
+            if(!tasks[duty_name][allocation.unit_name])
+              tasks[duty_name][allocation.unit_name]={};
+            tasks[duty_name][allocation.unit_name][ddah.utorid] = (allocation.minutes/60).toFixed(2);
+          });
+        });
+      });
+      return tasks;
+    }
+    getTotalHours(ddah){
+      let total = 0;
+      let allocations = ddah.duty_allocations;
+      let duties = Object.keys(allocations);
+      duties.forEach(duty=>{
+        allocations[duty].items.forEach(allocation=>{
+          total += (allocation.num_units*(!allocation.minutes?0:allocation.minutes));
+        });
+      });
+      return (total/60).toFixed(2);
+    }
     render() {
-        // const role = this.props.appState.getSelectedUserRole();
-        // console.log(this.props.appState.getCoursesList());
-        //console.log(this.props.appState.getSessionCourse());
+        let ddahs = this.props.mockDdahData.ddahs_entries;
+        let tasks = this.getAllTasks(ddahs);
+        let duties = Object.keys(tasks);
+        let selectedApplicant = this.props.appState.getSelectedApplicant();
+
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
                 <DdahCourseTabs {...this.props}/>
-                <div className="panel panel-default">
-                    <div className="panel-body">
-                        <table id="ddah-spreadsheet" className="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <Button className="copy-paste-action" bsStyle='primary' bsSize='xsmall'
-                                          title="Copy task hours in a selected row">Copy</Button>
-                                        <Button className="copy-paste-action" bsStyle='info' bsSize='xsmall'
-                                          title="Paste task hours to selected row">Paste</Button>
-                                    </th>
-                                    <th>Name</th>
-                                    <th>utorid</th>
-                                    <th>Required <br/> Hours</th>
-                                    <th>Total <br/> Hours</th>
-                                    <th>Tutorial <br/> Category</th>
-
-                                    {/*<!-- Duties -->*/}
-                                    <th>
-                                         Assignment Grading
-                                        <div className="label label-default">Grading</div>
-                                    </th>
-                                    <th>
-                                         Test Grading
-                                         <div className="label label-default">Grading</div>
-                                    </th>
-                                    <th>
-                                         Final Exam Grading
-                                         <div className="label label-default">Grading</div>
-                                    </th>
-
-                                    <th>
-                                        Prep Time for Tutorials
-                                        <div className="label label-default">Preparation</div>
-                                    </th>
-                                    <th>
-                                        Meeting with Supervisor
-                                        <div className="label label-default">Preparation</div>
-                                    </th>
-
-                                    <th>
-                                        Office Hours
-                                        <div className="label label-default">Contact Time</div>
-                                    </th>
-
-                                    <th>
-                                        _________
-                                        <div className="label label-default">Training</div>
-                                    </th>
-                                    <th>
-                                        _________
-                                        <div className="label label-default">Other Duties</div>
-                                    </th>
-
-                                    <th>
-                                        <NewTaskButton {...this.props} onClick={()=>this.props.appState.setTaskSelectorOpen(true)}/>
-                                        </th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="radio" name="copy-paste-radio"/></td>
-                                    <th scope="row">Studentlonglongname Studerson</th>
-                                    <td>theutor8</td>
-                                    <td>60</td>
-                                    <td>60</td>
-                                    <td></td>
-                                    <td><input type="number" value="7" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" value="8" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" value="16" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" value="10" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" value="4" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" value="15" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                </tr>
-                                <tr className="danger">
-                                    <td><input type="radio" name="copy-paste-radio"/></td>
-                                    <th scope="row">Lukarkark Mrokirmed</th>
-                                    <td>applicant66</td>
-                                    <td>60</td>
-                                    <td>0</td>
-                                    <td></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                </tr>
-                                <tr className="danger">
-                                    <td><input type="radio" name="copy-paste-radio"/></td>
-                                    <th scope="row">Crumiarc Maruraked</th>
-                                    <td>applicant390</td>
-                                    <td>120</td>
-                                    <td>0</td>
-                                    <td></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                    <td><input type="number" className="duty-hour form-control" placeholder="0"/></td>
-                                </tr>
-                            </tbody>
-
-                            <tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <RemoveButton {...this.props} />
-                                    <RemoveButton {...this.props} />
-                                    <RemoveButton {...this.props} />
-                                    <RemoveButton {...this.props} />
-                                    <RemoveButton {...this.props} />
-                                    <RemoveButton {...this.props} />
-                                    <RemoveButton {...this.props} />
-                                    <RemoveButton {...this.props} />
-                                </tr>
-                            </tfoot>
-
-                        </table>
-                    </div>
-                </div>
-
-                <DdahImportExporter {...this.props} />
+                <Panel>
+                    <table id="ddah-spreadsheet" className="table table-hover">
+                        <thead><tr>
+                            <CopyPasteButton {...this.props}
+                              copy={()=>alert('copy action')}
+                              paste={()=>alert('paste action')}/>
+                            <th>Name</th>
+                            <th>utorid</th>
+                            <th>Required <br/> Hours</th>
+                            <th>Total <br/> Hours</th>
+                            <th>Tutorial <br/> Category</th>
+                            {duties.map(duty=>
+                              Object.keys(tasks[duty]).map((task,i)=>
+                                <DutyTaskHeading key={i} {...this.props}
+                                  duty={duty} task={task} />
+                              )
+                            )}
+                            <NewTaskButton {...this.props}
+                              onClick={()=>this.props.appState.setTaskSelectorOpen(true)}/>
+                        </tr></thead>
+                        <tbody>
+                          {ddahs.map((ddah, i)=>
+                            <DdahEntry key={i} {...this.props}
+                              onClick={()=>this.props.appState.setSelectedApplicant(ddah.utorid)}
+                              checked={selectedApplicant==ddah.utorid}
+                              name={ddah.name} utorid={ddah.utorid} required={ddah.required_hours}
+                              tasks={tasks} duties={duties}
+                              total={this.getTotalHours(ddah)} />
+                          )}
+                        </tbody>
+                        <tfoot>
+                            <tr><td colSpan="6"></td>
+                            {duties.map(duty=>
+                              Object.keys(tasks[duty]).map((task, i)=>
+                                <RemoveButton key={i} {...this.props}
+                                  onClick={()=>alert(duty+'\n'+task)}/>
+                              )
+                            )}
+                          </tr>
+                        </tfoot>
+                    </table>
+                </Panel>
+                <DdahImportExporter {...this.props}
+                  import={()=>alert('import action')}
+                  export={()=>alert('export action')}/>
                 <CourseInfoHeader {...this.props} />
                 <DdahTaskSelector {...this.props}/>
             </div>
@@ -168,18 +104,63 @@ const DdahCourseTabs = props =>(
   </Nav>
 );
 
+const CopyPasteButton = props =>(
+  <th>
+      <Button className="copy-paste-action" bsStyle='primary' bsSize='xsmall'
+        title="Copy task hours in a selected row"
+        onClick={props.copy}>Copy</Button>
+      <Button className="copy-paste-action" bsStyle='info' bsSize='xsmall'
+        title="Paste task hours to selected row"
+        onClick={props.paste}>Paste</Button>
+  </th>
+);
+
+const DutyTaskHeading = props =>(
+  <th>
+    {props.task}
+    <div className="label label-default">{props.duty}</div>
+  </th>
+);
+
 const NewTaskButton = props =>(
-  <Button bsStyle='success' bsSize='small' onClick={props.onClick}>
-      New Task
-      <br/>
-      <span className="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-      <span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-  </Button>
+  <th>
+    <Button bsStyle='success' bsSize='small' onClick={props.onClick}>
+        New Task
+        <br/>
+        <span className="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+        <span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+    </Button>
+  </th>
+);
+
+const DdahEntry = props =>(
+  <tr className={(parseFloat(props.required)!=parseFloat(props.total))?'danger':''}
+    onClick={props.onClick}>
+      <td><input type="radio" name="copy-paste-radio" checked={props.checked}/></td>
+      <th scope="row">{props.name}</th>
+      <td>{props.utorid}</td>
+      <td>{props.required}</td>
+      <td>{props.total}</td>
+      <td></td>
+      {props.duties.map(duty=>
+        Object.keys(props.tasks[duty]).map((task,i)=>
+          <DdahInput {...props} value={props.tasks[duty][task][props.utorid]?
+            props.tasks[duty][task][props.utorid]:0} />
+        )
+      )}
+  </tr>
+);
+
+const DdahInput = props =>(
+  <td>
+    <input type="number" value={props.value}
+      className="duty-hour form-control" placeholder="0"/>
+  </td>
 );
 
 const RemoveButton = props =>(
   <td>
-    <Button bsSize='xsmall' bsStyle='warning'>
+    <Button bsSize='xsmall' bsStyle='warning' onClick={props.onClick}>
         <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
         Remove
     </Button>
@@ -190,10 +171,10 @@ const DdahImportExporter = props =>(
   <Panel>
     <div className="row">
         <section className="col-xs-6">
-            <Button bsStyle='primary' block>Import</Button>
+            <Button bsStyle='primary' block onClick={props.import}>Import</Button>
         </section>
         <section className="col-xs-6">
-            <Button block>Export</Button>
+            <Button block onClick={props.export}>Export</Button>
         </section>
     </div>
   </Panel>

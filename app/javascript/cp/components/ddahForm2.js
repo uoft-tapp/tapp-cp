@@ -20,10 +20,24 @@ class DdahForm extends React.Component {
       });
       return this.minutesToHour(total);
     }
+    getApplicantIndex(ddahs){
+      let index = 0;
+      ddahs.forEach((ddah, i)=>{
+        if(ddah.utorid == this.props.appState.getSelectedApplicant())
+          index = i;
+      })
+      return index;
+    }
     render() {
+        let selectedApplicant = this.props.appState.getSelectedApplicant();
+        if(!selectedApplicant){
+          return null;
+        }
         let signatures = this.props.mockDdahData.signatures;
         let review_signatures = this.props.mockDdahData.mid_course_review_changes;
-        let allocations= this.props.mockDdahData.ddahs_entries[0].duty_allocations;
+        let ddahs = this.props.mockDdahData.ddahs_entries;
+        let index = this.getApplicantIndex(ddahs);
+        let allocations= this.props.mockDdahData.ddahs_entries[index].duty_allocations;
         let duties = Object.keys(allocations);
 
         return (
@@ -37,7 +51,7 @@ class DdahForm extends React.Component {
                       <div className="col-sm-7">
                           <section id="ta-person">
                               <div id="ta-info">
-                                  <h3 id="ta-name">{this.props.mockDdahData.ta_name}</h3>
+                                  <h3 id="ta-name">{ddahs[index].name}</h3>
                               </div>
                           </section>
                       </div>
@@ -245,13 +259,13 @@ const SignatureInput = props =>(
   </div>
 );
 
-const CourseInfoHeader = props => (
+export const CourseInfoHeader = props => (
   <Panel {...props} value={
     <div className="row">
         <section className="col-xs-8">
             <span>{props.mockDdahData.course_data.code}</span>
             <span>{props.mockDdahData.course_data.prof}</span>
-            <span>{props.mockDdahData.course_data.name}</span>
+            <div>{props.mockDdahData.course_data.name}</div>
         </section>
         <section className="col-xs-4">
             <form className="form-horizontal">
@@ -275,4 +289,4 @@ const EnrolmentLabel = props =>(
 );
 
 
-export { DdahForm, CourseInfoHeader };
+export { DdahForm };

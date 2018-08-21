@@ -27,6 +27,10 @@ class DdahTaskSelector extends React.Component {
     })
     return keys;
   }
+  saveTasks(){
+    alert('save action');
+    this.props.appState.setTaskSelectorOpen(false)
+  }
   render() {
     let open = this.props.appState.getTaskSelectorOpen();
     let num_cols = 6;
@@ -63,11 +67,11 @@ class DdahTaskSelector extends React.Component {
                   )}/>
                 )}/>
             <hr/>
-            <NewDuty {...this.props}/>
+            <NewDuty {...this.props} onSave={()=>alert('save new tasks')}/>
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={()=>this.props.appState.setTaskSelectorOpen(false)}>Close</Button>
-            <Button bsStyle="primary">Save changes</Button>
+            <Button bsStyle="primary" onClick={()=>this.saveTasks()}>Save changes</Button>
           </Modal.Footer>
         </Modal>
       </div>
@@ -107,7 +111,7 @@ const NewDuty = props =>(
       <FormControl type="text"
         placeholder="Enter Name of Task/Duty"/>
       <InputGroup.Button>
-        <Button bsStyle='primary' bsSize='small'>Save</Button>
+        <Button bsStyle='primary' bsSize='small' onClick={props.onSave}>Save</Button>
       </InputGroup.Button>
     </InputGroup>
   </FormGroup>
