@@ -283,7 +283,7 @@ const EnrolmentLabel = props =>(
   <div className="form-group form-group-sm">
     <label className="col-xs-7 control-label">{props.label}</label>
     <div className="col-xs-3">
-        <p className="form-control-static">{props.data}</p>
+        <p className="form-control-static">{props.value}</p>
     </div>
   </div>
 );
