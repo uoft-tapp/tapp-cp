@@ -131,6 +131,7 @@ module Authorizer
       session[:logged_in] = true
     else
       if ENV['RAILS_ENV'] == 'development'
+        @is_windows = request.env['HTTP_USER_AGENT'].downcase.match(/windows/i)
         if params[:utorid]
           session[:utorid] = params[:utorid]
           session[:logged_in] = true

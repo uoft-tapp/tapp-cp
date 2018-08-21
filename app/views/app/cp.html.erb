@@ -24,8 +24,11 @@
     <!-- Bootstrap JS -->
     <!-- TEMPORARY jquery? -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <%= javascript_pack_tag 'cp' %>
+    <%= stylesheet_pack_tag 'cp' %>
+    <%= javascript_pack_tag 'polyfill-css' %>
 
-    <% if ENV['RAILS_ENV'] == 'development' %>
+    <% if ENV['RAILS_ENV'] == 'development' && @is_windows %>
       <!-- For development in Windows -->
       <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
       <!-- For development on Mac -->
@@ -33,10 +36,6 @@
       <script src="<%= @pack_url %>cp.js?v=<%= DateTime.now %>"></script>
       <link rel="stylesheet" media="screen" href="<%= @pack_url %>cp.css?v=<%= DateTime.now %>">
       <script src="<%= @pack_url %>polyfill-css.js?v=<%= DateTime.now %>"></script>
-    <% else %>
-        <%= javascript_pack_tag 'cp' %>
-        <%= stylesheet_pack_tag 'cp' %>
-        <%= javascript_pack_tag 'polyfill-css' %>
     <% end %>
 
     <!-- FA icons -->

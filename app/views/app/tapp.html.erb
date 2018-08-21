@@ -23,7 +23,7 @@
     <%= stylesheet_pack_tag 'tapp' %>
     <%= javascript_pack_tag 'polyfill-css' %>
 
-    <% if ENV['RAILS_ENV'] == 'development' %>
+    <% if ENV['RAILS_ENV'] == 'development'  && @is_windows %>
       <!-- For development in Windows -->
       <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
       <!-- For development on Mac -->
