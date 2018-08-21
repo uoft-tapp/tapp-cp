@@ -108,7 +108,8 @@ const ApplicantRouter = props =>
             <Switch>
                 <Route
                     path={routeConfig.contracts.route}
-                    render={() => <Contracts navKey={routeConfig.contracts.id} {...props} />}
+                    // Also pass in useful route-related props, in particular history
+                    render={p => <Contracts navKey={routeConfig.contracts.id} {...props} {...p}/>}
                 />
                 <Route
                     path={routeConfig.history.route}

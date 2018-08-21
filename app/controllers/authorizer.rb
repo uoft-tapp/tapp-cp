@@ -86,10 +86,8 @@ module Authorizer
     if !params[:utorid]
       access(expected_role)
     else
-      if ENV['RAILS_ENV'] == 'production'
-        if !has_access(expected_role) or params[:utorid] != session[:utorid]
-          render status: 403, file: 'public/403.html'
-        end
+      if !has_access(expected_role) or params[:utorid] != session[:utorid]
+        render status: 403, file: 'public/403.html'
       end
     end
   end

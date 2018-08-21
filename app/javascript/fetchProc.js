@@ -327,6 +327,35 @@ export const onFetchOffersSuccess = (resp) => {
     return offers;
 }
 
+export const onFetchApplicantOffersSuccess = (resp) => {
+    let offers = {};
+    resp.forEach(offer => {
+        offers[offer.id] = {
+            applicantId: offer.applicant_id,
+            firstName: offer.applicant.first_name,
+            lastName: offer.applicant.last_name,
+            studentNumber: offer.applicant.student_number,
+            email: offer.applicant.email,
+            utorid: offer.applicant.utorid,
+            course: offer.position,
+            position: offer.position,
+            hours: offer.hours,
+            status: offer.status,
+            hrStatus: offer.hr_status,
+            ddahStatus: offer.ddah_status,
+            sentAt: offer.send_date,
+            note: offer.commentary,
+            ddahSendDate: offer.ddah_send_date,
+            instructors: offer.instructors,
+            session: offer.session,
+            startDate: offer.start_date,
+            endDate: offer.end_date,
+            updated_at: offer.updated_at,
+        };
+    });
+    return offers;
+}
+
 export const onFetchSessionsSuccess = (resp)=>{
     let sessions = {};
     resp.forEach(session => {
@@ -480,7 +509,6 @@ export const setRole = (cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          console.log(resp.roles);
           appState.setCurrentUserRoles(resp.roles);
           if (cp && resp.roles.length > 1) { // cp_admin
               appState.selectUserRole(resp.roles[1]); // set to cp_admin
