@@ -42,6 +42,7 @@ const initialState = {
     selectedDdahData: { type: null, id: null },
     selectedTemplate: null,
     selectedApplicant: null,
+    selectedCourse: null,
     taskSelectorOpen: false,
 
     /** DB data **/
@@ -133,6 +134,12 @@ class AppState {
     }
     setSelectedApplicant(utorid){
         this.set('selectedApplicant', utorid);
+    }
+    getSelectedCourse(){
+        return this.get('selectedCourse');
+    }
+    setSelectedCourse(course){
+        this.set('selectedCourse', course);
     }
 
     // add a row to the ddah worksheet

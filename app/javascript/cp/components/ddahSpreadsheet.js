@@ -33,7 +33,34 @@ class DdahSpreadsheet extends React.Component {
       });
       return (total/60).toFixed(2);
     }
+    getSortedCourses(){
+      return this.props.appState.getCoursesList().sort((a, b)=>{
+        if(a.get('code') < b.get('code')) return -1;
+        if(a.get('code') > b.get('code')) return 1;
+        return 0;
+      });
+    }
+    getFirstCourse(){
+      let id = null, count = 0;
+      this.getSortedCourses().forEach((_, course)=>{
+        if(count==0)
+          id=course;
+        count++;
+      });
+      return id;
+    }
+    getCurrentCourse(){
+      let selectedCourse = this.props.appState.getSelectedCourse();
+      if(!selectedCourse)
+        this.props.appState.setSelectedCourse(this.getFirstCourse());
+      return this.props.appState.getSelectedCourse();
+    }
+    changeHour(hours, utorid, duty_name, task_name){
+      alert('apply change to hour: '+hours+' from appState');
+    }
     render() {
+        let nullCheck = this.props.appState.instrAnyNull();
+        if (nullCheck) return null; // this is very important for loading the page
         let ddahs = this.props.mockDdahData.ddahs_entries;
         let tasks = this.getAllTasks(ddahs);
         let duties = Object.keys(tasks);
@@ -41,7 +68,15 @@ class DdahSpreadsheet extends React.Component {
 
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
-                <DdahCourseTabs {...this.props}/>
+                <DdahCourseTabs {...this.props} selectedCourse={this.getCurrentCourse()}
+                  onSelect={event=>this.props.appState.setSelectedCourse(event)}
+                  value={
+                    this.getSortedCourses().map((course,i)=>
+                      <NavItem key={i} eventKey={i} >
+                      {course.get('code')}
+                      </NavItem>
+                    )
+                  }/>
                 <Panel>
                     <table id="ddah-spreadsheet" className="table table-hover">
                         <thead><tr>
@@ -64,8 +99,9 @@ class DdahSpreadsheet extends React.Component {
                         </tr></thead>
                         <tbody>
                           {ddahs.map((ddah, i)=>
-                            <DdahEntry key={i} {...this.props}
+                            <DdahEntry key={i} {...this.props} 
                               onClick={()=>this.props.appState.setSelectedApplicant(ddah.utorid)}
+                              onChange={this.changeHour}
                               checked={selectedApplicant==ddah.utorid}
                               name={ddah.name} utorid={ddah.utorid} required={ddah.required_hours}
                               tasks={tasks} duties={duties}
@@ -95,12 +131,8 @@ class DdahSpreadsheet extends React.Component {
 }
 
 const DdahCourseTabs = props =>(
-  <Nav bsStyle="tabs" justified activeKey={1} defaultValue={1}
-    onChange={event=>console.log(event.target.value)}>
-      <NavItem key={1}>item 1</NavItem>
-      <NavItem key={2}>item 2</NavItem>
-      <NavItem key={3} disabled>item 3</NavItem>
-      <NavItem key={4} disabled>item 4</NavItem>
+  <Nav bsStyle="tabs" activeKey={props.selectedCourse} onSelect={props.onSelect}>
+    {props.value}
   </Nav>
 );
 
@@ -145,7 +177,10 @@ const DdahEntry = props =>(
       {props.duties.map(duty=>
         Object.keys(props.tasks[duty]).map((task,i)=>
           <DdahInput {...props} value={props.tasks[duty][task][props.utorid]?
-            props.tasks[duty][task][props.utorid]:0} />
+            props.tasks[duty][task][props.utorid]:0}
+            onChange={event=>
+              props.onChange(event.target.value, props.utorid, duty, task)
+            }/>
         )
       )}
   </tr>
@@ -153,7 +188,7 @@ const DdahEntry = props =>(
 
 const DdahInput = props =>(
   <td>
-    <input type="number" value={props.value}
+    <input type="number" value={props.value} onChange={props.onChange}
       className="duty-hour form-control" placeholder="0"/>
   </td>
 );
