@@ -1,31 +1,135 @@
 {
     "courses": [
-        {
-            "course_id": "CSC999",
-            "course_name": "Fake Course",
-            "round_id": "114",
-            "enrolment": "170",
-            "n_positions": "5",
-            "n_hours": "60",
-            "dates": "September 1, 2017 to December 31, 2017",
-            "tutorials": "W5, W8",
-            "qualifications": "Must have taken this course or similar one. Strong writing skills. Desired: Knowledge of current events related to technology. Experience with facilitating group discussions. Video creation or editing experience is a plus. ",
-            "duties": "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted. ",
-            "total_hours": "0",
-            "start_posting": null,
-            "end_posting": null,
-            "status": "1",
-            "end_nominations": null,
-            "last_updated": "2017-08-03 17:17:22",
-            "instructor": [
-                {
-                    "utorid": "easterb2",
-                    "first_name": "Stephen",
-                    "last_name": "Easterbrook",
-                    "email": "sme@cs.toronto.edu"
-                }
-            ]
-        }
+      {
+          "course_id": "CSC999",
+          "course_name": "Fake Course 1",
+          "round_id": "114",
+          "enrolment": "170",
+          "n_positions": "5",
+          "n_hours": "60",
+          "dates": "September 1, 2017 to December 31, 2017",
+          "tutorials": "W5, W8",
+          "qualifications": "Must have taken this course or similar one. Strong writing skills. Desired: Knowledge of current events related to technology. Experience with facilitating group discussions. Video creation or editing experience is a plus. ",
+          "duties": "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted. ",
+          "total_hours": "0",
+          "start_posting": null,
+          "end_posting": null,
+          "status": "1",
+          "end_nominations": null,
+          "last_updated": "2017-08-03 17:17:22",
+          "instructor": [
+              {
+                  "utorid": "easterb2",
+                  "first_name": "Stephen",
+                  "last_name": "Easterbrook",
+                  "email": "sme@cs.toronto.edu"
+              }
+          ]
+      },
+      {
+          "course_id": "CSC998",
+          "course_name": "Fake Course 2",
+          "round_id": "114",
+          "enrolment": "170",
+          "n_positions": "5",
+          "n_hours": "60",
+          "dates": "September 1, 2017 to December 31, 2017",
+          "tutorials": "W5, W8",
+          "qualifications": "Must have taken this course or similar one. Strong writing skills. Desired: Knowledge of current events related to technology. Experience with facilitating group discussions. Video creation or editing experience is a plus. ",
+          "duties": "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted. ",
+          "total_hours": "0",
+          "start_posting": null,
+          "end_posting": null,
+          "status": "1",
+          "end_nominations": null,
+          "last_updated": "2017-08-03 17:17:22",
+          "instructor": [
+              {
+                  "utorid": "easterb2",
+                  "first_name": "Stephen",
+                  "last_name": "Easterbrook",
+                  "email": "sme@cs.toronto.edu"
+              }
+          ]
+      },
+      {
+          "course_id": "CSC997",
+          "course_name": "Fake Course 3",
+          "round_id": "114",
+          "enrolment": "170",
+          "n_positions": "5",
+          "n_hours": "60",
+          "dates": "September 1, 2017 to December 31, 2017",
+          "tutorials": "W5, W8",
+          "qualifications": "Must have taken this course or similar one. Strong writing skills. Desired: Knowledge of current events related to technology. Experience with facilitating group discussions. Video creation or editing experience is a plus. ",
+          "duties": "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted. ",
+          "total_hours": "0",
+          "start_posting": null,
+          "end_posting": null,
+          "status": "1",
+          "end_nominations": null,
+          "last_updated": "2017-08-03 17:17:22",
+          "instructor": [
+              {
+                  "utorid": "easterb2",
+                  "first_name": "Stephen",
+                  "last_name": "Easterbrook",
+                  "email": "sme@cs.toronto.edu"
+              }
+          ]
+      },
+      {
+          "course_id": "CSC996",
+          "course_name": "Fake Course 4",
+          "round_id": "114",
+          "enrolment": "170",
+          "n_positions": "5",
+          "n_hours": "60",
+          "dates": "September 1, 2017 to December 31, 2017",
+          "tutorials": "W5, W8",
+          "qualifications": "Must have taken this course or similar one. Strong writing skills. Desired: Knowledge of current events related to technology. Experience with facilitating group discussions. Video creation or editing experience is a plus. ",
+          "duties": "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted. ",
+          "total_hours": "0",
+          "start_posting": null,
+          "end_posting": null,
+          "status": "1",
+          "end_nominations": null,
+          "last_updated": "2017-08-03 17:17:22",
+          "instructor": [
+              {
+                  "utorid": "easterb2",
+                  "first_name": "Stephen",
+                  "last_name": "Easterbrook",
+                  "email": "sme@cs.toronto.edu"
+              }
+          ]
+      },
+      {
+          "course_id": "CSC995",
+          "course_name": "Fake Course 5",
+          "round_id": "114",
+          "enrolment": "170",
+          "n_positions": "5",
+          "n_hours": "60",
+          "dates": "September 1, 2017 to December 31, 2017",
+          "tutorials": "W5, W8",
+          "qualifications": "Must have taken this course or similar one. Strong writing skills. Desired: Knowledge of current events related to technology. Experience with facilitating group discussions. Video creation or editing experience is a plus. ",
+          "duties": "TA duties may include marking, leading skills development tutorials, Q&A/Exam/Assignment/Test Review sessions, and laboratories where noted. ",
+          "total_hours": "0",
+          "start_posting": null,
+          "end_posting": null,
+          "status": "1",
+          "end_nominations": null,
+          "last_updated": "2017-08-03 17:17:22",
+          "instructor": [
+              {
+                  "utorid": "easterb2",
+                  "first_name": "Stephen",
+                  "last_name": "Easterbrook",
+                  "email": "sme@cs.toronto.edu"
+              }
+          ]
+      }
     ],
     "applicants": [
         {
@@ -52,7 +156,7 @@
             "special_needs": "",
             "last_updated": "2017-07-04 23:43:08",
             "courses": [
-                "CSC999"
+                "CSC999", "CSC998", "CSC997", "CSC996", "CSC995"
             ]
         },        {
             "app_id": "101",
@@ -78,7 +182,7 @@
             "special_needs": "",
             "last_updated": "2017-07-04 23:43:08",
             "courses": [
-                "CSC999"
+              "CSC999", "CSC998", "CSC997", "CSC996"
             ]
         },        {
             "app_id": "103",
@@ -104,7 +208,7 @@
             "special_needs": "",
             "last_updated": "2017-07-04 23:43:08",
             "courses": [
-                "CSC999"
+              "CSC999", "CSC998"
             ]
         }
     ]
