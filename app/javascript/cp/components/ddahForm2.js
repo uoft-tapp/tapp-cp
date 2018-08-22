@@ -1,5 +1,6 @@
 import React from 'react';
 import { } from 'react-bootstrap';
+import Logo from '../../../assets/images/dcs_logo_blue_big.jpg';
 
 class DdahForm extends React.Component {
     minutesToHour(minutes){
@@ -57,7 +58,8 @@ class DdahForm extends React.Component {
                       </div>
 
                       <div className="col-sm-5">
-                          <img id="dcs-logo-ddah" className="img-responsive" src="<%= asset_url('dcs_logo_blue_big.jpg') %>" />
+                          <img id="dcs-logo-ddah" className="img-responsive"
+                            src={Logo} />
                       </div>
                   </div>
                 }/>
