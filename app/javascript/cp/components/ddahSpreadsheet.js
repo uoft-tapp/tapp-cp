@@ -52,7 +52,7 @@ class DdahSpreadsheet extends React.Component {
     getCurrentCourse(){
       let selectedCourse = this.props.appState.getSelectedCourse();
       if(!selectedCourse)
-        this.props.appState.setSelectedCourse(this.getFirstCourse());
+        this.props.appState.selectCourse(this.getFirstCourse());
       return this.props.appState.getSelectedCourse();
     }
     changeHour(hours, utorid, duty_name, task_name){
@@ -65,11 +65,12 @@ class DdahSpreadsheet extends React.Component {
         let tasks = this.getAllTasks(ddahs);
         let duties = Object.keys(tasks);
         let selectedApplicant = this.props.appState.getSelectedApplicant();
+        let selectedCourseId= this.getCurrentCourse();
 
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
-                <DdahCourseTabs {...this.props} selectedCourse={this.getCurrentCourse()}
-                  onSelect={event=>this.props.appState.setSelectedCourse(event)}
+                <DdahCourseTabs {...this.props} selectedCourse={selectedCourseId}
+                  onSelect={event=>this.props.appState.selectCourse(event)}
                   value={
                     this.getSortedCourses().map((course,i)=>
                       <NavItem key={i} eventKey={i} >
@@ -99,7 +100,7 @@ class DdahSpreadsheet extends React.Component {
                         </tr></thead>
                         <tbody>
                           {ddahs.map((ddah, i)=>
-                            <DdahEntry key={i} {...this.props} 
+                            <DdahEntry key={i} {...this.props}
                               onClick={()=>this.props.appState.setSelectedApplicant(ddah.utorid)}
                               onChange={this.changeHour}
                               checked={selectedApplicant==ddah.utorid}
@@ -123,7 +124,8 @@ class DdahSpreadsheet extends React.Component {
                 <DdahImportExporter {...this.props}
                   import={()=>alert('import action')}
                   export={()=>alert('export action')}/>
-                <CourseInfoHeader {...this.props} />
+                <CourseInfoHeader {...this.props}
+                  course={this.props.appState.getCourseHeaderInfo(selectedCourseId)}/>
                 <DdahTaskSelector {...this.props}/>
             </div>
         );

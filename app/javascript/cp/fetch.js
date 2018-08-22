@@ -94,7 +94,7 @@ export const instructorFetchAll = () => {
         appState.setLatestSession();
       getOffers(user, 'instructor');
       getDdahs(user);
-      getCourses(user);
+      getCourses(user).then(()=>appState.selectCourse(null));
     });
     getCategories();
     getDuties();

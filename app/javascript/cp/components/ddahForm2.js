@@ -40,6 +40,7 @@ class DdahForm extends React.Component {
         let index = this.getApplicantIndex(ddahs);
         let allocations= this.props.mockDdahData.ddahs_entries[index].duty_allocations;
         let duties = Object.keys(allocations);
+        let selectedCourseId= this.props.appState.getSelectedCourse();
 
         return (
             <div id="ddah-form" className="container-fluid container-fit">
@@ -64,7 +65,8 @@ class DdahForm extends React.Component {
                   </div>
                 }/>
 
-                <CourseInfoHeader {...this.props} />
+                <CourseInfoHeader {...this.props}
+                  course={this.props.appState.getCourseHeaderInfo(selectedCourseId)}/>
 
                 <Panel {...this.props} title='Allocation of Hours Worksheet'
                   value={
@@ -265,16 +267,16 @@ export const CourseInfoHeader = props => (
   <Panel {...props} value={
     <div className="row">
         <section className="col-xs-8">
-            <span>{props.mockDdahData.course_data.code}</span>
-            <span>{props.mockDdahData.course_data.prof}</span>
-            <div>{props.mockDdahData.course_data.name}</div>
+            <span>{props.course.code}</span>
+            <span>{props.course.instructors}</span>
+            <div>{props.course.name}</div>
         </section>
         <section className="col-xs-4">
             <form className="form-horizontal">
                 <EnrolmentLabel {...props} label='Expected Enrollment'
-                  value={props.mockDdahData.course_data.enrollment} />
+                  value={props.course.enrol} />
                 <EnrolmentLabel {...props} label='Est. Enrollment / TA'
-                  value={props.mockDdahData.course_data.enrollment_rate} />
+                  value={props.course.estEnrol} />
             </form>
         </section>
     </div>

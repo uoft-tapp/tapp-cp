@@ -135,11 +135,24 @@ class AppState {
     setSelectedApplicant(utorid){
         this.set('selectedApplicant', utorid);
     }
-    getSelectedCourse(){
-        return this.get('selectedCourse');
+    getCourseById(id){
+      return this.get('courses.list.'+id);
     }
-    setSelectedCourse(course){
-        this.set('selectedCourse', course);
+    getCourseAttribute(id, attr){
+      return this.get('courses.list.'+id+'.'+attr);
+    }
+    getCourseHeaderInfo(id){
+      let instructors = this.getCourseAttribute(id, 'instructors')?
+        this.getCourseAttribute(id, 'instructors').map(
+          instructor=>instructor.get('name')
+        ):[];
+      return {
+        code: this.getCourseAttribute(id, 'code'),
+        instructors: instructors.join(','),
+        name: this.getCourseAttribute(id, 'name'),
+        enrol: this.getCourseAttribute(id, 'estimatedEnrol'),
+        estEnrol: this.getCourseAttribute(id, 'cap')
+      };
     }
 
     // add a row to the ddah worksheet
@@ -419,6 +432,7 @@ class AppState {
     selectSession(id) {
         this.set('selectedSession', id);
         let role = appState.getSelectedUserRole();
+        this.selectCourse(null);
         switch(role){
           case 'cp_admin':
           case 'hr_assistant':
