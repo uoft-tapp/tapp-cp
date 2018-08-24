@@ -44,6 +44,7 @@ const initialState = {
     selectedApplicant: null,
     selectedCourse: null,
     taskSelectorOpen: false,
+    copyToModalOpen: false,
 
     /** DB data **/
     categories: { fetching: 0, list: null },
@@ -120,6 +121,13 @@ class AppState {
     }
     setTaskSelectorOpen(open){
       return this.set('taskSelectorOpen', open);
+    }
+
+    getCopyToModalOpen(){
+      return this.get('copyToModalOpen');
+    }
+    setCopyToModalOpen(open){
+      return this.set('copyToModalOpen', open);
     }
 
     getSelectedTemplate(){

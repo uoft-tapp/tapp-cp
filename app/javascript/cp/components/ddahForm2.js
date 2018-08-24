@@ -6,18 +6,18 @@ class DdahForm extends React.Component {
     minutesToHour(minutes){
       return (minutes/60).toFixed(2);
     }
-    getTotalByDuty(allocations, duty, review=false, round=true){
+    getTotalByDuty(allocations, duty, round=true){
       let total= 0;
       allocations[duty].items.forEach(allocation=>{
-        let minutes = review?allocation.minutes_revised_latest:allocation.minutes;
+        let minutes = allocation.is_revised?allocation.revised_minutes:allocation.minutes;
         total += (allocation.num_units*(!minutes?0:minutes));
       });
       return round?this.minutesToHour(total):total;
     }
-    getTotalHours(allocations, duties, review=false){
+    getTotalHours(allocations, duties){
       let total = 0;
       duties.forEach(duty=>{
-        total+= this.getTotalByDuty(allocations, duty, review, false);
+        total+= this.getTotalByDuty(allocations, duty, false);
       });
       return this.minutesToHour(total);
     }
@@ -82,8 +82,6 @@ class DdahForm extends React.Component {
                             allocations={allocations[duty].items} minutesToHour={this.minutesToHour}/>
                         )}
                         <DutyTableTotal {...this.props}
-                          hour_per_unit={this.getTotalHours(allocations, duties)}
-                          review_hours={this.getTotalHours(allocations, duties, true)}
                           total={this.getTotalHours(allocations, duties)}/>
                     </table>
                   }
@@ -108,15 +106,13 @@ class DdahForm extends React.Component {
     }
 }
 
-const duty_table_headings = ['# Unit', 'Type of Unit', 'Hours per Unit', 'Hours Revision **', 'Total Hours'];
+const duty_table_headings = ['# Unit', 'Type of Unit', 'Minutes per Unit', 'Minutes Revision **', 'Total Hours'];
 
 const DutyTableTotal = props =>(
   <tbody>
     <tr className="info row-total">
         <td>Total</td>
-        <td></td>
-        <td>{props.hour_per_unit}</td>
-        <td>{props.review_hours}</td>
+        <td colSpan="3"></td>
         <td>{props.total}</td>
     </tr>
   </tbody>
@@ -129,9 +125,8 @@ const DutyAllocation = props =>(
     <Allocation {...props} key={i}
       num_unit={allocation.num_units}
       duty={allocation.unit_name}
-      time={props.minutesToHour(allocation.minutes)}
-      revised_time={allocation.is_revised?
-        props.minutesToHour(allocation.minutes_revised_latest):''}/>
+      time={allocation.minutes}
+      revised_time={allocation.is_revised? allocation.revised_minutes:null}/>
   )}
   </tbody>
 );
@@ -147,8 +142,8 @@ const Allocation = props =>(
   <tr>
       <td className="number-of-units">{props.num_unit}</td>
       <td className="duty-description">{props.duty}</td>
-      <td className="unit-time">{props.time}</td>
-      <td className="revised-time">{props.revised_time}</td>
+      <td className={'unit-time' + (props.revised_time?' is_revised':'')}>{props.time}</td>
+      <td className="revised-time">{props.revised_time?props.revised_time:''}</td>
       <td></td>
   </tr>
 );
@@ -229,13 +224,13 @@ const Signature = props =>(
           <p className="form-label-heading">{props.signature.title}</p>
       </div>
       <SignatureInput {...props} col_name='signatures' col_size='5'
-         help_block='Prepared by (Supervisor)'
+         help_block='Prepared by (Supervisor)' disabled={true}
          value={props.signature.name}/>
       <SignatureInput {...props} col_name='signatures' col_size='4'
          help_block='SIGNATURE / INITIAL'
          value={props.signature.signature_initials}/>
       <SignatureInput {...props} col_name='signatures' col_size='3'
-         help_block='Date'
+         help_block='Date' disabled={true}
          value={props.signature.date}/>
   </div>
 );
@@ -249,7 +244,7 @@ const ReviewSignature = props =>(
         help_block='SIGNATURE / INITIAL'
         value={props.review_signature.signature_initials}/>
       <SignatureInput {...props} col_name='course-change' col_size='3'
-        help_block='Date'
+        help_block='Date' disabled={true}
         value={props.review_signature.date}/>
   </div>
 );
@@ -257,7 +252,8 @@ const ReviewSignature = props =>(
 const SignatureInput = props =>(
   <div className={props.col_name +'-col col-sm-'+props.col_size}>
       <div className="form-group">
-          <input type="text" className="form-control" value={props.value}/>
+          <input type="text" className="form-control" value={props.value}
+            disabled={props.disabled}/>
           <span className="help-block">{props.help_block}</span>
       </div>
   </div>

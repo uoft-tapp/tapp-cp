@@ -1,7 +1,8 @@
 import React from 'react';
-import { Panel, Nav, NavItem, Button } from 'react-bootstrap';
+import { Panel, Nav, NavItem, Button, InputGroup, FormControl, Glyphicon, Well } from 'react-bootstrap';
 import { CourseInfoHeader } from './ddahForm2.js';
 import { DdahTaskSelector } from './ddahTaskSelector.js';
+import { CopyToModal } from './CopyToModal.js';
 
 class DdahSpreadsheet extends React.Component {
     minutesToHours(minutes){
@@ -19,7 +20,10 @@ class DdahSpreadsheet extends React.Component {
           allocations[duty].items.forEach(allocation=>{
             if(!tasks[duty_name][allocation.unit_name])
               tasks[duty_name][allocation.unit_name]={};
-            tasks[duty_name][allocation.unit_name][ddah.utorid] = allocation.is_revised?this.minutesToHours(allocation.revised_minutes):this.minutesToHours(allocation.minutes);
+            tasks[duty_name][allocation.unit_name][ddah.utorid] = {
+                unit: allocation.num_units,
+                minute:allocation.is_revised?allocation.revised_minutes:allocation.minutes
+            };
           });
         });
       });
@@ -31,7 +35,8 @@ class DdahSpreadsheet extends React.Component {
       let duties = Object.keys(allocations);
       duties.forEach(duty=>{
         allocations[duty].items.forEach(allocation=>{
-          total += (allocation.num_units*(!allocation.minutes?0:allocation.minutes));
+          let time = allocation.is_revised? allocation.revised_minutes: allocation.minutes;
+          total += (allocation.num_units*(!time?0:time));
         });
       });
       return (total/60).toFixed(2);
@@ -58,8 +63,11 @@ class DdahSpreadsheet extends React.Component {
         this.props.appState.selectCourse(this.getFirstCourse());
       return this.props.appState.getSelectedCourse();
     }
-    changeHour(hours, utorid, duty_name, task_name){
-      alert('apply change to hour: '+hours+' from appState');
+    changeUnit(unit, utorid, duty_name, task_name){
+      alert('apply change to hour: '+unit+' from appState');
+    }
+    changeMinute(minute, utorid, duty_name, task_name){
+      alert('apply change to hour: '+minute+' from appState');
     }
     render() {
         let nullCheck = this.props.appState.instrAnyNull();
@@ -69,16 +77,18 @@ class DdahSpreadsheet extends React.Component {
         let duties = Object.keys(tasks);
         let selectedApplicant = this.props.appState.getSelectedApplicant();
         let selectedCourseId= this.getCurrentCourse();
+        let locked = true;  // todo: map over each TA in each sheet...
 
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
+            <CopyToModal {...this.props} />
                 <DdahCourseTabs
                   {...this.props} selectedCourse={selectedCourseId}
                   onSelect={event=>this.props.appState.selectCourse(event)}
                   value={
                     this.getSortedCourses().map((course,i)=>
                       <NavItem key={i} eventKey={i} >
-                      {course.get('code')}
+                      {course.get('code')} {locked?<Glyphicon glyph="lock"/>:''}
                       </NavItem>
                     )
                   }/>
@@ -87,9 +97,8 @@ class DdahSpreadsheet extends React.Component {
                <Panel>
                     <table id="ddah-spreadsheet" className="table table-hover">
                         <thead><tr>
-                            <CopyPasteButton {...this.props}
-                              copy={()=>alert('copy action')}
-                              paste={()=>alert('paste action')}/>
+                            <CopyToButton {...this.props}
+                              onClick={()=>this.props.appState.setCopyToModalOpen(true)}/>
                             <th>Name</th>
                             <th>utorid</th>
                             <th>Required <br/> Hours</th>
@@ -106,7 +115,8 @@ class DdahSpreadsheet extends React.Component {
                           {ddahs.map((ddah, i)=>
                             <DdahEntry key={i} {...this.props}
                               onClick={()=>this.props.appState.setSelectedApplicant(ddah.utorid)}
-                              onChange={this.changeHour}
+                              onChangeUnit={this.changeUnit}
+                              onChangeHour={this.changeMinute}
                               checked={selectedApplicant==ddah.utorid}
                               name={ddah.name} utorid={ddah.utorid} required={ddah.required_hours}
                               tasks={tasks} duties={duties}
@@ -142,14 +152,11 @@ const DdahCourseTabs = props =>(
   </Nav>
 );
 
-const CopyPasteButton = props =>(
+const CopyToButton = props =>(
   <th>
       <Button className="copy-paste-action" bsStyle='primary' bsSize='xsmall'
         title="Copy task hours in a selected row"
-        onClick={props.copy}>Copy</Button>
-      <Button className="copy-paste-action" bsStyle='info' bsSize='xsmall'
-        title="Paste task hours to selected row"
-        onClick={props.paste}>Paste</Button>
+        onClick={props.onClick}>Copy to</Button>
   </th>
 );
 
@@ -161,12 +168,12 @@ const DutyTaskHeading = props =>(
 );
 
 const NewTaskButton = props =>(
-    <Button id="new-task-button" bsStyle='success' bsSize='medium' onClick={props.onClick}>
+    <Button id="new-task-button" bsStyle='success' onClick={props.onClick}>
         New Task
         &nbsp;&nbsp;
-        <span className="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-        <span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-    </Button>
+        <Glyphicon glyph="plus-sign"/>
+        <Glyphicon glyph="arrow-right"/>
+     </Button>
  );
 
 const DdahEntry = props =>(
@@ -180,11 +187,13 @@ const DdahEntry = props =>(
       <td></td>
       {props.duties.map(duty=>
         Object.keys(props.tasks[duty]).map((task,i)=>
-          <DdahInput {...props} value={props.tasks[duty][task][props.utorid]?
-            props.tasks[duty][task][props.utorid]:0}
-            onChange={event=>
-              props.onChange(event.target.value, props.utorid, duty, task)
-            }/>
+          <DdahInput {...props}
+          unit={props.tasks[duty][task][props.utorid]?
+            props.tasks[duty][task][props.utorid].unit:''}
+          minute={props.tasks[duty][task][props.utorid]?
+            props.tasks[duty][task][props.utorid].minute:''}
+            onChangeUnit={event=>props.onChangeUnit(event.target.value, props.utorid, duty, task)}
+            onChangeMinute={event=>props.onChangeMinute(event.target.value, props.utorid, duty, task)}/>
         )
       )}
   </tr>
@@ -192,15 +201,21 @@ const DdahEntry = props =>(
 
 const DdahInput = props =>(
   <td>
-    <input type="number" value={props.value} onChange={props.onChange}
-      className="duty-hour form-control" placeholder="0"/>
-  </td>
+    <InputGroup>
+        <InputGroup.Addon style={{padding: '0', width: '50%'}}>
+            <FormControl type="number" style={{height: '100%', border: '0'}}
+                value={props.unit} onChange={props.onChangeUnit}
+                placeholder="Units"/>
+        </InputGroup.Addon>
+        <FormControl id="task-minute-field" type="number" value={props.minute} onChange={props.onChangeMinute} placeholder="Minutes"/>
+    </InputGroup>
+   </td>
 );
 
 const RemoveButton = props =>(
   <td>
-    <Button bsSize='xsmall' bsStyle='warning' onClick={props.onClick}>
-        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+    <Button className='remove-task-button' bsSize='xsmall' bsStyle='warning' onClick={props.onClick}>
+        <Glyphicon glyph="remove"/> Remove
     </Button>
   </td>
 );

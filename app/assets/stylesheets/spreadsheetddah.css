@@ -104,6 +104,9 @@ input[type="radio"] {
     padding: 7px 10px;
 }
 
+.is_revised{
+    text-decoration: line-through;
+}
 
 /*//////////////////////////////////////////////////////////////////////////
 // DDAH Styles
@@ -283,8 +286,19 @@ tbody .row-total {
 }
 #ddah-spreadsheet input {
   background: #ffffff69;
-  min-width: 26px;
-  /* sanity check */
+  min-width: 40px;
+}
+
+#ddah-spreadsheet input#task-minute-field {
+  min-width: 46px;
+}
+
+#ddah-spreadsheet input::placeholder {
+    font-size: 8.9px;
+}
+
+#ddah-spreadsheet tr {
+    cursor: pointer;
 }
 
 .copy-paste-action {
@@ -299,6 +313,13 @@ tbody .row-total {
     padding-right: 3px;
 }
 
+#course-tabs-nav span.glyphicon{
+    color: #eb5e5e;  /*red*/
+}
+
+.remove-task-button{
+    width: 100%;
+}
 
 /*//////////////////////////////////////////////////////////////////////////
 // Override Global (DDAH_SPREADSHEET-specific) Bootstrap Styles
@@ -308,7 +329,7 @@ tbody .row-total {
     width: fit-content !important;  /*override CP style, 100%*/
 }
 
-.modal-dialog {
+#task-selection-modal .modal-dialog {
     width: 90%;
 }
 

@@ -40,8 +40,8 @@ class DdahTaskSelector extends React.Component {
 
 
     return (
-      <div>
-        <Modal show={open} onHide={()=>this.props.appState.setTaskSelectorOpen(false)}>
+        <Modal id='task-selection-modal' show={open} bsSize='lg'
+            onHide={()=>this.props.appState.setTaskSelectorOpen(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Select Task</Modal.Title>
           </Modal.Header>
@@ -66,15 +66,12 @@ class DdahTaskSelector extends React.Component {
                         action={task.action}/>
                   )}/>
                 )}/>
-            <hr/>
-            <NewDuty {...this.props} onSave={()=>alert('save new tasks')}/>
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={()=>this.props.appState.setTaskSelectorOpen(false)}>Close</Button>
             <Button bsStyle="primary" onClick={()=>this.saveTasks()}>Save changes</Button>
           </Modal.Footer>
         </Modal>
-      </div>
     );
   }
 }
@@ -103,17 +100,5 @@ const Task = props =>(
     <Badge style={{float:'right'}}>{props.num}</Badge>
     </small>
   </ListGroupItem>
-);
-const NewDuty = props =>(
-  <FormGroup bsSize="small">
-    <InputGroup>
-      <InputGroup.Addon>Create New Duty:</InputGroup.Addon>
-      <FormControl type="text"
-        placeholder="Enter Name of Task/Duty"/>
-      <InputGroup.Button>
-        <Button bsStyle='primary' bsSize='small' onClick={props.onSave}>Save</Button>
-      </InputGroup.Button>
-    </InputGroup>
-  </FormGroup>
 );
 export { DdahTaskSelector };

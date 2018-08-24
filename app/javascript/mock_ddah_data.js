@@ -11,6 +11,7 @@ const mockDdahData = {
             utorid: "theutor8",
             required_hours: 60,
             tutorial_category: "",
+            locked: true,
             duty_allocations: {
                 grading: {
                     heading: "Grading",
@@ -90,6 +91,7 @@ const mockDdahData = {
             utorid: "applicant66",
             required_hours: 60,
             tutorial_category: "",
+            locked: false,
             duty_allocations: {
                 grading: {
                     heading: "Grading",
@@ -124,6 +126,7 @@ const mockDdahData = {
             utorid: "applicant390",
             required_hours: 120,
             tutorial_category: "",
+            locked: true,
             duty_allocations: {
                 grading: {
                     heading: "Grading",
@@ -158,6 +161,7 @@ const mockDdahData = {
             utorid: "applicant888",
             required_hours: 80,
             tutorial_category: "",
+            locked: false,
             duty_allocations: {
                 grading: {
                     heading: "Grading",
