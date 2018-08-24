@@ -18,24 +18,24 @@ const mockDdahData = {
                     items: [
                         {
                             unit_name: "Assignment Grading",
-                            minutes: 560,
+                            minutes: 420,
                             num_units: 1,
                             is_revised: false,
-                            minutes_revised_latest: null
+                            revised_minutes: null
                         },
                         {
                             unit_name: "Test Grading",
                             minutes: 480,
                             num_units: 1,
                             is_revised: false,
-                            minutes_revised_latest: null
+                            revised_minutes: null
                         },
                         {
                             unit_name: "Final Exam Grading",
-                            minutes: 7680,
+                            minutes: 960,
                             num_units: 1,
                             is_revised: false,
-                            minutes_revised_latest: null
+                            revised_minutes: null
                         }
                     ],
                 },
@@ -48,14 +48,14 @@ const mockDdahData = {
                             minutes: 180,
                             num_units: 1,
                             is_revised: true,
-                            minutes_revised_latest: 600
+                            revised_minutes: 600
                         },
                         {
                             unit_name: "Meeting with Supervisor",
                             minutes: 240,
                             num_units: 1,
                             is_revised: false,
-                            minutes_revised_latest: null
+                            revised_minutes: null
                         }
                     ]
                 },
@@ -68,7 +68,7 @@ const mockDdahData = {
                             minutes: 1320,
                             num_units: 1,
                             is_revised: true,
-                            minutes_revised_latest: 900
+                            revised_minutes: 900
                         }
                     ]
                 },

@@ -266,12 +266,12 @@ const SignatureInput = props =>(
 export const CourseInfoHeader = props => (
   <Panel {...props} value={
     <div className="row">
-        <section className="col-xs-8">
-            <span>{props.course.code}</span>
-            <span>{props.course.instructors}</span>
-            <div>{props.course.name}</div>
+        <section id="course-overview" className="col-xs-8">
+            <span id="course-code">{props.course.code}</span>
+            <span id="course-prof">{props.course.instructors}</span>
+            <div id="course-title">{props.course.name}</div>
         </section>
-        <section className="col-xs-4">
+        <section id="course-details" className="col-xs-4">
             <form className="form-horizontal">
                 <EnrolmentLabel {...props} label='Expected Enrollment'
                   value={props.course.enrol} />

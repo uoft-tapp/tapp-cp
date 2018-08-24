@@ -49,6 +49,10 @@
   margin-bottom: 0;
 }
 
+#ddah-spreadsheet .nav-tabs {
+    border-bottom: none;
+}
+
 
 /*//////////////////////////////////////////////////////////////////////////
 // DDAH + DDAH SPREADHSEET Styles
@@ -57,7 +61,6 @@
  main#ddah-container {
     width: fit-content;
     margin-top: 50px;
-    background-color: #e4e4e4;
     font-size: 12px;
  }
 
@@ -89,6 +92,16 @@ input[type="radio"] {
 
 #course-details {
   border-left: 1px solid #b9b9b9;
+}
+
+#course-tabs-nav {
+    display: inline-flex;
+}
+
+#new-task-button {
+    float: right;
+    margin-top: 10px;
+    padding: 7px 10px;
 }
 
 

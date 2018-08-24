@@ -28,7 +28,7 @@ class DdahEditor extends React.Component {
 
     render() {
         return (
-          <main id="ddah-container">
+          <main id="ddah-container" className="container-fluid">
               <DdahSpreadsheet {...this.props} mockDdahData={mockDdahData} />
               <DdahForm {...this.props} mockDdahData={mockDdahData} />
           </main>

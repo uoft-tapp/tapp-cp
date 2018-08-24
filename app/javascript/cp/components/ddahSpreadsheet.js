@@ -4,6 +4,9 @@ import { CourseInfoHeader } from './ddahForm2.js';
 import { DdahTaskSelector } from './ddahTaskSelector.js';
 
 class DdahSpreadsheet extends React.Component {
+    minutesToHours(minutes){
+        return (minutes/60).toFixed(2);
+    }
     getAllTasks(ddahs){
       let tasks = {}
       ddahs.forEach(ddah=>{
@@ -16,7 +19,7 @@ class DdahSpreadsheet extends React.Component {
           allocations[duty].items.forEach(allocation=>{
             if(!tasks[duty_name][allocation.unit_name])
               tasks[duty_name][allocation.unit_name]={};
-            tasks[duty_name][allocation.unit_name][ddah.utorid] = (allocation.minutes/60).toFixed(2);
+            tasks[duty_name][allocation.unit_name][ddah.utorid] = allocation.is_revised?this.minutesToHours(allocation.revised_minutes):this.minutesToHours(allocation.minutes);
           });
         });
       });
@@ -69,7 +72,8 @@ class DdahSpreadsheet extends React.Component {
 
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
-                <DdahCourseTabs {...this.props} selectedCourse={selectedCourseId}
+                <DdahCourseTabs
+                  {...this.props} selectedCourse={selectedCourseId}
                   onSelect={event=>this.props.appState.selectCourse(event)}
                   value={
                     this.getSortedCourses().map((course,i)=>
@@ -78,7 +82,9 @@ class DdahSpreadsheet extends React.Component {
                       </NavItem>
                     )
                   }/>
-                <Panel>
+                 <NewTaskButton {...this.props}
+                  onClick={()=>this.props.appState.setTaskSelectorOpen(true)}/>
+               <Panel>
                     <table id="ddah-spreadsheet" className="table table-hover">
                         <thead><tr>
                             <CopyPasteButton {...this.props}
@@ -95,8 +101,6 @@ class DdahSpreadsheet extends React.Component {
                                   duty={duty} task={task} />
                               )
                             )}
-                            <NewTaskButton {...this.props}
-                              onClick={()=>this.props.appState.setTaskSelectorOpen(true)}/>
                         </tr></thead>
                         <tbody>
                           {ddahs.map((ddah, i)=>
@@ -133,7 +137,7 @@ class DdahSpreadsheet extends React.Component {
 }
 
 const DdahCourseTabs = props =>(
-  <Nav bsStyle="tabs" activeKey={props.selectedCourse} onSelect={props.onSelect}>
+  <Nav id="course-tabs-nav" bsStyle="tabs" activeKey={props.selectedCourse} onSelect={props.onSelect}>
     {props.value}
   </Nav>
 );
@@ -157,15 +161,13 @@ const DutyTaskHeading = props =>(
 );
 
 const NewTaskButton = props =>(
-  <th>
-    <Button bsStyle='success' bsSize='small' onClick={props.onClick}>
+    <Button id="new-task-button" bsStyle='success' bsSize='medium' onClick={props.onClick}>
         New Task
-        <br/>
+        &nbsp;&nbsp;
         <span className="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
         <span className="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
     </Button>
-  </th>
-);
+ );
 
 const DdahEntry = props =>(
   <tr className={(parseFloat(props.required)!=parseFloat(props.total))?'danger':''}
@@ -198,8 +200,7 @@ const DdahInput = props =>(
 const RemoveButton = props =>(
   <td>
     <Button bsSize='xsmall' bsStyle='warning' onClick={props.onClick}>
-        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-        Remove
+        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
     </Button>
   </td>
 );
