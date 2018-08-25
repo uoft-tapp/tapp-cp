@@ -135,11 +135,10 @@ class DdahSpreadsheet extends React.Component {
                         </tfoot>
                     </table>
                 </Panel>
-                <DdahImportExporter {...this.props}
+                <DdahActionButtons {...this.props}
                   import={()=>alert('import action')}
-                  export={()=>alert('export action')}/>
-                <CourseInfoHeader {...this.props}
-                  course={this.props.appState.getCourseHeaderInfo(selectedCourseId)}/>
+                  export={()=>alert('export action')}
+                  submit={()=>alert('submit action')}/>
                 <DdahTaskSelector {...this.props}/>
             </div>
         );
@@ -220,14 +219,17 @@ const RemoveButton = props =>(
   </td>
 );
 
-const DdahImportExporter = props =>(
+const DdahActionButtons = props =>(
   <Panel>
     <div className="row">
-        <section className="col-xs-6">
+        <section className="col-xs-3">
             <Button bsStyle='primary' block onClick={props.import}>Import</Button>
         </section>
-        <section className="col-xs-6">
+        <section className="col-xs-3">
             <Button block onClick={props.export}>Export</Button>
+        </section>
+        <section className="col-xs-6">
+            <Button bsStyle='info' block onClick={props.submit}>Submit</Button>
         </section>
     </div>
   </Panel>

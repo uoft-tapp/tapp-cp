@@ -33,7 +33,7 @@ class DdahTaskSelector extends React.Component {
   }
   render() {
     let open = this.props.appState.getTaskSelectorOpen();
-    let num_cols = 5;
+    let num_cols = 4;
     let allocations= this.props.mockDdahData.ddahs_entries[0].duty_allocations;
     let duties = this.getDutiesKey(Object.keys(allocations), allocations);
     let other_duties = this.splitDataToCol(this.generateMockTask(27), num_cols);
@@ -69,7 +69,6 @@ class DdahTaskSelector extends React.Component {
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={()=>this.props.appState.setTaskSelectorOpen(false)}>Close</Button>
-            <Button bsStyle="primary" onClick={()=>this.saveTasks()}>Save changes</Button>
           </Modal.Footer>
         </Modal>
     );
