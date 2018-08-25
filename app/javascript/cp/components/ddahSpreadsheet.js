@@ -2,7 +2,7 @@ import React from 'react';
 import { Panel, Nav, NavItem, Button, InputGroup, FormControl, Glyphicon, Well } from 'react-bootstrap';
 import { CourseInfoHeader } from './ddahForm2.js';
 import { DdahTaskSelector } from './ddahTaskSelector.js';
-import { CopyToModal } from './CopyToModal.js';
+import { CopyToModal } from './copyToModal.js';
 
 class DdahSpreadsheet extends React.Component {
     minutesToHours(minutes){
