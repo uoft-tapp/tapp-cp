@@ -53,10 +53,12 @@ Rails.application.routes.draw do
 
   # DDAH routes
   get 'instructors/utorid/:utorid' => "instructors#show_by_utorid"
-  scope 'instructors/:utorid' do
+  scope 'sessions/:session_id/instructors/:utorid' do
     resources :offers, only: [:index, :show]
     resources :positions, only: [:index, :show]
     resources :ddahs, only: [:index, :show, :create, :destroy, :update]
+  end
+  scope 'instructors/:utorid' do
     resources :templates, only: [:index, :show, :create, :destroy, :update]
   end
   resources :ddahs, only: [:index, :show, :create, :destroy, :update]
