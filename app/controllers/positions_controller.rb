@@ -11,7 +11,7 @@ class PositionsController < ApplicationController
   end
 
   def show
-    if params[:utorid]
+    if params[:utorid] || params[:session_id]
       positions = positions_from_session(params[:session_id], params[:utorid])
       if id_array(positions).include?(params[:id].to_i)
         position = Position.find(params[:id])
@@ -48,14 +48,6 @@ class PositionsController < ApplicationController
         position.update_attributes!(attribute => date)
       end
     end
-  end
-
-  def get_utorids(position)
-    utorids = []
-    position.instructors.each do |instructor|
-      utorids.push(instructor[:utorid])
-    end
-    return utorids
   end
 
 end

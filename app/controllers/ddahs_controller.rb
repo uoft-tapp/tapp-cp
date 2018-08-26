@@ -15,24 +15,16 @@ class DdahsController < ApplicationController
   end
 
   def index
-    if params[:session_id]
-      if params[:utorid]
-        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], params[:session_id]))
-      else
-        render json: get_all_ddahs(ddahs_from_session(params[:session_id]))
-      end
+    if params[:session_id] || params[:utorid]
+      render json: get_all_ddahs(params[:session_id], params[:utorid])
     else
-      if params[:utorid]
-        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], nil))
-      else
-        render json: get_all_ddahs(Ddah.all)
-      end
+      render json: get_all_ddahs(Ddah.all)
     end
   end
 
   def show
-    if params[:utorid]
-      ddahs = id_array(get_all_ddah_for_utorid(params[:utorid]))
+    if params[:session_id] || params[:utorid]
+      ddahs = id_array(get_all_ddahs(params[:session_id], params[:utorid], false))
       if ddahs.include?(params[:id].to_i)
         ddah = Ddah.find(params[:id])
         render status: 200, json: ddah.format
@@ -289,25 +281,10 @@ class DdahsController < ApplicationController
     end
   end
 
-  def get_all_ddahs(ddahs)
-    ddahs.map do |ddah|
-      ddah.format
+  def get_all_ddahs(session, utorid, format = true)
+    ddahs_from_session(session, utorid).map do |ddah|
+      format ? ddah.format : ddah
     end
-  end
-
-  def get_all_ddah_for_utorid(utorid, session = nil)
-    ddahs = []
-    all_ddahs = (session) ? ddahs_from_session(session) : Ddah.all
-    all_ddahs.each do |ddah|
-      offer = Offer.find(ddah[:offer_id])
-      position = Position.find(offer[:position_id])
-      position.instructors.each do |instructor|
-        if instructor[:utorid] == utorid
-          ddahs.push(ddah)
-        end
-      end
-    end
-    return ddahs
   end
 
   def check_ddah_status(ddahs, status)

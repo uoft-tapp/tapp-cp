@@ -14,25 +14,17 @@ class OffersController < ApplicationController
   before_action :applicant, only: [:applicant_get_offers]
 
   def index
-    if params[:session_id]
-      if params[:utorid]
-        render json: get_all_offers_for_utorid(params[:utorid], params[:session_id])
-      else
-        render json: get_all_offers(offers_from_session(params[:session_id]))
-      end
+    if params[:session_id] || params[:utorid]
+      render json: get_all_offers(params[:session_id], params[:utorid])
     else
-      if params[:utorid]
-        render json: get_all_offers_for_utorid(params[:utorid], nil)
-      else
-        render json: get_all_offers(Offer.all)
-      end
+      render json: get_all_offers(Offer.all)
     end
   end
 
   def show
-    if params[:utorid]
-      offers = id_array(get_all_offers_for_utorid(params[:utorid], nil))
-      if offers.include?(params[:id])
+    if params[:session_id] || params[:utorid]
+      offers = id_array(get_all_offers(params[:session_id], params[:utorid], false))
+      if offers.include?(params[:id].to_i)
         offer = Offer.find(params[:id])
         render json: offer.instructor_format
       else
@@ -242,9 +234,9 @@ class OffersController < ApplicationController
     params.permit(:hr_status, :ddah_status, :commentary)
   end
 
-  def get_all_offers(offers)
-    offers.map do |offer|
-      offer.format
+  def get_all_offers(session, utorid, format=true)
+    offers_from_session(session, utorid).map do |offer|
+      format ? (utorid ? offer.format : offer.instructor_format) : offer
     end
   end
 
@@ -307,20 +299,6 @@ class OffersController < ApplicationController
     if invalid.length > 0
       render status: 404, json: {invalid_offers: invalid}
     end
-  end
-
-  def get_all_offers_for_utorid(utorid, session)
-    offers = []
-    all_offers = (session) ? offers_from_session(session) : Offer.all
-    all_offers.each do |offer|
-      position = Position.find(offer[:position_id])
-      position.instructors.each do |instructor|
-        if instructor[:utorid] == utorid
-          offers.push(offer.instructor_format)
-        end
-      end
-    end
-    return offers
   end
 
 end
