@@ -20,14 +20,6 @@ Rails.application.routes.draw do
     resources :offers, only: [:index]
     resources :ddahs, only: [:index]
   end
-  scope '/sessions/:session_id/instructors/:utorid' do
-    get "offers", to: "offers#index"
-    get "positions", to: "positions#index"
-    get "applicants", to: "applicants#index"
-    get "applications", to: "applications#index"
-    get "assignments", to: "assignments#index"
-    get "ddahs", to: "ddahs#index"
-  end
   resources :applicants do
     resources :assignments, except: [:show]
     resources :applications, only: [:index]
@@ -36,6 +28,7 @@ Rails.application.routes.draw do
   resources :applications, only: [:index, :show, :update]
   resources :positions
   resources :instructors
+  resources :tasks
 
   # CP resources
   resources :offers do

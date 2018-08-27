@@ -10,20 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180404063613) do
+ActiveRecord::Schema.define(version: 20180827220412) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "allocations", force: :cascade do |t|
     t.integer "num_unit"
-    t.string "unit_name"
     t.integer "minutes"
     t.bigint "duty_id"
     t.bigint "ddah_id"
     t.bigint "template_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "revised_minutes"
     t.index ["ddah_id"], name: "index_allocations_on_ddah_id"
     t.index ["duty_id"], name: "index_allocations_on_duty_id"
     t.index ["template_id"], name: "index_allocations_on_template_id"
@@ -86,12 +86,6 @@ ActiveRecord::Schema.define(version: 20180404063613) do
     t.bigint "ddah_id", null: false
     t.bigint "category_id", null: false
     t.index ["ddah_id", "category_id"], name: "index_categories_ddahs_on_ddah_id_and_category_id"
-  end
-
-  create_table "categories_templates", id: false, force: :cascade do |t|
-    t.bigint "template_id", null: false
-    t.bigint "category_id", null: false
-    t.index ["template_id", "category_id"], name: "index_categories_templates_on_template_id_and_category_id"
   end
 
   create_table "ddahs", force: :cascade do |t|
@@ -215,23 +209,27 @@ ActiveRecord::Schema.define(version: 20180404063613) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "templates", force: :cascade do |t|
-    t.string "name", null: false
-    t.boolean "optional", default: true
-    t.bigint "instructor_id"
-    t.string "tutorial_category", default: "Classroom TA"
-    t.string "department", default: "Computer Science"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "scaling_learning", default: false
-    t.index ["instructor_id"], name: "index_templates_on_instructor_id"
-    t.index ["name", "instructor_id", "id"], name: "index_templates_on_name_and_instructor_id_and_id", unique: true
+  create_table "task_id_in_allocations", force: :cascade do |t|
+    t.bigint "task_id"
+    t.index ["task_id"], name: "index_task_id_in_allocations_on_task_id"
   end
 
-  create_table "templates_trainings", id: false, force: :cascade do |t|
+  create_table "tasks", force: :cascade do |t|
+    t.string "name"
+    t.boolean "legacy", default: false
+    t.bigint "duty_id"
+    t.index ["duty_id"], name: "index_tasks_on_duty_id"
+  end
+
+  create_table "tasks_templates", id: false, force: :cascade do |t|
+    t.bigint "task_id", null: false
     t.bigint "template_id", null: false
-    t.bigint "training_id", null: false
-    t.index ["template_id", "training_id"], name: "index_templates_trainings_on_template_id_and_training_id"
+    t.index ["task_id", "template_id"], name: "index_tasks_templates_on_task_id_and_template_id"
+  end
+
+  create_table "templates", force: :cascade do |t|
+    t.bigint "position_id"
+    t.index ["position_id"], name: "index_templates_on_position_id"
   end
 
   create_table "trainings", force: :cascade do |t|
@@ -241,15 +239,14 @@ ActiveRecord::Schema.define(version: 20180404063613) do
   end
 
   add_foreign_key "allocations", "ddahs"
-  add_foreign_key "allocations", "duties"
-  add_foreign_key "allocations", "templates"
   add_foreign_key "applications", "applicants"
   add_foreign_key "assignments", "applicants"
   add_foreign_key "assignments", "positions"
-  add_foreign_key "ddahs", "instructors"
   add_foreign_key "ddahs", "offers"
   add_foreign_key "positions", "sessions"
   add_foreign_key "preferences", "applications"
   add_foreign_key "preferences", "positions"
-  add_foreign_key "templates", "instructors"
+  add_foreign_key "task_id_in_allocations", "tasks"
+  add_foreign_key "tasks", "duties"
+  add_foreign_key "templates", "positions"
 end

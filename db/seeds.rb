@@ -12,7 +12,6 @@ default_instructor = {
 }
 duty = [
     "Training",
-    "Additional Training (if required)",
     "Preparation",
     "Contact Time",
     "Marking/Grading",
@@ -29,7 +28,7 @@ category = [
   "Review and Q&A Session",
   "Laboratory/Practical",
 ]
-allocations = [
+tasks = [
   {
     label: 'Marking/Grading',
     types: [
@@ -145,30 +144,22 @@ def map_key_to_array(key, data)
   end
   return map
 end
-def get_allocation_array(data, template)
-  allocations = []
-  template_id = Template.find_by(template)[:id]
+def get_tasks_array(data)
+  tasks = []
   data.each do |item|
     duty_id = Duty.find_by(name: item[:label])[:id]
     item[:types].each do |type|
-      allocations.push({
-        template_id: template_id,
+      tasks.push({
         duty_id: duty_id,
-        unit_name: type,
+        name: type,
       })
     end
   end
-  return allocations
+  return tasks
 end
 insert_seed_data(Instructor, [:utorid], [default_instructor], "Instructor")
 insert_seed_data(Duty, [:name], map_key_to_array(:name, duty), "Duty")
 insert_seed_data(Training, [:name], map_key_to_array(:name, training), "Training")
 insert_seed_data(Category, [:name], map_key_to_array(:name, category), "Category")
-
-default_template = {
-  name: 'Default Template',
-  instructor_id: Instructor.find_by(utorid: 'reidkare')[:id],
-}
-insert_seed_data(Template, [:name, :instructor_id], [default_template], "Template")
-insert_seed_data(Allocation, [:unit_name, :duty_id, :template_id],
-  get_allocation_array(allocations, default_template), "Allocation")
+puts Task.all
+insert_seed_data(Task, [:name, :duty_id], get_tasks_array(tasks), "Task")
