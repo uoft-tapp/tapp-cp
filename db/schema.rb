@@ -18,15 +18,11 @@ ActiveRecord::Schema.define(version: 20180827220412) do
   create_table "allocations", force: :cascade do |t|
     t.integer "num_unit"
     t.integer "minutes"
-    t.bigint "duty_id"
     t.bigint "ddah_id"
-    t.bigint "template_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "revised_minutes"
     t.index ["ddah_id"], name: "index_allocations_on_ddah_id"
-    t.index ["duty_id"], name: "index_allocations_on_duty_id"
-    t.index ["template_id"], name: "index_allocations_on_template_id"
   end
 
   create_table "applicants", force: :cascade do |t|
@@ -91,7 +87,6 @@ ActiveRecord::Schema.define(version: 20180827220412) do
   create_table "ddahs", force: :cascade do |t|
     t.boolean "optional"
     t.bigint "offer_id"
-    t.bigint "instructor_id"
     t.string "tutorial_category", default: "Classroom TA"
     t.string "department", default: "Computer Science"
     t.string "supervisor_signature"
@@ -109,7 +104,6 @@ ActiveRecord::Schema.define(version: 20180827220412) do
     t.string "review_student_signature"
     t.date "review_date"
     t.boolean "scaling_learning", default: false
-    t.index ["instructor_id"], name: "index_ddahs_on_instructor_id"
     t.index ["offer_id", "id"], name: "index_ddahs_on_offer_id_and_id", unique: true
     t.index ["offer_id"], name: "index_ddahs_on_offer_id"
   end

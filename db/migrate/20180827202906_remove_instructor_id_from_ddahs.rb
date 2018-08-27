@@ -1,7 +1,5 @@
 class RemoveInstructorIdFromDdahs < ActiveRecord::Migration[5.1]
   def change
-    if foreign_key_exists?(:ddahs, :instructors)
-      remove_foreign_key :ddahs, :instructors
-    end
+    remove_reference :ddahs, :instructor, foreign_key: true
   end
 end
