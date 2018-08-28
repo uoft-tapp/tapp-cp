@@ -16,11 +16,6 @@ class AppController < ApplicationController
     render :cp, layout: false
   end
 
-  ''' WIP '''
-  def ddah_plus_spreadsheet
-    render :spreadsheetddah, layout: false
-  end
-
   def roles
     if ENV['RAILS_ENV'] == 'production'
       render json: {development: false, ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
@@ -70,6 +65,6 @@ class AppController < ApplicationController
     render json: {development: ENV['RAILS_ENV']}
   end
 
-  
+
 
 end

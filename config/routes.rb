@@ -1,9 +1,6 @@
 include Authorizer
 Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
-
-  get '/cp/wip/(*z)', to: "app#ddah_plus_spreadsheet"  # WIP
-
   get '/cp/(*z)', to: "app#cp"
   get '/roles', to: "app#roles"
 
