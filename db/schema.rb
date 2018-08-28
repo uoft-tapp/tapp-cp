@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180827220412) do
+ActiveRecord::Schema.define(version: 20180828002722) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,7 +22,9 @@ ActiveRecord::Schema.define(version: 20180827220412) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "revised_minutes"
+    t.bigint "task_id"
     t.index ["ddah_id"], name: "index_allocations_on_ddah_id"
+    t.index ["task_id"], name: "index_allocations_on_task_id"
   end
 
   create_table "applicants", force: :cascade do |t|
@@ -233,6 +235,7 @@ ActiveRecord::Schema.define(version: 20180827220412) do
   end
 
   add_foreign_key "allocations", "ddahs"
+  add_foreign_key "allocations", "tasks"
   add_foreign_key "applications", "applicants"
   add_foreign_key "assignments", "applicants"
   add_foreign_key "assignments", "positions"
