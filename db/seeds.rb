@@ -161,5 +161,4 @@ insert_seed_data(Instructor, [:utorid], [default_instructor], "Instructor")
 insert_seed_data(Duty, [:name], map_key_to_array(:name, duty), "Duty")
 insert_seed_data(Training, [:name], map_key_to_array(:name, training), "Training")
 insert_seed_data(Category, [:name], map_key_to_array(:name, category), "Category")
-puts Task.all
 insert_seed_data(Task, [:name, :duty_id], get_tasks_array(tasks), "Task")
