@@ -336,27 +336,6 @@ export const onFetchSessionsSuccess = (resp)=>{
     });
     return sessions;
 }
-
-export const onFetchTemplatesSuccess = (resp)=> {
-    let templates = {};
-    resp.forEach(template => {
-        templates[template.id] = {
-            name: template.name,
-            optional: template.optional,
-            requiresTraining: template.scaling_learning,
-            allocations: template.allocations.map(allocation => ({
-                id: allocation.id,
-                units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
-                time: allocation.minutes,
-            })),
-            trainings: template.trainings,
-            categories: template.trainings,
-        };
-    });
-    return templates;
-}
 export const onFetchTrainingsSuccess = (resp)=>{
     let trainings = {};
     resp.forEach(training => {

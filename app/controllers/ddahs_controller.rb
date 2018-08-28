@@ -7,7 +7,7 @@ class DdahsController < ApplicationController
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
   before_action :cp_admin, only: [:can_preview, :preview, :accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
   before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
-  before_action  only: [:pdf, :new_template] do
+  before_action  only: [:pdf] do
     both_cp_admin_instructor(Ddah)
   end
   before_action only: [:can_finish_ddah, :finish_ddah] do
@@ -73,32 +73,6 @@ class DdahsController < ApplicationController
       render status: 200, json: {message: "DDAH was updated successfully."}
     else
       render status: 403, file: 'public/403.html'
-    end
-  end
-
-  def new_template
-    ddah = Ddah.find_by(id: params[:ddah_id])
-    if ddah
-      template = Template.find_by(name: params[:name], instructor_id: ddah[:instructor_id])
-      if !template
-        data = {
-          name: params[:name],
-          optional: ddah[:optional],
-          instructor_id: ddah[:instructor_id],
-          tutorial_category: ddah[:tutorial_category],
-          department: ddah[:department],
-          scaling_learning: ddah[:scaling_learning],
-        }
-        template = Template.create!(data)
-        copy_allocations(template, ddah.allocations, :ddah_id, :template_id)
-        template.training_ids = ddah.training_ids
-        template.category_ids = ddah.category_ids
-        render status: 200, json: {message: "A new template was successfully created."}
-      else
-        render status: 404, json: {message: "A template with the same name already exists."}
-      end
-    else
-      render status: 404, json: {message: "Invalid or no id given."}
     end
   end
 

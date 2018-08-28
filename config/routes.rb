@@ -51,16 +51,11 @@ Rails.application.routes.draw do
     resources :positions, only: [:index, :show]
     resources :ddahs, only: [:index, :show, :create, :destroy, :update]
   end
-  scope 'instructors/:utorid' do
-    resources :templates, only: [:index, :show, :create, :destroy, :update]
-  end
   resources :ddahs, only: [:index, :show, :create, :destroy, :update]
   scope 'ddahs/:ddah_id' do
-    post "new-template" => "ddahs#new_template"
     get "pdf", to: "ddahs#pdf"
     post "accept", to: "ddahs#accept"
   end
-  resources :templates, only: [:index, :show, :create, :destroy, :update]
 
   # TAPP routes
   get "/export/chass/sessions/:session_id/:round_id", to: "export#chass"
@@ -90,7 +85,6 @@ Rails.application.routes.draw do
   post "import/offers" => "import#import_offers"
   post "import/locked-assignments" => "import#import_locked_assignments"
   post "/import/ddahs", to: "import#ddahs"
-  post "/import/templates", to: "import#templates"
   get "/export/ddahs/:position_id", to: "export#ddahs"
   get "/export/session-ddahs/:session_id", to: "export#session_ddahs"
 
@@ -104,7 +98,6 @@ Rails.application.routes.draw do
   post "/ddahs/status/finish" => "ddahs#finish_ddah"
   post "/ddahs/status/can-approve" => "ddahs#can_approve_ddah"
   post "/ddahs/status/approve" => "ddahs#approve_ddah"
-  get "/templates/:template_id/preview" => "templates#preview"
 
   # student-facing
   get "/applicants/:utorid/offers" => "offers#applicant_get_offers"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Panel, Nav, NavItem, Button, InputGroup, FormControl, Glyphicon, Well } from 'react-bootstrap';
-import { CourseInfoHeader } from './ddahForm2.js';
+import { CourseInfoHeader } from './ddahForm.js';
 import { DdahTaskSelector } from './ddahTaskSelector.js';
 import { CopyToModal } from './copyToModal.js';
 

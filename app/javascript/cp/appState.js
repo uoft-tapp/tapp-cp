@@ -40,7 +40,6 @@ const initialState = {
     },
 
     selectedDdahData: { type: null, id: null },
-    selectedTemplate: null,
     selectedApplicant: null,
     selectedCourse: null,
     taskSelectorOpen: false,
@@ -53,7 +52,6 @@ const initialState = {
     duties: { fetching: 0, list: null },
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
-    templates: { fetching: 0, list: null },
     trainings: { fetching: 0, list: null },
 
     importing: 0,
@@ -128,14 +126,6 @@ class AppState {
     }
     setCopyToModalOpen(open){
       return this.set('copyToModalOpen', open);
-    }
-
-    getSelectedTemplate(){
-        return this.get('selectedTemplate');
-    }
-
-    setSelectedTemplate(template_id){
-        this.set('selectedTemplate', template_id);
     }
     getSelectedApplicant(){
         return this.get('selectedApplicant');
@@ -216,21 +206,6 @@ class AppState {
     // check whether any of the given filters in the category are selected on the offers table
     anyFilterSelected(field) {
         return this.get('selectedFilters').has(field);
-    }
-
-    applyTemplate(templateId) {
-        let template = this.get('templates.list.' + templateId);
-        template.get('allocations').forEach(function(allocation, key){
-          let allocations = template.get("allocations").set(key, allocation.remove("id"));
-          template = template.set("allocations", allocations);
-        });
-        // replace the values in the current ddah with the values in the template
-        this.set(
-            'ddahWorksheet',
-            this.get('ddahWorksheet')
-                .merge(this.createDdahWorksheet(template))
-                .set('changed', true)
-        );
     }
 
     clearDdah() {
@@ -400,11 +375,6 @@ class AppState {
         return this.get('selectedDdahData.type') == 'offer';
     }
 
-    // check whether the currently-selected ddah data corresponds to a template
-    isTemplateSelected() {
-        return this.get('selectedDdahData.type') == 'template';
-    }
-
     // add a notification to the list of unread notifications
     notify(text) {
         let notifications = this.get('nav.notifications');
@@ -550,26 +520,6 @@ class AppState {
         }
     }
 
-    // unselect this template if it is already selected; otherwise select this template
-    toggleSelectedTemplate(template) {
-        let currId = this.getSelectedDdahId();
-
-        if (this.isTemplateSelected() && this.getSelectedDdahId() == template) {
-            // this template is currently selected, so unselect it
-            this.set({
-                selectedDdahData: fromJS({ type: null, id: null }),
-                ddahWorksheet: fromJS(initialState.ddahWorksheet).set('changed', false),
-            });
-        } else {
-            let newDdahData = this.get('templates.list.' + template);
-
-            // this template is not currently selected, so select it
-            this.set({
-                selectedDdahData: fromJS({ type: 'template', id: template }),
-                ddahWorksheet: this.createDdahWorksheet(newDdahData).set('changed', false),
-            });
-        }
-    }
 
     // toggle the sort direction of the sort currently applied to the offers table
     toggleSortDir(field) {
@@ -626,7 +576,6 @@ class AppState {
             this.get('ddahs.fetching'),
             this.get('duties.fetching'),
             this.get('offers.fetching'),
-            this.get('templates.fetching'),
             this.get('trainings.fetching'),
         ].some(val => val > 0);
     }
@@ -639,7 +588,6 @@ class AppState {
             this.get('ddahs.list'),
             this.get('duties.list'),
             this.get('offers.list'),
-            this.get('templates.list'),
             this.get('trainings.list'),
         ].some(val => val == null);
     }
@@ -651,28 +599,6 @@ class AppState {
         }
 
         fetch.clearHrStatus(offers);
-    }
-
-    createTemplate() {
-        let name = window.prompt('Please enter a name for the new template:');
-
-        if (name && name.trim()) {
-            // the route to create a new template expects a position with which to associate the template
-            // we don't associate templates with positions in the front-end model, so we pick a position id
-            // without caring which
-            fetch.createTemplate(name)
-                // when the request succeeds, display the new template
-                .then(template => this.toggleSelectedTemplate(template));
-        }
-    }
-
-    createTemplateFromDdah(offer) {
-        let name = window.prompt('Please enter a name for the new template:');
-
-        if (name && name.trim()) {
-            let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
-            fetch.createTemplateFromDdah(name, ddahId);
-        }
     }
 
     // email applicants
@@ -819,11 +745,6 @@ class AppState {
         return this.get('sessions.fetching') > 0;
     }
 
-    // check if templates are being fetched
-    fetchingTemplates() {
-        return this.get('templates.fetching') > 0;
-    }
-
     // check if trainings are being fetched
     fetchingTrainings() {
         return this.get('trainings.fetching') > 0;
@@ -903,10 +824,6 @@ class AppState {
 
     getSessionsList() {
         return this.get('sessions.list');
-    }
-
-    getTemplatesList() {
-        return this.get('templates.list');
     }
 
     getTrainingsList() {
@@ -1003,10 +920,6 @@ class AppState {
 
     isSessionsListNull() {
         return this.get('sessions.list') == null;
-    }
-
-    isTemplatesListNull() {
-        return this.get('templates.list') == null;
     }
 
     isTrainingsListNull() {
@@ -1232,10 +1145,6 @@ class AppState {
       this.set('selectedSession', this.getLatestSession());
     }
 
-    setTemplatesList(list) {
-        this.set('templates.list', list);
-    }
-
     setTrainingsList(list) {
         this.set('trainings.list', list);
     }
@@ -1300,29 +1209,6 @@ class AppState {
           fetch.updateSessionPay(session, pay);
         else
           this.set('sessions.list.'+session+'.pay', pay);
-    }
-
-    updateTemplate(template) {
-        // process ddah for format
-        let ddah = this.get('ddahWorksheet');
-        let updates = {
-            optional: ddah.get('optional'),
-            categories: ddah.get('categories').toJS(),
-            trainings: ddah.get('trainings').toJS(),
-            allocations: ddah
-                .get('allocations')
-                .map(allocation => ({
-                    id: allocation.get('id'),
-                    num_unit: allocation.get('units'),
-                    unit_name: allocation.get('type'),
-                    minutes: allocation.get('time'),
-                    duty_id: allocation.get('duty'),
-                }))
-                .toJS(),
-            scaling_learning: ddah.get('requiresTraining'),
-        };
-
-        fetch.updateTemplate(template, updates).then(this.set('ddahWorksheet.changed', false));
     }
 
     withdrawOffers(offers) {

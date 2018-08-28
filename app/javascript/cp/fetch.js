@@ -26,9 +26,6 @@ const getDuties = () => getResource('/duties',
 const getTrainings = () => getResource('/trainings',
     fetchProc.onFetchTrainingsSuccess, 'trainings', false);
 
-const getTemplates = user => getResource('/instructors/' + user + '/templates',
-    fetchProc.onFetchTemplatesSuccess, 'templates', false);
-
 const getCourses = (user = null) => getResource(
     ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
     fetchProc.onFetchCpCoursesSuccess, 'courses');
@@ -98,7 +95,6 @@ export const instructorFetchAll = () => {
     });
     getCategories();
     getDuties();
-    getTemplates(user);
     getTrainings();
 }
 
@@ -303,36 +299,6 @@ export const exportDdahs = (course, session) => {
   (course!='all'&&course)?
     downloadFile('/export/ddahs/' + course):
     downloadFile('/export/session-ddahs/'+ session);
-}
-
-// create a new, empty template with this name
-export const createTemplate = (name) => {
-  let user = appState.getCurrentUserName();
-  let fetch = true;
-  return postData('/instructors/' + user + '/templates', { name: name },() => {
-      if(fetch) getTemplates(user);
-    }, null,
-    resp => {
-      fetch = false;
-      msgFailure(res.message);
-    })
-
-}
-
-// update an existing template
-export const updateTemplate = (id, ddahData) => {
-    let user = appState.getCurrentUserName();
-    return putData('/instructors/' + user + '/templates/' + id, ddahData, () => {
-      getTemplates(user);
-    });
-}
-
-// create a new template using data from an existing ddah
-export const createTemplateFromDdah = (name, ddah) => {
-    let user = appState.getCurrentUserName();
-    postData('/ddahs/' + ddah + '/new-template', { name: name }, () => {
-      getTemplates(user);
-    });
 }
 
 // create a new, empty ddah for this offer
