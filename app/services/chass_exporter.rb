@@ -2,7 +2,7 @@ class ChassExporter
   include SessionSeparate
 
     def initialize(session)
-      session_check(session)
+      generator_init(session)
     end
 
     def export(round_id)
