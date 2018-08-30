@@ -168,7 +168,7 @@ const NavbarInst = props => {
                 />}
                 {!isApplicant && <Session {...props}/>}
                 {!isApplicant && <Notifications {...props} />}
-                {!isApplicant && <Auth {...props} />}
+                <Auth {...props} />
             </Nav>
         </Navbar>
     );
