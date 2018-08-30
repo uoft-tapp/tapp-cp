@@ -8,36 +8,12 @@ class DdahSpreadsheet extends React.Component {
     minutesToHours(minutes){
         return (minutes/60).toFixed(2);
     }
-    getAllTasks(ddahs){
-      let tasks = {}
-      ddahs.forEach(ddah=>{
-        let allocations = ddah.duty_allocations;
-        let duties = Object.keys(allocations);
-        duties.forEach(duty=>{
-          let duty_name = allocations[duty].heading;
-          if(!tasks[duty_name])
-            tasks[duty_name] = {}
-          allocations[duty].items.forEach(allocation=>{
-            if(!tasks[duty_name][allocation.unit_name])
-              tasks[duty_name][allocation.unit_name]={};
-            tasks[duty_name][allocation.unit_name][ddah.utorid] = {
-                unit: allocation.num_units,
-                minute:allocation.is_revised?allocation.revised_minutes:allocation.minutes
-            };
-          });
-        });
-      });
-      return tasks;
-    }
     getTotalHours(ddah){
       let total = 0;
-      let allocations = ddah.duty_allocations;
-      let duties = Object.keys(allocations);
-      duties.forEach(duty=>{
-        allocations[duty].items.forEach(allocation=>{
-          let time = allocation.is_revised? allocation.revised_minutes: allocation.minutes;
-          total += (allocation.num_units*(!time?0:time));
-        });
+      let allocations = ddah.get('allocations');
+      allocations.forEach(allocation=>{
+        let time = allocation.get('revisedTime')? allocation.get('revisedTime'): allocation.get('time');
+        total += (allocation.get('units')*(!time?0:time));
       });
       return (total/60).toFixed(2);
     }
@@ -69,15 +45,63 @@ class DdahSpreadsheet extends React.Component {
     changeMinute(minute, utorid, duty_name, task_name){
       alert('apply change to hour: '+minute+' from appState');
     }
+    getHeadings(duties, tasks){
+      return duties.map((duty, id)=>
+        tasks[id].filter(task=>task.checked).map((task,i)=>
+          <DutyTaskHeading key={i} {...this.props} duty={duty} task={task.name} />
+        )
+      );
+    }
+    getAllocations(selectedApplicant, ddahs, duties, tasks){
+      return Object.keys(ddahs).map((i, k)=>
+        <DdahEntry key={k} {...this.props}
+          onClick={()=>this.props.appState.setSelectedApplicant(
+          this.props.appState.getOfferAttrById(ddahs[i].get('offer'), 'applicantId'))}
+          onChangeUnit={this.changeUnit}
+          onChangeHour={this.changeMinute}
+          checked={selectedApplicant==this.props.appState.getOfferAttrById(ddahs[i].get('offer'), 'applicantId')}
+          name={this.props.appState.getOfferAttrById(ddahs[i].get('offer'), 'firstName')+' '+
+            this.props.appState.getOfferAttrById(ddahs[i].get('offer'), 'lastName')}
+          utorid={this.props.appState.getOfferAttrById(ddahs[i].get('offer'), 'utorid')}
+          required={this.props.appState.getOfferAttrById(ddahs[i].get('offer'), 'hours')}
+          value={this.getAllocationValues(duties, tasks, i)}
+          total={this.getTotalHours(ddahs[i])} />
+      );
+    }
+    getAllocationValues(duties, tasks, ddah){
+      return duties.map((_,duty)=>
+        tasks[duty].filter(task=>task.checked).map((task,i)=>
+          <DdahInput {...this.props}
+            unit={task.allocations[ddah]? task.allocations[ddah].units:''}
+            minute={task.allocations[ddah]? task.allocations[ddah].time:''}
+              onChangeUnit={event=>this.onChangeUnit(event.target.value, ddah, duty, i)}
+              onChangeMinute={event=>this.onChangeMinute(event.target.value, ddah, duty, i)}/>
+      ));
+    }
+    getRemoveButtons(duties, tasks){
+      return duties.map((duty,id)=>
+        tasks[id].filter(task=>task.checked).map((task, i)=>
+          <RemoveButton key={i} {...this.props}
+            onClick={()=>this.props.appState.removeTask(task.id)}/>
+        )
+      );
+    }
+    getCourseTabs(){
+      let locked = true;  // todo: map over each TA in each sheet...
+      return this.getSortedCourses().map((course,i)=>
+        <NavItem key={i} eventKey={i} >
+        {course.get('code')} {locked?<Glyphicon glyph="lock"/>:''}
+        </NavItem>
+      );
+    }
     render() {
         let nullCheck = this.props.appState.instrAnyNull();
         if (nullCheck) return null; // this is very important for loading the page
-        let ddahs = this.props.mockDdahData.ddahs_entries;
-        let tasks = this.getAllTasks(ddahs);
-        let duties = Object.keys(tasks);
-        let selectedApplicant = this.props.appState.getSelectedApplicant();
         let selectedCourseId= this.getCurrentCourse();
-        let locked = true;  // todo: map over each TA in each sheet...
+        let ddahs = this.props.appState.getSelectedCourseDdahs();
+        let duties = this.props.appState.getDutiesList();
+        let tasks = this.props.appState.getCategorisedTasks();
+        let selectedApplicant = this.props.appState.getSelectedApplicant();
 
         return (
             <div id="ddah-spreadsheet" className="container-fluid container-fit">
@@ -85,13 +109,7 @@ class DdahSpreadsheet extends React.Component {
                 <DdahCourseTabs
                   {...this.props} selectedCourse={selectedCourseId}
                   onSelect={event=>this.props.appState.selectCourse(event)}
-                  value={
-                    this.getSortedCourses().map((course,i)=>
-                      <NavItem key={i} eventKey={i} >
-                      {course.get('code')} {locked?<Glyphicon glyph="lock"/>:''}
-                      </NavItem>
-                    )
-                  }/>
+                  value={this.getCourseTabs()}/>
                  <NewTaskButton {...this.props}
                   onClick={()=>this.props.appState.setTaskSelectorOpen(true)}/>
                <Panel>
@@ -104,33 +122,14 @@ class DdahSpreadsheet extends React.Component {
                             <th>Required <br/> Hours</th>
                             <th>Total <br/> Hours</th>
                             <th>Tutorial <br/> Category</th>
-                            {duties.map(duty=>
-                              Object.keys(tasks[duty]).map((task,i)=>
-                                <DutyTaskHeading key={i} {...this.props}
-                                  duty={duty} task={task} />
-                              )
-                            )}
+                            {this.getHeadings(duties, tasks)}
                         </tr></thead>
                         <tbody>
-                          {ddahs.map((ddah, i)=>
-                            <DdahEntry key={i} {...this.props}
-                              onClick={()=>this.props.appState.setSelectedApplicant(ddah.utorid)}
-                              onChangeUnit={this.changeUnit}
-                              onChangeHour={this.changeMinute}
-                              checked={selectedApplicant==ddah.utorid}
-                              name={ddah.name} utorid={ddah.utorid} required={ddah.required_hours}
-                              tasks={tasks} duties={duties}
-                              total={this.getTotalHours(ddah)} />
-                          )}
+                          {this.getAllocations(selectedApplicant, ddahs, duties, tasks)}
                         </tbody>
                         <tfoot>
                             <tr><td colSpan="6"></td>
-                            {duties.map(duty=>
-                              Object.keys(tasks[duty]).map((task, i)=>
-                                <RemoveButton key={i} {...this.props}
-                                  onClick={()=>alert(duty+'\n'+task)}/>
-                              )
-                            )}
+                            {this.getRemoveButtons(duties, tasks)}
                           </tr>
                         </tfoot>
                     </table>
@@ -184,17 +183,7 @@ const DdahEntry = props =>(
       <td>{props.required}</td>
       <td>{props.total}</td>
       <td></td>
-      {props.duties.map(duty=>
-        Object.keys(props.tasks[duty]).map((task,i)=>
-          <DdahInput {...props}
-          unit={props.tasks[duty][task][props.utorid]?
-            props.tasks[duty][task][props.utorid].unit:''}
-          minute={props.tasks[duty][task][props.utorid]?
-            props.tasks[duty][task][props.utorid].minute:''}
-            onChangeUnit={event=>props.onChangeUnit(event.target.value, props.utorid, duty, task)}
-            onChangeMinute={event=>props.onChangeMinute(event.target.value, props.utorid, duty, task)}/>
-        )
-      )}
+      {props.value}
   </tr>
 );
 

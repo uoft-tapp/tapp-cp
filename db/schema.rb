@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180828002722) do
+ActiveRecord::Schema.define(version: 20180828205932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -217,6 +217,17 @@ ActiveRecord::Schema.define(version: 20180828002722) do
     t.index ["duty_id"], name: "index_tasks_on_duty_id"
   end
 
+  create_table "tasks_templates", id: false, force: :cascade do |t|
+    t.bigint "task_id", null: false
+    t.bigint "template_id", null: false
+    t.index ["task_id", "template_id"], name: "index_tasks_templates_on_task_id_and_template_id"
+  end
+
+  create_table "templates", force: :cascade do |t|
+    t.bigint "position_id"
+    t.index ["position_id"], name: "index_templates_on_position_id"
+  end
+
   create_table "trainings", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -234,4 +245,5 @@ ActiveRecord::Schema.define(version: 20180828002722) do
   add_foreign_key "preferences", "positions"
   add_foreign_key "task_id_in_allocations", "tasks"
   add_foreign_key "tasks", "duties"
+  add_foreign_key "templates", "positions"
 end

@@ -260,6 +260,7 @@ export const onFetchDdahsSuccess = (resp) => {
         ddahs[ddah.id] = {
             offer: ddah.offer_id,
             position: ddah.position.id,
+            applicant: ddah.applicant.id,
             department: ddah.department,
             supervisor: ddah.supervisor,
             supervisorId: ddah.instructor_id,
@@ -269,9 +270,9 @@ export const onFetchDdahsSuccess = (resp) => {
             allocations: ddah.allocations.map(allocation => ({
                 id: allocation.id,
                 units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
+                task: allocation.task_id,
                 time: allocation.minutes,
+                revisedTime: allocation.revised_minutes,
             })),
             trainings: ddah.trainings,
             categories: ddah.categories,
@@ -342,6 +343,27 @@ export const onFetchTrainingsSuccess = (resp)=>{
         trainings[training.id] = training.name;
     });
     return trainings;
+}
+export const onFetchTasksSuccess = (resp)=>{
+    let tasks = {};
+    resp.forEach(task => {
+        tasks[task.id] = {
+          name: task.name,
+          dutyId: task.duty_id,
+          count: task.count,
+        };
+    });
+    return tasks;
+}
+export const onFetchTemplatesSuccess = (resp)=>{
+    let templates = {};
+    resp.forEach(template => {
+        templates[template.id] = {
+          courseId: template.position_id,
+          tasks: template.tasks,
+        };
+    });
+    return templates;
 }
 /*
   common fetch helper functions

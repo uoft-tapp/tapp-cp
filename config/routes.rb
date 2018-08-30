@@ -46,7 +46,8 @@ Rails.application.routes.draw do
   scope 'sessions/:session_id/instructors/:utorid' do
     resources :offers, only: [:index, :show]
     resources :positions, only: [:index, :show]
-    resources :ddahs, only: [:index, :show, :create, :destroy, :update]
+    resources :ddahs, only: [:index, :show, :update]
+    resources :templates, only: [:index, :update]
   end
   resources :ddahs, only: [:index, :show, :create, :destroy, :update]
   scope 'ddahs/:ddah_id' do

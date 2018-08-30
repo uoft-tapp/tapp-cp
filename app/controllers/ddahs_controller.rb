@@ -6,7 +6,7 @@ class DdahsController < ApplicationController
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
   before_action :cp_admin, only: [:can_preview, :preview, :accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
-  before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
+  before_action :either_cp_admin_instructor, only: [:index, :show, :update]
   before_action  only: [:pdf] do
     both_cp_admin_instructor(Ddah)
   end
@@ -34,35 +34,6 @@ class DdahsController < ApplicationController
     else
       ddah = Ddah.find(params[:id])
       render json: ddah.format
-    end
-  end
-
-  def create
-    offer = Offer.find(params[:offer_id])
-    instructor = Instructor.find_by!(utorid: params[:utorid])
-    ddah = Ddah.find_by(offer_id: offer[:id])
-    if !ddah
-      ddah = Ddah.create!(
-        offer_id: offer[:id],
-        instructor_id: instructor[:id],
-        optional: true,
-      )
-      offer.update_attributes!(ddah_status: "Created")
-      render status: 201, json: ddah.to_json
-    else
-      render status: 404, json: {message: "Error: A DDAH already exists for this offer."}
-    end
-  end
-
-  def destroy
-    ddah = Ddah.find(params[:id])
-    if can_modify(params[:utorid], ddah)||params[:utorid]==nil
-      ddah.allocations.each do |allocation|
-        allocation.destroy!
-      end
-      ddah.destroy!
-    else
-      render status: 403, file: 'public/403.html'
     end
   end
 

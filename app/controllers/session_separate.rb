@@ -63,26 +63,32 @@ module SessionSeparate
   def offers_from_session(session, utorid, data = true)
     positions = positions_from_session(session, utorid, false)
     sql = "SELECT a.id id FROM offers a, (#{positions}) b WHERE a.position_id=b.id"
+    create_ddah(sql, utorid)
     return data ? get_plain_table_data(Offer.all, sql) : sql
   end
 
   def ddahs_from_session(session, utorid)
     offers = offers_from_session(session, utorid, false)
     sql = "SELECT a.id id FROM ddahs a, (#{offers}) b WHERE a.offer_id=b.id"
+    puts sql
     return get_plain_table_data(Ddah.all, sql)
   end
 
+  def templates_from_session(session, utorid)
+    positions = positions_from_session(session, utorid, false)
+    create_template(positions)
+    sql = "SELECT a.id id FROM templates a, (#{positions}) b WHERE a.position_id=b.id"
+    return get_plain_table_data(Template.all, sql)
+  end
+
+
   private
-  def get_plain_table_data(table, sql, format)
+  def get_plain_table_data(table, sql)
     data = []
     ids = get_id_array(sql)
     table.each do |item|
       if ids.include? item[:id]
-        if format
-          data.push(item.format)
-        else
-          data.push(item)
-        end
+        data.push(item)
       end
     end
     return data
@@ -91,6 +97,33 @@ module SessionSeparate
   def get_id_array(sql)
     execute_sql(sql).map do |item|
       item[:id]
+    end
+  end
+
+  def create_template(sql)
+    positions = get_id_array(sql)
+    positions.each do |position|
+      template = Template.find_by(position_id: position)
+      if !template
+        Template.create!(position_id: position)
+      end
+    end
+  end
+
+  def create_ddah(sql, utorid)
+    if utorid
+      offers = get_id_array(sql)
+      offers.each do |id|
+        offer = Offer.find(id)
+        ddah = Ddah.find_by(offer_id: offer[:id])
+        if !ddah
+          Ddah.create!(
+            offer_id: offer[:id],
+            optional: true,
+          )
+          offer.update_attributes!(ddah_status: "Created")
+        end
+      end
     end
   end
 

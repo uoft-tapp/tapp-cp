@@ -42,6 +42,7 @@ const initialState = {
     selectedDdahData: { type: null, id: null },
     selectedApplicant: null,
     selectedCourse: null,
+    selectedTemplate: null,
     taskSelectorOpen: false,
     copyToModalOpen: false,
 
@@ -53,6 +54,8 @@ const initialState = {
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
     trainings: { fetching: 0, list: null },
+    tasks: { fetching: 0, list: null },
+    templates: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -133,6 +136,34 @@ class AppState {
     setSelectedApplicant(utorid){
         this.set('selectedApplicant', utorid);
     }
+    getSelectedTemplate(){
+        return this.get('selectedTemplate');
+    }
+    setSelectedTemplate(id){
+        this.set('selectedTemplate', id);
+    }
+    getSelectedTemplateTasks(){
+      return this.get('templates.list.'+this.getSelectedTemplate()+'.tasks');
+    }
+    addTask(task){
+      let selectedTemplate = this.getSelectedTemplate();
+      let tasks = this.getSelectedTemplateTasks().toJS();
+      if(!tasks.includes(parseInt(task))){
+        tasks.push(task);
+        fetch.updateTemplate(selectedTemplate, tasks.map(i=>parseInt(i)));
+      }
+    }
+    removeTask(task){
+      let selectedTemplate = this.getSelectedTemplate();
+      let tasks = this.getSelectedTemplateTasks().toJS();
+      if(tasks.includes(parseInt(task))){
+        tasks.splice(tasks.indexOf(task), 1);
+        fetch.updateTemplate(selectedTemplate, tasks.map(i=>parseInt(i)));
+      }
+    }
+    getOfferAttrById(id, attr){
+      return this.get('offers.list.'+id+'.'+attr);
+    }
     getCourseById(id){
       return this.get('courses.list.'+id);
     }
@@ -151,6 +182,49 @@ class AppState {
         enrol: this.getCourseAttribute(id, 'estimatedEnrol'),
         estEnrol: this.getCourseAttribute(id, 'cap')
       };
+    }
+    getCategorisedTasks(){
+      let tasks = {};
+      let selected = this.getSelectedTemplateTasks().toJS();
+      this.getTasksList().forEach((task, i)=>{
+        if(!tasks[task.get('dutyId')])
+          tasks[task.get('dutyId')] = [];
+        tasks[task.get('dutyId')].push({
+          id: i,
+          name: task.get('name'),
+          count: task.get('count'),
+          checked: selected.includes(parseInt(i)),
+          allocations: this.getAllocationByTask(i),
+        });
+      });
+      return tasks;
+    }
+    getAllocationByTask(task){
+      let allocations = {};
+      this.getDdahsList().forEach((ddah, i)=>{
+        allocations[i] = null;
+        ddah.get('allocations').forEach((allocation, id)=>{
+          if(parseInt(allocation.get('task'))==parseInt(task)){
+            allocations[i]={
+              id: id,
+              units: allocation.get('unit'),
+              time: allocation.get('time'),
+              revisedTime: allocation.get('revisedTime'),
+            };
+          }
+        });
+      });
+      return allocations;
+    }
+    getSelectedCourseDdahs(){
+      let course = this.getSelectedCourse();
+      let ddahs = {};
+      this.getDdahsList().forEach((ddah, i)=>{
+        if(ddah.get('position')==course){
+          ddahs[i] = ddah;
+        }
+      });
+      return ddahs;
     }
 
     // add a row to the ddah worksheet
@@ -438,6 +512,15 @@ class AppState {
 
     selectCourse(course) {
         this.set('selectedCourse', course);
+        let templates = this.getTemplatesList();
+        if(templates){
+          templates.forEach((template, i)=>{
+            if(template.get('courseId')==course){
+              this.setSelectedTemplate(i);
+            }
+          });
+          this.setSelectedApplicant(null);
+        }
     }
 
     selectUserRole(role) {
@@ -577,6 +660,8 @@ class AppState {
             this.get('duties.fetching'),
             this.get('offers.fetching'),
             this.get('trainings.fetching'),
+            this.get('tasks.fetching'),
+            this.get('templates.fetching'),
         ].some(val => val > 0);
     }
 
@@ -589,6 +674,8 @@ class AppState {
             this.get('duties.list'),
             this.get('offers.list'),
             this.get('trainings.list'),
+            this.get('tasks.list'),
+            this.get('templates.list'),
         ].some(val => val == null);
     }
 
@@ -750,12 +837,30 @@ class AppState {
         return this.get('trainings.fetching') > 0;
     }
 
+    // check if tasks are being fetched
+    fetchingTasks() {
+        return this.get('tasks.fetching') > 0;
+    }
+
+    // check if templates are being fetched
+    fetchingTemplates() {
+        return this.get('templates.fetching') > 0;
+    }
+
     getCategoriesList() {
         return this.get('categories.list');
     }
 
     getCoursesList() {
         return this.get('courses.list');
+    }
+
+    getTasksList() {
+        return this.get('tasks.list');
+    }
+
+    getTemplatesList() {
+        return this.get('templates.list');
     }
 
     getSessionCourse(){
@@ -1147,6 +1252,14 @@ class AppState {
 
     setTrainingsList(list) {
         this.set('trainings.list', list);
+    }
+
+    setTasksList(list) {
+        this.set('tasks.list', list);
+    }
+
+    setTemplatesList(list) {
+        this.set('templates.list', list);
     }
 
     showContractApplicant(offer) {

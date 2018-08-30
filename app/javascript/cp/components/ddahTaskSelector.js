@@ -2,42 +2,30 @@ import React from 'react';
 import { Modal, Button, Grid, ListGroup, ListGroupItem, Badge,
   FormGroup, FormControl, InputGroup } from 'react-bootstrap';
 
-const otherwise = 'Other Duties';
 class DdahTaskSelector extends React.Component {
-  generateMockTask(num){
-    let task= {name: 'task #..', num: 0, action: ()=>alert('hello')};
-    let tasks = [];
-    for(let i=0; i<num; i++)
-      tasks.push(task);
-    return tasks;
+  getAllDuties(duties){
+    return duties.map((duty, i)=>
+      <TaskHeading key={i} value={duty}/>
+    );
   }
-  splitDataToCol(data, num_cols){
-    let output =[];
-    let portion = Math.ceil(data.length/num_cols);
-    for (let i = 0; i < data.length; i += portion){
-        output[output.length] = data.slice(i, i + portion);
-    }
-    return output;
+  getAllTasks(duties, tasks){
+    return duties.map((_, duty)=>
+      <TaskCol key={duty} {...this.props} value={this.getTask(tasks, duty)}/>
+    );
   }
-  getDutiesKey(duties, allocations){
-    let keys = [];
-    duties.forEach(duty=>{
-      if(allocations[duty].heading!=otherwise)
-        keys.push(duty);
-    })
-    return keys;
-  }
-  saveTasks(){
-    alert('save action');
-    this.props.appState.setTaskSelectorOpen(false)
+  getTask(tasks, duty){
+    return tasks[duty].map((task,i)=>
+      <Task key={i} {...this.props} task={task.name} num={task.count?task.count:0}
+          checked={task.checked}
+          action={()=>this.props.appState.addTask(task.id)}/>
+    );
   }
   render() {
+    let nullCheck = this.props.appState.instrAnyNull();
+    if (nullCheck) return null; // this is very important for loading the page
     let open = this.props.appState.getTaskSelectorOpen();
-    let num_cols = 4;
-    let allocations= this.props.mockDdahData.ddahs_entries[0].duty_allocations;
-    let duties = this.getDutiesKey(Object.keys(allocations), allocations);
-    let other_duties = this.splitDataToCol(this.generateMockTask(27), num_cols);
-
+    let duties = this.props.appState.getDutiesList();
+    let tasks = this.props.appState.getCategorisedTasks();
 
     return (
         <Modal id='task-selection-modal' show={open} bsSize='lg'
@@ -46,26 +34,9 @@ class DdahTaskSelector extends React.Component {
             <Modal.Title>Select Task</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <TaskTable {...this.props} headings={
-              duties.map((duty, i)=>
-                <TaskHeading  key={i} value={allocations[duty].heading}/>
-            )}
-            body={duties.map((duty,i)=>
-              <TaskCol key={i} {...this.props} value={
-                  allocations[duty].items.map((allocation,i)=>
-                      <Task key={i} {...this.props} task={allocation.unit_name} num={allocation.minutes}
-                          action={()=>alert(allocation.unit_name)}/>
-                )}/>
-              )}/>
-            <hr />
-            <TaskTable {...this.props} headings={<TaskHeading value={otherwise}/>}
-              body={other_duties.map((col,i)=>
-                  <TaskCol key={i} {...this.props} value={
-                    col.map((task, i)=>
-                      <Task key={i} {...this.props} task={task.name} num={task.num}
-                        action={task.action}/>
-                  )}/>
-                )}/>
+            <TaskTable {...this.props}
+              headings={this.getAllDuties(duties)}
+              body={this.getAllTasks(duties, tasks)}/>
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={()=>this.props.appState.setTaskSelectorOpen(false)}>Close</Button>
@@ -93,7 +64,7 @@ const TaskCol = props =>(
   </td>
 )
 const Task = props =>(
-  <ListGroupItem onClick={props.action}>
+  <ListGroupItem onClick={props.checked?()=>'':props.action} active={props.checked}>
     <small>
     {props.task}
     <Badge style={{float:'right'}}>{props.num}</Badge>
