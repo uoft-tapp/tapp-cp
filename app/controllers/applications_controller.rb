@@ -19,7 +19,7 @@ class ApplicationsController < ApplicationController
     elsif params[:session_id].present?
       applications_from_session(params[:session_id],params[:utorid])
     else
-      Application.includes(:preferences).all
+      applications_from_session(params[:session_id])
     end
 
     render json: @applications.to_json(include: [:preferences])

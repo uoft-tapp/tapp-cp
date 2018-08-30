@@ -40,6 +40,11 @@ const initialState = {
     },
 
     selectedDdahData: { type: null, id: null },
+    selectedApplicant: null,
+    selectedCourse: null,
+    selectedTemplate: null,
+    taskSelectorOpen: false,
+    copyToModalOpen: false,
 
     /** DB data **/
     categories: { fetching: 0, list: null },
@@ -48,8 +53,9 @@ const initialState = {
     duties: { fetching: 0, list: null },
     offers: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
-    templates: { fetching: 0, list: null },
     trainings: { fetching: 0, list: null },
+    tasks: { fetching: 0, list: null },
+    templates: { fetching: 0, list: null },
 
     importing: 0,
 };
@@ -111,6 +117,116 @@ class AppState {
      ** view state getters and setters **
      ************************************/
 
+    getTaskSelectorOpen(){
+      return this.get('taskSelectorOpen');
+    }
+    setTaskSelectorOpen(open){
+      return this.set('taskSelectorOpen', open);
+    }
+
+    getCopyToModalOpen(){
+      return this.get('copyToModalOpen');
+    }
+    setCopyToModalOpen(open){
+      return this.set('copyToModalOpen', open);
+    }
+    getSelectedApplicant(){
+        return this.get('selectedApplicant');
+    }
+    setSelectedApplicant(utorid){
+        this.set('selectedApplicant', utorid);
+    }
+    getSelectedTemplate(){
+        return this.get('selectedTemplate');
+    }
+    setSelectedTemplate(id){
+        this.set('selectedTemplate', id);
+    }
+    getSelectedTemplateTasks(){
+      return this.get('templates.list.'+this.getSelectedTemplate()+'.tasks');
+    }
+    addTask(task){
+      let selectedTemplate = this.getSelectedTemplate();
+      let tasks = this.getSelectedTemplateTasks().toJS();
+      if(!tasks.includes(parseInt(task))){
+        tasks.push(task);
+        fetch.updateTemplate(selectedTemplate, tasks.map(i=>parseInt(i)));
+      }
+    }
+    removeTask(task){
+      let selectedTemplate = this.getSelectedTemplate();
+      let tasks = this.getSelectedTemplateTasks().toJS();
+      if(tasks.includes(parseInt(task))){
+        tasks.splice(tasks.indexOf(task), 1);
+        fetch.updateTemplate(selectedTemplate, tasks.map(i=>parseInt(i)));
+      }
+    }
+    getOfferAttrById(id, attr){
+      return this.get('offers.list.'+id+'.'+attr);
+    }
+    getCourseById(id){
+      return this.get('courses.list.'+id);
+    }
+    getCourseAttribute(id, attr){
+      return this.get('courses.list.'+id+'.'+attr);
+    }
+    getCourseHeaderInfo(id){
+      let instructors = this.getCourseAttribute(id, 'instructors')?
+        this.getCourseAttribute(id, 'instructors').map(
+          instructor=>instructor.get('name')
+        ):[];
+      return {
+        code: this.getCourseAttribute(id, 'code'),
+        instructors: instructors.join(','),
+        name: this.getCourseAttribute(id, 'name'),
+        enrol: this.getCourseAttribute(id, 'estimatedEnrol'),
+        estEnrol: this.getCourseAttribute(id, 'cap')
+      };
+    }
+    getCategorisedTasks(){
+      let tasks = {};
+      let selected = this.getSelectedTemplateTasks().toJS();
+      this.getTasksList().forEach((task, i)=>{
+        if(!tasks[task.get('dutyId')])
+          tasks[task.get('dutyId')] = [];
+        tasks[task.get('dutyId')].push({
+          id: i,
+          name: task.get('name'),
+          count: task.get('count'),
+          checked: selected.includes(parseInt(i)),
+          allocations: this.getAllocationByTask(i),
+        });
+      });
+      return tasks;
+    }
+    getAllocationByTask(task){
+      let allocations = {};
+      this.getDdahsList().forEach((ddah, i)=>{
+        allocations[i] = null;
+        ddah.get('allocations').forEach((allocation, id)=>{
+          if(parseInt(allocation.get('task'))==parseInt(task)){
+            allocations[i]={
+              id: id,
+              units: allocation.get('unit'),
+              time: allocation.get('time'),
+              revisedTime: allocation.get('revisedTime'),
+            };
+          }
+        });
+      });
+      return allocations;
+    }
+    getSelectedCourseDdahs(){
+      let course = this.getSelectedCourse();
+      let ddahs = {};
+      this.getDdahsList().forEach((ddah, i)=>{
+        if(ddah.get('position')==course){
+          ddahs[i] = ddah;
+        }
+      });
+      return ddahs;
+    }
+
     // add a row to the ddah worksheet
     addAllocation() {
         let allocations = this.get('ddahWorksheet.allocations');
@@ -164,21 +280,6 @@ class AppState {
     // check whether any of the given filters in the category are selected on the offers table
     anyFilterSelected(field) {
         return this.get('selectedFilters').has(field);
-    }
-
-    applyTemplate(templateId) {
-        let template = this.get('templates.list.' + templateId);
-        template.get('allocations').forEach(function(allocation, key){
-          let allocations = template.get("allocations").set(key, allocation.remove("id"));
-          template = template.set("allocations", allocations);
-        });
-        // replace the values in the current ddah with the values in the template
-        this.set(
-            'ddahWorksheet',
-            this.get('ddahWorksheet')
-                .merge(this.createDdahWorksheet(template))
-                .set('changed', true)
-        );
     }
 
     clearDdah() {
@@ -348,11 +449,6 @@ class AppState {
         return this.get('selectedDdahData.type') == 'offer';
     }
 
-    // check whether the currently-selected ddah data corresponds to a template
-    isTemplateSelected() {
-        return this.get('selectedDdahData.type') == 'template';
-    }
-
     // add a notification to the list of unread notifications
     notify(text) {
         let notifications = this.get('nav.notifications');
@@ -388,6 +484,7 @@ class AppState {
     selectSession(id) {
         this.set('selectedSession', id);
         let role = appState.getSelectedUserRole();
+        this.selectCourse(null);
         switch(role){
           case 'cp_admin':
           case 'hr_assistant':
@@ -415,10 +512,18 @@ class AppState {
 
     selectCourse(course) {
         this.set('selectedCourse', course);
+        let templates = this.getTemplatesList();
+        if(templates){
+          templates.forEach((template, i)=>{
+            if(template.get('courseId')==course){
+              this.setSelectedTemplate(i);
+            }
+          });
+          this.setSelectedApplicant(null);
+        }
     }
 
     selectUserRole(role) {
-        console.log("set to role: " + role);
         this.set('nav.selectedRole', role);
     }
 
@@ -498,26 +603,6 @@ class AppState {
         }
     }
 
-    // unselect this template if it is already selected; otherwise select this template
-    toggleSelectedTemplate(template) {
-        let currId = this.getSelectedDdahId();
-
-        if (this.isTemplateSelected() && this.getSelectedDdahId() == template) {
-            // this template is currently selected, so unselect it
-            this.set({
-                selectedDdahData: fromJS({ type: null, id: null }),
-                ddahWorksheet: fromJS(initialState.ddahWorksheet).set('changed', false),
-            });
-        } else {
-            let newDdahData = this.get('templates.list.' + template);
-
-            // this template is not currently selected, so select it
-            this.set({
-                selectedDdahData: fromJS({ type: 'template', id: template }),
-                ddahWorksheet: this.createDdahWorksheet(newDdahData).set('changed', false),
-            });
-        }
-    }
 
     // toggle the sort direction of the sort currently applied to the offers table
     toggleSortDir(field) {
@@ -574,8 +659,9 @@ class AppState {
             this.get('ddahs.fetching'),
             this.get('duties.fetching'),
             this.get('offers.fetching'),
-            this.get('templates.fetching'),
             this.get('trainings.fetching'),
+            this.get('tasks.fetching'),
+            this.get('templates.fetching'),
         ].some(val => val > 0);
     }
 
@@ -587,8 +673,9 @@ class AppState {
             this.get('ddahs.list'),
             this.get('duties.list'),
             this.get('offers.list'),
-            this.get('templates.list'),
             this.get('trainings.list'),
+            this.get('tasks.list'),
+            this.get('templates.list'),
         ].some(val => val == null);
     }
 
@@ -599,28 +686,6 @@ class AppState {
         }
 
         fetch.clearHrStatus(offers);
-    }
-
-    createTemplate() {
-        let name = window.prompt('Please enter a name for the new template:');
-
-        if (name && name.trim()) {
-            // the route to create a new template expects a position with which to associate the template
-            // we don't associate templates with positions in the front-end model, so we pick a position id
-            // without caring which
-            fetch.createTemplate(name)
-                // when the request succeeds, display the new template
-                .then(template => this.toggleSelectedTemplate(template));
-        }
-    }
-
-    createTemplateFromDdah(offer) {
-        let name = window.prompt('Please enter a name for the new template:');
-
-        if (name && name.trim()) {
-            let ddahId = this.get('ddahs.list').findKey(ddah => ddah.get('offer') == offer);
-            fetch.createTemplateFromDdah(name, ddahId);
-        }
     }
 
     // email applicants
@@ -727,7 +792,6 @@ class AppState {
 
     fetchAll() {
         let role = this.getSelectedUserRole();
-        console.log('role: ' + role);
 
         if (role == 'cp_admin' || role == 'hr_assistant') {
             fetch.adminFetchAll();
@@ -768,14 +832,19 @@ class AppState {
         return this.get('sessions.fetching') > 0;
     }
 
-    // check if templates are being fetched
-    fetchingTemplates() {
-        return this.get('templates.fetching') > 0;
-    }
-
     // check if trainings are being fetched
     fetchingTrainings() {
         return this.get('trainings.fetching') > 0;
+    }
+
+    // check if tasks are being fetched
+    fetchingTasks() {
+        return this.get('tasks.fetching') > 0;
+    }
+
+    // check if templates are being fetched
+    fetchingTemplates() {
+        return this.get('templates.fetching') > 0;
     }
 
     getCategoriesList() {
@@ -784,6 +853,14 @@ class AppState {
 
     getCoursesList() {
         return this.get('courses.list');
+    }
+
+    getTasksList() {
+        return this.get('tasks.list');
+    }
+
+    getTemplatesList() {
+        return this.get('templates.list');
     }
 
     getSessionCourse(){
@@ -852,10 +929,6 @@ class AppState {
 
     getSessionsList() {
         return this.get('sessions.list');
-    }
-
-    getTemplatesList() {
-        return this.get('templates.list');
     }
 
     getTrainingsList() {
@@ -952,10 +1025,6 @@ class AppState {
 
     isSessionsListNull() {
         return this.get('sessions.list') == null;
-    }
-
-    isTemplatesListNull() {
-        return this.get('templates.list') == null;
     }
 
     isTrainingsListNull() {
@@ -1181,12 +1250,16 @@ class AppState {
       this.set('selectedSession', this.getLatestSession());
     }
 
-    setTemplatesList(list) {
-        this.set('templates.list', list);
-    }
-
     setTrainingsList(list) {
         this.set('trainings.list', list);
+    }
+
+    setTasksList(list) {
+        this.set('tasks.list', list);
+    }
+
+    setTemplatesList(list) {
+        this.set('templates.list', list);
     }
 
     showContractApplicant(offer) {
@@ -1249,29 +1322,6 @@ class AppState {
           fetch.updateSessionPay(session, pay);
         else
           this.set('sessions.list.'+session+'.pay', pay);
-    }
-
-    updateTemplate(template) {
-        // process ddah for format
-        let ddah = this.get('ddahWorksheet');
-        let updates = {
-            optional: ddah.get('optional'),
-            categories: ddah.get('categories').toJS(),
-            trainings: ddah.get('trainings').toJS(),
-            allocations: ddah
-                .get('allocations')
-                .map(allocation => ({
-                    id: allocation.get('id'),
-                    num_unit: allocation.get('units'),
-                    unit_name: allocation.get('type'),
-                    minutes: allocation.get('time'),
-                    duty_id: allocation.get('duty'),
-                }))
-                .toJS(),
-            scaling_learning: ddah.get('requiresTraining'),
-        };
-
-        fetch.updateTemplate(template, updates).then(this.set('ddahWorksheet.changed', false));
     }
 
     withdrawOffers(offers) {

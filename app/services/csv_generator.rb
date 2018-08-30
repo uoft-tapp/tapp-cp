@@ -9,7 +9,7 @@ class CSVGenerator
   end
 
   def generate_cdf_info(session)
-    session_check(session)
+    generator_init(session)
     if @assignments.size == 0
       return {generated: false,
         msg: "Warning: You have not made any assignments. Operation aborted."}
@@ -29,7 +29,7 @@ class CSVGenerator
   end
 
   def generate_offers(session)
-    session_check(session)
+    generator_init(session)
     if @assignments.size == 0
       return {generated: false,
         msg: "Warning: You have not made any assignments. Operation aborted."}
@@ -53,7 +53,7 @@ class CSVGenerator
   end
 
   def generate_transcript_access(session)
-    session_check(session)
+    generator_init(session)
     if @applicants.size == 0
       return {generated: false,
         msg: "Warning: There are currenly no applicant in the system. Operation aborted"}

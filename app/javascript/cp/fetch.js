@@ -26,8 +26,8 @@ const getDuties = () => getResource('/duties',
 const getTrainings = () => getResource('/trainings',
     fetchProc.onFetchTrainingsSuccess, 'trainings', false);
 
-const getTemplates = user => getResource('/instructors/' + user + '/templates',
-    fetchProc.onFetchTemplatesSuccess, 'templates', false);
+const getTasks = () => getResource('/tasks',
+  fetchProc.onFetchTasksSuccess, 'tasks', false);
 
 const getCourses = (user = null) => getResource(
     ((user != null)? '/instructors/' + user + '/positions' : '/positions'),
@@ -37,19 +37,23 @@ const getDdahs = user => getResource(
     user ? '/instructors/' + user + '/ddahs' : '/ddahs',
     fetchProc.onFetchDdahsSuccess, 'ddahs');
 
+const getTemplates = user => getResource(
+    user ? '/instructors/' + user + '/templates' : '/templates',
+    fetchProc.onFetchTemplatesSuccess, 'templates');
+
 const getOffers = (user, role) => {
     let route = '/offers';
     if (user) {
         if (role == 'instructor') {
             route = '/instructors/' + user + '/offers';
-            getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
+            return getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
         }
         else if (role == 'applicant') {
             route = '/applicants/' + user + '/offers';
-            getResource(route, fetchProc.onFetchOffersSuccess, 'offers', false);
+            return getResource(route, fetchProc.onFetchOffersSuccess, 'offers', false);
         }
     } else {
-        getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
+        return getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
     }
 }
 
@@ -84,7 +88,6 @@ export const adminFetchAll = () =>  {
 
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
-    console.log("before fetch: " + user);
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
@@ -93,14 +96,14 @@ export const instructorFetchAll = () => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      getOffers(user, 'instructor');
-      getDdahs(user);
-      getCourses(user);
+      getOffers(user, 'instructor').then(()=>getDdahs(user));
+      getCourses(user).then(()=>appState.selectCourse(null));
+      getTemplates(user);
     });
     getCategories();
     getDuties();
-    getTemplates(user);
     getTrainings();
+    getTasks();
 }
 
 export const applicantFetchAll = () => {
@@ -306,36 +309,6 @@ export const exportDdahs = (course, session) => {
     downloadFile('/export/session-ddahs/'+ session);
 }
 
-// create a new, empty template with this name
-export const createTemplate = (name) => {
-  let user = appState.getCurrentUserName();
-  let fetch = true;
-  return postData('/instructors/' + user + '/templates', { name: name },() => {
-      if(fetch) getTemplates(user);
-    }, null,
-    resp => {
-      fetch = false;
-      msgFailure(res.message);
-    })
-
-}
-
-// update an existing template
-export const updateTemplate = (id, ddahData) => {
-    let user = appState.getCurrentUserName();
-    return putData('/instructors/' + user + '/templates/' + id, ddahData, () => {
-      getTemplates(user);
-    });
-}
-
-// create a new template using data from an existing ddah
-export const createTemplateFromDdah = (name, ddah) => {
-    let user = appState.getCurrentUserName();
-    postData('/ddahs/' + ddah + '/new-template', { name: name }, () => {
-      getTemplates(user);
-    });
-}
-
 // create a new, empty ddah for this offer
 export const createDdah = (offer) => {
     let user = appState.getCurrentUserName();
@@ -414,6 +387,14 @@ export const previewDdahs = (ddahs) => {
     },{
       blob: true,
     });
+}
+
+export const updateTemplate = (template, tasks) =>{
+  let user = appState.getCurrentUserName();
+  let session = appState.getSelectedSession();
+  putData('/sessions/'+session+'/instructors/'+user+'/templates/'+template, {tasks: tasks},()=> {
+    getTemplates(user);
+  });
 }
 
 // get current user role(s) and username

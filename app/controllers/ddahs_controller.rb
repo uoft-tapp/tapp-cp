@@ -1,12 +1,13 @@
 class DdahsController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :set_domain
+  include Model
   include DdahUpdater
   include Authorizer
   before_action :correct_applicant, only: [:student_pdf, :student_accept]
   before_action :cp_admin, only: [:can_preview, :preview, :accept, :can_send_contract, :send_contracts, :can_nag_student, :send_nag_student, :can_approve_ddah, :approve_ddah]
-  before_action :either_cp_admin_instructor, only: [:index, :show, :create, :destroy, :update]
-  before_action  only: [:pdf, :new_template] do
+  before_action :either_cp_admin_instructor, only: [:index, :show, :update]
+  before_action  only: [:pdf] do
     both_cp_admin_instructor(Ddah)
   end
   before_action only: [:can_finish_ddah, :finish_ddah] do
@@ -14,27 +15,19 @@ class DdahsController < ApplicationController
   end
 
   def index
-    if params[:session_id]
-      if params[:utorid]
-        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], params[:session_id]))
-      else
-        render json: get_all_ddahs(ddahs_from_session(params[:session_id]))
-      end
+    if params[:session_id] || params[:utorid]
+      render json: get_all_ddahs(params[:session_id], params[:utorid])
     else
-      if params[:utorid]
-        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], nil))
-      else
-        render json: get_all_ddahs(Ddah.all)
-      end
+      render json: get_all_ddahs(Ddah.all)
     end
   end
 
   def show
-    if params[:utorid]
-      ddahs = id_array(get_all_ddah_for_utorid(params[:utorid]))
-      if ddahs.include?(params[:id])
+    if params[:session_id] || params[:utorid]
+      ddahs = id_array(get_all_ddahs(params[:session_id], params[:utorid], false))
+      if ddahs.include?(params[:id].to_i)
         ddah = Ddah.find(params[:id])
-        render json: ddah.format
+        render status: 200, json: ddah.format
       else
         render status: 404, json: {status: 404}
       end
@@ -44,63 +37,14 @@ class DdahsController < ApplicationController
     end
   end
 
-  def create
-    offer = Offer.find(params[:offer_id])
-    instructor = Instructor.find_by!(utorid: params[:utorid])
-    ddah = Ddah.find_by(offer_id: offer[:id])
-    if !ddah
-      ddah = Ddah.create!(
-        offer_id: offer[:id],
-        instructor_id: instructor[:id],
-        optional: true,
-      )
-      offer.update_attributes!(ddah_status: "Created")
-      render status: 201, json: ddah.to_json
-    else
-      render status: 404, json: {message: "Error: A DDAH already exists for this offer."}
-    end
-  end
-
-  def destroy
-    ddah = Ddah.find(params[:id])
-    if can_modify(params[:utorid], ddah)
-      ddah.allocations.each do |allocation|
-        allocation.destroy!
-      end
-      ddah.destroy!
-    else
-      render status: 403, file: 'public/403.html'
-    end
-  end
-
   def update
     ddah = Ddah.find(params[:id])
-    if can_modify(params[:utorid], ddah)
+    if can_modify(params[:utorid], ddah)||params[:utorid]==nil
       update_form(ddah, params)
       render status: 200, json: {message: "DDAH was updated successfully."}
     else
       render status: 403, file: 'public/403.html'
     end
-  end
-
-  def new_template
-    ddah = Ddah.find(params[:ddah_id])
-    offer = Offer.find(ddah[:offer_id])
-    position = Position.find(offer[:position_id])
-    data = {
-      name: params[:name],
-      optional: ddah[:optional],
-      instructor_id: ddah[:instructor_id],
-      tutorial_category: ddah[:tutorial_category],
-      department: ddah[:department],
-      scaling_learning: ddah[:scaling_learning],
-      # position_id: position[:id],
-    }
-    template = Template.create!(data)
-    copy_allocations(template, ddah.allocations, :ddah_id, :template_id)
-    template.training_ids = ddah.training_ids
-    template.category_ids = ddah.category_ids
-    render status: 200, json: {message: "A new template was successfully created."}
   end
 
   '''
@@ -154,7 +98,7 @@ class DdahsController < ApplicationController
     Set DDAH status to "Ready" (instructor)
   '''
   def can_finish_ddah
-    check_ddah_status(params[:ddahs], [nil, "None", "Created"])
+    check_ddah_status(params[:ddahs], ["Created"])
   end
 
   def finish_ddah
@@ -199,17 +143,21 @@ class DdahsController < ApplicationController
   end
 
   def pdf
-    ddah = Ddah.find(params[:ddah_id])
+    ddah = Ddah.find_by(id: params[:ddah_id])
     if ddah
       get_ddah_pdf(ddah)
     else
-      render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
+      render status: 404, json: {message: "A DDAH has not been made for this offer."}
     end
   end
 
   def accept
-    ddah = Ddah.find(params[:ddah_id])
-    accept_ddah(ddah[:offer_id])
+    ddah = Ddah.find_by(id: params[:ddah_id])
+    if ddah
+      accept_ddah(false, ddah[:offer_id], ddah)
+    else
+      render status: 404, json: {message: "A DDAH has not been made for this offer."}
+    end
   end
 
   '''
@@ -220,18 +168,22 @@ class DdahsController < ApplicationController
     if ddah
       get_ddah_pdf(ddah)
     else
-      render status: 404, json: {message: "Error: A DDAH has not been made for this offer."}
+      render status: 404, json: {message: "A DDAH has not been made for this offer."}
     end
   end
 
   def student_accept
-    accept_ddah(params[:offer_id], true, params[:signature])
+    accept_ddah(true, params[:offer_id], nil, params[:signature])
   end
 
   private
   def can_modify(utorid, ddah)
     instructor = Instructor.find_by(utorid: utorid)
-    return ddah[:instructor_id] == instructor[:id]
+    if instructor
+      return ddah[:instructor_id] == instructor[:id]
+    else
+      return false
+    end
   end
 
   def get_ddah_pdf(ddah)
@@ -239,24 +191,29 @@ class DdahsController < ApplicationController
     send_data generator.render, filename: "ddah.pdf", disposition: "inline"
   end
 
-  def accept_ddah(offer_id, student = false, signature = nil)
-    offer = Offer.find(offer_id)
-    if offer[:ddah_status] == "Accepted"
-      render status: 404, json: {message: "Error: You have already accepted this DDAH.", status: offer[:ddah_status]}
-    else
-      ddah = Ddah.find_by(offer_id: offer_id)
-      if ddah
-        if student
+  def accept_ddah(student, offer_id, ddah, signature = nil)
+    offer = Offer.find_by(id: offer_id)
+    if offer
+      if student
+        ddah = Ddah.find_by(offer_id: offer_id)
+        if ddah
           accept_student_ddah(ddah, offer, signature, DateTime.now.to_date)
+        else
+          render status: 404, json: {message: "DDAH does not exist."}
+        end
+      else
+        if offer[:ddah_status] == "Accepted"
+          render status: 404, json: {message: "You have already accepted this DDAH.", status: offer[:ddah_status]}
         else
           offer.update_attributes!(ddah_status: "Accepted")
           ddah.update_attributes!(student_signature: signature, student_sign_date:  DateTime.now.to_date)
           render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
         end
-      else
-        render status: 404, json: {message: "Error: DDAH not found."}
       end
+    else
+      render status: 404, json: {message: "Offer does not exist."}
     end
+
   end
 
   def accept_student_ddah(ddah, offer, signature, date)
@@ -265,38 +222,27 @@ class DdahsController < ApplicationController
       ddah.update_attributes!(student_signature: signature, student_sign_date: date)
       render status: 200, json: {message: "You have accepted this DDAH.", status: offer[:ddah_status]}
     else
-      render status: 404, json: {message: "Error: You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
+      render status: 404, json: {message: "You cannot accept an unsent DDAH.", status: offer[:ddah_status]}
     end
   end
 
-  def get_all_ddahs(ddahs)
-    ddahs.map do |ddah|
-      ddah.format
+  def get_all_ddahs(session, utorid, format = true)
+    ddahs_from_session(session, utorid).map do |ddah|
+      format ? ddah.format : ddah
     end
-  end
-
-  def get_all_ddah_for_utorid(utorid, session = nil)
-    ddahs = []
-    all_ddahs = (session) ? ddahs_from_session(session) : Ddah.all
-    all_ddahs.each do |ddah|
-      offer = Offer.find(ddah[:offer_id])
-      position = Position.find(offer[:position_id])
-      position.instructors.each do |instructor|
-        if instructor[:utorid] == utorid
-          ddahs.push(ddah)
-        end
-      end
-    end
-    return ddahs
   end
 
   def check_ddah_status(ddahs, status)
     invalid = []
     ddahs.each do |ddah_id|
-      ddah = Ddah.find(ddah_id)
-      offer = Offer.find(ddah[:offer_id])
-      if !(status.include? offer[:ddah_status])
-        invalid.push(ddah[:id])
+      ddah = Ddah.find_by(id: ddah_id)
+      if ddah
+        offer = Offer.find(ddah[:offer_id])
+        if !(status.include? offer[:ddah_status])
+          invalid.push(ddah[:id])
+        end
+      else
+        invalid.push(ddah_id)
       end
     end
     if invalid.length > 0

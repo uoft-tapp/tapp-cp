@@ -65,6 +65,6 @@ class AppController < ApplicationController
     render json: {development: ENV['RAILS_ENV']}
   end
 
-  
+
 
 end

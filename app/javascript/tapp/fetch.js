@@ -11,18 +11,9 @@ const getHelper = (URL) => fetchProc.getHelper(URL, appState);
 const postHelper = (URL, body) => fetchProc.postHelper(URL, body, appState);
 const deleteHelper = (URL) => fetchProc.deleteHelper(URL, appState);
 const putHelper = (URL, body) => fetchProc.putHelper(URL, body, appState);
-const getResource = (route, onSuccess, dataName, setData, mince=true) => 
+const getResource = (route, onSuccess, dataName, setData, mince=true) =>
   fetchProc.getResource(route, onSuccess, dataName, setData, mince, appState);
-export const is_valid_instructor = (utorid, appState) => {
 
-    return fetch('/instructors/utorid/' + utorid).then(response => {
-                                                            return response.json();
-                                                }).catch(function(error) {
-                                                    appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
-                                                    return Promise.reject(error);
-                                                });
-                                                        
-}
 /* Resource GETters */
 const getSessions = () => getResource('/sessions',
   fetchProc.onFetchSessionsSuccess, 'sessions', appState.setSessionsList, false);
@@ -33,17 +24,6 @@ const getInstructors = () => getResource('/instructors',
 const getApplicants = (utorid = null) => !utorid?getResource('/applicants',
   fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList):
   getResource('/instructors/'+utorid+'/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
-
-// const getApplicants = (selectedRole) => {
-//   if (selectedRole == "tapp_admin") {
-//     getResource('/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
-//   } else if (selectedRole == "instructor") {
-//     getResource('/instructors/'+utorid+'/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
-//   } else {
-//     console.error("invalid role");
-//   }
-//   console.log(selectedRole)
-// }
 
 const getApplications = (utorid = null) => !utorid?getResource('/applications',
   fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList):
@@ -57,14 +37,6 @@ const getAssignments = (utorid = null) => !utorid?getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList):
   getResource('/instructors/'+utorid+'/assignments', fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
-const getInstructorId = (utorid) => {
-  fetch('/instructors/utorid/' + utorid)
-    .then(response => response.json())
-    .then(responseJson => {
-      appState.setUserId(responseJson.id);
-    })
-    .catch(error => console.error(error));
-} 
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
@@ -110,14 +82,12 @@ const fetchInstructorAll = (instructor = false) => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      // getApplicants(appState.getSelectedUserRole());
       if(instructor){
         let utorid = appState.getCurrentUserName();
         getApplicants(utorid);
         getApplications(utorid);
         getAssignments(utorid);
         getCourses(utorid);
-        getInstructorId(utorid);
       }
       else{
         getApplicants();

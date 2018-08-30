@@ -62,7 +62,6 @@ export const getResource = (route, onSuccess, dataName, setData, mince, state) =
         appState.getSelectedSession():appState.get('selectedSession');
         if(session&&session!='N/A'){
             route = '/sessions/'+session+route;
-            console.log("getResource: " + route);
             return getResHelper(route, onSuccess, dataName, setData, appState);
         }
         else{
@@ -82,8 +81,7 @@ function getResHelper(route, onSuccess, dataName, setData, appState){
             setData? setData(data): appState.set(dataName+'.list', fromJS(data));
             appState.setFetchingDataList(dataName, false, true);
         })
-        .catch((error) => //appState.setFetchingDataList(dataName, false)
-            console.error(error));
+        .catch((error) => appState.setFetchingDataList(dataName, false));
 }
 
 /*
@@ -262,6 +260,7 @@ export const onFetchDdahsSuccess = (resp) => {
         ddahs[ddah.id] = {
             offer: ddah.offer_id,
             position: ddah.position.id,
+            applicant: ddah.applicant.id,
             department: ddah.department,
             supervisor: ddah.supervisor,
             supervisorId: ddah.instructor_id,
@@ -271,9 +270,9 @@ export const onFetchDdahsSuccess = (resp) => {
             allocations: ddah.allocations.map(allocation => ({
                 id: allocation.id,
                 units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
+                task: allocation.task_id,
                 time: allocation.minutes,
+                revisedTime: allocation.revised_minutes,
             })),
             trainings: ddah.trainings,
             categories: ddah.categories,
@@ -338,33 +337,33 @@ export const onFetchSessionsSuccess = (resp)=>{
     });
     return sessions;
 }
-
-export const onFetchTemplatesSuccess = (resp)=> {
-    let templates = {};
-    resp.forEach(template => {
-        templates[template.id] = {
-            name: template.name,
-            optional: template.optional,
-            requiresTraining: template.scaling_learning,
-            allocations: template.allocations.map(allocation => ({
-                id: allocation.id,
-                units: allocation.num_unit,
-                duty: allocation.duty_id,
-                type: allocation.unit_name,
-                time: allocation.minutes,
-            })),
-            trainings: template.trainings,
-            categories: template.trainings,
-        };
-    });
-    return templates;
-}
 export const onFetchTrainingsSuccess = (resp)=>{
     let trainings = {};
     resp.forEach(training => {
         trainings[training.id] = training.name;
     });
     return trainings;
+}
+export const onFetchTasksSuccess = (resp)=>{
+    let tasks = {};
+    resp.forEach(task => {
+        tasks[task.id] = {
+          name: task.name,
+          dutyId: task.duty_id,
+          count: task.count,
+        };
+    });
+    return tasks;
+}
+export const onFetchTemplatesSuccess = (resp)=>{
+    let templates = {};
+    resp.forEach(template => {
+        templates[template.id] = {
+          courseId: template.position_id,
+          tasks: template.tasks,
+        };
+    });
+    return templates;
 }
 /*
   common fetch helper functions
@@ -480,15 +479,13 @@ export const setRole = (cp, appState)=>{
   return getHelper('/roles', appState)
       .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
       .then(resp => {
-          console.log(resp.roles);
           appState.setCurrentUserRoles(resp.roles);
           if (cp && resp.roles.length > 1) { // cp_admin
-              appState.selectUserRole(resp.roles[1]); // set to cp_admin
+              appState.selectUserRole(resp.roles[1]); // (set to cp_admin), ["tapp_admin", "cp_admin", "instructor"]
           } else {
               appState.selectUserRole(resp.roles[0]);
           }
           appState.setCurrentUserName(resp.utorid);
-          console.log("utorid set to:" + resp.utorid);
           appState.setIsDevelopment(resp.development === true);
           if(cp) appState.setTaCoordinator(resp.ta_coord);
     });

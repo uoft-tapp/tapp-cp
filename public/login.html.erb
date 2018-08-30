@@ -38,7 +38,12 @@
   <body>
     <form action=<%request.headers['PATH_INFO']%>>
       utorID:<br>
-      <input type="text" name="utorid" value="">
+      <input list="utorid" type="text" name="utorid" value="">
+      <datalist id="utorid">
+        <% @existing_users.each do |user| %>
+        <option><%= user %></option>
+        <% end %>
+      </datalist>
       <br>
       <input type="submit" value="Submit" onSubmit="login()">
     </form>

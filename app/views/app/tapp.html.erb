@@ -23,9 +23,11 @@
     <%= stylesheet_pack_tag 'tapp' %>
     <%= javascript_pack_tag 'polyfill-css' %>
 
-    <% if ENV['RAILS_ENV'] == 'development' %>
+    <% if ENV['RAILS_ENV'] == 'development'  && @is_windows %>
       <!-- For development in Windows -->
       <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
+      <!-- For development on Mac -->
+      <% @pack_url = "#{request.base_url}/packs/" %>
       <script src="<%= @pack_url %>tapp.js?v=<%= DateTime.now %>"></script>
       <link rel="stylesheet" media="screen" href="<%= @pack_url %>tapp.css?v=<%= DateTime.now %>">
       <script src="<%= @pack_url %>polyfill-css.js?v=<%= DateTime.now %>"></script>

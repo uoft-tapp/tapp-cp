@@ -1,6 +1,5 @@
 class Ddah < ApplicationRecord
   belongs_to :offer
-  belongs_to :instructor
   has_and_belongs_to_many :categories
   has_many :allocations
   has_and_belongs_to_many :trainings
@@ -20,12 +19,10 @@ class Ddah < ApplicationRecord
     position = Position.find(offer[:position_id])
     allocations = self.allocations.map do |allocation|
       allocation = allocation.json
-      allocation.except(*[:template_id, :ddah_id])
+      allocation.except(*[:ddah_id])
     end
-    instructor = Instructor.find(ddah[:instructor_id])
     data = {
       applicant: applicant.format,
-      supervisor: instructor[:name],
       position: position.format,
       allocations: allocations,
       trainings: self.training_ids,

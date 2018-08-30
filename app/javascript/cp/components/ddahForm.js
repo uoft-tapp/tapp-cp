@@ -1,567 +1,292 @@
 import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { } from 'react-bootstrap';
+import Logo from '../../../assets/images/dcs_logo_blue_big.jpg';
 
 class DdahForm extends React.Component {
+    minutesToHour(minutes){
+      return (minutes/60).toFixed(2);
+    }
+    getTotalByDuty(allocations, duty, round=true){
+      let total= 0;
+      allocations[duty].items.forEach(allocation=>{
+        let minutes = allocation.is_revised?allocation.revised_minutes:allocation.minutes;
+        total += (allocation.num_units*(!minutes?0:minutes));
+      });
+      return round?this.minutesToHour(total):total;
+    }
+    getTotalHours(allocations, duties){
+      let total = 0;
+      duties.forEach(duty=>{
+        total+= this.getTotalByDuty(allocations, duty, false);
+      });
+      return this.minutesToHour(total);
+    }
+    getApplicantIndex(ddahs){
+      let index = 0;
+      ddahs.forEach((ddah, i)=>{
+        if(ddah.utorid == this.props.appState.getSelectedApplicant())
+          index = i;
+      })
+      return index;
+    }
     render() {
-        let ddahWorksheet = this.props.appState.getDdahWorksheet();
-
-        // check whether ddah for offer was selected, and if so, get related details
-        let hours, offersCount, course, ddah;
-        if (this.props.appState.isOfferSelected()) {
-            let offer = this.props.appState.getOffersList().get(this.props.selectedDdahId);
-            let position = offer.get('position');
-
-            hours = offer.get('hours');
-            offersCount = this.props.appState.getOffersForCourse(position).size;
-            course = this.props.appState.getCoursesList().get(position.toString());
-
-            ddah = this.props.appState
-                .getDdahsList()
-                .find(ddah => ddah.get('offer') == this.props.selectedDdahId);
+        let selectedApplicant = this.props.appState.getSelectedApplicant();
+        if(!selectedApplicant){
+          return null;
         }
+        let signatures = this.props.mockDdahData.signatures;
+        let review_signatures = this.props.mockDdahData.mid_course_review_changes;
+        let ddahs = this.props.mockDdahData.ddahs_entries;
+        let index = this.getApplicantIndex(ddahs);
+        let allocations= this.props.mockDdahData.ddahs_entries[index].duty_allocations;
+        let duties = Object.keys(allocations);
+        let selectedCourseId= this.props.appState.getSelectedCourse();
 
         return (
-            <div
-                id="ddah-container"
-                className={([null,'None', 'Created'].includes(this.props.status) ||
-                    this.props.appState.isTemplateSelected()) ? '' : 'disabled'}>
-                <h3>Description of Duties and Allocation of Hours Form</h3>
-                <Header
-                    ddahData={ddahWorksheet}
-                    course={course}
-                    ddah={ddah}
-                    offersCount={offersCount}
-                    {...this.props}
-                />
-                <Allocations ddahData={ddahWorksheet} {...this.props} />
-                <Training ddahData={ddahWorksheet} {...this.props} />
-                <Summary hours={hours} {...this.props} />
-                {this.props.appState.isOfferSelected() &&
-                    <Signatures ddahData={ddahWorksheet} ddah={ddah} {...this.props} />}
+            <div id="ddah-form" className="container-fluid container-fit">
+                <header>
+                    <h3>Description of Duties and Allocation of Hours (DDAH)</h3>
+                </header>
+
+                <Panel {...this.props} value={
+                  <div className="row">
+                      <div className="col-sm-7">
+                          <section id="ta-person">
+                              <div id="ta-info">
+                                  <h3 id="ta-name">{ddahs[index].name}</h3>
+                              </div>
+                          </section>
+                      </div>
+
+                      <div className="col-sm-5">
+                          <img id="dcs-logo-ddah" className="img-responsive"
+                            src={Logo} />
+                      </div>
+                  </div>
+                }/>
+
+                <CourseInfoHeader {...this.props}
+                  course={this.props.appState.getCourseHeaderInfo(selectedCourseId)}/>
+
+                <Panel {...this.props} title='Allocation of Hours Worksheet'
+                  value={
+                    <table id="duty-table" className="table table-hover">
+                        <thead><tr>
+                          {duty_table_headings.map((heading,i)=>
+                            <th key={i}>{heading}</th>
+                          )}
+                        </tr></thead>
+                        {duties.map((duty,i)=>
+                          <DutyAllocation {...this.props} key={i}
+                            title={allocations[duty].heading} total={this.getTotalByDuty(allocations, duty)}
+                            allocations={allocations[duty].items} minutesToHour={this.minutesToHour}/>
+                        )}
+                        <DutyTableTotal {...this.props}
+                          total={this.getTotalHours(allocations, duties)}/>
+                    </table>
+                  }
+                  footer='** Revised as necessary, following mid-course review'/>
+
+                <div className="row">
+                    <HalfPanel title='Training'
+                      value={this.props.mockDdahData.training.map((item, i)=>
+                            <CheckBoxItem {...this.props} key={i} item={'training' + i} category='trainings'
+                              checked={item.checked} name={item.name} value={item.id}/>
+                        )} {...this.props}/>
+                    <HalfPanel title='Tutorial Category (1 primary activity)' list={true}
+                      value={this.props.mockDdahData.tutorial_category.map((item, i)=>
+                            <RadioItem {...this.props} key={i} item={'tutorial' + i} category='tutorial-category'
+                              checked={item.checked} name={item.name} />
+                        )} {...this.props}/>
+                </div>
+                <SignatureBlock {... this.props}
+                  signatures={signatures} review_signatures={review_signatures} />
             </div>
         );
     }
 }
 
-const Header = props =>
-    <table id="ddah-header">
-        <tbody>
-            <tr>
-                <td>
-                    <b>Department:</b>
-                </td>
-                <td>
-                    <input
-                        type="text"
-                        readOnly
-                        value={props.ddah ? props.ddah.get('department') : ''}
-                        disabled={props.appState.isTemplateSelected()}
-                    />
-                </td>
-                <td>
-                    <b>Supervising Professor:</b>
-                </td>
-                <td>
-                    <select
-                        value={
-                            props.ddahData.get('supervisorId') != null
-                                ? props.ddahData.get('supervisorId')
-                                : ''
-                        }
-                        disabled={props.appState.isTemplateSelected()}
-                        onChange={event =>
-                            props.appState.updateDdahWorksheet('supervisorId', event.target.value)}>
-                        <option />
-                        {props.course &&
-                            props.course.get('instructors').map((instructor, key) =>
-                                <option value={key}>
-                                    {instructor}
-                                </option>
-                            )}
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <b>Course Code:</b>
-                </td>
-                <td>
-                    <input
-                        type="text"
-                        readOnly
-                        value={props.course ? props.course.get('code') : ''}
-                        disabled={props.appState.isTemplateSelected()}
-                    />
-                </td>
-                <td>
-                    <b>Est. Enrolment / TA:</b>
-                </td>
-                <td>
-                    <input
-                        type="number"
-                        readOnly
-                        value={
-                            props.course && props.course.get('estimatedEnrol') != null
-                                ? (props.course.get('estimatedEnrol') / props.offersCount).toFixed()
-                                : ''
-                        }
-                        disabled={props.appState.isTemplateSelected()}
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <b>Course Title:</b>
-                </td>
-                <td>
-                    <input
-                        type="text"
-                        readOnly
-                        value={props.course ? props.course.get('name') : ''}
-                        disabled={props.appState.isTemplateSelected()}
-                    />
-                </td>
-                <td>
-                    <b>Expected Enrolment:</b>
-                </td>
-                <td>
-                    <input
-                        type="number"
-                        readOnly
-                        value={
-                            props.course && props.course.get('estimatedEnrol') != null
-                                ? props.course.get('estimatedEnrol')
-                                : ''
-                        }
-                        disabled={props.appState.isTemplateSelected()}
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <b>Tutorial Category:</b>
-                </td>
-                <td>
-                    <input
-                        type="text"
-                        readOnly
-                        value={props.ddah ? props.ddah.get('tutCategory') : ''}
-                        disabled={props.appState.isTemplateSelected()}
-                    />
-                </td>
-                <td rowSpan="2">
-                    <small>
-                        Requires Training for Scaling Learning<br />Activities to Size of Tutorial
-                    </small>
-                </td>
-                <td rowSpan="2">
-                    <input
-                        type="checkbox"
-                        checked={props.ddahData.get('requiresTraining') == true}
-                        onChange={event =>
-                            props.appState.updateDdahWorksheet(
-                                'requiresTraining',
-                                event.target.checked
-                            )}
-                    />
-                </td>
-            </tr>
-            <tr>
-                <td />
-                <td>
-                    <input
-                        type="radio"
-                        id="optional"
-                        name="optional"
-                        checked={props.ddahData.get('optional') == true}
-                        onChange={event =>
-                            props.appState.updateDdahWorksheet('optional', event.target.checked)}
-                    />&nbsp;<label htmlFor="optional">Optional</label>&emsp;
-                    <input
-                        type="radio"
-                        id="mandatory"
-                        name="optional"
-                        checked={props.ddahData.get('optional') == false}
-                        onChange={event =>
-                            props.appState.updateDdahWorksheet('optional', !event.target.checked)}
-                    />&nbsp;<label htmlFor="mandatory">Mandatory</label>
-                </td>
-            </tr>
-        </tbody>
-    </table>;
+const duty_table_headings = ['# Unit', 'Type of Unit', 'Minutes per Unit', 'Minutes Revision **', 'Total Hours'];
 
-const Allocations = props =>
-    <Table condensed hover id="allocations-table">
-        <thead>
-            <tr className="title">
-                <th colSpan="5">Allocation of Hours Worksheet</th>
-            </tr>
-            <tr>
-                <th># of Units</th>
-                <th>Type of Duties</th>
-                <th>
-                    Type of Unit<br />
-                    <small>(e.g. assignments, tutorials, meetings, etc.)</small>
-                </th>
-                <th>
-                    Time/Task<br />
-                    <small>(minutes)</small>
-                </th>
-                <th>
-                    Total Time<br />
-                    <small>(hours)</small>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {props.ddahData.get('allocations').map((row, i) =>
-                <tr key={'allocation-' + i}>
-                    <td>
-                        <input
-                            type="number"
-                            min="0"
-                            value={row.get('units') != null ? row.get('units') : ''}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheetAllocation(
-                                    i,
-                                    'units',
-                                    event.target.value
-                                )}
-                        />
-                    </td>
-                    <td>
-                        <select
-                            value={row.get('duty') != null ? row.get('duty') : ''}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheetAllocation(
-                                    i,
-                                    'duty',
-                                    event.target.value
-                                )}>
-                            <option />
-                            {props.appState.getDutiesList().map((duty, id) =>
-                                <option value={id}>
-                                    {duty}
-                                </option>
-                            )}
-                        </select>
-                    </td>
-                    <td>
-                        <input
-                            type="text"
-                            autoComplete="on"
-                            value={row.get('type') != null ? row.get('type') : ''}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheetAllocation(
-                                    i,
-                                    'type',
-                                    event.target.value
-                                )}
-                        />
-                    </td>
-                    <td>
-                        <input
-                            type="number"
-                            min="0"
-                            value={row.get('time') != null ? row.get('time') : ''}
-                            onChange={event =>
-                                props.appState.updateDdahWorksheetAllocation(
-                                    i,
-                                    'time',
-                                    event.target.value
-                                )}
-                        />
-                    </td>
-                    <td>
-                        {(row.get('units') * row.get('time') / 60).toFixed(2)}
-                        <i
-                            className="fa fa-minus-circle delete-button"
-                            title="Delete row"
-                            onClick={() => props.appState.removeAllocation(i)}
-                        />
-                    </td>
-                </tr>
-            )}
+const DutyTableTotal = props =>(
+  <tbody>
+    <tr className="info row-total">
+        <td>Total</td>
+        <td colSpan="3"></td>
+        <td>{props.total}</td>
+    </tr>
+  </tbody>
+);
 
-            <tr>
-                <td colSpan="5" style={{ backgroundColor: 'white', textAlign: 'left' }}>
-                    <Button
-                        bsSize="small"
-                        bsStyle="info"
-                        onClick={() => props.appState.addAllocation()}>
-                        <b>+ Add row</b>
-                    </Button>
-                </td>
-            </tr>
+const DutyAllocation = props =>(
+  <tbody>
+  <DutyHeading {...props} title={props.title} total={props.total}/>
+  {props.allocations.map((allocation, i)=>
+    <Allocation {...props} key={i}
+      num_unit={allocation.num_units}
+      duty={allocation.unit_name}
+      time={allocation.minutes}
+      revised_time={allocation.is_revised? allocation.revised_minutes:null}/>
+  )}
+  </tbody>
+);
 
-            <tr>
-                <td>
-                    <b>Total</b>
-                </td>
-                <td />
-                <td />
-                <td />
-                <td>
-                    {props.appState.getDdahWorksheetTotal().toFixed(2)}
-                </td>
-            </tr>
-        </tbody>
-    </Table>;
+const DutyHeading = props =>(
+  <tr className="duty-heading">
+      <th colSpan="4">{props.title}</th>
+      <td className="total">{props.total}</td>
+  </tr>
+);
 
-const Training = props => {
-    let trainings = props.appState.getTrainingsList(),
-        categories = props.appState.getCategoriesList();
+const Allocation = props =>(
+  <tr>
+      <td className="number-of-units">{props.num_unit}</td>
+      <td className="duty-description">{props.duty}</td>
+      <td className={'unit-time' + (props.revised_time?' is_revised':'')}>{props.time}</td>
+      <td className="revised-time">{props.revised_time?props.revised_time:''}</td>
+      <td></td>
+  </tr>
+);
 
-    return (
-        <table id="training">
-            <thead>
-                <tr className="title">
-                    <th colSpan="2">Training</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <table className="sub-table">
-                            <tbody>
-                                {trainings.map((training, i) =>
-                                    <tr>
-                                        <td>
-                                            <input
-                                                type="checkbox"
-                                                id={'training-' + i}
-                                                checked={props.ddahData
-                                                    .get('trainings')
-                                                    .includes(parseInt(i))}
-                                                onChange={event =>
-                                                    props.appState.updateDdahWorksheet(
-                                                        'trainings',
-                                                        i
-                                                    )}
-                                            />&nbsp;<label htmlFor={'training-' + i}>{training}</label>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </td>
-                    <td>
-                        <table className="sub-table">
-                            <tbody>
-                                <tr>
-                                    <td>Indicate Tutorial Category (1 primary activity)</td>
-                                </tr>
-                                {categories.map((category, i) =>
-                                    <tr>
-                                        <td>
-                                            <input
-                                                type="checkbox"
-                                                id={'category-' + i}
-                                                checked={props.ddahData
-                                                    .get('categories')
-                                                    .includes(parseInt(i))}
-                                                onChange={event =>
-                                                    props.appState.updateDdahWorksheet(
-                                                        'categories',
-                                                        i
-                                                    )}
-                                            />&nbsp;<label htmlFor={'category-' + i}>{category}</label>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    );
-};
+const HalfPanel = props =>(
+  <div className='col-sm-6'>
+    <Panel {...props} title={props.title}
+      value={props.value} list={props.list}
+      footer={props.footer} />
+  </div>
+);
 
-const Summary = props => {
-    let duties = props.appState.getDutiesList();
+const Panel = props =>(
+  <div className='panel panel-default'>
+    {props.title?<PanelHeading {...props} title={props.title}/>:''}
+    <div className={props.list?'group-list':'panel-body'}>
+      {props.value}
+    </div>
+    {props.footer?<div className="worksheet-footer panel-footer">{props.footer}</div>:''}
+  </div>
+);
 
-    return (
-        <Table condensed id="summary-table">
-            <thead>
-                <tr className="title">
-                    <th colSpan="2">Allocation of Hours Summary</th>
-                </tr>
-                <tr>
-                    <th>Duties</th>
-                    <th>
-                        Time<br />
-                        <small>(hours)</small>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {props.appState.getDutiesSummary().map((duty, i) =>
-                    <tr key={'duty-' + i}>
-                        <td>
-                            {duties.get(i)}
-                        </td>
-                        <td>
-                            {duty.toFixed(2)}
-                        </td>
-                    </tr>
-                )}
-                <tr>
-                    <td>
-                        <b>Total</b>
-                        {props.appState.isOfferSelected() &&
-                            <span style={{ float: 'right', color: 'blue' }}>
-                                Expected: {props.hours.toFixed(2)}
-                            </span>}
-                    </td>
-                    <td>
-                        {props.appState.getDdahWorksheetTotal().toFixed(2)}
-                    </td>
-                </tr>
-            </tbody>
-        </Table>
-    );
-};
+const PanelHeading = props =>(
+  <div className="panel-heading">
+    <h3 className="panel-title">{props.title}</h3>
+  </div>
+);
 
-const Signatures = props => {
-    let offer = props.appState.getOffersList().get(props.selectedDdahId);
+const CheckBoxItem = props =>(
+  <div className="checkbox" key={props.item}>
+    <SelectableInput {...props} type='checkbox' value={props.value}
+      checked={props.checked} category={props.category} name={props.name} />
+  </div>
+);
 
-    return (
-        <table id="signatures">
-            <tbody>
-                <tr>
-                    <td>
-                        <input
-                            type="text"
-                            value={
-                                props.ddahData.get('supervisor')
-                                    ? props.ddahData.get('supervisor')
-                                    : ''
-                            }
-                            readOnly
-                        />
-                        <br />
+const RadioItem = props =>(
+  <div className="list-group-item list-group-item-condensed" key={props.item}>
+    <SelectableInput {...props} type='radio' value=''
+      checked={props.checked} category={props.category} name={props.name} />
+  </div>
+);
 
-                        <span className="input-label">
-                            &ensp;Prepared by <i>(Supervisor)</i>
-                        </span>
-                    </td>
+const SelectableInput = props =>(
+  <div className={props.type}>
+      <label>
+          <input name={props.category} type={props.type}
+            defaultChecked={props.checked} value={props.value}/>
+          {props.name}
+      </label>
+  </div>
+);
 
-                    <td>
-                        <input
-                            type="text"
-                            readOnly
-                            value={
-                                props.ddah.get('superSignature')
-                                    ? props.ddah.get('superSignature')
-                                    : ''
-                            }
-                        />
-                        <br />
-                        <span className="input-label">Signature</span>
-                    </td>
+const SignatureBlock = props =>(
+  <section id="signature-block" className="panel panel-default panel-warning">
+      <div className="panel-body bg-warning">
+          {Object.keys(props.signatures).map((key, i)=>
+            <Signature key={i} signature={props.signatures[key]} {...props} />
+          )}
+      </div>
+      <div className="panel-footer">
+          <div className="row">
+              <div className="col-sm-12">
+                  <h6>Mid-Course Review Changes (if any **)</h6>
+              </div>
+              <div className="col-sm-12">
+                  {Object.keys(props.review_signatures).map((key, i)=>
+                    <ReviewSignature key={i} review_signature={props.review_signatures[key]} {...props} />
+                  )}
+              </div>
+          </div>
+      </div>
+  </section>
+);
 
-                    <td>
-                        <span className="input-label">Date:</span>&nbsp;
-                        <input
-                            type="text"
-                            readOnly
-                            value={
-                                props.ddah.get('superSignDate')
-                                    ? new Date(props.ddah.get('superSignDate')).toLocaleDateString()
-                                    : ''
-                            }
-                        />
-                    </td>
-                </tr>
+const Signature = props =>(
+  <div className="row">
+      <div className="col-sm-12">
+          <p className="form-label-heading">{props.signature.title}</p>
+      </div>
+      <SignatureInput {...props} col_name='signatures' col_size='5'
+         help_block='Prepared by (Supervisor)' disabled={true}
+         value={props.signature.name}/>
+      <SignatureInput {...props} col_name='signatures' col_size='4'
+         help_block='SIGNATURE / INITIAL'
+         value={props.signature.signature_initials}/>
+      <SignatureInput {...props} col_name='signatures' col_size='3'
+         help_block='Date' disabled={true}
+         value={props.signature.date}/>
+  </div>
+);
 
-                <tr>
-                    <td>
-                        <input type="text" readOnly
-                        value={
-                            props.appState.getTaCoordinator()
-                                ? props.appState.getTaCoordinator()
-                                : ''
-                        }/>
-                        <br />
-                        <span className="input-label">
-                            &ensp;Prepared by <i>(Chair/Designated Authority)</i>
-                        </span>
-                    </td>
+const ReviewSignature = props =>(
+  <div className="row">
+      <div className="course-change-col col-sm-4">
+          <p className="form-label-heading form-control-static pull-right">{props.review_signature.title}</p>
+      </div>
+      <SignatureInput {...props} col_name='course-change' col_size='4'
+        help_block='SIGNATURE / INITIAL'
+        value={props.review_signature.signature_initials}/>
+      <SignatureInput {...props} col_name='course-change' col_size='3'
+        help_block='Date' disabled={true}
+        value={props.review_signature.date}/>
+  </div>
+);
 
-                    <td>
-                        <input
-                            type="text"
-                            readOnly
-                            value={
-                                props.ddah.get('authSignature')
-                                    ? props.ddah.get('authSignature')
-                                    : ''
-                            }
-                        />
-                        <br />
-                        <span className="input-label">Signature</span>
-                    </td>
+const SignatureInput = props =>(
+  <div className={props.col_name +'-col col-sm-'+props.col_size}>
+      <div className="form-group">
+          <input type="text" className="form-control" value={props.value}
+            disabled={props.disabled}/>
+          <span className="help-block">{props.help_block}</span>
+      </div>
+  </div>
+);
 
-                    <td>
-                        <span className="input-label">Date:</span>&nbsp;
-                        <input
-                            type="text"
-                            readOnly
-                            value={
-                                props.ddah.get('authSignDate')
-                                    ? new Date(props.ddah.get('authSignDate')).toLocaleDateString()
-                                    : ''
-                            }
-                        />
-                    </td>
-                </tr>
+export const CourseInfoHeader = props => (
+  <Panel {...props} value={
+    <div className="row">
+        <section id="course-overview" className="col-xs-8">
+            <span id="course-code">{props.course.code}</span>
+            <span id="course-prof">{props.course.instructors}</span>
+            <div id="course-title">{props.course.name}</div>
+        </section>
+        <section id="course-details" className="col-xs-4">
+            <form className="form-horizontal">
+                <EnrolmentLabel {...props} label='Expected Enrollment'
+                  value={props.course.enrol} />
+                <EnrolmentLabel {...props} label='Est. Enrollment / TA'
+                  value={props.course.estEnrol} />
+            </form>
+        </section>
+    </div>
+  }/>
+);
 
-                <tr>
-                    <td>
-                        <input
-                            type="text"
-                            value={offer.get('lastName') + ', ' + offer.get('firstName')}
-                            readOnly
-                        />
-                        <br />
-                        <span className="input-label">
-                            &ensp;Accepted by <i>(Teaching Assistant)</i>
-                        </span>
-                    </td>
+const EnrolmentLabel = props =>(
+  <div className="form-group form-group-sm">
+    <label className="col-xs-7 control-label">{props.label}</label>
+    <div className="col-xs-3">
+        <p className="form-control-static">{props.value}</p>
+    </div>
+  </div>
+);
 
-                    <td>
-                        <input
-                            type="text"
-                            readOnly
-                            value={
-                                props.ddah.get('studentSignature')
-                                    ? props.ddah.get('studentSignature')
-                                    : ''
-                            }
-                        />
-                        <br />
-                        <span className="input-label">Signature</span>
-                    </td>
-
-                    <td>
-                        <span className="input-label">Date:</span>&nbsp;
-                        <input
-                            type="text"
-                            readOnly
-                            value={
-                                props.ddah.get('studentSignDate')
-                                    ? new Date(
-                                          props.ddah.get('studentSignDate')
-                                      ).toLocaleDateString()
-                                    : ''
-                            }
-                        />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    );
-};
 
 export { DdahForm };

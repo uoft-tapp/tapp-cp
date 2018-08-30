@@ -26,6 +26,7 @@ import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
 import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
 import { Contracts } from '../cp/components/contracts.js';
 import { History } from '../cp/components/history.js';
+import { DdahEditor } from '../cp/components/ddahEditor.js';
 
 /*** Main app component ***/
 
@@ -63,13 +64,7 @@ class App extends React.Component {
                     </div>
                 );
             case 'instructor':
-                return (
-                    <div>
-                        <Navbar {...this.props} />
-                        <InstrControlPanel {...this.props} />
-                        <AlertContainer {...this.props} />
-                    </div>
-                );
+                return <InstrRouter {...this.props} />;
             case 'applicant':
                 return <ApplicantRouter {...this.props} />;
         }
@@ -99,6 +94,23 @@ const AdminRouter = props =>
             <AlertContainer {...props} />
         </div>
     </Router>;
+
+const InstrRouter = props =>(
+   <Router basename="cp">
+        <div>
+            <Navbar {...props} />
+
+            <Switch>
+                <Route
+                    path={routeConfig.sheet.route}
+                    render={() => <DdahEditor navKey={routeConfig.sheet.id} {...props}/>}/>
+                <Redirect from="/" to="/sheet" />
+            </Switch>
+
+            <AlertContainer {...props} />
+        </div>
+    </Router>
+);
 
 const ApplicantRouter = props =>
     <Router basename="cp">

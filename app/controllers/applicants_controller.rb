@@ -10,7 +10,7 @@ class ApplicantsController < ApplicationController
 '''
   def index
     if session[:roles].include?("tapp_admin")
-      render json: Applicant.all
+      render json: applicants_from_session(params[:session_id])
     elsif params[:session_id]
       render json: applicants_from_session(params[:session_id], session[:utorid])
     else

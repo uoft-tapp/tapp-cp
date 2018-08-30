@@ -15,5 +15,5 @@ before_install:
   - sleep 15
 
 script:
-  - docker-compose run -eRAILS_ENV=test rails-app rake db:create db:migrate
+  - docker-compose run -eRAILS_ENV=test rails-app rake db:create db:migrate db:seed
   - docker-compose run -eRAILS_ENV=test rails-app rake spec

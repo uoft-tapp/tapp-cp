@@ -1,0 +1,92 @@
+{
+    "offers": [
+      {
+          "course_id": "CSC999",
+          "round_id": 114,
+          "utorid": "applicant1",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC998",
+          "round_id": 114,
+          "utorid": "applicant1",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC997",
+          "round_id": 114,
+          "utorid": "applicant1",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC996",
+          "round_id": 114,
+          "utorid": "applicant1",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC995",
+          "round_id": 114,
+          "utorid": "applicant1",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC999",
+          "round_id": 114,
+          "utorid": "applicant2",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC998",
+          "round_id": 114,
+          "utorid": "applicant2",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC997",
+          "round_id": 114,
+          "utorid": "applicant2",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC996",
+          "round_id": 114,
+          "utorid": "applicant2",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC999",
+          "round_id": 114,
+          "utorid": "applicant3",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      },
+      {
+          "course_id": "CSC998",
+          "round_id": 114,
+          "utorid": "applicant3",
+          "hours": 60,
+          "session": "Winter",
+          "year": 2017
+      }
+	]
+}

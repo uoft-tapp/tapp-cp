@@ -2,9 +2,9 @@
 
 <b>Department</b>: <%= @ddah[:department]%>:<b>Supervising Professor</b>: <%= @ddah[:supervisor]%>:
 
-<b>Course Code</b>: <%= @template?"":@ddah[:position][:position]%>:<b>Est. Enrolment / TA</b>: <%= get_est_enrol_per_ta(@ddah[:position][:id], @ddah[:position][:current_enrolment], @template) %>:
+<b>Course Code</b>: <%= @template?"": @ddah[:position][:position]%>:<b>Est. Enrolment / TA</b>: <%= get_est_enrol_per_ta(@template?nil:@ddah[:position][:id], @template?nil:@ddah[:position][:current_enrolment], @template) %>:
 
-<b>Course Title</b>: <%= @template?"":@ddah[:position][:course_name]%>:<b>Expected Enrolment</b>: <%= (@template? nil: @ddah[:position][:current_enrolment])? @ddah[:position][:current_enrolment]:0 %>:
+<b>Course Title</b>: <%= @template?"": @ddah[:position][:course_name]%>:<b>Expected Enrolment</b>: <%= (@template? nil: @ddah[:position][:current_enrolment])? @ddah[:position][:current_enrolment]:0 %>:
 
 <b>Tutorial Category</b>: <%= @ddah[:tutorial_category]%>: :
 
