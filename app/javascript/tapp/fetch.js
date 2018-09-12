@@ -21,8 +21,9 @@ const getSessions = () => getResource('/sessions',
 const getInstructors = () => getResource('/instructors',
   fetchProc.onFetchInstructorsSuccess, 'instructors', appState.setInstructorsList, false);
 
-const getApplicants = () => getResource('/applicants',
-  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
+const getApplicants = (utorid = null) => !utorid?getResource('/applicants',
+  fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList):
+  getResource('/instructors/'+utorid+'/applicants', fetchProc.onFetchApplicantsSuccess, 'applicants', appState.setApplicantsList);
 
 const getApplications = (utorid = null) => !utorid?getResource('/applications',
   fetchProc.onFetchApplicationsSuccess, 'applications',  appState.setApplicationsList):
@@ -34,14 +35,6 @@ const getCourses = () => getResource('/positions',
 const getAssignments = () => getResource('/assignments',
   fetchProc.onFetchAssignmentsSuccess, 'assignments', appState.setAssignmentsList);
 
-const getInstructorId = (utorid) => {
-  fetch('/instructors/utorid/' + utorid)
-    .then(response => response.json())
-    .then(responseJson => {
-      appState.setUserId(responseJson.id);
-    })
-    .catch(error => console.error(error));
-}
 export const downloadFile = (route) => fetchProc.downloadFile(route, appState);
 const importData = (route, data, fetch) => fetchProc.importData(route, data, fetch, appState);
 const postData = (route, data, fetch, okay = null, error = null) => fetchProc.postData(route, data, fetch, appState, okay, error);
@@ -87,14 +80,12 @@ const fetchInstructorAll = (instructor = true) => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      // getApplicants(appState.getSelectedUserRole());
       if(instructor){
         let utorid = appState.getCurrentUserName();
         getApplicants(utorid);
         getApplications(utorid);
         getAssignments(utorid);
         getCourses(utorid);
-        getInstructorId(utorid);
       }
       else{
         getApplicants();
