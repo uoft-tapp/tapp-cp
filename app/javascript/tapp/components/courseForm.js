@@ -2,13 +2,27 @@ import React from 'react';
 import { ListGroupItem, Badge } from 'react-bootstrap';
 
 class CourseForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            expanded: false,
+        };
+    }
+
+    toggleExpanded = (e) => {
+        e.preventDefault();
+        this.setState({
+            expanded: !this.state.expanded,
+        });
+    };
+
     render() {
         let instructors = this.props.getInstructorsList();
 
         return (
             <ListGroupItem key={this.props.courseId}>
                 <a name={this.props.courseId} />
-                <table className="form_table">
+                <table className="form-table">
                     <tbody>
                         <tr>
                             <td className="col-1">
@@ -28,6 +42,7 @@ class CourseForm extends React.Component {
                                         readOnly
                                         disabled
                                     />
+
                                 </p>
                                 <p>
                                     <input
@@ -58,7 +73,7 @@ class CourseForm extends React.Component {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'estimatedEnrol'
+                                                'estextensionsimatedEnrol'
                                             );
                                         }
                                     }}
@@ -172,7 +187,7 @@ class CourseForm extends React.Component {
                             <td className="col-7">
                                 <p>
                                     <b>Instructors
-                                     <i className="fa fa-pencil instructor-modal-opener clickable"
+                                     <i className="fa fa-pencil button icon"
                                       title="Open Instructor Editor"
                                       onClick={()=> this.props.showInstructorModal()}></i>
                                     </b>
@@ -184,44 +199,89 @@ class CourseForm extends React.Component {
                                     {...this.props}
                                 />
                             </td>
-                            <td className="col-8">
-                                <p>
-                                    <b>Qualifications: </b>
-                                </p>
-                                <textarea
-                                    onBlur={event => {
-                                        if (event.target.value != this.props.course.qual) {
-                                            this.props.updateCourse(
-                                                this.props.courseId,
-                                                event.target.value,
-                                                'qual'
-                                            );
-                                        }
-                                    }}
-                                    defaultValue={this.props.course.qual}
-                                />
-                            </td>
-                            <td className="col-9">
-                                <p>
-                                    <b>Responsibilities: </b>
-                                </p>
-                                <textarea
-                                    onBlur={event => {
-                                        if (event.target.value != this.props.course.resp) {
-                                            this.props.updateCourse(
-                                                this.props.courseId,
-                                                event.target.value,
-                                                'resp'
-                                            );
-                                        }
-                                    }}
-                                    defaultValue={this.props.course.resp}
-                                />
-                            </td>
                         </tr>
                     </tbody>
                 </table>
+                <ExpandableDescriptions expanded={this.state.expanded}
+                                        handleClick={this.toggleExpanded}
+                                        {...this.props}
+                />
             </ListGroupItem>
+        );
+    }
+}
+
+
+class ExpandableDescriptions extends React.Component {
+    render () {
+        if (this.props.expanded) {
+            return (
+                <div>
+                    <button className="expand-button" onClick={this.props.handleClick}>
+                        <span className="glyphicon glyphicon-chevron-up">
+                        </span>
+                    </button>
+                    <Descriptions {...this.props} key={this.props.courseId}/>
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <button className="expand-button" onClick={this.props.handleClick}>
+                        <span className="glyphicon glyphicon-chevron-down">
+                        </span>
+                    </button>
+                </div>
+            );
+        }
+    }
+}
+
+class Descriptions extends React.Component {
+    render() {
+        return (
+            <table className="form-table">
+                <tbody>
+                <tr>
+                    <td className="col-half">
+                        <p>
+                            <b>Qualifications: </b>
+                        </p>
+                        <textarea
+                            className="long-text"
+                            onBlur={event => {
+                                if (event.target.value != this.props.course.qual) {
+                                    this.props.updateCourse(
+                                        this.props.courseId,
+                                        event.target.value,
+                                        'qual'
+                                    );
+                                }
+                            }}
+                            defaultValue={this.props.course.qual}
+                        />
+                    </td>
+                    <td className="col-half">
+                        <p>
+                            <b>Responsibilities: </b>
+                        </p>
+                        <textarea
+                            className="long-text"
+                            onBlur={event => {
+                                if (event.target.value != this.props.course.resp) {
+                                    this.props.updateCourse(
+                                        this.props.courseId,
+                                        event.target.value,
+                                        'resp'
+                                    );
+                                }
+                            }}
+                            defaultValue={this.props.course.resp}
+                        />
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         );
     }
 }
@@ -266,7 +326,7 @@ class InstructorForm extends React.Component {
 
     render() {
         return (
-            <div className="instructor_form" onClick={() => this.input.focus()}>
+            <div className="instructor-form" onClick={() => this.input.focus()}>
                 {this.props.instructors.map((instructor, key) =>
                     <Badge key={key}>
                         {this.props.instructor_data[instructor]}

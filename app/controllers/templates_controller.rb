@@ -1,5 +1,7 @@
 class TemplatesController < ApplicationController
-  protect_from_forgery with: :null_session
+  # protect_from_forgery with: :null_session
+  skip_before_action :verify_authenticity_token
+
   include DdahUpdater
   include Authorizer
   include Model

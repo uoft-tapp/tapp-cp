@@ -2,7 +2,8 @@ class OffersController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :set_domain
   include Authorizer
-  before_action :cp_admin, except: [:index, :show, :get_contract_student, :set_status_student, :can_print, :combine_contracts_print]
+  before_action :cp_admin, except: [:index, :show, :get_contract_student, :set_status_student,
+                                    :can_print, :combine_contracts_print, :applicant_get_offers]
   before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
   before_action only: [:get_contract_pdf, :get_contract, :can_print, :combine_contracts_print] do
    cp_admin(true)
@@ -10,6 +11,7 @@ class OffersController < ApplicationController
   before_action only: [:index, :show] do
     either_cp_admin_instructor(true)
   end
+  before_action :applicant, only: [:applicant_get_offers]
 
   def index
     if params[:session_id]
@@ -29,7 +31,7 @@ class OffersController < ApplicationController
 
   def show
     if params[:utorid]
-      offers = id_array(get_all_offers_for_utorid(params[:utorid]))
+      offers = id_array(get_all_offers_for_utorid(params[:utorid], nil))
       if offers.include?(params[:id])
         offer = Offer.find(params[:id])
         render json: offer.instructor_format
@@ -40,6 +42,18 @@ class OffersController < ApplicationController
       offer = Offer.find(params[:id])
       render json: offer.format
     end
+  end
+
+  def applicant_get_offers
+    offers = []
+    all_offers = Offer.all
+    all_offers.each do |offer|
+      applicant = Applicant.find(offer[:applicant_id])
+      if applicant[:utorid] == params[:utorid]
+        offers.push(offer.format)
+      end
+    end
+    render json: offers
   end
 
   # can update HR status for offers that are accepted or pending
@@ -91,16 +105,16 @@ class OffersController < ApplicationController
     begin
       params[:offers].each do |id|
         offer = Offer.find(id)
-          if ENV['RAILS_ENV'] != 'test'
-            offer.update_attributes!(link: "/pb/#{offer[:id]}")
-            CpMailer.contract_email(offer.format,"#{ENV["domain"]}#{offer[:link]}").deliver_now!
-          end
-          offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
+        if ENV['RAILS_ENV'] != 'test'
+          offer.update_attributes!(link: "/pb/#{offer[:id]}")
+          CpMailer.contract_email(offer.format, "#{ENV["domain"]}#{offer[:link]}").deliver_now!
+        end
+        offer.update_attributes!({status: "Pending", send_date: DateTime.now.to_s})
       end
-      render status: 200, json: {message: "You've successfully sent out all the contracts."}
+      render status: 200, json: {message: "Contracts successfully sent."}
     rescue Errno::ECONNREFUSED
       puts "rejected"
-      render status: 404, json: {message: "Connection Refused."}
+      render status: 404, json: {message: "Connection refused."}
     end
   end
 
@@ -115,7 +129,7 @@ class OffersController < ApplicationController
       end
       render json: {message: "You've sent the nag emails."}
     rescue Errno::ECONNREFUSED
-      render status: 404, json: {message: "Connection Refused."}
+      render status: 404, json: {message: "Connection refused."}
     end
   end
 
@@ -150,10 +164,9 @@ class OffersController < ApplicationController
       end
       render status: 200, json: {message: "You've successfully sent out all the nag emails."}
     rescue Errno::ECONNREFUSED
-      render status: 404, json: {message: "Connection Refused."}
+      render status: 404, json: {message: "Connection refused."}
     end
   end
-
 
   def combine_contracts_print
     offers = []

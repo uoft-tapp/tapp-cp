@@ -20,7 +20,7 @@ class AppController < ApplicationController
     if ENV['RAILS_ENV'] == 'production'
       render json: {development: false, ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
     else
-      render json: {development: true,  ta_coord: ENV["TA_COORD"], utorid: "development", roles: session[:roles]}
+      render json: {development: true,  ta_coord: ENV["TA_COORD"], utorid: session[:utorid], roles: session[:roles]}
     end
   end
 
@@ -56,11 +56,15 @@ class AppController < ApplicationController
 
   def logout
     session[:logged_in] = false
-    redirect_back(fallback_location: request.referrer)
+    session[:utorid] = nil
+    session[:roles] = nil
+    render file: 'public/logout.html'
   end
 
-  def reenter_session
-    session[:logged_in] = true
+  def is_development
+    render json: {development: ENV['RAILS_ENV']}
   end
+
+  
 
 end

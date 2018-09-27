@@ -1,8 +1,9 @@
 class AssignmentsController < ApplicationController
-  protect_from_forgery with: :null_session
+  # protect_from_forgery with: :null_session
+  skip_before_action :verify_authenticity_token
   include Authorizer
   before_action :set_domain
-  before_action :tapp_admin
+  before_action :admin_or_instructor
 
  '''
     index #GET
@@ -16,7 +17,7 @@ class AssignmentsController < ApplicationController
       elsif params[:position_id].present?
         Position.find(params[:position_id]).assignments
       elsif params[:session_id].present?
-        assignments_from_session(params[:session_id])
+        assignments_from_session(params[:session_id], params[:utorid])
       else
         Assignment.all
       end

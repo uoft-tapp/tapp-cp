@@ -24,6 +24,8 @@ import { Navbar } from '../cp/components/navbar.js';
 import { AdminControlPanel } from '../cp/components/adminControlPanel.js';
 import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
 import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
+import { Contracts } from '../cp/components/contracts.js';
+import { History } from '../cp/components/history.js';
 
 /*** Main app component ***/
 
@@ -68,6 +70,8 @@ class App extends React.Component {
                         <AlertContainer {...this.props} />
                     </div>
                 );
+            case 'applicant':
+                return <ApplicantRouter {...this.props} />;
         }
 
         return null;
@@ -93,6 +97,25 @@ const AdminRouter = props =>
             </Switch>
 
             <AlertContainer {...props} />
+        </div>
+    </Router>;
+
+const ApplicantRouter = props =>
+    <Router basename="cp">
+        <div>
+            <Navbar {...props} />
+
+            <Switch>
+                <Route
+                    path={routeConfig.contracts.route}
+                    render={() => <Contracts navKey={routeConfig.contracts.id} {...props} />}
+                />
+                <Route
+                    path={routeConfig.history.route}
+                    render={() => <History navKey={routeConfig.history.id} {...props} />}
+                />
+                <Redirect from="/" to="/contracts" />
+            </Switch>
         </div>
     </Router>;
 

@@ -16,6 +16,8 @@ const initialState = {
         notifications: [],
     },
 
+    isDevelopment: false,
+
     // list of UI alerts (string can contain HTML, but be careful because it is not sanitized!)
     alerts: [],
 
@@ -416,7 +418,12 @@ class AppState {
     }
 
     selectUserRole(role) {
+        console.log("set to role: " + role);
         this.set('nav.selectedRole', role);
+    }
+
+    setIsDevelopment(bool) {
+        this.set('isDevelopment', bool);
     }
 
     setCurrentUserName(user) {
@@ -720,10 +727,14 @@ class AppState {
 
     fetchAll() {
         let role = this.getSelectedUserRole();
+        console.log('role: ' + role);
+
         if (role == 'cp_admin' || role == 'hr_assistant') {
             fetch.adminFetchAll();
         } else if (role == 'instructor') {
             fetch.instructorFetchAll();
+        } else if (role == 'applicant') {
+            fetch.applicantFetchAll();
         }
     }
 

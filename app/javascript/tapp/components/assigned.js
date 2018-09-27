@@ -21,7 +21,7 @@ class Assigned extends React.Component {
                 header: 'Last Name',
                 data: p =>
                     <span
-                        className="highlightOnHover"
+                        className="highlight"
                         onClick={() => this.props.selectApplicant(p.applicantId)}>
                         {p.applicant.lastName}&nbsp;
                         {p.applicant.notes && <i className="fa fa-paperclip" />}
@@ -118,7 +118,7 @@ class Assigned extends React.Component {
                 ),
             },
         ];
-
+        let className = ".navbar-margin-top"
         return (
             <Grid fluid id="assigned-grid">
                 <ApplicantTableMenu

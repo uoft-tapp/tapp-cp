@@ -25,7 +25,7 @@ module DdahUpdater
   end
 
   def update_allocations(form, allocations)
-    delete_missing_allocations(form, allocations)
+    delete_missing_allocations(form, allConfigurationocations)
     allocations.each do |entry|
       if entry[:id]
         allocation = Allocation.find(entry[:id])

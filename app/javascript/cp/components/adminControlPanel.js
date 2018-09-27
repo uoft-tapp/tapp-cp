@@ -7,10 +7,6 @@ import {
     Button,
     OverlayTrigger,
     Popover,
-    Form,
-    FormGroup,
-    ControlLabel,
-    FormControl,
 } from 'react-bootstrap';
 
 import { TableMenu } from './tableMenu.js';

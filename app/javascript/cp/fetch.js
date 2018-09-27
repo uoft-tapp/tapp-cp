@@ -37,9 +37,21 @@ const getDdahs = user => getResource(
     user ? '/instructors/' + user + '/ddahs' : '/ddahs',
     fetchProc.onFetchDdahsSuccess, 'ddahs');
 
-const getOffers = user => getResource(
-    user ? '/instructors/' + user + '/offers' : '/offers',
-    fetchProc.onFetchOffersSuccess, 'offers');
+const getOffers = (user, role) => {
+    let route = '/offers';
+    if (user) {
+        if (role == 'instructor') {
+            route = '/instructors/' + user + '/offers';
+            getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
+        }
+        else if (role == 'applicant') {
+            route = '/applicants/' + user + '/offers';
+            getResource(route, fetchProc.onFetchOffersSuccess, 'offers', false);
+        }
+    } else {
+        getResource(route, fetchProc.onFetchOffersSuccess, 'offers');
+    }
+}
 
 
 const downloadFile = (route) => fetchProc.downloadFile(route, appState);
@@ -72,6 +84,7 @@ export const adminFetchAll = () =>  {
 
 export const instructorFetchAll = () => {
     let user = appState.getCurrentUserName();
+    console.log("before fetch: " + user);
     getSessions().then(()=>{
       let sessions = appState.getSessionsList();
       if(!sessions){
@@ -80,14 +93,29 @@ export const instructorFetchAll = () => {
       let session = appState.getSelectedSession();
       if(!session||session=='N/A')
         appState.setLatestSession();
-      getOffers(user);
+      getOffers(user, 'instructor');
       getDdahs(user);
       getCourses(user);
     });
     getCategories();
     getDuties();
-    getTemplates();
+    getTemplates(user);
     getTrainings();
+}
+
+export const applicantFetchAll = () => {
+    let user = appState.getCurrentUserName();
+    getSessions().then(()=> {
+        let sessions = appState.getSessionsList();
+        if (!sessions) {
+            appState.setSessionsList(fromJS([]));
+        }
+        let session = appState.getSelectedSession();
+        if (!session || session == 'N/A')
+            appState.setLatestSession();
+        getOffers(user, 'applicant');
+        // TODO: get DDAH forms if necessary
+    });
 }
 
 // import locked assignments from TAPP
@@ -391,5 +419,5 @@ export const previewDdahs = (ddahs) => {
 // get current user role(s) and username
 // if we are in development, set the current user name to a special value
 export const fetchAuth = () => {
-    return fetchProc.setRole(['cp_admin', 'hr_assistant', 'instructor'], true, appState);
+    return fetchProc.setRole(true, appState);
 }
