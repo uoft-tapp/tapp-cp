@@ -19,7 +19,7 @@ RUN apk --update --upgrade add curl-dev libcurl build-base openssh \
 RUN apk add --no-cache curl && \
   mkdir -p /opt && \
   curl -sL https://yarnpkg.com/latest.tar.gz | tar xz -C /opt && \
-  mv /opt/yarn-* /opt/yarn && \
+  mv /opt/yarn* /opt/yarn && \
   ln -s /opt/yarn/bin/yarn /usr/local/bin && \
   apk del --purge curl
 
