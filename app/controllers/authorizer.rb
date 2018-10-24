@@ -43,15 +43,13 @@ module Authorizer
       end
       access(expected_roles)
     else
-      if ENV['RAILS_ENV'] == 'production'
-        expected_roles = ["tapp_admin", "instructor"]
-        if has_access(expected_roles)
-          if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
-	          render status: 403, file: 'public/403.html'
-          end
-        else
+      expected_roles = ["tapp_admin", "instructor"]
+      if has_access(expected_roles)
+        if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
           render status: 403, file: 'public/403.html'
         end
+      else
+        render status: 403, file: 'public/403.html'
       end
     end
   end
@@ -65,31 +63,27 @@ module Authorizer
       end
       access(expected_roles)
     else
-      if ENV['RAILS_ENV'] == 'production'
-        expected_roles = ["instructor"]
-        if has_access(expected_roles)
-          if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
-            render status: 403, file: 'public/403.html'
-          end
-        else
+      expected_roles = ["instructor"]
+      if has_access(expected_roles)
+        if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
           render status: 403, file: 'public/403.html'
         end
+      else
+        render status: 403, file: 'public/403.html'
       end
     end
   end
 
 
   def both_cp_admin_instructor(model, attr_name = :id, array = false)
-    if ENV['RAILS_ENV'] == 'production'
-      expected_roles = ["cp_admin", "instructor"]
-      if has_access(expected_roles)
-        if !has_access(["cp_admin"])
-          instructor = Instructor.find_by(utorid: session[:utorid])
-          correct_instructor(model, instructor, params[attr_name], array)
-        end
-      else
-        render status: 403, file: 'public/403.html'
+    expected_roles = ["cp_admin", "instructor"]
+    if has_access(expected_roles)
+      if !has_access(["cp_admin"])
+        instructor = Instructor.find_by(utorid: session[:utorid])
+        correct_instructor(model, instructor, params[attr_name], array)
       end
+    else
+      render status: 403, file: 'public/403.html'
     end
   end
 
@@ -98,11 +92,9 @@ module Authorizer
     the utorid of the applicant the offer was made to.
   '''
   def correct_applicant
-    if ENV['RAILS_ENV'] == 'production'
-      utorid = get_utorid
-      if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
-        render status: 403, file: 'public/403.html'
-      end
+    utorid = get_utorid
+    if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
+      render status: 403, file: 'public/403.html'
     end
   end
 
@@ -115,28 +107,23 @@ module Authorizer
       end
       session[:logged_in] = true
     else
-      if ENV['RAILS_ENV'] == 'development'
-        if params[:utorid]
-          session[:utorid] = params[:utorid]
-          session[:logged_in] = true
-          set_roles
-          return
-        end
-        if session[:logged_in].nil? || session[:logged_in] == false
-          session[:logged_in] = false
-          @existing_users = get_system_utorids
-          render file: 'public/login.html'
-        end
+      if params[:utorid]
+        request.env['HTTP_X_FORWARDED_USER'] = params[:utorid]
+        session[:logged_in] = true
+        set_roles
+      end
+      if session[:logged_in].nil? || session[:logged_in] == false
+        session[:logged_in] = false
+        @existing_users = get_system_utorids
+        render file: 'public/login.html'
       end
     end
   end
 
   def access(expected_roles)
-    # if ENV['RAILS_ENV'] == 'production'
-      if !has_role(expected_roles)
-        render status: 403, file: 'public/403.html'
-      end
-    # end
+    if !has_role(expected_roles)
+      render status: 403, file: 'public/403.html'
+    end
   end
 
   def has_access(expected_roles)
@@ -163,22 +150,6 @@ module Authorizer
     if get_utorid
       instructor = Instructor.find_by(utorid: get_utorid)
       return !instructor.nil?
-    else
-      return nil
-    end
-  end
-
-  def is_applicant
-    if get_utorid
-      # Applicant will be neither instructor nor admin nor assistant
-      instructor = Instructor.find_by(utorid: get_utorid)
-      if listed_as(ENV['TAPP_ADMINS']) or listed_as(ENV['CP_ADMINS']) or
-          listed_as(ENV['TAPP_ASSISTANTS']) or listed_as(ENV['HR_ASSISTANTS']) or instructor
-        return nil
-      # TODO: check if applicant
-      else
-        return listed_as("applicant1,applicant2,applicant3")
-      end
     else
       return nil
     end
@@ -233,11 +204,6 @@ module Authorizer
       {
         access: is_instructor,
         role: "instructor",
-      },
-      {
-        access: is_applicant,
-
-        role: "applicant",
       }
     ]
     roles.each do |role|
@@ -245,10 +211,8 @@ module Authorizer
         session[:roles].push(role[:role])
       end
     end
-    if session[:roles].empty?
-      session[:logged_in] = false
-      session[:utorid] = nil
-      render file: "public/login.html" and return
+    if session[:roles] == []
+      session[:roles].push('applicant')
     end
   end
 
