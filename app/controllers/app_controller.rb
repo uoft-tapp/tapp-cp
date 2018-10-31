@@ -60,11 +60,4 @@ class AppController < ApplicationController
     session[:roles] = nil
     render file: 'public/logout.html'
   end
-
-  def is_development
-    render json: {development: ENV['RAILS_ENV']}
-  end
-
-  
-
 end

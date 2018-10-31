@@ -107,13 +107,10 @@ module Authorizer
       end
       session[:logged_in] = true
     else
-      if params[:utorid]
+      if session[:utorid]
         request.env['HTTP_X_FORWARDED_USER'] = params[:utorid]
-        session[:logged_in] = true
-        set_roles
       end
-      if session[:logged_in].nil? || session[:logged_in] == false
-        session[:logged_in] = false
+      if !session[:logged_in]
         @existing_users = get_system_utorids
         render file: 'public/login.html'
       end
