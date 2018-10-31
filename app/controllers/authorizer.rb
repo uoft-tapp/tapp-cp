@@ -109,6 +109,7 @@ module Authorizer
     else
       if session[:utorid]
         request.env['HTTP_X_FORWARDED_USER'] = params[:utorid]
+        set_roles
       end
       if !session[:logged_in]
         @existing_users = get_system_utorids
