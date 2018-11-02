@@ -14,27 +14,19 @@ class DdahsController < ApplicationController
   end
 
   def index
-    if params[:session_id]
-      if params[:utorid]
-        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], params[:session_id]))
-      else
-        render json: get_all_ddahs(ddahs_from_session(params[:session_id]))
-      end
+    if params[:session_id] || params[:utorid]
+      render json: get_all_ddahs(params[:session_id], params[:utorid])
     else
-      if params[:utorid]
-        render json: get_all_ddahs(get_all_ddah_for_utorid(params[:utorid], nil))
-      else
-        render json: get_all_ddahs(Ddah.all)
-      end
+      render json: get_all_ddahs(Ddah.all)
     end
   end
 
   def show
-    if params[:utorid]
-      ddahs = id_array(get_all_ddah_for_utorid(params[:utorid]))
-      if ddahs.include?(params[:id])
+    if params[:session_id] || params[:utorid]
+      ddahs = id_array(get_all_ddahs(params[:session_id], params[:utorid], false))
+      if ddahs.include?(params[:id].to_i)
         ddah = Ddah.find(params[:id])
-        render json: ddah.format
+        render status: 200, json: ddah.format
       else
         render status: 404, json: {status: 404}
       end
@@ -43,7 +35,7 @@ class DdahsController < ApplicationController
       render json: ddah.format
     end
   end
-
+  
   def create
     offer = Offer.find(params[:offer_id])
     instructor = Instructor.find_by!(utorid: params[:utorid])

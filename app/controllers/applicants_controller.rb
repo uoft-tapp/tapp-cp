@@ -1,17 +1,20 @@
 class ApplicantsController < ApplicationController
   protect_from_forgery with: :null_session
   include Authorizer
-  before_action :tapp_admin
-
+  before_action :tapp_admin, except: [:index]
+  before_action :tapp_access, only: [:index]
+  
 '''
   index #GET
     /applicants/
 '''
   def index
-    if params[:session_id]
-      render json: applicants_from_session(params[:session_id], params[:utorid])
+    if session[:roles].include?("tapp_admin")
+      render json: applicants_from_session(params[:session_id])
+    elsif params[:session_id]
+      render json: applicants_from_session(params[:session_id], session[:utorid])
     else
-      render json: Applicant.all
+      render file: 'public/403.html'
     end
   end
 

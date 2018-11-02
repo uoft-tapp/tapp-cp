@@ -10,7 +10,6 @@ class InstructorImporter
         email: instructor["email"],
         name: "#{instructor['first_name']} #{instructor['last_name']}",
       }
-      puts "data: #{data}"
       insertion_helper(Instructor, data, ident, exists)
     end
   end
