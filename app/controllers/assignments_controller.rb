@@ -11,16 +11,15 @@ class AssignmentsController < ApplicationController
       /applicants/:applicant_id/assignments - returns an assignments given an applicant ID
  '''
   def index
-      @assignments = if params[:applicant_id].present?
-        Applicant.find(params[:applicant_id]).assignments
-      elsif params[:position_id].present?
-        Position.find(params[:position_id]).assignments
-      elsif params[:session_id].present?
-        assignments_from_session(params[:session_id])
-      else
-        Assignment.all
-      end
-
+    @assignments = if params[:applicant_id].present?
+      Applicant.find(params[:applicant_id]).assignments
+    elsif params[:position_id].present?
+      Position.find(params[:position_id]).assignments
+    elsif params[:session_id].present?
+      assignments_from_session(params[:session_id], params[:utorid])
+    else
+      Assignment.all
+    end
     render json: @assignments.to_json
   end
 

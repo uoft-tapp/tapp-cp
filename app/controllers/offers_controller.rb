@@ -12,25 +12,17 @@ class OffersController < ApplicationController
   end
 
   def index
-    if params[:session_id]
-      if params[:utorid]
-        render json: get_all_offers_for_utorid(params[:utorid], params[:session_id])
-      else
-        render json: get_all_offers(offers_from_session(params[:session_id]))
-      end
+    if params[:session_id] || params[:utorid]
+      render json: get_all_offers(params[:session_id], params[:utorid])
     else
-      if params[:utorid]
-        render json: get_all_offers_for_utorid(params[:utorid], nil)
-      else
-        render json: get_all_offers(Offer.all)
-      end
+      render json: get_all_offers(Offer.all)
     end
   end
 
   def show
-    if params[:utorid]
-      offers = id_array(get_all_offers_for_utorid(params[:utorid]))
-      if offers.include?(params[:id])
+    if params[:session_id] || params[:utorid]
+      offers = id_array(get_all_offers(params[:session_id], params[:utorid], false))
+      if offers.include?(params[:id].to_i)
         offer = Offer.find(params[:id])
         render json: offer.instructor_format
       else
@@ -41,7 +33,7 @@ class OffersController < ApplicationController
       render json: offer.format
     end
   end
-
+  
   # can update HR status for offers that are accepted or pending
   def can_hr_update
     check_offers_status(params[:offers], :status, ["Accepted", "Pending"])

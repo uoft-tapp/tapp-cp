@@ -71,7 +71,7 @@ class CSVGenerator
   end
 
   def generate_cp_offers(session_id)
-    set_all_offer_in_session(session_id)
+    @offers = offers_from_session(session_id)
     if @offers.size == 0
       return {generated: false,
         msg: "Warning: There are currenly no offers for this session. Operation aborted"}
@@ -99,7 +99,7 @@ class CSVGenerator
   def generate_ddahs(position_id)
     position = Position.find_by(id: position_id)
     if position
-      set_all_offer_in_session(position[:session_id], position)
+      @offers = offers_from_session(session_id)
       if @offers.size == 0
         return {generated: false,
           msg: "Warning: There are currenly no offers for this position. Operation aborted"}
@@ -113,21 +113,6 @@ class CSVGenerator
   end
 
   private
-  def set_all_offer_in_session(session_id, position = nil)
-    session = Session.find(session_id)
-    @offers = []
-    Offer.all.each do |offer|
-      offer = offer.format
-      if offer[:session] == session
-        if !position
-          @offers.push(offer)
-        elsif offer[:position] == position[:position]
-          @offers.push(offer)
-        end
-      end
-    end
-  end
-
   def get_cdf_info(attributes)
     data = CSV.generate do |csv|
       csv << attributes

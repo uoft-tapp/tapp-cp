@@ -11,65 +11,59 @@ module SessionSeparate
   def session_check(session_id)
     session = Session.find(session_id)
     if session
-      @assignments = assignments_from_session(session[:id])
-      @applicants = applicants_from_session(session[:id])
+      @assignments = assignments_from_session(session[:id], nil, @assignments)
+      @applicants = applicants_from_session(session[:id], nil, @applicants)
     else
       return {generated: false,  msg: "Error: Invalid Session id."}
     end
   end
 
-  def assignments_from_session(session)
-    session_select = "SELECT p.id id FROM positions p WHERE p.session_id=#{session}"
-    sql="SELECT DISTINCT a.id FROM assignments a, (#{session_select}) p WHERE p.id=a.position_id ORDER BY a.id"
-    return get_plain_table_data(Assignment.all.includes([:position, :applicant]), sql)
+  def assignments_from_session(session, utorid = nil, table = nil)
+    positions = positions_from_session(session, utorid, false)
+    sql="SELECT DISTINCT a.id FROM assignments a, (#{positions}) p WHERE p.id=a.position_id"
+    return get_plain_table_data(table ? table : Assignment.all.includes([:position, :applicant]), sql)
   end
 
-  def applicants_from_session(session)
-    session_select = "SELECT p.id id FROM positions p WHERE p.session_id=#{session}"
-    pref_select = "SELECT DISTINCT pref.application_id id FROM preferences pref, (#{session_select}) p WHERE p.id=pref.position_id"
-    application_select="SELECT DISTINCT app.applicant_id id FROM applications app, (#{pref_select}) p WHERE p.id=app.id"
-    sql="SELECT DISTINCT app.id FROM applicants app, (#{application_select}) p WHERE p.id=app.id ORDER BY app.id"
-    return get_plain_table_data(Applicant.all, sql)
+  def applicants_from_session(session, utorid = nil, table = nil)
+    applications = applications_from_session(session, utorid, false)
+    sql="SELECT DISTINCT app.id FROM applicants app, (#{applications}) p WHERE p.id=app.id"
+    return get_plain_table_data(table ? table : Applicant.all, sql)
   end
 
-  def applications_from_session(session)
-    session_select = "SELECT p.id id FROM positions p WHERE p.session_id=#{session}"
-    pref_select = "SELECT DISTINCT pref.application_id id FROM preferences pref, (#{session_select}) p WHERE p.id=pref.position_id"
-    sql="SELECT DISTINCT app.id FROM applications app, (#{pref_select}) p WHERE p.id=app.id ORDER BY app.id"
-    return get_plain_table_data(Application.all.includes(:preferences), sql)
+  def applications_from_session(session, utorid = nil, data=true)
+    positions = positions_from_session(session, utorid, false)
+    pref_select = "SELECT DISTINCT pref.application_id id FROM preferences pref, (#{positions}) p WHERE p.id=pref.position_id"
+    sql="SELECT DISTINCT app.id FROM applications app, (#{pref_select}) p WHERE p.id=app.id"
+    return data ? get_plain_table_data(Application.all.includes(:preferences), sql) : sql
   end
 
-  def positions_from_session(session = nil)
-    if session
-      sql = "SELECT * FROM positions p WHERE p.session_id=#{session} ORDER BY p.id"
-      return get_plain_table_data(Position.all.includes(:instructors), sql)
+  def positions_from_session(session = nil, utorid = nil, data=true)
+    positions = utorid ? Position.all : Position.all.includes(:instructors)
+    if utorid
+      instructor_select = "SELECT id FROM instructors WHERE utorid='#{utorid}'"
+      instr_position_select = "SELECT a.position_id position_id FROM instructors_positions a, (#{instructor_select}) b WHERE a.instructor_id=b.id"
+      sql = "SELECT a.id id FROM positions a, (#{instr_position_select}) b WHERE a.id=b.position_id"
+      sql = session ? "#{sql} AND a.session_id=#{session}" : sql
+      puts sql
+      return data ? get_plain_table_data(positions, sql) : sql
     else
-      sql = "SELECT * FROM positions p ORDER BY p.id"
-      return get_plain_table_data(Position.all, sql).format
+      sql = "SELECT a.id id FROM positions a"
+      sql = session ? "#{sql} WHERE a.session_id=#{session}" : sql
+      puts sql
+      return data ? (!session ? positions : get_plain_table_data(positions, sql)) : sql
     end
   end
 
-  def offers_from_session(session)
-    offers = []
-    Offer.all.each do |offer|
-      position = Position.find(offer[:position_id])
-      if position[:session_id] == session.to_i
-        offers.push(offer)
-      end
-    end
-    return offers
+  def offers_from_session(session, utorid, data = true)
+    positions = positions_from_session(session, utorid, false)
+    sql = "SELECT a.id id FROM offers a, (#{positions}) b WHERE a.position_id=b.id"
+    return data ? get_plain_table_data(Offer.all, sql) : sql
   end
 
-  def ddahs_from_session(session)
-    ddahs = []
-    Ddah.all.each do |ddah|
-      offer = Offer.find(ddah[:offer_id])
-      position = Position.find(offer[:position_id])
-      if position[:session_id] == session.to_i
-        ddahs.push(ddah)
-      end
-    end
-    return ddahs
+  def ddahs_from_session(session, utorid)
+    offers = offers_from_session(session, utorid, false)
+    sql = "SELECT a.id id FROM ddahs a, (#{offers}) b WHERE a.offer_id=b.id"
+    return get_plain_table_data(Ddah.all, sql)
   end
 
   private
@@ -89,6 +83,5 @@ module SessionSeparate
       item[:id]
     end
   end
-
 
 end
