@@ -24,7 +24,7 @@ gem 'webpacker'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.5'
+gem 'jbuilder', '~> 2.8'
 # Use prawn to generate PDF files
 gem 'prawn', '~> 2.2'
 # Use Redis adapter to run Action Cable in production
