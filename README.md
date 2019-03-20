@@ -29,7 +29,7 @@ directory, and run
 docker-compose up
 ```
 
-In a new tab, open http://localhost:3000 to see the Rails welcome page!
+In a new tab, open http://localhost:3022 to see the Rails welcome page!
 
 `docker-compose up` has launched two containers: `rails-app`
 and `webpack-dev-server`. The former runs the Rails app, while the latter
@@ -42,7 +42,7 @@ You have full control over Rails code, apply the usual methods. Check the next
 section for details on running commands like `rake …` and `rails …`.
 
 To get you started with React quicker, this app comes preloaded with a simple
-React app. Visiting http://localhost:3000/hello_react will load JavaScript code
+React app. Visiting http://localhost:3022/hello_react will load JavaScript code
 located in `app/javascript/packs/hello_react.jsx`.
 
 ## Running commands

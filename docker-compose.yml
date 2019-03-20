@@ -25,7 +25,7 @@ services:
     networks:
       - default
     ports:
-      - "3000:3000"
+      - "3022:3022"
     links:
       - postgres
 

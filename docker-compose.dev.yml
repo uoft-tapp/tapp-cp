@@ -4,7 +4,7 @@ services:
     volumes:
       - .:/srv/app
     command: >
-      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3000 -P /dev/null
+      ./bin/rails-server-entrypoint -b 0.0.0.0 -p 3022 -P /dev/null
 
   webpack-dev-server:
     build: .
