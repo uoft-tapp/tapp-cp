@@ -1,5 +1,5 @@
-import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import React from "react";
+import { Table, Button } from "react-bootstrap";
 
 class DdahForm extends React.Component {
     render() {
@@ -8,23 +8,32 @@ class DdahForm extends React.Component {
         // check whether ddah for offer was selected, and if so, get related details
         let hours, offersCount, course, ddah;
         if (this.props.appState.isOfferSelected()) {
-            let offer = this.props.appState.getOffersList().get(this.props.selectedDdahId);
-            let position = offer.get('position');
+            let offer = this.props.appState
+                .getOffersList()
+                .get(this.props.selectedDdahId);
+            let position = offer.get("position");
 
-            hours = offer.get('hours');
+            hours = offer.get("hours");
             offersCount = this.props.appState.getOffersForCourse(position).size;
-            course = this.props.appState.getCoursesList().get(position.toString());
+            course = this.props.appState
+                .getCoursesList()
+                .get(position.toString());
 
             ddah = this.props.appState
                 .getDdahsList()
-                .find(ddah => ddah.get('offer') == this.props.selectedDdahId);
+                .find(ddah => ddah.get("offer") == this.props.selectedDdahId);
         }
 
         return (
             <div
                 id="ddah-container"
-                className={([null,'None', 'Created'].includes(this.props.status) ||
-                    this.props.appState.isTemplateSelected()) ? '' : 'disabled'}>
+                className={
+                    [null, "None", "Created"].includes(this.props.status) ||
+                    this.props.appState.isTemplateSelected()
+                        ? ""
+                        : "disabled"
+                }
+            >
                 <h3>Description of Duties and Allocation of Hours Form</h3>
                 <Header
                     ddahData={ddahWorksheet}
@@ -36,14 +45,19 @@ class DdahForm extends React.Component {
                 <Allocations ddahData={ddahWorksheet} {...this.props} />
                 <Training ddahData={ddahWorksheet} {...this.props} />
                 <Summary hours={hours} {...this.props} />
-                {this.props.appState.isOfferSelected() &&
-                    <Signatures ddahData={ddahWorksheet} ddah={ddah} {...this.props} />}
+                {this.props.appState.isOfferSelected() && (
+                    <Signatures
+                        ddahData={ddahWorksheet}
+                        ddah={ddah}
+                        {...this.props}
+                    />
+                )}
             </div>
         );
     }
 }
 
-const Header = props =>
+const Header = props => (
     <table id="ddah-header">
         <tbody>
             <tr>
@@ -54,7 +68,7 @@ const Header = props =>
                     <input
                         type="text"
                         readOnly
-                        value={props.ddah ? props.ddah.get('department') : ''}
+                        value={props.ddah ? props.ddah.get("department") : ""}
                         disabled={props.appState.isTemplateSelected()}
                     />
                 </td>
@@ -64,20 +78,25 @@ const Header = props =>
                 <td>
                     <select
                         value={
-                            props.ddahData.get('supervisorId') != null
-                                ? props.ddahData.get('supervisorId')
-                                : ''
+                            props.ddahData.get("supervisorId") != null
+                                ? props.ddahData.get("supervisorId")
+                                : ""
                         }
                         disabled={props.appState.isTemplateSelected()}
                         onChange={event =>
-                            props.appState.updateDdahWorksheet('supervisorId', event.target.value)}>
+                            props.appState.updateDdahWorksheet(
+                                "supervisorId",
+                                event.target.value
+                            )
+                        }
+                    >
                         <option />
                         {props.course &&
-                            props.course.get('instructors').map((instructor, key) =>
-                                <option value={key}>
-                                    {instructor}
-                                </option>
-                            )}
+                            props.course
+                                .get("instructors")
+                                .map((instructor, key) => (
+                                    <option value={key}>{instructor}</option>
+                                ))}
                     </select>
                 </td>
             </tr>
@@ -89,7 +108,7 @@ const Header = props =>
                     <input
                         type="text"
                         readOnly
-                        value={props.course ? props.course.get('code') : ''}
+                        value={props.course ? props.course.get("code") : ""}
                         disabled={props.appState.isTemplateSelected()}
                     />
                 </td>
@@ -101,9 +120,13 @@ const Header = props =>
                         type="number"
                         readOnly
                         value={
-                            props.course && props.course.get('estimatedEnrol') != null
-                                ? (props.course.get('estimatedEnrol') / props.offersCount).toFixed()
-                                : ''
+                            props.course &&
+                            props.course.get("estimatedEnrol") != null
+                                ? (
+                                      props.course.get("estimatedEnrol") /
+                                      props.offersCount
+                                  ).toFixed()
+                                : ""
                         }
                         disabled={props.appState.isTemplateSelected()}
                     />
@@ -117,7 +140,7 @@ const Header = props =>
                     <input
                         type="text"
                         readOnly
-                        value={props.course ? props.course.get('name') : ''}
+                        value={props.course ? props.course.get("name") : ""}
                         disabled={props.appState.isTemplateSelected()}
                     />
                 </td>
@@ -129,9 +152,10 @@ const Header = props =>
                         type="number"
                         readOnly
                         value={
-                            props.course && props.course.get('estimatedEnrol') != null
-                                ? props.course.get('estimatedEnrol')
-                                : ''
+                            props.course &&
+                            props.course.get("estimatedEnrol") != null
+                                ? props.course.get("estimatedEnrol")
+                                : ""
                         }
                         disabled={props.appState.isTemplateSelected()}
                     />
@@ -145,24 +169,27 @@ const Header = props =>
                     <input
                         type="text"
                         readOnly
-                        value={props.ddah ? props.ddah.get('tutCategory') : ''}
+                        value={props.ddah ? props.ddah.get("tutCategory") : ""}
                         disabled={props.appState.isTemplateSelected()}
                     />
                 </td>
                 <td rowSpan="2">
                     <small>
-                        Requires Training for Scaling Learning<br />Activities to Size of Tutorial
+                        Requires Training for Scaling Learning
+                        <br />
+                        Activities to Size of Tutorial
                     </small>
                 </td>
                 <td rowSpan="2">
                     <input
                         type="checkbox"
-                        checked={props.ddahData.get('requiresTraining') == true}
+                        checked={props.ddahData.get("requiresTraining") == true}
                         onChange={event =>
                             props.appState.updateDdahWorksheet(
-                                'requiresTraining',
+                                "requiresTraining",
                                 event.target.checked
-                            )}
+                            )
+                        }
                     />
                 </td>
             </tr>
@@ -173,24 +200,35 @@ const Header = props =>
                         type="radio"
                         id="optional"
                         name="optional"
-                        checked={props.ddahData.get('optional') == true}
+                        checked={props.ddahData.get("optional") == true}
                         onChange={event =>
-                            props.appState.updateDdahWorksheet('optional', event.target.checked)}
-                    />&nbsp;<label htmlFor="optional">Optional</label>&emsp;
+                            props.appState.updateDdahWorksheet(
+                                "optional",
+                                event.target.checked
+                            )
+                        }
+                    />
+                    &nbsp;<label htmlFor="optional">Optional</label>&emsp;
                     <input
                         type="radio"
                         id="mandatory"
                         name="optional"
-                        checked={props.ddahData.get('optional') == false}
+                        checked={props.ddahData.get("optional") == false}
                         onChange={event =>
-                            props.appState.updateDdahWorksheet('optional', !event.target.checked)}
-                    />&nbsp;<label htmlFor="mandatory">Mandatory</label>
+                            props.appState.updateDdahWorksheet(
+                                "optional",
+                                !event.target.checked
+                            )
+                        }
+                    />
+                    &nbsp;<label htmlFor="mandatory">Mandatory</label>
                 </td>
             </tr>
         </tbody>
-    </table>;
+    </table>
+);
 
-const Allocations = props =>
+const Allocations = props => (
     <Table condensed hover id="allocations-table">
         <thead>
             <tr className="title">
@@ -200,80 +238,94 @@ const Allocations = props =>
                 <th># of Units</th>
                 <th>Type of Duties</th>
                 <th>
-                    Type of Unit<br />
+                    Type of Unit
+                    <br />
                     <small>(e.g. assignments, tutorials, meetings, etc.)</small>
                 </th>
                 <th>
-                    Time/Task<br />
+                    Time/Task
+                    <br />
                     <small>(minutes)</small>
                 </th>
                 <th>
-                    Total Time<br />
+                    Total Time
+                    <br />
                     <small>(hours)</small>
                 </th>
             </tr>
         </thead>
         <tbody>
-            {props.ddahData.get('allocations').map((row, i) =>
-                <tr key={'allocation-' + i}>
+            {props.ddahData.get("allocations").map((row, i) => (
+                <tr key={"allocation-" + i}>
                     <td>
                         <input
                             type="number"
                             min="0"
-                            value={row.get('units') != null ? row.get('units') : ''}
+                            value={
+                                row.get("units") != null ? row.get("units") : ""
+                            }
                             onChange={event =>
                                 props.appState.updateDdahWorksheetAllocation(
                                     i,
-                                    'units',
+                                    "units",
                                     event.target.value
-                                )}
+                                )
+                            }
                         />
                     </td>
                     <td>
                         <select
-                            value={row.get('duty') != null ? row.get('duty') : ''}
+                            value={
+                                row.get("duty") != null ? row.get("duty") : ""
+                            }
                             onChange={event =>
                                 props.appState.updateDdahWorksheetAllocation(
                                     i,
-                                    'duty',
+                                    "duty",
                                     event.target.value
-                                )}>
+                                )
+                            }
+                        >
                             <option />
-                            {props.appState.getDutiesList().map((duty, id) =>
-                                <option value={id}>
-                                    {duty}
-                                </option>
-                            )}
+                            {props.appState.getDutiesList().map((duty, id) => (
+                                <option value={id}>{duty}</option>
+                            ))}
                         </select>
                     </td>
                     <td>
                         <input
                             type="text"
                             autoComplete="on"
-                            value={row.get('type') != null ? row.get('type') : ''}
+                            value={
+                                row.get("type") != null ? row.get("type") : ""
+                            }
                             onChange={event =>
                                 props.appState.updateDdahWorksheetAllocation(
                                     i,
-                                    'type',
+                                    "type",
                                     event.target.value
-                                )}
+                                )
+                            }
                         />
                     </td>
                     <td>
                         <input
                             type="number"
                             min="0"
-                            value={row.get('time') != null ? row.get('time') : ''}
+                            value={
+                                row.get("time") != null ? row.get("time") : ""
+                            }
                             onChange={event =>
                                 props.appState.updateDdahWorksheetAllocation(
                                     i,
-                                    'time',
+                                    "time",
                                     event.target.value
-                                )}
+                                )
+                            }
                         />
                     </td>
                     <td>
-                        {(row.get('units') * row.get('time') / 60).toFixed(2)}
+                        {((row.get("units") * row.get("time")) / 60).toFixed(2)}
                         <i
                             className="fa fa-minus-circle delete-button"
                             title="Delete row"
@@ -281,14 +333,18 @@ const Allocations = props =>
                         />
                     </td>
                 </tr>
-            )}
+            ))}
 
             <tr>
-                <td colSpan="5" style={{ backgroundColor: 'white', textAlign: 'left' }}>
+                <td
+                    colSpan="5"
+                    style={{ backgroundColor: "white", textAlign: "left" }}
+                >
                     <Button
                         bsSize="small"
                         bsStyle="info"
-                        onClick={() => props.appState.addAllocation()}>
+                        onClick={() => props.appState.addAllocation()}
+                    >
                         <b>+ Add row</b>
                     </Button>
                 </td>
@@ -301,12 +357,11 @@ const Allocations = props =>
                 <td />
                 <td />
                 <td />
-                <td>
-                    {props.appState.getDdahWorksheetTotal().toFixed(2)}
-                </td>
+                <td>{props.appState.getDdahWorksheetTotal().toFixed(2)}</td>
             </tr>
         </tbody>
-    </Table>;
+    </Table>
+);
 
 const Training = props => {
     let trainings = props.appState.getTrainingsList(),
@@ -324,24 +379,29 @@ const Training = props => {
                     <td>
                         <table className="sub-table">
                             <tbody>
-                                {trainings.map((training, i) =>
+                                {trainings.map((training, i) => (
                                     <tr>
                                         <td>
                                             <input
                                                 type="checkbox"
-                                                id={'training-' + i}
+                                                id={"training-" + i}
                                                 checked={props.ddahData
-                                                    .get('trainings')
+                                                    .get("trainings")
                                                     .includes(parseInt(i))}
                                                 onChange={event =>
                                                     props.appState.updateDdahWorksheet(
-                                                        'trainings',
+                                                        "trainings",
                                                         i
-                                                    )}
-                                            />&nbsp;<label htmlFor={'training-' + i}>{training}</label>
+                                                    )
+                                                }
+                                            />
+                                            &nbsp;
+                                            <label htmlFor={"training-" + i}>
+                                                {training}
+                                            </label>
                                         </td>
                                     </tr>
-                                )}
+                                ))}
                             </tbody>
                         </table>
                     </td>
@@ -349,26 +409,34 @@ const Training = props => {
                         <table className="sub-table">
                             <tbody>
                                 <tr>
-                                    <td>Indicate Tutorial Category (1 primary activity)</td>
+                                    <td>
+                                        Indicate Tutorial Category (1 primary
+                                        activity)
+                                    </td>
                                 </tr>
-                                {categories.map((category, i) =>
+                                {categories.map((category, i) => (
                                     <tr>
                                         <td>
                                             <input
                                                 type="checkbox"
-                                                id={'category-' + i}
+                                                id={"category-" + i}
                                                 checked={props.ddahData
-                                                    .get('categories')
+                                                    .get("categories")
                                                     .includes(parseInt(i))}
                                                 onChange={event =>
                                                     props.appState.updateDdahWorksheet(
-                                                        'categories',
+                                                        "categories",
                                                         i
-                                                    )}
-                                            />&nbsp;<label htmlFor={'category-' + i}>{category}</label>
+                                                    )
+                                                }
+                                            />
+                                            &nbsp;
+                                            <label htmlFor={"category-" + i}>
+                                                {category}
+                                            </label>
                                         </td>
                                     </tr>
-                                )}
+                                ))}
                             </tbody>
                         </table>
                     </td>
@@ -390,33 +458,29 @@ const Summary = props => {
                 <tr>
                     <th>Duties</th>
                     <th>
-                        Time<br />
+                        Time
+                        <br />
                         <small>(hours)</small>
                     </th>
                 </tr>
             </thead>
             <tbody>
-                {props.appState.getDutiesSummary().map((duty, i) =>
-                    <tr key={'duty-' + i}>
-                        <td>
-                            {duties.get(i)}
-                        </td>
-                        <td>
-                            {duty.toFixed(2)}
-                        </td>
+                {props.appState.getDutiesSummary().map((duty, i) => (
+                    <tr key={"duty-" + i}>
+                        <td>{duties.get(i)}</td>
+                        <td>{duty.toFixed(2)}</td>
                     </tr>
-                )}
+                ))}
                 <tr>
                     <td>
                         <b>Total</b>
-                        {props.appState.isOfferSelected() &&
-                            <span style={{ float: 'right', color: 'blue' }}>
+                        {props.appState.isOfferSelected() && (
+                            <span style={{ float: "right", color: "blue" }}>
                                 Expected: {props.hours.toFixed(2)}
-                            </span>}
+                            </span>
+                        )}
                     </td>
-                    <td>
-                        {props.appState.getDdahWorksheetTotal().toFixed(2)}
-                    </td>
+                    <td>{props.appState.getDdahWorksheetTotal().toFixed(2)}</td>
                 </tr>
             </tbody>
         </Table>
@@ -434,9 +498,9 @@ const Signatures = props => {
                         <input
                             type="text"
                             value={
-                                props.ddahData.get('supervisor')
-                                    ? props.ddahData.get('supervisor')
-                                    : ''
+                                props.ddahData.get("supervisor")
+                                    ? props.ddahData.get("supervisor")
+                                    : ""
                             }
                             readOnly
                         />
@@ -452,9 +516,9 @@ const Signatures = props => {
                             type="text"
                             readOnly
                             value={
-                                props.ddah.get('superSignature')
-                                    ? props.ddah.get('superSignature')
-                                    : ''
+                                props.ddah.get("superSignature")
+                                    ? props.ddah.get("superSignature")
+                                    : ""
                             }
                         />
                         <br />
@@ -467,9 +531,11 @@ const Signatures = props => {
                             type="text"
                             readOnly
                             value={
-                                props.ddah.get('superSignDate')
-                                    ? new Date(props.ddah.get('superSignDate')).toLocaleDateString()
-                                    : ''
+                                props.ddah.get("superSignDate")
+                                    ? new Date(
+                                          props.ddah.get("superSignDate")
+                                      ).toLocaleDateString()
+                                    : ""
                             }
                         />
                     </td>
@@ -477,15 +543,19 @@ const Signatures = props => {
 
                 <tr>
                     <td>
-                        <input type="text" readOnly
-                        value={
-                            props.appState.getTaCoordinator()
-                                ? props.appState.getTaCoordinator()
-                                : ''
-                        }/>
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                props.appState.getTaCoordinator()
+                                    ? props.appState.getTaCoordinator()
+                                    : ""
+                            }
+                        />
                         <br />
                         <span className="input-label">
-                            &ensp;Prepared by <i>(Chair/Designated Authority)</i>
+                            &ensp;Prepared by{" "}
+                            <i>(Chair/Designated Authority)</i>
                         </span>
                     </td>
 
@@ -494,9 +564,9 @@ const Signatures = props => {
                             type="text"
                             readOnly
                             value={
-                                props.ddah.get('authSignature')
-                                    ? props.ddah.get('authSignature')
-                                    : ''
+                                props.ddah.get("authSignature")
+                                    ? props.ddah.get("authSignature")
+                                    : ""
                             }
                         />
                         <br />
@@ -509,9 +579,11 @@ const Signatures = props => {
                             type="text"
                             readOnly
                             value={
-                                props.ddah.get('authSignDate')
-                                    ? new Date(props.ddah.get('authSignDate')).toLocaleDateString()
-                                    : ''
+                                props.ddah.get("authSignDate")
+                                    ? new Date(
+                                          props.ddah.get("authSignDate")
+                                      ).toLocaleDateString()
+                                    : ""
                             }
                         />
                     </td>
@@ -521,7 +593,11 @@ const Signatures = props => {
                     <td>
                         <input
                             type="text"
-                            value={offer.get('lastName') + ', ' + offer.get('firstName')}
+                            value={
+                                offer.get("lastName") +
+                                ", " +
+                                offer.get("firstName")
+                            }
                             readOnly
                         />
                         <br />
@@ -535,9 +611,9 @@ const Signatures = props => {
                             type="text"
                             readOnly
                             value={
-                                props.ddah.get('studentSignature')
-                                    ? props.ddah.get('studentSignature')
-                                    : ''
+                                props.ddah.get("studentSignature")
+                                    ? props.ddah.get("studentSignature")
+                                    : ""
                             }
                         />
                         <br />
@@ -550,11 +626,11 @@ const Signatures = props => {
                             type="text"
                             readOnly
                             value={
-                                props.ddah.get('studentSignDate')
+                                props.ddah.get("studentSignDate")
                                     ? new Date(
-                                          props.ddah.get('studentSignDate')
+                                          props.ddah.get("studentSignDate")
                                       ).toLocaleDateString()
-                                    : ''
+                                    : ""
                             }
                         />
                     </td>

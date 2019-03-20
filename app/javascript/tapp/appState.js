@@ -1,8 +1,8 @@
-import React from 'react';
-import { fromJS, isImmutable } from 'immutable';
+import React from "react";
+import { fromJS, isImmutable } from "immutable";
 
-import * as fetch from './fetch.js';
-import { routeConfig } from './routeConfig.js';
+import * as fetch from "./fetch.js";
+import { routeConfig } from "./routeConfig.js";
 
 const initialState = {
     // navbar component
@@ -14,7 +14,7 @@ const initialState = {
         selectedTab: null,
 
         // list of unread notifications (string can contain HTML, but be careful because it is not sanitized!)
-        notifications: [],
+        notifications: []
     },
 
     // list of UI alerts (string can contain HTML, but be careful because it is not sanitized!)
@@ -37,40 +37,40 @@ const initialState = {
         panelLayout: 0,
 
         // will be populated with mappings of selected courses to their selected sort and filter fields
-        panelFields: {},
+        panelFields: {}
     },
 
     // assigned view
     assignedView: {
         // will be populated with selected sort and filter fields
         selectedSortFields: [],
-        selectedFilters: {},
+        selectedFilters: {}
     },
 
     // unassigned view
     unassignedView: {
         // will be populated with selected sort and filter fields
         selectedSortFields: [],
-        selectedFilters: {},
+        selectedFilters: {}
     },
 
     // assignment form used by applicant view
     assignmentForm: {
         panels: [],
-        tempAssignments: [],
+        tempAssignments: []
     },
 
     // instructor Modal
     instructorModal: {
-      open: false,
-      selectedTab: 'create',
-      alert: null,
-      instructor: {
-        id: null,
-        utorid: null,
-        name: null,
-        email: null,
-      },
+        open: false,
+        selectedTab: "create",
+        alert: null,
+        instructor: {
+            id: null,
+            utorid: null,
+            name: null,
+            email: null
+        }
     },
 
     /** DB data **/
@@ -82,7 +82,7 @@ const initialState = {
     instructors: { fetching: 0, list: null },
     sessions: { fetching: 0, list: null },
 
-    importing: 0,
+    importing: 0
 };
 
 class AppState {
@@ -93,7 +93,8 @@ class AppState {
         // list of change listeners
         this._listeners = [];
         // notify listeners of change
-        var notifyListeners = () => this._listeners.forEach(listener => listener());
+        var notifyListeners = () =>
+            this._listeners.forEach(listener => listener());
 
         // parses a property path into a list, as expected by Immutable
         var parsePath = path =>
@@ -121,7 +122,8 @@ class AppState {
             if (arguments.length == 1) {
                 _data = _data.withMutations(map => {
                     Object.entries(property).reduce(
-                        (result, [prop, val]) => result.setIn(parsePath(prop), val),
+                        (result, [prop, val]) =>
+                            result.setIn(parsePath(prop), val),
                         map
                     );
                 });
@@ -134,7 +136,9 @@ class AppState {
         };
 
         this.add = function(property, value) {
-            _data = _data.updateIn(parsePath(property), array => array.push(value));
+            _data = _data.updateIn(parsePath(property), array =>
+                array.push(value)
+            );
 
             // notify listener(s) of change
             notifyListeners();
@@ -162,13 +166,18 @@ class AppState {
     // note that we do not allow multiple sorts on the same field (incl. in different directions)
     addCoursePanelSort(course, field) {
         if (
-            !this.get('abcView.panelFields.' + course + '.selectedFilters').some(
-                ([f, _]) => f == field
-            )
+            !this.get(
+                "abcView.panelFields." + course + ".selectedFilters"
+            ).some(([f, _]) => f == field)
         ) {
-            this.add('abcView.panelFields.' + course + '.selectedSortFields', fromJS([field, 1]));
+            this.add(
+                "abcView.panelFields." + course + ".selectedSortFields",
+                fromJS([field, 1])
+            );
         } else {
-            this.alert('<b>Applicant Table</b>&ensp;Cannot apply the same sort more than once.');
+            this.alert(
+                "<b>Applicant Table</b>&ensp;Cannot apply the same sort more than once."
+            );
         }
     }
 
@@ -177,149 +186,159 @@ class AppState {
     addSort(field) {
         let view = this.getSelectedViewStateComponent();
 
-        if (!this.get(view + '.selectedSortFields').some(([f, _]) => f == field)) {
-            this.add(view + '.selectedSortFields', fromJS([field, 1]));
+        if (
+            !this.get(view + ".selectedSortFields").some(([f, _]) => f == field)
+        ) {
+            this.add(view + ".selectedSortFields", fromJS([field, 1]));
         } else {
-            this.alert('<b>Applicant Table</b>&ensp;Cannot apply the same sort more than once.');
+            this.alert(
+                "<b>Applicant Table</b>&ensp;Cannot apply the same sort more than once."
+            );
         }
     }
 
     // add a temporary assignment through the assignment form of the applicant view
     addTempAssignment(positionId, hours) {
         this.add(
-            'assignmentForm.tempAssignments',
+            "assignmentForm.tempAssignments",
             fromJS({ positionId: positionId, hours: hours })
         );
     }
 
     // add an alert to the list of active alerts
     alert(text) {
-        if(this.instructorModalOpen()){
-          this.setInstructorModalAlert(text);
-        }
-        else {
-          let alerts = this.get('alerts');
-          // give it an id that is 1 larger than the largest id in the array, or 0 if the array is empty
-          this.add(
-              'alerts',
-              fromJS({
-                  id: alerts.size > 0 ? alerts.last().get('id') + 1 : 0,
-                  text: text,
-              })
-          );
+        if (this.instructorModalOpen()) {
+            this.setInstructorModalAlert(text);
+        } else {
+            let alerts = this.get("alerts");
+            // give it an id that is 1 larger than the largest id in the array, or 0 if the array is empty
+            this.add(
+                "alerts",
+                fromJS({
+                    id: alerts.size > 0 ? alerts.last().get("id") + 1 : 0,
+                    text: text
+                })
+            );
         }
     }
 
     // check whether any of the given filters in the category are selected on the applicant table in a course panel
     anyCoursePanelFilterSelected(course, field) {
-        return this.get('abcView.panelFields.' + course + '.selectedFilters').has(field);
+        return this.get(
+            "abcView.panelFields." + course + ".selectedFilters"
+        ).has(field);
     }
 
     // check whether any of the given filters in the category are selected on the applicant table in a
     // single-applicant-table view
     anyFilterSelected(field) {
         let view = this.getSelectedViewStateComponent();
-        return this.get(view + '.selectedFilters').has(field);
+        return this.get(view + ".selectedFilters").has(field);
     }
 
     // remove all selected filters on the applicant table in a course panel
     clearCoursePanelFilters(course) {
-        this.set('abcView.panelFields.' + course + '.selectedFilters', fromJS({}));
+        this.set(
+            "abcView.panelFields." + course + ".selectedFilters",
+            fromJS({})
+        );
     }
 
     // remove all selected filters on the applicant table in a single-applicant-table view
     clearFilters() {
         let view = this.getSelectedViewStateComponent();
-        this.set(view + '.selectedFilters', fromJS({}));
+        this.set(view + ".selectedFilters", fromJS({}));
     }
 
     createAssignmentForm(panels) {
-        this.set('assignmentForm.panels', panels);
+        this.set("assignmentForm.panels", panels);
     }
 
     dismissAlert(id) {
-        let alerts = this.get('alerts');
-        let i = alerts.findIndex(alert => alert.get('id') == id);
+        let alerts = this.get("alerts");
+        let i = alerts.findIndex(alert => alert.get("id") == id);
 
         if (i != -1) {
-            this.remove('alerts', i);
+            this.remove("alerts", i);
         }
     }
 
     // remove currently-selected courses that are not part of the currently-selected round
     filterSelectedCourses() {
-        let selected = this.get('abcView.selectedCourses'),
+        let selected = this.get("abcView.selectedCourses"),
             courses = this.getCoursesList();
 
         let newSelected = selected.filter(course => courses.has(course));
 
         if (selected.size != newSelected.size) {
-            this.set('abcView.selectedCourses', newSelected);
+            this.set("abcView.selectedCourses", newSelected);
         }
     }
 
     getAlerts() {
-        return this.get('alerts');
+        return this.get("alerts");
     }
 
     getAssignmentForm() {
-        return this.get('assignmentForm');
+        return this.get("assignmentForm");
     }
 
     getCoursePanelFiltersByCourse(course) {
-        return this.get('abcView.panelFields.' + course + '.selectedFilters');
+        return this.get("abcView.panelFields." + course + ".selectedFilters");
     }
 
     getCoursePanelLayout() {
-        return this.get('abcView.panelLayout');
+        return this.get("abcView.panelLayout");
     }
 
     getCoursePanelSortsByCourse(course) {
-        return this.get('abcView.panelFields.' + course + '.selectedSortFields');
+        return this.get(
+            "abcView.panelFields." + course + ".selectedSortFields"
+        );
     }
 
     getCurrentUserName() {
-        return this.get('nav.user');
+        return this.get("nav.user");
     }
 
     getCurrentUserRoles() {
-        return this.get('nav.roles');
+        return this.get("nav.roles");
     }
 
     getFilters() {
         let view = this.getSelectedViewStateComponent();
-        return this.get(view + '.selectedFilters');
+        return this.get(view + ".selectedFilters");
     }
 
     getSelectedApplicant() {
-        return this.get('selectedApplicant');
+        return this.get("selectedApplicant");
     }
 
     getSelectedCourses() {
-        return this.get('abcView.selectedCourses');
+        return this.get("abcView.selectedCourses");
     }
 
     getSelectedNavTab() {
-        return this.get('nav.selectedTab');
+        return this.get("nav.selectedTab");
     }
 
     getSelectedRound() {
-        return this.get('selectedRound');
+        return this.get("selectedRound");
     }
 
     getSelectedUserRole() {
-        return this.get('nav.selectedRole');
+        return this.get("nav.selectedRole");
     }
 
     // return the name of the appState component that corresponds to the currently selected view
     getSelectedViewStateComponent() {
-        switch (this.get('nav.selectedTab')) {
+        switch (this.get("nav.selectedTab")) {
             case routeConfig.abc.id:
-                return 'abcView';
+                return "abcView";
             case routeConfig.assigned.id:
-                return 'assignedView';
+                return "assignedView";
             case routeConfig.unassigned.id:
-                return 'unassignedView';
+                return "unassignedView";
             default:
                 return null;
         }
@@ -327,125 +346,129 @@ class AppState {
 
     getSorts() {
         let view = this.getSelectedViewStateComponent();
-        return this.get(view + '.selectedSortFields');
+        return this.get(view + ".selectedSortFields");
     }
 
     getTempAssignments() {
-        return this.get('assignmentForm.tempAssignments');
+        return this.get("assignmentForm.tempAssignments");
     }
 
     getUnreadNotifications() {
-        return this.get('nav.notifications');
+        return this.get("nav.notifications");
     }
 
     // check whether a filter is selected on the applicant table in a course panel
     isCoursePanelFilterSelected(course, field, category) {
-        let filters = this.get('abcView.panelFields.' + course + '.selectedFilters');
+        let filters = this.get(
+            "abcView.panelFields." + course + ".selectedFilters"
+        );
 
         return filters.has(field) && filters.get(field).includes(category);
     }
 
     // check whether a course in the course menu is selected
     isCourseSelected(course) {
-        return this.get('abcView.selectedCourses').includes(course);
+        return this.get("abcView.selectedCourses").includes(course);
     }
 
     // check whether a filter is selected on the applicant table in a single-applicant-table view
     isFilterSelected(field, category) {
         let view = this.getSelectedViewStateComponent();
-        let filters = this.get(view + '.selectedFilters');
+        let filters = this.get(view + ".selectedFilters");
 
         return filters.has(field) && filters.get(field).includes(category);
     }
 
     // check whether a panel is expanded in the applicant view
     isPanelExpanded(index) {
-        return this.get('assignmentForm.panels[' + index + '].expanded');
+        return this.get("assignmentForm.panels[" + index + "].expanded");
     }
 
     // add a notification to the list of unread notifications
     notify(text) {
-        this.add('nav.notifications', text);
+        this.add("nav.notifications", text);
     }
 
     // clear the list of unread notifications
     readNotifications() {
-        this.set('nav.notifications', fromJS([]));
+        this.set("nav.notifications", fromJS([]));
     }
 
     // remove a sort from the applicant table in a course panel
     removeCoursePanelSort(course, field) {
-        let i = this.get('abcView.panelFields.' + course + '.selectedSortFields').findIndex(
-            f => f.get(0) == field
-        );
-        this.remove('abcView.panelFields.' + course + '.selectedSortFields', i);
+        let i = this.get(
+            "abcView.panelFields." + course + ".selectedSortFields"
+        ).findIndex(f => f.get(0) == field);
+        this.remove("abcView.panelFields." + course + ".selectedSortFields", i);
     }
 
     // remove a sort from the applicant table in a single-applicant-table view
     removeSort(field) {
         let view = this.getSelectedViewStateComponent();
 
-        let i = this.get(view + '.selectedSortFields').findIndex(f => f.get(0) == field);
-        this.remove(view + '.selectedSortFields', i);
+        let i = this.get(view + ".selectedSortFields").findIndex(
+            f => f.get(0) == field
+        );
+        this.remove(view + ".selectedSortFields", i);
     }
 
     // remove a temporary assignment from the assignment form of the applicant view
     removeTempAssignment(course) {
-        let i = this.get('assignmentForm.tempAssignments').findIndex(
-            ass => ass.get('positionId') == course
+        let i = this.get("assignmentForm.tempAssignments").findIndex(
+            ass => ass.get("positionId") == course
         );
-        this.remove('assignmentForm.tempAssignments', i);
+        this.remove("assignmentForm.tempAssignments", i);
     }
 
     // select an applicant to display in the applicant view
     selectApplicant(applicant) {
-        this.set('selectedApplicant', applicant);
+        this.set("selectedApplicant", applicant);
     }
 
     // select a navbar tab
     selectNavTab(eventKey) {
-        this.set('nav.selectedTab', eventKey);
+        this.set("nav.selectedTab", eventKey);
     }
 
     // select a round to display
     selectRound(round) {
-        this.set('selectedRound', round);
+        this.set("selectedRound", round);
     }
 
     selectSingleCourse(course) {
         // Note: toString() is a hack because our components think that course IDs are numbers but Immutable
         // thinks they are strings
-        this.set('abcView.selectedCourses', fromJS([course.toString()]));
+        this.set("abcView.selectedCourses", fromJS([course.toString()]));
     }
 
     selectUserRole(role) {
-        this.set('nav.selectedRole', role);
+        this.set("nav.selectedRole", role);
     }
 
     // set the course panel layout in the ABC view
     setCoursePanelLayout(layout) {
-        this.set('abcView.panelLayout', layout);
+        this.set("abcView.panelLayout", layout);
     }
 
     setCurrentUserName(user) {
-        this.set('nav.user', user);
+        this.set("nav.user", user);
     }
 
     setCurrentUserRoles(roles) {
-        this.set('nav.roles', roles);
+        this.set("nav.roles", roles);
     }
 
     // change the number of hours of a temporary assignment
     setTempAssignmentHours(id, hours) {
-        let i = this.get('assignmentForm.tempAssignments').findIndex(
-            ass => ass.get('positionId') == id
+        let i = this.get("assignmentForm.tempAssignments").findIndex(
+            ass => ass.get("positionId") == id
         );
-        this.set('assignmentForm.tempAssignments[' + i + '].hours', hours);
+        this.set("assignmentForm.tempAssignments[" + i + "].hours", hours);
     }
 
     // switch the places of two courses in the course panel layout in the ABC view
     swapCoursesInLayout(course1, course2) {
-        let selected = this.get('abcView.selectedCourses'),
+        let selected = this.get("abcView.selectedCourses"),
             i1,
             i2;
 
@@ -458,14 +481,16 @@ class AppState {
         }
 
         this.set({
-            ['abcView.selectedCourses[' + i1 + ']']: selected.get(i2),
-            ['abcView.selectedCourses[' + i2 + ']']: selected.get(i1),
+            ["abcView.selectedCourses[" + i1 + "]"]: selected.get(i2),
+            ["abcView.selectedCourses[" + i2 + "]"]: selected.get(i1)
         });
     }
 
     // toggle a filter on the applicant table in a course panel
     toggleCoursePanelFilter(course, field, category) {
-        let filters = this.get('abcView.panelFields.' + course + '.selectedFilters');
+        let filters = this.get(
+            "abcView.panelFields." + course + ".selectedFilters"
+        );
 
         // filter is already applied
         if (filters.has(field)) {
@@ -474,20 +499,38 @@ class AppState {
             if (i == -1) {
                 // filter on this category is not already applied
                 this.add(
-                    'abcView.panelFields.' + course + '.selectedFilters[' + field + ']',
+                    "abcView.panelFields." +
+                        course +
+                        ".selectedFilters[" +
+                        field +
+                        "]",
                     category
                 );
             } else if (filters.get(field).size > 1) {
                 // filter on this category is already applied, along with other categories
-                this.remove('abcView.panelFields.' + course + '.selectedFilters[' + field + ']', i);
+                this.remove(
+                    "abcView.panelFields." +
+                        course +
+                        ".selectedFilters[" +
+                        field +
+                        "]",
+                    i
+                );
             } else {
                 // filter is only applied on this category
-                this.remove('abcView.panelFields.' + course + '.selectedFilters', field);
+                this.remove(
+                    "abcView.panelFields." + course + ".selectedFilters",
+                    field
+                );
             }
         } else {
             // filter has not been applied
             this.set(
-                'abcView.panelFields.' + course + '.selectedFilters[' + field + ']',
+                "abcView.panelFields." +
+                    course +
+                    ".selectedFilters[" +
+                    field +
+                    "]",
                 fromJS([category])
             );
         }
@@ -495,12 +538,18 @@ class AppState {
 
     // toggle the sort direction of the sort currently applied to the applicant table in a course panel
     toggleCoursePanelSortDir(course, field) {
-        let sortFields = this.get('abcView.panelFields.' + course + '.selectedSortFields');
+        let sortFields = this.get(
+            "abcView.panelFields." + course + ".selectedSortFields"
+        );
         let i = sortFields.findIndex(f => f.get(0) == field);
 
         if (i != -1) {
             this.set(
-                'abcView.panelFields.' + course + '.selectedSortFields[' + i + '][1]',
+                "abcView.panelFields." +
+                    course +
+                    ".selectedSortFields[" +
+                    i +
+                    "][1]",
                 -sortFields.get(i).get(1)
             );
         }
@@ -509,69 +558,80 @@ class AppState {
     // toggle a filter on the applicant table in a single-applicant-table view
     toggleFilter(field, category) {
         let view = this.getSelectedViewStateComponent();
-        let filters = this.get(view + '.selectedFilters');
+        let filters = this.get(view + ".selectedFilters");
 
         if (filters.has(field)) {
             let i = filters.get(field).indexOf(category);
 
             if (i == -1) {
                 // filter on this category is not already applied
-                this.add(view + '.selectedFilters[' + field + ']', category);
+                this.add(view + ".selectedFilters[" + field + "]", category);
             } else if (filters.get(field).size > 1) {
                 // filter on this category is already applied, along with other categories
-                this.remove(view + '.selectedFilters[' + field + ']', i);
+                this.remove(view + ".selectedFilters[" + field + "]", i);
             } else {
                 // filter is only applied on this category
-                this.remove(view + '.selectedFilters', field);
+                this.remove(view + ".selectedFilters", field);
             }
         } else {
-            this.set(view + '.selectedFilters[' + field + ']', fromJS([category]));
+            this.set(
+                view + ".selectedFilters[" + field + "]",
+                fromJS([category])
+            );
         }
     }
 
     // toggle the expanded state of a panel in the applicant assignment form component
     togglePanelExpanded(index) {
-        this.set('assignmentForm.panels[' + index + '].expanded', !this.isPanelExpanded(index));
+        this.set(
+            "assignmentForm.panels[" + index + "].expanded",
+            !this.isPanelExpanded(index)
+        );
     }
 
     // toggle the selected state of the course that is clicked
     // note that we only allow up to 4 courses to be selected in the ABC view
     toggleSelectedCourse(course) {
-        let selected = this.get('abcView.selectedCourses');
+        let selected = this.get("abcView.selectedCourses");
         let i = selected.indexOf(course);
 
         if (i == -1) {
             if (selected.size < 4) {
-                this.add('abcView.selectedCourses', course);
+                this.add("abcView.selectedCourses", course);
             } else {
-                this.alert('<b>Courses Menu</b>&ensp;Cannot select more than 4 courses.');
+                this.alert(
+                    "<b>Courses Menu</b>&ensp;Cannot select more than 4 courses."
+                );
             }
         } else {
-            this.remove('abcView.selectedCourses', i);
+            this.remove("abcView.selectedCourses", i);
         }
     }
 
     // toggle the sort direction of the sort currently applied to the applicant table in a single-applicant-table view
     toggleSortDir(field) {
         let view = this.getSelectedViewStateComponent();
-        let sortFields = this.get(view + '.selectedSortFields');
+        let sortFields = this.get(view + ".selectedSortFields");
         let i = sortFields.findIndex(f => f.get(0) == field);
 
         if (i != -1) {
-            this.set(view + '.selectedSortFields[' + i + '][1]', -sortFields.get(i).get(1));
+            this.set(
+                view + ".selectedSortFields[" + i + "][1]",
+                -sortFields.get(i).get(1)
+            );
         }
     }
 
     // unselect the applicant displayed in the applicant view
     unselectApplicant() {
-        this.set('selectedApplicant', null);
+        this.set("selectedApplicant", null);
     }
 
     // check whether a panelFields object exists for each of the currently selected courses
     // if not, create the appropriate panelFields
     updateCoursePanelFields() {
-        let selected = this.get('abcView.selectedCourses'),
-            panelFields = this.get('abcView.panelFields'),
+        let selected = this.get("abcView.selectedCourses"),
+            panelFields = this.get("abcView.panelFields"),
             missingCourses = [];
 
         for (var course of selected.values()) {
@@ -596,7 +656,7 @@ class AppState {
         });
 
         if (missingCourses.length > 0) {
-            this.set('abcView.panelFields', newPanelFields);
+            this.set("abcView.panelFields", newPanelFields);
         }
     }
 
@@ -605,67 +665,65 @@ class AppState {
      ******************************/
 
     addInstructor(courseId, instructorId) {
-        let val = this.getCoursesList().get(courseId.toString()).get('instructors').toJS();
+        let val = this.getCoursesList()
+            .get(courseId.toString())
+            .get("instructors")
+            .toJS();
         val.push(parseInt(instructorId));
         fetch.updateCourse(courseId, { instructors: val });
     }
 
     // check if any data is being fetched
     anyFetching() {
-      let role = this.getSelectedUserRole();
-      switch(role){
-        case 'tapp_admin':
-          return [
-              this.get('sessions.fetching'),
-              this.get('courses.fetching'),
-              this.get('instructors.fetching'),
-              this.get('applicants.fetching'),
-              this.get('applications.fetching'),
-              this.get('assignments.fetching'),
-          ].some(val => val > 0);
-        case 'tapp_assistant':
-          return [
-              this.get('sessions.fetching'),
-          ].some(val => val > 0);
-        case 'instructor':
-          return [
-              this.get('sessions.fetching'),
-              this.get('courses.fetching'),
-              this.get('applicants.fetching'),
-              this.get('applications.fetching'),
-              this.get('assignments.fetching'),
-          ].some(val => val > 0);
-      }
+        let role = this.getSelectedUserRole();
+        switch (role) {
+            case "tapp_admin":
+                return [
+                    this.get("sessions.fetching"),
+                    this.get("courses.fetching"),
+                    this.get("instructors.fetching"),
+                    this.get("applicants.fetching"),
+                    this.get("applications.fetching"),
+                    this.get("assignments.fetching")
+                ].some(val => val > 0);
+            case "tapp_assistant":
+                return [this.get("sessions.fetching")].some(val => val > 0);
+            case "instructor":
+                return [
+                    this.get("sessions.fetching"),
+                    this.get("courses.fetching"),
+                    this.get("applicants.fetching"),
+                    this.get("applications.fetching"),
+                    this.get("assignments.fetching")
+                ].some(val => val > 0);
+        }
     }
 
     // check if any data has not yet been fetched
     anyNull() {
-      let role = this.getSelectedUserRole();
-      switch(role){
-        case 'tapp_admin':
-          return [
-              this.get('sessions.list'),
-              this.get('courses.list'),
-              this.get('instructors.list'),
-              this.get('applicants.list'),
-              this.get('applications.list'),
-              this.get('assignments.list'),
-          ].some(val => val == null);
-        case 'tapp_assistant':
-          return [
-              this.get('sessions.list'),
-          ].some(val => val == null);
-        case 'instructor':
-          return [
-              this.get('sessions.list'),
-              this.get('courses.list'),
-              this.get('applicants.list'),
-              this.get('applications.list'),
-              this.get('assignments.list'),
-          ].some(val => val == null);
-      }
+        let role = this.getSelectedUserRole();
+        switch (role) {
+            case "tapp_admin":
+                return [
+                    this.get("sessions.list"),
+                    this.get("courses.list"),
+                    this.get("instructors.list"),
+                    this.get("applicants.list"),
+                    this.get("applications.list"),
+                    this.get("assignments.list")
+                ].some(val => val == null);
+            case "tapp_assistant":
+                return [this.get("sessions.list")].some(val => val == null);
+            case "instructor":
+                return [
+                    this.get("sessions.list"),
+                    this.get("courses.list"),
+                    this.get("applicants.list"),
+                    this.get("applications.list"),
+                    this.get("assignments.list")
+                ].some(val => val == null);
+        }
     }
-
 
     // create a new assignment
     createAssignment(applicant, course, hours) {
@@ -679,40 +737,40 @@ class AppState {
 
     // export current assignments
     exportOffers(session) {
-        fetch.exportOffers(this.get('selectedRound'), session);
+        fetch.exportOffers(this.get("selectedRound"), session);
     }
 
-    downloadFile(route){
+    downloadFile(route) {
         fetch.downloadFile(route);
     }
 
-    fetchingSessions(){
-        return this.get('sessions.fetching') > 0;
+    fetchingSessions() {
+        return this.get("sessions.fetching") > 0;
     }
 
     // check if applicants are being fetched
     fetchingApplicants() {
-        return this.get('applicants.fetching') > 0;
+        return this.get("applicants.fetching") > 0;
     }
 
     // check if applications are being fetched
     fetchingApplications() {
-        return this.get('applications.fetching') > 0;
+        return this.get("applications.fetching") > 0;
     }
 
     // check if assignments are being fetched
     fetchingAssignments() {
-        return this.get('assignments.fetching') > 0;
+        return this.get("assignments.fetching") > 0;
     }
 
     // check if courses are being fetched
     fetchingCourses() {
-        return this.get('courses.fetching') > 0;
+        return this.get("courses.fetching") > 0;
     }
 
     // check if instructors are being fetched
     fetchingInstructors() {
-        return this.get('instructors.fetching') > 0;
+        return this.get("instructors.fetching") > 0;
     }
 
     // get applicants who are assigned to course; returns a list of [applicantID, applicantData]
@@ -724,7 +782,9 @@ class AppState {
             .filter(
                 (_, app) =>
                     assignments.has(app) &&
-                    assignments.get(app).some(ass => ass.get('positionId') == course)
+                    assignments
+                        .get(app)
+                        .some(ass => ass.get("positionId") == course)
             )
             .entrySeq();
     }
@@ -735,163 +795,188 @@ class AppState {
         return this.getApplicantsList().get(applicant.toString());
     }
 
-    getInstructorDataFromModal(key = null, trim = false){
-      if (key){
-        let result = this.get('instructorModal.instructor.'+key)?
-          this.get('instructorModal.instructor.'+key): '';
-        return trim?result.trim():result;
-      }
-      else {
-        let id = this.getInstructorDataFromModal('id', true);
-        return {
-            id: (id==''||!id)? null: parseInt(id),
-            utorid: this.getInstructorDataFromModal('utorid', true),
-            name: this.getInstructorDataFromModal('name', true),
-            email: this.getInstructorDataFromModal('email', true),
-          };
-      }
-    }
-
-    setInstructorDataFromModal(key, val){
-        if(key=='id'){
-          this.setInstructorDataFromModal('utorid', this.getInstructorAttributeById(val, 'utorid'));
-          this.setInstructorDataFromModal('name', this.getInstructorAttributeById(val, 'name'));
-          this.setInstructorDataFromModal('email', this.getInstructorAttributeById(val, 'email'));
+    getInstructorDataFromModal(key = null, trim = false) {
+        if (key) {
+            let result = this.get("instructorModal.instructor." + key)
+                ? this.get("instructorModal.instructor." + key)
+                : "";
+            return trim ? result.trim() : result;
+        } else {
+            let id = this.getInstructorDataFromModal("id", true);
+            return {
+                id: id == "" || !id ? null : parseInt(id),
+                utorid: this.getInstructorDataFromModal("utorid", true),
+                name: this.getInstructorDataFromModal("name", true),
+                email: this.getInstructorDataFromModal("email", true)
+            };
         }
-        this.set('instructorModal.instructor.'+key, val);
     }
 
-    getSelectedTabFromModal(){
-      return this.get('instructorModal.selectedTab');
+    setInstructorDataFromModal(key, val) {
+        if (key == "id") {
+            this.setInstructorDataFromModal(
+                "utorid",
+                this.getInstructorAttributeById(val, "utorid")
+            );
+            this.setInstructorDataFromModal(
+                "name",
+                this.getInstructorAttributeById(val, "name")
+            );
+            this.setInstructorDataFromModal(
+                "email",
+                this.getInstructorAttributeById(val, "email")
+            );
+        }
+        this.set("instructorModal.instructor." + key, val);
     }
 
-    setSelectedTabFromModal(tab){
+    getSelectedTabFromModal() {
+        return this.get("instructorModal.selectedTab");
+    }
+
+    setSelectedTabFromModal(tab) {
         this.set("instructorModal.selectedTab", tab);
     }
 
-    containsEmptyInstructorField(instructor){
-      let keys = Object.keys(instructor);
-      for(let i in keys) {
-        if(instructor[keys[i]]=='')
-          return true;
-      }
-      return false;
+    containsEmptyInstructorField(instructor) {
+        let keys = Object.keys(instructor);
+        for (let i in keys) {
+            if (instructor[keys[i]] == "") return true;
+        }
+        return false;
     }
 
-    updateInstructor(){
-      this.validateInstructorModalForm((instructor, action2)=>{
-          if((this.getInstructorAttributeById(instructor.id, 'name')==instructor.name)
-              &&(this.getInstructorAttributeById(instructor.id, 'email')==instructor.email))
-            this.alert("This instructor's information remains unchanged.");
-          else{
-            action2(instructor);
-          }
-        }, (instructor)=>{
-        this.validateInstructorNameEmail(instructor.name, instructor.email, ()=>{
-          delete instructor.utorid;
-          fetch.updateInstructor(instructor);
+    updateInstructor() {
+        this.validateInstructorModalForm(
+            (instructor, action2) => {
+                if (
+                    this.getInstructorAttributeById(instructor.id, "name") ==
+                        instructor.name &&
+                    this.getInstructorAttributeById(instructor.id, "email") ==
+                        instructor.email
+                )
+                    this.alert(
+                        "This instructor's information remains unchanged."
+                    );
+                else {
+                    action2(instructor);
+                }
+            },
+            instructor => {
+                this.validateInstructorNameEmail(
+                    instructor.name,
+                    instructor.email,
+                    () => {
+                        delete instructor.utorid;
+                        fetch.updateInstructor(instructor);
+                    }
+                );
+            }
+        );
+    }
+
+    deleteInstructor() {
+        let id = this.getInstructorDataFromModal("id", true);
+        if (id == "") this.alert("No instructor selected.");
+        else {
+            let response = confirm(
+                "Are you sure you want to delete this instructor?"
+            );
+            if (response) fetch.deleteInstructor(parseInt(id));
+        }
+    }
+
+    createInstructor() {
+        this.validateInstructorModalForm(
+            (instructor, action2) => {
+                if (!this.validInstructorUtorid(instructor.utorid))
+                    this.alert(
+                        "An instructor with this utorid already exists."
+                    );
+                else {
+                    action2(instructor);
+                }
+            },
+            instructor => {
+                this.validateInstructorNameEmail(
+                    instructor.name,
+                    instructor.email,
+                    () => {
+                        delete instructor.id;
+                        fetch.createInstructor(instructor);
+                    }
+                );
+            }
+        );
+    }
+
+    validateInstructorModalForm(action1, action2) {
+        if (this.instructorModalOpen()) {
+            let instructor = this.getInstructorDataFromModal();
+            if (!this.containsEmptyInstructorField(instructor)) {
+                if (action1) action1(instructor, action2);
+                else action2(instructor);
+            } else this.alert("This form contains empty fields.");
+        }
+    }
+
+    validateInstructorNameEmail(name, email, action) {
+        if (!this.validInstructorName(name))
+            this.alert("Please enter both the first and last name.");
+        else {
+            if (!this.validInstructorEmail(email)) this.alert("Invalid Email");
+            else {
+                this.setInstructorModalAlert(null);
+                action();
+            }
+        }
+    }
+
+    validInstructorUtorid(utorid) {
+        let instructors = this.getInstructorsList(true),
+            valid = true;
+        instructors.forEach(instr => {
+            if (utorid == instr.get("utorid")) valid = false;
         });
-      });
+        return valid;
     }
 
-    deleteInstructor(){
-      let id = this.getInstructorDataFromModal('id', true);
-      if(id=='')
-        this.alert('No instructor selected.');
-      else{
-        let response = confirm("Are you sure you want to delete this instructor?");
-        if(response)
-            fetch.deleteInstructor(parseInt(id));
-      }
+    validInstructorEmail(email) {
+        let regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return regex.test(email);
     }
 
-    createInstructor(){
-      this.validateInstructorModalForm((instructor, action2)=>{
-        if(!this.validInstructorUtorid(instructor.utorid))
-          this.alert("An instructor with this utorid already exists.");
-        else{
-          action2(instructor);
-        }
-      }, (instructor)=>{
-        this.validateInstructorNameEmail(instructor.name, instructor.email, ()=>{
-          delete instructor.id;
-          fetch.createInstructor(instructor);
-        });
-      });
+    validInstructorName(name) {
+        return name.split(" ").filter(word => word !== "").length >= 2;
     }
 
-    validateInstructorModalForm(action1, action2){
-      if(this.instructorModalOpen()){
-        let instructor = this.getInstructorDataFromModal();
-        if(!this.containsEmptyInstructorField(instructor)){
-          if(action1)
-            action1(instructor, action2);
-          else
-            action2(instructor);
-        }
-        else this.alert("This form contains empty fields.");
-      }
+    instructorModalOpen() {
+        return this.get("instructorModal.open");
     }
 
-    validateInstructorNameEmail(name, email, action){
-      if(!this.validInstructorName(name))
-        this.alert("Please enter both the first and last name.");
-      else {
-        if (!this.validInstructorEmail(email))
-          this.alert("Invalid Email");
-        else{
-          this.setInstructorModalAlert(null);
-          action();
-        }
-      }
+    getInstructorModalAlert() {
+        return this.get("instructorModal.alert");
     }
 
-    validInstructorUtorid(utorid){
-      let instructors = this.getInstructorsList(true),
-        valid = true;
-      instructors.forEach(instr=>{
-        if(utorid == instr.get('utorid'))
-          valid = false;
-      });
-      return valid;
+    setInstructorModalAlert(text) {
+        this.set("instructorModal.alert", text);
     }
 
-    validInstructorEmail(email){
-      let regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return regex.test(email);
+    showInstructorModal() {
+        this.set("instructorModal.open", true);
     }
 
-    validInstructorName(name){
-      return name.split(" ").filter(word => word!=='').length >= 2;
-    }
-
-    instructorModalOpen(){
-      return this.get("instructorModal.open");
-    }
-
-    getInstructorModalAlert(){
-      return this.get("instructorModal.alert");
-    }
-
-    setInstructorModalAlert(text){
-      this.set('instructorModal.alert', text);
-    }
-
-    showInstructorModal(){
-      this.set("instructorModal.open", true);
-    }
-
-    hideInstructorModal(){
-      this.set("instructorModal.instructor.id", null);
-      this.set("instructorModal.instructor.utorid", null);
-      this.set("instructorModal.instructor.name", null);
-      this.set("instructorModal.instructor.email", null);
-      this.set("instructorModal.open", false);
+    hideInstructorModal() {
+        this.set("instructorModal.instructor.id", null);
+        this.set("instructorModal.instructor.utorid", null);
+        this.set("instructorModal.instructor.name", null);
+        this.set("instructorModal.instructor.email", null);
+        this.set("instructorModal.open", false);
     }
 
     getApplicantsInSelectedRound() {
-        let round = this.get('selectedRound'),
-            applicants = this.get('applicants.list'),
+        let round = this.get("selectedRound"),
+            applicants = this.get("applicants.list"),
             applications = this.getApplicationsInSelectedRound();
 
         if (round && applicants) {
@@ -910,11 +995,15 @@ class AppState {
     getApplicantsToCourse(course) {
         let applications = this.getApplicationsList().filter(applicant =>
             applicant.some(application =>
-                application.get('prefs').some(pref => pref.get('positionId') == course)
+                application
+                    .get("prefs")
+                    .some(pref => pref.get("positionId") == course)
             )
         );
 
-        return this.getApplicantsList().filter((_, id) => applications.has(id)).entrySeq();
+        return this.getApplicantsList()
+            .filter((_, id) => applications.has(id))
+            .entrySeq();
     }
 
     // get applicants to course who are not assigned to it; returns a list of [applicantID, applicantData]
@@ -926,24 +1015,44 @@ class AppState {
             // get applications to course
             .filter(applicant =>
                 applicant.some(application =>
-                    application.get('prefs').some(pref => pref.get('positionId') == course)
+                    application
+                        .get("prefs")
+                        .some(pref => pref.get("positionId") == course)
                 )
             )
             // get applications to course with no corresponding assignment
             .filterNot(
                 (_, applicant) =>
                     assignments.has(applicant) &&
-                    assignments.get(applicant).some(ass => ass.get('positionId') == course)
+                    assignments
+                        .get(applicant)
+                        .some(ass => ass.get("positionId") == course)
             );
 
         // sort applications for unassigned table by preference
         let sortedApplications = applications.sort(function(a, b) {
-            var aPref = a.get(0).get('prefs').some(pref => pref.get('positionId') == course && pref.get('preferred'));
-            var bPref = b.get(0).get('prefs').some(pref => pref.get('positionId') == course && pref.get('preferred'));
+            var aPref = a
+                .get(0)
+                .get("prefs")
+                .some(
+                    pref =>
+                        pref.get("positionId") == course &&
+                        pref.get("preferred")
+                );
+            var bPref = b
+                .get(0)
+                .get("prefs")
+                .some(
+                    pref =>
+                        pref.get("positionId") == course &&
+                        pref.get("preferred")
+                );
             return bPref - aPref;
-            });
+        });
 
-        return sortedApplications.map((_, applicant) => applicants.get(applicant)).entrySeq();
+        return sortedApplications
+            .map((_, applicant) => applicants.get(applicant))
+            .entrySeq();
     }
 
     getApplicationById(applicant) {
@@ -951,7 +1060,9 @@ class AppState {
         // one application
         // Note: toString() is a hack because our components think that course IDs are numbers but Immutable
         // thinks they are strings
-        return this.getApplicationsList().get(applicant.toString()).first();
+        return this.getApplicationsList()
+            .get(applicant.toString())
+            .first();
     }
 
     // check whether this course is a preference for this applicant
@@ -960,14 +1071,19 @@ class AppState {
         // one application
         // Note: toString() is a hack because our components think that course IDs are numbers but Immutable
         // thinks they are strings
-        let prefs = this.getApplicationsList().get(applicant.toString()).first().get('prefs');
+        let prefs = this.getApplicationsList()
+            .get(applicant.toString())
+            .first()
+            .get("prefs");
 
-        return prefs.some(pref => pref.get('positionId') == course && pref.get('preferred'));
+        return prefs.some(
+            pref => pref.get("positionId") == course && pref.get("preferred")
+        );
     }
 
     getApplicationsInSelectedRound() {
-        let round = this.get('selectedRound'),
-            applications = this.get('applications.list'),
+        let round = this.get("selectedRound"),
+            applications = this.get("applications.list"),
             courses = this.getCoursesInSelectedRound();
 
         if (round && applications) {
@@ -979,9 +1095,13 @@ class AppState {
                             // applied to is in the selected round
                             // note: this assumes that, if all courses in the application are in the same round
                             application =>
-                                application.get('prefs').size == 0 ||
+                                application.get("prefs").size == 0 ||
                                 courses.has(
-                                    application.get('prefs').first().get('positionId').toString()
+                                    application
+                                        .get("prefs")
+                                        .first()
+                                        .get("positionId")
+                                        .toString()
                                 )
                         )
                     )
@@ -1003,7 +1123,9 @@ class AppState {
         let assignments = this.getAssignmentsList(),
             applicants = this.getApplicantsList();
 
-        applicants = assignments.map((_, applicant) => applicants.get(applicant));
+        applicants = assignments.map((_, applicant) =>
+            applicants.get(applicant)
+        );
         return applicants.filter(_ => _).entrySeq();
     }
 
@@ -1013,7 +1135,7 @@ class AppState {
         let assignments = this.getAssignmentsList().get(applicant.toString());
 
         if (assignments) {
-            return assignments.find(ass => ass.get('positionId') == course);
+            return assignments.find(ass => ass.get("positionId") == course);
         } else {
             return null;
         }
@@ -1032,8 +1154,8 @@ class AppState {
     }
 
     getAssignmentsInSelectedRound() {
-        let round = this.get('selectedRound'),
-            assignments = this.get('assignments.list'),
+        let round = this.get("selectedRound"),
+            assignments = this.get("assignments.list"),
             courses = this.getCoursesInSelectedRound();
 
         if (round && assignments) {
@@ -1045,7 +1167,9 @@ class AppState {
                         // numbers but Immutable thinks they are strings
                         applicant =>
                             applicant.filter(assignment =>
-                                courses.has(assignment.get('positionId').toString())
+                                courses.has(
+                                    assignment.get("positionId").toString()
+                                )
                             )
                     )
                     // filter out applicants who have no assignments to course(s) in the selected round
@@ -1064,7 +1188,7 @@ class AppState {
     // get the current number of assignments to course
     getCourseAssignmentCount(course) {
         return this.getAssignmentsList().filter(applicant =>
-            applicant.some(ass => ass.get('positionId') == course)
+            applicant.some(ass => ass.get("positionId") == course)
         ).size;
     }
 
@@ -1077,23 +1201,29 @@ class AppState {
     // get a sorted list of course codes
     getCourseCodes() {
         let courses = this.getCoursesList();
-        if(courses.size>0)
-          return courses.map(course => course.get('code')).flip().keySeq().sort();
+        if (courses.size > 0)
+            return courses
+                .map(course => course.get("code"))
+                .flip()
+                .keySeq()
+                .sort();
         else return [];
     }
 
     getCourseCodeById(course) {
         // Note: toString() is a hack because our components think that course IDs are numbers but Immutable
         // thinks they are strings
-        return this.getCoursesList().get(course.toString()).get('code');
+        return this.getCoursesList()
+            .get(course.toString())
+            .get("code");
     }
 
     getCoursesInSelectedRound() {
-        let round = this.get('selectedRound'),
-            courses = this.get('courses.list');
+        let round = this.get("selectedRound"),
+            courses = this.get("courses.list");
 
         if (round && courses) {
-            return courses.filter(course => course.get('round') == round);
+            return courses.filter(course => course.get("round") == round);
         } else {
             // all rounds displayed and/or no courses exist
             return courses;
@@ -1104,67 +1234,67 @@ class AppState {
         return this.getCoursesInSelectedRound();
     }
 
-    getSessionsList(){
-        return this.get('sessions.list');
+    getSessionsList() {
+        return this.get("sessions.list");
     }
 
-    getSessionName(id){
+    getSessionName(id) {
         let sessions = this.getSessionsList();
         let selected = sessions.get(id);
-        if(selected)
-            return selected.get('semester')+' '+selected.get('year');
+        if (selected)
+            return selected.get("semester") + " " + selected.get("year");
         else return null;
     }
 
-    selectSession(id){
-      this.set('selectedSession', id);
-      fetch.fetchAll();
+    selectSession(id) {
+        this.set("selectedSession", id);
+        fetch.fetchAll();
     }
 
-    getLatestSession(){
-      let latest = null;
-      this.getSessionsList().forEach((key, id)=>{
-        if(!latest|| id>latest)
-          latest = id;
-      });
-      return latest?latest:'N/A';
+    getLatestSession() {
+        let latest = null;
+        this.getSessionsList().forEach((key, id) => {
+            if (!latest || id > latest) latest = id;
+        });
+        return latest ? latest : "N/A";
     }
 
-    setLatestSession(){
-      this.set('selectedSession', this.getLatestSession());
+    setLatestSession() {
+        this.set("selectedSession", this.getLatestSession());
     }
 
-    getSelectedSession(){
-      return this.get('selectedSession');
+    getSelectedSession() {
+        return this.get("selectedSession");
     }
 
     getInstructorsList(fullData = false) {
-        if(fullData)
-          return this.get('instructors.list');
+        if (fullData) return this.get("instructors.list");
         else {
-          let instructors = this.get('instructors.list');
-          let list = {};
-          instructors.forEach((instructor,id)=> {
-            list[id] = instructor.get('name');
-          });
-          return list;
+            let instructors = this.get("instructors.list");
+            let list = {};
+            instructors.forEach((instructor, id) => {
+                list[id] = instructor.get("name");
+            });
+            return list;
         }
     }
 
-    getInstructorAttributeById(id, attribute){
-      let val = null;
-      this.get('instructors.list').forEach((instr, key)=>{
-        if(key == id)
-          val = instr.get(attribute);
-      });
-      return val;
+    getInstructorAttributeById(id, attribute) {
+        let val = null;
+        this.get("instructors.list").forEach((instr, key) => {
+            if (key == id) val = instr.get(attribute);
+        });
+        return val;
     }
 
     // get a list of all rounds for all courses
     getRounds() {
-        let courses = this.get('courses.list');
-        if(courses.size>0)
-          return courses.map(course => course.get('round')).flip().keySeq();
+        let courses = this.get("courses.list");
+        if (courses.size > 0)
+            return courses
+                .map(course => course.get("round"))
+                .flip()
+                .keySeq();
         else return [];
     }
 
@@ -1193,27 +1323,27 @@ class AppState {
     }
 
     importing() {
-        return this.get('importing') > 0;
+        return this.get("importing") > 0;
     }
 
     isApplicantsListNull() {
-        return this.get('applicants.list') == null;
+        return this.get("applicants.list") == null;
     }
 
     isApplicationsListNull() {
-        return this.get('applications.list') == null;
+        return this.get("applications.list") == null;
     }
 
     isAssignmentsListNull() {
-        return this.get('assignments.list') == null;
+        return this.get("assignments.list") == null;
     }
 
     isCoursesListNull() {
-        return this.get('courses.list') == null;
+        return this.get("courses.list") == null;
     }
 
     isInstructorsListNull() {
-        return this.get('instructors.list') == null;
+        return this.get("instructors.list") == null;
     }
 
     // add/update the notes for an applicant
@@ -1223,13 +1353,13 @@ class AppState {
 
     // persist a temporary assignment to the database
     permAssignment(course) {
-        let applicant = this.get('selectedApplicant');
-        let tempAssignment = this.get('assignmentForm.tempAssignments').find(
-            ass => ass.get('positionId') == course
+        let applicant = this.get("selectedApplicant");
+        let tempAssignment = this.get("assignmentForm.tempAssignments").find(
+            ass => ass.get("positionId") == course
         );
 
         // note that there are two 'set' calls here
-        this.createAssignment(applicant, course, tempAssignment.get('hours'));
+        this.createAssignment(applicant, course, tempAssignment.get("hours"));
 
         this.removeTempAssignment(course);
     }
@@ -1237,69 +1367,80 @@ class AppState {
     removeInstructor(courseId, index) {
         // Note: toString() is a hack because our components think that course IDs are numbers but Immutable
         // thinks they are strings
-        let val = this.getCoursesList().get(courseId.toString()).get('instructors').toJS();
+        let val = this.getCoursesList()
+            .get(courseId.toString())
+            .get("instructors")
+            .toJS();
         val.splice(index, 1);
         fetch.updateCourse(courseId, { instructors: val });
     }
 
     setApplicantsList(list) {
-        this.set('applicants.list', list);
+        this.set("applicants.list", list);
     }
 
     setApplicationsList(list) {
-        this.set('applications.list', list);
+        this.set("applications.list", list);
     }
 
     setAssignmentsList(list) {
-        this.set('assignments.list', list);
+        this.set("assignments.list", list);
     }
 
     setCoursesList(list) {
-        this.set('courses.list', list);
+        this.set("courses.list", list);
     }
 
     setFetchingDataList(data, fetching, success) {
-        let init = this.get(data + '.fetching'),
-            notifications = this.get('nav.notifications');
+        let init = this.get(data + ".fetching"),
+            notifications = this.get("nav.notifications");
         if (fetching) {
             this.set({
-                [data + '.fetching']: init + 1,
-                'nav.notifications': notifications.push('<i>Fetching ' + data + '...</i>'),
+                [data + ".fetching"]: init + 1,
+                "nav.notifications": notifications.push(
+                    "<i>Fetching " + data + "...</i>"
+                )
             });
         } else if (success) {
             this.set({
-                [data + '.fetching']: init - 1,
-                'nav.notifications': notifications.push('Successfully fetched ' + data + '.'),
+                [data + ".fetching"]: init - 1,
+                "nav.notifications": notifications.push(
+                    "Successfully fetched " + data + "."
+                )
             });
         } else {
-            this.set(data + '.fetching', init - 1);
+            this.set(data + ".fetching", init - 1);
         }
     }
 
     setImporting(importing, success) {
-        let init = this.get('importing'),
-            notifications = this.get('nav.notifications');
+        let init = this.get("importing"),
+            notifications = this.get("nav.notifications");
         if (importing) {
             this.set({
                 importing: init + 1,
-                'nav.notifications': notifications.push('<i>Import in progress...</i>'),
+                "nav.notifications": notifications.push(
+                    "<i>Import in progress...</i>"
+                )
             });
         } else if (success) {
             this.set({
                 importing: init - 1,
-                'nav.notifications': notifications.push('Import completed successfully.'),
+                "nav.notifications": notifications.push(
+                    "Import completed successfully."
+                )
             });
         } else {
-            this.set('importing', init - 1);
+            this.set("importing", init - 1);
         }
     }
 
     setInstructorsList(list) {
-        this.set('instructors.list', list);
+        this.set("instructors.list", list);
     }
 
     setSessionsList(list) {
-        this.set('sessions.list', list);
+        this.set("sessions.list", list);
     }
 
     updateAssignment(applicant, assignment, hours) {
@@ -1313,76 +1454,79 @@ class AppState {
     updateCourse(courseId, val, attr) {
         let data = {};
         switch (attr) {
-            case 'estimatedPositions':
-                data['estimated_count'] = val;
+            case "estimatedPositions":
+                data["estimated_count"] = val;
                 break;
-            case 'positionHours':
-                data['hours'] = val;
+            case "positionHours":
+                data["hours"] = val;
                 break;
-            case 'estimatedEnrol':
-                data['current_enrolment'] = val;
+            case "estimatedEnrol":
+                data["current_enrolment"] = val;
                 break;
-            case 'qual':
-                data['qualifications'] = val;
+            case "qual":
+                data["qualifications"] = val;
                 break;
-            case 'resp':
-                data['duties'] = val;
+            case "resp":
+                data["duties"] = val;
                 break;
-            case 'cap':
-                data['cap_enrolment'] = val;
+            case "cap":
+                data["cap_enrolment"] = val;
                 break;
-            case 'waitlist':
-                data['num_waitlisted'] = val;
+            case "waitlist":
+                data["num_waitlisted"] = val;
                 break;
-            case 'startDate':
-                data['start_date'] = val;
+            case "startDate":
+                data["start_date"] = val;
                 break;
-            case 'endDate':
-                data['end_date'] = val;
+            case "endDate":
+                data["end_date"] = val;
                 break;
         }
         fetch.updateCourse(courseId, data);
     }
 
-    emailAssignments(code, round, key){
-        let email = document.getElementById("email-"+key);
-        let spinner = document.getElementById("spinner-"+key);
+    emailAssignments(code, round, key) {
+        let email = document.getElementById("email-" + key);
+        let spinner = document.getElementById("spinner-" + key);
         email.style.display = "none";
         spinner.style.display = "block";
         fetch.emailAssignments(code, round, key);
     }
 
-    stopEmailSpinner(key){
-        let email = document.getElementById("email-"+key);
-        let spinner = document.getElementById("spinner-"+key);
+    stopEmailSpinner(key) {
+        let email = document.getElementById("email-" + key);
+        let spinner = document.getElementById("spinner-" + key);
         email.style.display = "block";
         spinner.style.display = "none";
     }
-
 }
 
 let appStateInst = new AppState(),
     appState = {};
 
 // wrap all AppState functions in functions in appState that parse Immutable results as JS
-Object.getOwnPropertyNames(Object.getPrototypeOf(appStateInst)).forEach(name => {
-    // do not create a wrapper for the AppState constructor
-    if (name != 'constructor') {
-        appState[[name]] = (...args) => {
-            // convert any object arguments to Immutable objects
-            args = args.map(arg => (arg instanceof Object ? fromJS(arg) : arg));
+Object.getOwnPropertyNames(Object.getPrototypeOf(appStateInst)).forEach(
+    name => {
+        // do not create a wrapper for the AppState constructor
+        if (name != "constructor") {
+            appState[[name]] = (...args) => {
+                // convert any object arguments to Immutable objects
+                args = args.map(arg =>
+                    arg instanceof Object ? fromJS(arg) : arg
+                );
 
-            // pass arguments to the function
-            let result = appStateInst[[name]](...args);
+                // pass arguments to the function
+                let result = appStateInst[[name]](...args);
 
-            // if the result of the function is an Immutable object, convert it to a JS object
-            if (isImmutable(result)) {
-                result = result.toJS();
-            }
+                // if the result of the function is an Immutable object, convert it to a JS object
+                if (isImmutable(result)) {
+                    result = result.toJS();
+                }
 
-            return result;
-        };
+                return result;
+            };
+        }
     }
-});
+);
 
 export { appState };

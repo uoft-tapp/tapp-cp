@@ -1,23 +1,27 @@
-import React from 'react';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import React from "react";
+import { DropdownButton, MenuItem } from "react-bootstrap";
 
 // menu that allows importing data from a file and persisting it to the database, or importing data from TAPP and
 // persisting it to the database
 class ImportMenu extends React.Component {
     uploadFile() {
-        let fileInput = document.getElementById('file-input');
+        let fileInput = document.getElementById("file-input");
         let files = fileInput.files;
 
         if (files.length > 0) {
             // uploading a CHASS offers file
-            if (this.getFileType(files[0]) != 'application/json') {
-                this.props.appState.alert('<b>Error:</b> The file you selected is not a JSON.');
+            if (this.getFileType(files[0]) != "application/json") {
+                this.props.appState.alert(
+                    "<b>Error:</b> The file you selected is not a JSON."
+                );
                 return;
             }
 
             if (
                 confirm(
-                    'Are you sure you want to import "' + files[0].name + '" into the database?'
+                    'Are you sure you want to import "' +
+                        files[0].name +
+                        '" into the database?'
                 )
             ) {
                 let importFunc = data => {
@@ -25,7 +29,7 @@ class ImportMenu extends React.Component {
                         data = JSON.parse(data);
                         this.props.appState.importOffers(data);
                     } catch (err) {
-                        this.props.appState.alert('<b>Error:</b> ' + err);
+                        this.props.appState.alert("<b>Error:</b> " + err);
                     }
                 };
 
@@ -34,23 +38,21 @@ class ImportMenu extends React.Component {
                 reader.readAsText(files[0]);
             }
 
-            fileInput.value = '';
+            fileInput.value = "";
         }
     }
 
-    getFileType(file){
+    getFileType(file) {
         let type = file.type;
-        if (type != ""){
-          return type;
-        }
-        else{
-          let name = file.name.split(".");
-          if (name[name.length-1]=="json"){
-            return "application/json";
-          }
-          else{
-            return "";
-          }
+        if (type != "") {
+            return type;
+        } else {
+            let name = file.name.split(".");
+            if (name[name.length - 1] == "json") {
+                return "application/json";
+            } else {
+                return "";
+            }
         }
     }
 
@@ -61,14 +63,21 @@ class ImportMenu extends React.Component {
                 bsStyle="primary"
                 title={
                     <span>
-                        Import&nbsp;{this.props.appState.importing() &&
+                        Import&nbsp;
+                        {this.props.appState.importing() && (
                             <i
                                 className="fa fa-spinner fa-spin"
-                                style={{ fontSize: '16px', color: 'white' }}
-                            />}
+                                style={{ fontSize: "16px", color: "white" }}
+                            />
+                        )}
                     </span>
-                }>
-                <MenuItem onClick={() => document.getElementById('file-input').click()}>
+                }
+            >
+                <MenuItem
+                    onClick={() =>
+                        document.getElementById("file-input").click()
+                    }
+                >
                     Import offers from file
                 </MenuItem>
 
@@ -76,7 +85,7 @@ class ImportMenu extends React.Component {
                     id="file-input"
                     type="file"
                     accept="application/json"
-                    style={{ display: 'none' }}
+                    style={{ display: "none" }}
                     onChange={() => this.uploadFile()}
                 />
 
@@ -84,12 +93,13 @@ class ImportMenu extends React.Component {
                     onClick={() => {
                         if (
                             confirm(
-                                'Are you sure you want to import the current set of locked assignments into the database?'
+                                "Are you sure you want to import the current set of locked assignments into the database?"
                             )
                         ) {
                             this.props.appState.importAssignments();
                         }
-                    }}>
+                    }}
+                >
                     Import locked assignments
                 </MenuItem>
             </DropdownButton>

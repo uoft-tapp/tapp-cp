@@ -1,12 +1,8 @@
-import React from 'react';
+import React from "react";
 
 class Instructor extends React.Component {
     render() {
-      return(
-        <div>
-        Instructor Stuff
-        </div>
-      );
+        return <div>Instructor Stuff</div>;
     }
 }
 

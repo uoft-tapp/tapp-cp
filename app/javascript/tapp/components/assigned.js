@@ -1,9 +1,9 @@
-import React from 'react';
-import { Grid, Row, Col, ButtonToolbar, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { ApplicantTableMenu } from './applicantTableMenu.js';
-import { ApplicantTable } from './applicantTable.js';
-import { routeConfig } from '../routeConfig.js';
+import React from "react";
+import { Grid, Row, Col, ButtonToolbar, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { ApplicantTableMenu } from "./applicantTableMenu.js";
+import { ApplicantTable } from "./applicantTable.js";
+import { routeConfig } from "../routeConfig.js";
 
 class Assigned extends React.Component {
     render() {
@@ -13,110 +13,133 @@ class Assigned extends React.Component {
         }
 
         let fetchCheck = this.props.anyFetching();
-        let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
+        let cursorStyle = { cursor: fetchCheck ? "progress" : "auto" };
 
         // table/menu configuration
         this.config = [
             {
-                header: 'Last Name',
-                data: p =>
+                header: "Last Name",
+                data: p => (
                     <span
                         className="highlightOnHover"
-                        onClick={() => this.props.selectApplicant(p.applicantId)}>
+                        onClick={() =>
+                            this.props.selectApplicant(p.applicantId)
+                        }
+                    >
                         {p.applicant.lastName}&nbsp;
                         {p.applicant.notes && <i className="fa fa-paperclip" />}
-                    </span>,
+                    </span>
+                ),
                 sortData: p => p.applicant.lastName,
 
-                style: { width: 0.10 },
+                style: { width: 0.1 }
             },
             {
-                header: 'First Name',
+                header: "First Name",
                 data: p => p.applicant.firstName,
                 sortData: p => p.applicant.firstName,
 
-                style: { width: 0.10 },
+                style: { width: 0.1 }
             },
             {
-                header: 'Dept.',
+                header: "Dept.",
                 data: p => p.applicant.dept,
                 sortData: p => p.applicant.dept,
 
-                filterLabel: 'Dept.',
-                filterCategories: ['DCS', 'Other'],
+                filterLabel: "Dept.",
+                filterCategories: ["DCS", "Other"],
                 filterFuncs: [
-                    p => p.applicant.dept == 'Computer Science',
-                    p => p.applicant.dept != 'Computer Science',
+                    p => p.applicant.dept == "Computer Science",
+                    p => p.applicant.dept != "Computer Science"
                 ],
 
-                style: { width: 0.08 },
+                style: { width: 0.08 }
             },
             {
-                header: 'Prog.',
+                header: "Prog.",
                 data: p => p.applicant.program,
                 sortData: p => p.applicant.program,
 
-                filterLabel: 'Prog.',
-                filterCategories: ['PostDoc', 'PhD', 'Masters', 'UG'],
+                filterLabel: "Prog.",
+                filterCategories: ["PostDoc", "PhD", "Masters", "UG"],
                 filterFuncs: [
-                    p => p.applicant.program == 'PostDoc',
-                    p => p.applicant.program == 'PhD',
-                    p => ['MSc', 'MASc', 'MScAC', 'MEng', 'OG'].includes(p.applicant.program),
-                    p => p.applicant.program == 'UG',
+                    p => p.applicant.program == "PostDoc",
+                    p => p.applicant.program == "PhD",
+                    p =>
+                        ["MSc", "MASc", "MScAC", "MEng", "OG"].includes(
+                            p.applicant.program
+                        ),
+                    p => p.applicant.program == "UG"
                 ],
 
-                style: { width: 0.05 },
+                style: { width: 0.05 }
             },
             {
-                header: 'Year',
+                header: "Year",
                 data: p => p.applicant.year,
                 sortData: p => p.applicant.year,
 
-                style: { width: 0.03 },
+                style: { width: 0.03 }
             },
             {
-                header: 'Email',
+                header: "Email",
                 data: p => p.applicant.email,
                 sortData: p => p.applicant.email,
 
-                style: { width: 0.20 },
+                style: { width: 0.2 }
             },
             {
-                header: 'Course(s)',
-                data: p =>
+                header: "Course(s)",
+                data: p => (
                     <ButtonToolbar>
-                        {this.props.getAssignmentsByApplicant(p.applicantId).map(ass =>
-                            <Link
-                                to={
-                                    routeConfig.abc.route +
-                                    '#' +
-                                    ass.positionId +
-                                    '-' +
-                                    p.applicantId +
-                                    '-1'
-                                }
-                                key={'link-' + p.applicantId + '-' + ass.positionId}>
-                                <Button
-                                    bsSize="xsmall"
-                                    style={{ borderColor: '#555' }}
-                                    onClick={() => this.props.selectSingleCourse(ass.positionId)}>
-                                    {this.props.getCourseCodeById(
+                        {this.props
+                            .getAssignmentsByApplicant(p.applicantId)
+                            .map(ass => (
+                                <Link
+                                    to={
+                                        routeConfig.abc.route +
+                                        "#" +
+                                        ass.positionId +
+                                        "-" +
+                                        p.applicantId +
+                                        "-1"
+                                    }
+                                    key={
+                                        "link-" +
+                                        p.applicantId +
+                                        "-" +
                                         ass.positionId
-                                    )}&nbsp;&middot;&nbsp;{ass.hours}
-                                </Button>
-                            </Link>
-                        )}
-                    </ButtonToolbar>,
+                                    }
+                                >
+                                    <Button
+                                        bsSize="xsmall"
+                                        style={{ borderColor: "#555" }}
+                                        onClick={() =>
+                                            this.props.selectSingleCourse(
+                                                ass.positionId
+                                            )
+                                        }
+                                    >
+                                        {this.props.getCourseCodeById(
+                                            ass.positionId
+                                        )}
+                                        &nbsp;&middot;&nbsp;{ass.hours}
+                                    </Button>
+                                </Link>
+                            ))}
+                    </ButtonToolbar>
+                ),
 
-                filterLabel: 'Course',
+                filterLabel: "Course",
                 filterCategories: this.props.getCourseCodes(),
                 // for each course, filter out applicants who are not assigned to that course
-                filterFuncs: Object.keys(this.props.getCoursesList()).map(key => p =>
-                    this.props
-                        .getAssignmentsByApplicant(p.applicantId)
-                        .some(pref => pref.positionId == key)
-                ),
-            },
+                filterFuncs: Object.keys(this.props.getCoursesList()).map(
+                    key => p =>
+                        this.props
+                            .getAssignmentsByApplicant(p.applicantId)
+                            .some(pref => pref.positionId == key)
+                )
+            }
         ];
 
         return (
@@ -124,10 +147,15 @@ class Assigned extends React.Component {
                 <ApplicantTableMenu
                     config={this.config}
                     getSelectedSortFields={() => this.props.getSorts()}
-                    anyFilterSelected={field => this.props.anyFilterSelected(field)}
+                    anyFilterSelected={field =>
+                        this.props.anyFilterSelected(field)
+                    }
                     isFilterSelected={(field, category) =>
-                        this.props.isFilterSelected(field, category)}
-                    toggleFilter={(field, category) => this.props.toggleFilter(field, category)}
+                        this.props.isFilterSelected(field, category)
+                    }
+                    toggleFilter={(field, category) =>
+                        this.props.toggleFilter(field, category)
+                    }
                     clearFilters={() => this.props.clearFilters()}
                     addSort={field => this.props.addSort(field)}
                     removeSort={field => this.props.removeSort(field)}
@@ -137,7 +165,7 @@ class Assigned extends React.Component {
                 <ApplicantTable
                     config={this.config}
                     getApplicants={() => this.props.getAssignedApplicants()}
-                    rowId={p => 'assigned-' + p.applicantId}
+                    rowId={p => "assigned-" + p.applicantId}
                     getSelectedSortFields={() => this.props.getSorts()}
                     getSelectedFilters={() => this.props.getFilters()}
                     width="100vw"

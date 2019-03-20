@@ -1,11 +1,18 @@
-import React from 'react';
-import { Panel, Form, FormGroup, ControlLabel, InputGroup, FormControl } from 'react-bootstrap';
+import React from "react";
+import {
+    Panel,
+    Form,
+    FormGroup,
+    ControlLabel,
+    InputGroup,
+    FormControl
+} from "react-bootstrap";
 
 class SessionsForm extends React.Component {
     render() {
         let session = this.props.appState.getSelectedSession(),
             pay = this.props.appState.getSessionPay(session);
-        pay = pay?pay:'';
+        pay = pay ? pay : "";
         return (
             <Panel className="sessions">
                 <Form inline>
@@ -18,9 +25,20 @@ class SessionsForm extends React.Component {
                                 min="0.00"
                                 step="0.01"
                                 value={pay}
-                                disabled={session=='N/A'}
-                                onChange={event=> this.props.appState.updateSessionPay(session, event.target.value)}
-                                onBlur={event => this.props.appState.updateSessionPay(session, event.target.value,true)}
+                                disabled={session == "N/A"}
+                                onChange={event =>
+                                    this.props.appState.updateSessionPay(
+                                        session,
+                                        event.target.value
+                                    )
+                                }
+                                onBlur={event =>
+                                    this.props.appState.updateSessionPay(
+                                        session,
+                                        event.target.value,
+                                        true
+                                    )
+                                }
                             />
                         </InputGroup>
                     </FormGroup>

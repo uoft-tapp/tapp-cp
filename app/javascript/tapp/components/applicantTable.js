@@ -1,42 +1,56 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Table } from 'react-bootstrap';
+import React from "react";
+import PropTypes from "prop-types";
+import { Table } from "react-bootstrap";
 
-const THeader = props =>
+const THeader = props => (
     <thead>
         <tr>
-            {props.config.map((field, i) =>
+            {props.config.map((field, i) => (
                 <th
-                    key={'header-' + i}
+                    key={"header-" + i}
                     style={
                         field.style
                             ? Object.assign({}, field.style, {
-                                  width: 'calc(' + field.style.width + '*' + props.width + ')',
+                                  width:
+                                      "calc(" +
+                                      field.style.width +
+                                      "*" +
+                                      props.width +
+                                      ")"
                               })
                             : {}
-                    }>
+                    }
+                >
                     {field.header}
                 </th>
-            )}
+            ))}
         </tr>
-    </thead>;
+    </thead>
+);
 
-const ApplicantRow = props =>
-    <tr key={'applicant-' + props.applicantId + '-row'} id={props.rowId(props)}>
-        {props.config.map((field, i) =>
+const ApplicantRow = props => (
+    <tr key={"applicant-" + props.applicantId + "-row"} id={props.rowId(props)}>
+        {props.config.map((field, i) => (
             <td
-                key={'applicant-' + props.applicantId + '-row-' + i}
+                key={"applicant-" + props.applicantId + "-row-" + i}
                 style={
                     field.style
                         ? Object.assign({}, field.style, {
-                              width: 'calc(' + field.style.width + '*' + props.width + ')',
+                              width:
+                                  "calc(" +
+                                  field.style.width +
+                                  "*" +
+                                  props.width +
+                                  ")"
                           })
                         : {}
-                }>
+                }
+            >
                 {field.data(props)}
             </td>
-        )}
-    </tr>;
+        ))}
+    </tr>
+);
 
 class ApplicantTable extends React.Component {
     // acquire and process list of applicants
@@ -56,7 +70,10 @@ class ApplicantTable extends React.Component {
                             acc ||
                             this.props.config[field].filterFuncs[category](
                                 Object.assign(
-                                    { applicantId: applicant[0], applicant: applicant[1] },
+                                    {
+                                        applicantId: applicant[0],
+                                        applicant: applicant[1]
+                                    },
                                     this.props
                                 )
                             ),
@@ -66,7 +83,9 @@ class ApplicantTable extends React.Component {
             }
 
             // apply additional sorting to unassigned applicants
-            this.applicants.sort((a, b) => this.sortApplicants(a, b, selectedSortFields));
+            this.applicants.sort((a, b) =>
+                this.sortApplicants(a, b, selectedSortFields)
+            );
         }
     }
 
@@ -110,28 +129,37 @@ class ApplicantTable extends React.Component {
         return (
             <div
                 className={
-                    'table-container ' +
-                    (this.props.assigned ? 'assigned-table' : 'unassigned-table')
-                }>
+                    "table-container " +
+                    (this.props.assigned
+                        ? "assigned-table"
+                        : "unassigned-table")
+                }
+            >
                 <Table striped bordered condensed hover>
-                    <THeader config={this.props.config} width={this.props.width} />
+                    <THeader
+                        config={this.props.config}
+                        width={this.props.width}
+                    />
                 </Table>
 
                 <div
                     className={
-                        'table-body ' +
-                        (this.props.assigned ? 'assigned-table' : 'unassigned-table')
-                    }>
+                        "table-body " +
+                        (this.props.assigned
+                            ? "assigned-table"
+                            : "unassigned-table")
+                    }
+                >
                     <Table striped bordered condensed hover>
                         <tbody>
-                            {this.applicants.map(([key, val]) =>
+                            {this.applicants.map(([key, val]) => (
                                 <ApplicantRow
-                                    key={'applicant-' + key}
+                                    key={"applicant-" + key}
                                     applicantId={key}
                                     applicant={val}
                                     {...this.props}
                                 />
-                            )}
+                            ))}
                         </tbody>
                     </Table>
                 </div>
@@ -164,8 +192,8 @@ ApplicantTable.propTypes = {
             // style applied to cells in table column
             style: PropTypes.shape({
                 // column width - this should be a percentage of the total table width (between 0 and 1)
-                width: PropTypes.number,
-            }),
+                width: PropTypes.number
+            })
         })
     ).isRequired,
 
@@ -185,7 +213,7 @@ ApplicantTable.propTypes = {
     rowId: PropTypes.func,
 
     // total table width (can use any units)
-    width: PropTypes.string,
+    width: PropTypes.string
 };
 
 export { ApplicantTable };

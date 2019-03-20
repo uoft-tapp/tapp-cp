@@ -1,85 +1,111 @@
-import { fromJS } from 'immutable';
+import { fromJS } from "immutable";
 /*
   fetch core functions
 */
 export const msgFailure = (text, appState) => {
-    appState.alert('<b>Action Failed:</b> ' + text);
+    appState.alert("<b>Action Failed:</b> " + text);
     return Promise.reject();
-}
+};
 export const respFailure = (resp, appState) => {
-  // parse a response into an error message
-    appState.alert('<b>Action Failed</b> ' + resp.url + ': ' + resp.statusText);
+    // parse a response into an error message
+    appState.alert("<b>Action Failed</b> " + resp.url + ": " + resp.statusText);
     return Promise.reject();
-}
+};
 export const getHelper = (URL, appState) => {
-    return fetchHelper(URL, {
-        headers: {
-            Accept: 'application/json',
+    return fetchHelper(
+        URL,
+        {
+            headers: {
+                Accept: "application/json"
+            },
+            method: "GET",
+            credentials: "include" // This line is crucial in any fetch because it is needed to work with Shibboleth in production
         },
-        method: 'GET',
-        credentials: 'include', // This line is crucial in any fetch because it is needed to work with Shibboleth in production
-    }, appState);
-}
+        appState
+    );
+};
 export const postHelper = (URL, body, appState) => {
-    return fetchHelper(URL, {
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json; charset=utf-8',
+    return fetchHelper(
+        URL,
+        {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            method: "POST",
+            body: JSON.stringify(body),
+            credentials: "include"
         },
-        method: 'POST',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    }, appState);
-}
+        appState
+    );
+};
 export const deleteHelper = (URL, appState) => {
-    return fetchHelper(URL, {
-        method: 'DELETE',
-        credentials: 'include',
-    }, appState);
-}
-export const putHelper = (URL, body, appState) => {
-    return fetchHelper(URL, {
-        headers: {
-            'Content-Type': 'application/json; charset=utf-8',
+    return fetchHelper(
+        URL,
+        {
+            method: "DELETE",
+            credentials: "include"
         },
-        method: 'PUT',
-        body: JSON.stringify(body),
-        credentials: 'include',
-    }, appState);
-}
-export const getResource = (route, onSuccess, dataName, setData, mince, state) =>{
-  let appState = state;
-  if(mince){
-    let session = setData?
-      appState.getSelectedSession():appState.get('selectedSession');
-    if(session&&session!='N/A'){
-      route = '/sessions/'+session+route;
-      return getResHelper(route, onSuccess, dataName, setData, appState);
+        appState
+    );
+};
+export const putHelper = (URL, body, appState) => {
+    return fetchHelper(
+        URL,
+        {
+            headers: {
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            method: "PUT",
+            body: JSON.stringify(body),
+            credentials: "include"
+        },
+        appState
+    );
+};
+export const getResource = (
+    route,
+    onSuccess,
+    dataName,
+    setData,
+    mince,
+    state
+) => {
+    let appState = state;
+    if (mince) {
+        let session = setData
+            ? appState.getSelectedSession()
+            : appState.get("selectedSession");
+        if (session && session != "N/A") {
+            route = "/sessions/" + session + route;
+            return getResHelper(route, onSuccess, dataName, setData, appState);
+        } else {
+            setData
+                ? setData([])
+                : appState.set(dataName + ".list", fromJS([]));
+            return appState.setFetchingDataList(dataName, false, true);
+        }
+    } else {
+        return getResHelper(route, onSuccess, dataName, setData, appState);
     }
-    else{
-      setData? setData([]): appState.set(dataName+'.list', fromJS([]));
-      return appState.setFetchingDataList(dataName, false, true);
-    };
-  }
-  else{
-    return getResHelper(route, onSuccess, dataName, setData, appState);
-  }
-}
-function getResHelper(route, onSuccess, dataName, setData, appState){
-  return getHelper(route)
-      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-      .then(onSuccess)
-      .then(data => {
-          setData? setData(data): appState.set(dataName+'.list', fromJS(data));
-          appState.setFetchingDataList(dataName, false, true);
-      })
-      .catch(() => appState.setFetchingDataList(dataName, false));
+};
+function getResHelper(route, onSuccess, dataName, setData, appState) {
+    return getHelper(route)
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(onSuccess)
+        .then(data => {
+            setData
+                ? setData(data)
+                : appState.set(dataName + ".list", fromJS(data));
+            appState.setFetchingDataList(dataName, false, true);
+        })
+        .catch(() => appState.setFetchingDataList(dataName, false));
 }
 
 /*
   On Fetch Success functions
 */
-export const onFetchApplicantsSuccess = (resp) => {
+export const onFetchApplicantsSuccess = resp => {
     let applicants = {};
     resp.forEach(app => {
         applicants[app.id] = {
@@ -93,45 +119,45 @@ export const onFetchApplicantsSuccess = (resp) => {
             dept: app.dept,
             program: (function(id) {
                 switch (id) {
-                    case '1PHD':
-                        return 'PhD';
-                    case '2Msc':
-                        return 'MSc';
-                    case '3MScAC':
-                        return 'MScAC';
-                    case '4MASc':
-                        return 'MASc';
-                    case '5MEng':
-                        return 'MEng';
-                    case '6Other':
-                        return 'OG';
-                    case '7PDF':
-                        return 'PostDoc';
-                    case '8UG':
-                        return 'UG';
+                    case "1PHD":
+                        return "PhD";
+                    case "2Msc":
+                        return "MSc";
+                    case "3MScAC":
+                        return "MScAC";
+                    case "4MASc":
+                        return "MASc";
+                    case "5MEng":
+                        return "MEng";
+                    case "6Other":
+                        return "OG";
+                    case "7PDF":
+                        return "PostDoc";
+                    case "8UG":
+                        return "UG";
                     default:
-                        return 'Other';
+                        return "Other";
                 }
             })(app.program_id),
             year: app.yip,
             notes: app.commentary,
-            fullTime: app.full_time == 'Y',
+            fullTime: app.full_time == "Y"
         };
     });
     return applicants;
-}
+};
 
-export const onFetchApplicationsSuccess = (resp) => {
+export const onFetchApplicationsSuccess = resp => {
     let applications = {},
         newApp;
     resp.forEach(app => {
         newApp = {
-            taTraining: app.ta_training == 'Y',
-            academicAccess: app.access_acad_history == 'Y',
+            taTraining: app.ta_training == "Y",
+            academicAccess: app.access_acad_history == "Y",
             prefs: (function(prefs) {
                 return prefs.map(pref => ({
                     positionId: pref.position_id,
-                    preferred: pref.rank == 1,
+                    preferred: pref.rank == 1
                 }));
             })(app.preferences),
             rawPrefs: app.raw_prefs,
@@ -140,7 +166,7 @@ export const onFetchApplicationsSuccess = (resp) => {
             skills: app.technical_skills,
             avail: app.availability,
             other: app.other_info,
-            specialNeeds: app.special_needs,
+            specialNeeds: app.special_needs
         };
         if (applications[app.applicant_id]) {
             applications[app.applicant_id].push(newApp);
@@ -149,61 +175,63 @@ export const onFetchApplicationsSuccess = (resp) => {
         }
     });
     return applications;
-}
+};
 
-export const onFetchTappCoursesSuccess = (resp) => {
+export const onFetchTappCoursesSuccess = resp => {
     let courses = {};
     resp.forEach(course => {
         courses[course.id] = getCourse(course, true);
     });
     return courses;
-}
+};
 
-export const onFetchCpCoursesSuccess = (resp) => {
+export const onFetchCpCoursesSuccess = resp => {
     let courses = {};
     resp.forEach(course => {
         courses[course.id] = getCourse(course, false);
     });
     return courses;
+};
+
+function getCourse(course, tapp) {
+    let data = {
+        name: course.course_name,
+        code: course.position,
+        campus: (function(code) {
+            switch (code) {
+                case 1:
+                    return "St. George";
+                case 3:
+                    return "Scarborough";
+                case 5:
+                    return "Mississauga";
+                default:
+                    return "Other";
+            }
+        })(course.campus_code),
+        estimatedEnrol: course.current_enrolment,
+        cap: course.cap_enrolment,
+        waitlist: course.num_waitlisted
+    };
+    let extra = tapp
+        ? {
+              round: course.round_id,
+              instructors: course.instructors.map(instr => instr.id),
+              estimatedPositions: course.estimated_count,
+              positionHours: course.hours,
+              qual: course.qualifications,
+              resp: course.duties,
+              startDate: course.start_date,
+              endDate: course.end_date
+          }
+        : {
+              session: course.session_id,
+              instructors: course.instructors
+          };
+    return mergeJson(data, extra);
 }
 
-function getCourse(course, tapp){
-  let data = {
-    name: course.course_name,
-    code: course.position,
-    campus: (function(code) {
-        switch (code) {
-            case 1:
-                return 'St. George';
-            case 3:
-                return 'Scarborough';
-            case 5:
-                return 'Mississauga';
-            default:
-                return 'Other';
-        }
-    })(course.campus_code),
-    estimatedEnrol: course.current_enrolment,
-    cap: course.cap_enrolment,
-    waitlist: course.num_waitlisted,
-  }
-  let extra = tapp?{
-    round: course.round_id,
-    instructors: course.instructors.map(instr => instr.id),
-    estimatedPositions: course.estimated_count,
-    positionHours: course.hours,
-    qual: course.qualifications,
-    resp: course.duties,
-    startDate: course.start_date,
-    endDate: course.end_date,
-  }:{
-    session: course.session_id,
-    instructors: course.instructors,
-  };
-  return mergeJson(data, extra);
-}
-
-export const onFetchAssignmentsSuccess = (resp) => {
+export const onFetchAssignmentsSuccess = resp => {
     let assignments = {},
         assignmentCounts = {},
         count,
@@ -213,7 +241,7 @@ export const onFetchAssignmentsSuccess = (resp) => {
             id: ass.id,
             positionId: ass.position_id,
             hours: ass.hours,
-            locked: ass.export_date != null,
+            locked: ass.export_date != null
         };
         if (assignments[ass.applicant_id]) {
             assignments[ass.applicant_id].push(newAss);
@@ -222,29 +250,29 @@ export const onFetchAssignmentsSuccess = (resp) => {
         }
     });
     return assignments;
-}
+};
 
-export const onFetchInstructorsSuccess = (resp) => {
+export const onFetchInstructorsSuccess = resp => {
     let instructors = {};
     resp.forEach(instr => {
         instructors[instr.id] = {
-          name: instr.name,
-          utorid: instr.utorid,
-          email: instr.email,
+            name: instr.name,
+            utorid: instr.utorid,
+            email: instr.email
         };
     });
     return instructors;
-}
+};
 
-export const onFetchCategoriesSuccess = (resp)=>{
+export const onFetchCategoriesSuccess = resp => {
     let categories = {};
     resp.forEach(category => {
         categories[category.id] = category.name;
     });
     return categories;
-}
+};
 
-export const onFetchDdahsSuccess = (resp) => {
+export const onFetchDdahsSuccess = resp => {
     let ddahs = {};
     resp.forEach(ddah => {
         ddahs[ddah.id] = {
@@ -261,7 +289,7 @@ export const onFetchDdahsSuccess = (resp) => {
                 units: allocation.num_unit,
                 duty: allocation.duty_id,
                 type: allocation.unit_name,
-                time: allocation.minutes,
+                time: allocation.minutes
             })),
             trainings: ddah.trainings,
             categories: ddah.categories,
@@ -271,21 +299,21 @@ export const onFetchDdahsSuccess = (resp) => {
             authSignDate: ddah.ta_coord_sign_date,
             studentSignature: ddah.student_signature,
             studentSignDate: ddah.student_sign_date,
-            link: ddah.link,
+            link: ddah.link
         };
     });
     return ddahs;
-}
+};
 
-export const onFetchDutiesSuccess = (resp)=>{
+export const onFetchDutiesSuccess = resp => {
     let duties = {};
     resp.forEach(duty => {
         duties[duty.id] = duty.name;
     });
     return duties;
-}
+};
 
-export const onFetchOffersSuccess = (resp) => {
+export const onFetchOffersSuccess = resp => {
     let offers = {};
     resp.forEach(offer => {
         offers[offer.id] = {
@@ -309,25 +337,25 @@ export const onFetchOffersSuccess = (resp) => {
             printedAt: offer.print_time,
             link: offer.link,
             note: offer.commentary,
-            ddahSendDate: offer.ddah_send_date,
+            ddahSendDate: offer.ddah_send_date
         };
     });
     return offers;
-}
+};
 
-export const onFetchSessionsSuccess = (resp)=>{
+export const onFetchSessionsSuccess = resp => {
     let sessions = {};
     resp.forEach(session => {
         sessions[session.id] = {
             year: session.year,
             semester: session.semester,
-            pay: session.pay,
+            pay: session.pay
         };
     });
     return sessions;
-}
+};
 
-export const onFetchTemplatesSuccess = (resp)=> {
+export const onFetchTemplatesSuccess = resp => {
     let templates = {};
     resp.forEach(template => {
         templates[template.id] = {
@@ -339,240 +367,322 @@ export const onFetchTemplatesSuccess = (resp)=> {
                 units: allocation.num_unit,
                 duty: allocation.duty_id,
                 type: allocation.unit_name,
-                time: allocation.minutes,
+                time: allocation.minutes
             })),
             trainings: template.trainings,
-            categories: template.trainings,
+            categories: template.trainings
         };
     });
     return templates;
-}
-export const onFetchTrainingsSuccess = (resp)=>{
+};
+export const onFetchTrainingsSuccess = resp => {
     let trainings = {};
     resp.forEach(training => {
         trainings[training.id] = training.name;
     });
     return trainings;
-}
+};
 /*
   common fetch helper functions
 */
-function responseDealer(resp, data, appState, okay, error){
-  if(resp.ok){
-    if(resp.status == 204){
-      return (okay)?okay():resp;
-    }
-    else{
-      if(data.blob)
-        return (okay)?resp.blob().then(res=>okay(res)):resp;
-      else
-        return (okay)?resp.json().then(res=>okay(res)):resp;
-    }
-  }
-  else if(resp.status == 404){
-    return (error)?
-      resp.json().then(res=>error(res)):
-      respFailure(resp, appState);
-  }
-  else {
-    return respFailure(resp, appState);
-  }
-}
-export const putData = (route, data, fetch, appState, okay = null, error = null) => {
-  return putHelper(route, data, appState)
-    .then(resp => responseDealer(resp, data, appState, okay, error))
-    .then(res => {
-      if (fetch)
-        return fetch(res);
-    });
-}
-export const postData = (route, data, fetch, appState, okay = null, error = null) => {
-  return postHelper(route, data, appState)
-    .then(resp => responseDealer(resp, data, appState, okay, error))
-    .then(() => {
-      if (fetch)
-        return fetch();
-    });
-}
-export const deleteData = (route, fetch, appState, okay = null, error = null) =>{
-  return deleteHelper(route, appState)
-    .then(resp => responseDealer(resp, {}, appState, okay, error))
-    .then(() => {
-      fetch();
-    });
-}
-export const downloadFile = (route, appState) =>{
-  let download = false;
-  let filename = '';
-  return getHelper(route, appState)
-  .then(resp=>{
-    if(resp.ok){
-      download = true;
-      filename = resp.headers.get('Content-Disposition').match(/filename="(.*)"/)[1];
-      return resp.blob();
-    }
-    else{
-      return resp.json();
-    }
-  })
-  .then(resp => {
-    if(download){
-      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-        window.navigator.msSaveOrOpenBlob(resp, filename); //special case for Edge & IE
-      }
-      else{
-        let url = URL.createObjectURL(resp);
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.target="_self" ; //required in FF
-        a.style.display = 'none';
-        document.body.appendChild(a); //required in FF
-        a.click();
-        URL.revokeObjectURL(url);
-        document.body.removeChild(a); //required in FF
-      }
-    }
-    else{
-      appState.alert(resp.message);
-    }
-  });
-}
-
-export const importData = (route, data, fetch, appState) =>{
-  appState.setImporting(true);
-  let imported = true;
-  return postHelper(route, data, appState)
-    .then(resp => {
-        if (resp.ok)
-            return resp.json();
-        else if (resp.status == 404) {
-            imported = false;
-            return resp.json();
+function responseDealer(resp, data, appState, okay, error) {
+    if (resp.ok) {
+        if (resp.status == 204) {
+            return okay ? okay() : resp;
+        } else {
+            if (data.blob)
+                return okay ? resp.blob().then(res => okay(res)) : resp;
+            else return okay ? resp.json().then(res => okay(res)) : resp;
         }
-        else return respFailure(resp, appState);
-    })
-    .then(resp =>{
-        if(!imported || resp.errors)
-            resp.message.forEach(message => appState.alert(message));
-    })
-    .then(() => {
-        if(imported){
+    } else if (resp.status == 404) {
+        return error
+            ? resp.json().then(res => error(res))
+            : respFailure(resp, appState);
+    } else {
+        return respFailure(resp, appState);
+    }
+}
+export const putData = (
+    route,
+    data,
+    fetch,
+    appState,
+    okay = null,
+    error = null
+) => {
+    return putHelper(route, data, appState)
+        .then(resp => responseDealer(resp, data, appState, okay, error))
+        .then(res => {
+            if (fetch) return fetch(res);
+        });
+};
+export const postData = (
+    route,
+    data,
+    fetch,
+    appState,
+    okay = null,
+    error = null
+) => {
+    return postHelper(route, data, appState)
+        .then(resp => responseDealer(resp, data, appState, okay, error))
+        .then(() => {
+            if (fetch) return fetch();
+        });
+};
+export const deleteData = (
+    route,
+    fetch,
+    appState,
+    okay = null,
+    error = null
+) => {
+    return deleteHelper(route, appState)
+        .then(resp => responseDealer(resp, {}, appState, okay, error))
+        .then(() => {
             fetch();
-            appState.setImporting(false, true);
-        }
-        else appState.setImporting(false);
-    });
-}
-export const setRole = (roles, cp, appState)=>{
-  return getHelper('/roles', appState)
-      .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
-      .then(resp => {
-          if (resp.development) {
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName('zaleskim');
-          } else {
-              roles = resp.roles.filter(role =>roles.includes(role));
-              appState.setCurrentUserRoles(roles);
-              appState.selectUserRole(roles[0]);
-              appState.setCurrentUserName(resp.utorid);
-          }
-          if(cp) appState.setTaCoordinator(resp.ta_coord);
-    });
-}
-export const batchOfferAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
-  data = toInt(data);
-  return batchAction(true, canRoute, actionRoute, data, msg, fetch, extra, put, state);
-}
-export const batchDdahAction = (canRoute, actionRoute, data, msg, fetch, extra, put, state) =>{
-  data = toInt(data);
-  return batchAction(false, canRoute, actionRoute, data, msg, fetch, extra, put, state);
-}
+        });
+};
+export const downloadFile = (route, appState) => {
+    let download = false;
+    let filename = "";
+    return getHelper(route, appState)
+        .then(resp => {
+            if (resp.ok) {
+                download = true;
+                filename = resp.headers
+                    .get("Content-Disposition")
+                    .match(/filename="(.*)"/)[1];
+                return resp.blob();
+            } else {
+                return resp.json();
+            }
+        })
+        .then(resp => {
+            if (download) {
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(resp, filename); //special case for Edge & IE
+                } else {
+                    let url = URL.createObjectURL(resp);
+                    let a = document.createElement("a");
+                    a.href = url;
+                    a.download = filename;
+                    a.target = "_self"; //required in FF
+                    a.style.display = "none";
+                    document.body.appendChild(a); //required in FF
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    document.body.removeChild(a); //required in FF
+                }
+            } else {
+                appState.alert(resp.message);
+            }
+        });
+};
+
+export const importData = (route, data, fetch, appState) => {
+    appState.setImporting(true);
+    let imported = true;
+    return postHelper(route, data, appState)
+        .then(resp => {
+            if (resp.ok) return resp.json();
+            else if (resp.status == 404) {
+                imported = false;
+                return resp.json();
+            } else return respFailure(resp, appState);
+        })
+        .then(resp => {
+            if (!imported || resp.errors)
+                resp.message.forEach(message => appState.alert(message));
+        })
+        .then(() => {
+            if (imported) {
+                fetch();
+                appState.setImporting(false, true);
+            } else appState.setImporting(false);
+        });
+};
+export const setRole = (roles, cp, appState) => {
+    return getHelper("/roles", appState)
+        .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
+        .then(resp => {
+            if (resp.development) {
+                appState.setCurrentUserRoles(roles);
+                appState.selectUserRole(roles[0]);
+                appState.setCurrentUserName("zaleskim");
+            } else {
+                roles = resp.roles.filter(role => roles.includes(role));
+                appState.setCurrentUserRoles(roles);
+                appState.selectUserRole(roles[0]);
+                appState.setCurrentUserName(resp.utorid);
+            }
+            if (cp) appState.setTaCoordinator(resp.ta_coord);
+        });
+};
+export const batchOfferAction = (
+    canRoute,
+    actionRoute,
+    data,
+    msg,
+    fetch,
+    extra,
+    put,
+    state
+) => {
+    data = toInt(data);
+    return batchAction(
+        true,
+        canRoute,
+        actionRoute,
+        data,
+        msg,
+        fetch,
+        extra,
+        put,
+        state
+    );
+};
+export const batchDdahAction = (
+    canRoute,
+    actionRoute,
+    data,
+    msg,
+    fetch,
+    extra,
+    put,
+    state
+) => {
+    data = toInt(data);
+    return batchAction(
+        false,
+        canRoute,
+        actionRoute,
+        data,
+        msg,
+        fetch,
+        extra,
+        put,
+        state
+    );
+};
 /*
   non-export functions
 */
-function toInt(data){
-  return data.map((item)=>parseInt(item));
+function toInt(data) {
+    return data.map(item => parseInt(item));
 }
-function mergeJson(json1, json2){
-  let keys = Object.keys(json2);
-  for(let i =0; i < keys.length; i++)
-    json1[keys[i]] = json2[keys[i]];
-  return json1;
+function mergeJson(json1, json2) {
+    let keys = Object.keys(json2);
+    for (let i = 0; i < keys.length; i++) json1[keys[i]] = json2[keys[i]];
+    return json1;
 }
 function fetchHelper(URL, init, appState) {
     return fetch(URL, init).catch(function(error) {
-        appState.alert('<b>' + init.method + ' ' + URL + '</b> Network error: ' + error);
+        appState.alert(
+            "<b>" + init.method + " " + URL + "</b> Network error: " + error
+        );
         return Promise.reject(error);
     });
 }
-function batchAction(offer, canRoute, actionRoute, data, msg, fetch, extra, put, state){
-  let appState = state;
-  let valid = data;
-  let postedData = offer?{offers: data}:{ddahs: data};
-  return postData(canRoute, postedData, null, state,
-    ()=>{
-      data = getActionData(offer, null, data, msg, appState);
-      return setBatchData(actionRoute, data, appState,
-        fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
-    },
-    resp=>{
-      data = getActionData(offer, resp, data, msg, appState);
-      if(valid.length >0){
-        return setBatchData(actionRoute, data, appState,
-          fetch, resp=>appState.alert("<b>Error</b>: "+resp.message), extra, put);
-      }
-  });
+function batchAction(
+    offer,
+    canRoute,
+    actionRoute,
+    data,
+    msg,
+    fetch,
+    extra,
+    put,
+    state
+) {
+    let appState = state;
+    let valid = data;
+    let postedData = offer ? { offers: data } : { ddahs: data };
+    return postData(
+        canRoute,
+        postedData,
+        null,
+        state,
+        () => {
+            data = getActionData(offer, null, data, msg, appState);
+            return setBatchData(
+                actionRoute,
+                data,
+                appState,
+                fetch,
+                resp => appState.alert("<b>Error</b>: " + resp.message),
+                extra,
+                put
+            );
+        },
+        resp => {
+            data = getActionData(offer, resp, data, msg, appState);
+            if (valid.length > 0) {
+                return setBatchData(
+                    actionRoute,
+                    data,
+                    appState,
+                    fetch,
+                    resp => appState.alert("<b>Error</b>: " + resp.message),
+                    extra,
+                    put
+                );
+            }
+        }
+    );
 }
-function getActionData(offer, resp, data, msg, appState){
-  if(offer){
-    if(resp) filterOffer(resp, data, msg, appState);
-    return {offers: data};
-  }
-  else{
-    if(resp) filterDdah(resp, data, msg, appState);
-    return {ddahs: data};
-  }
+function getActionData(offer, resp, data, msg, appState) {
+    if (offer) {
+        if (resp) filterOffer(resp, data, msg, appState);
+        return { offers: data };
+    } else {
+        if (resp) filterDdah(resp, data, msg, appState);
+        return { ddahs: data };
+    }
 }
-function setBatchData(route, data, appState, succ, fail, extra, put){
-  data = (extra!=null)?mergeJson(data,extra):data;
-  if(put){
-    return putData(route, data, succ, appState);
-  }
-  else{
-    return postData(route,data, null, appState, succ, fail);
-  }
+function setBatchData(route, data, appState, succ, fail, extra, put) {
+    data = extra != null ? mergeJson(data, extra) : data;
+    if (put) {
+        return putData(route, data, succ, appState);
+    } else {
+        return postData(route, data, null, appState, succ, fail);
+    }
 }
-function filterOffer(res, validOffers, msg, appState){
-  let offersList = appState.getOffersList();
-  res.invalid_offers.forEach(offer => {
-      appState.alert(
-          '<b>Error</b>: Cannot '+msg.start+' ' +
-          offersList.getIn([offer.toString(), 'lastName']) +
-          ', ' +
-          offersList.getIn([offer.toString(), 'firstName']) +
-          ' for ' +
-          offersList.getIn([offer.toString(), 'course']) +
-          ' '+(!msg.end?'':msg.end)
-      );
-      validOffers.splice(validOffers.indexOf(offer), 1);
-  });
+function filterOffer(res, validOffers, msg, appState) {
+    let offersList = appState.getOffersList();
+    res.invalid_offers.forEach(offer => {
+        appState.alert(
+            "<b>Error</b>: Cannot " +
+                msg.start +
+                " " +
+                offersList.getIn([offer.toString(), "lastName"]) +
+                ", " +
+                offersList.getIn([offer.toString(), "firstName"]) +
+                " for " +
+                offersList.getIn([offer.toString(), "course"]) +
+                " " +
+                (!msg.end ? "" : msg.end)
+        );
+        validOffers.splice(validOffers.indexOf(offer), 1);
+    });
 }
-function filterDdah(res, validDdahs, msg, appState){
-  let ddahsList = appState.getDdahsList();
-  let offersList = appState.getOffersList();
-  res.invalid_offers.forEach(ddah => {
-      var offer = ddahsList.getIn([ddah.toString(), 'offer']).toString();
-      appState.alert(
-          '<b>Error</b>: Cannot '+msg.start+' ' +
-              offersList.getIn([offer, 'lastName']) +
-              ', ' +
-              offersList.getIn([offer, 'firstName']) +
-              ' for ' +
-              offersList.getIn([offer, 'course']) +
-              ' '+((!msg.end)?'':msg.end)
-      );
-      validDdahs.splice(validDdahs.indexOf(ddah), 1);
-  });
+function filterDdah(res, validDdahs, msg, appState) {
+    let ddahsList = appState.getDdahsList();
+    let offersList = appState.getOffersList();
+    res.invalid_offers.forEach(ddah => {
+        var offer = ddahsList.getIn([ddah.toString(), "offer"]).toString();
+        appState.alert(
+            "<b>Error</b>: Cannot " +
+                msg.start +
+                " " +
+                offersList.getIn([offer, "lastName"]) +
+                ", " +
+                offersList.getIn([offer, "firstName"]) +
+                " for " +
+                offersList.getIn([offer, "course"]) +
+                " " +
+                (!msg.end ? "" : msg.end)
+        );
+        validDdahs.splice(validDdahs.indexOf(ddah), 1);
+    });
 }

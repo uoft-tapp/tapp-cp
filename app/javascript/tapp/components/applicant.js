@@ -1,6 +1,6 @@
-import React from 'react';
-import { AssignmentForm } from './assignmentForm.js';
-import { Panel, Button } from 'react-bootstrap';
+import React from "react";
+import { AssignmentForm } from "./assignmentForm.js";
+import { Panel, Button } from "react-bootstrap";
 
 class Applicant extends React.Component {
     constructor(props) {
@@ -8,17 +8,17 @@ class Applicant extends React.Component {
 
         // applicant panels and their default expansion state
         this.defaultConfig = [
-            { label: 'Notes', expanded: true },
-            { label: 'Personal Information', expanded: true },
-            { label: 'Current Assignment Status', expanded: true },
-            { label: 'Course Preferences', expanded: true },
-            { label: 'Course Preferences (Raw Text)', expanded: false },
-            { label: 'Teaching Experience', expanded: true },
-            { label: 'Academic Qualifications', expanded: true },
-            { label: 'Technical Skills', expanded: true },
-            { label: 'Availability', expanded: true },
-            { label: 'Other Information', expanded: true },
-            { label: 'Special Needs Issues', expanded: true },
+            { label: "Notes", expanded: true },
+            { label: "Personal Information", expanded: true },
+            { label: "Current Assignment Status", expanded: true },
+            { label: "Course Preferences", expanded: true },
+            { label: "Course Preferences (Raw Text)", expanded: false },
+            { label: "Teaching Experience", expanded: true },
+            { label: "Academic Qualifications", expanded: true },
+            { label: "Technical Skills", expanded: true },
+            { label: "Availability", expanded: true },
+            { label: "Other Information", expanded: true },
+            { label: "Special Needs Issues", expanded: true }
         ];
     }
 
@@ -28,7 +28,7 @@ class Applicant extends React.Component {
             return null;
         }
         return (
-            <span style={{ whiteSpace: 'pre-wrap' }}>
+            <span style={{ whiteSpace: "pre-wrap" }}>
                 {text.replace(/\\r*\\n/g, <br />)}
             </span>
         );
@@ -38,38 +38,50 @@ class Applicant extends React.Component {
         let application = this.props.getApplicationById(this.props.applicantId);
 
         switch (panel) {
-            case 'Personal Information':
-                return <PersonalInfo applicant={this.props.applicantId} {...this.props} />;
+            case "Personal Information":
+                return (
+                    <PersonalInfo
+                        applicant={this.props.applicantId}
+                        {...this.props}
+                    />
+                );
 
-            case 'Current Assignment Status':
+            case "Current Assignment Status":
                 return <AssignmentForm {...this.props} />;
 
-            case 'Course Preferences':
-                return <Prefs applicant={this.props.applicantId} {...this.props} />;
+            case "Course Preferences":
+                return (
+                    <Prefs applicant={this.props.applicantId} {...this.props} />
+                );
 
-            case 'Course Preferences (Raw Text)':
+            case "Course Preferences (Raw Text)":
                 return this.format(application.rawPrefs);
 
-            case 'Teaching Experience':
+            case "Teaching Experience":
                 return this.format(application.exp);
 
-            case 'Academic Qualifications':
+            case "Academic Qualifications":
                 return this.format(application.qual);
 
-            case 'Technical Skills':
+            case "Technical Skills":
                 return this.format(application.skills);
 
-            case 'Availability':
+            case "Availability":
                 return this.format(application.avail);
 
-            case 'Other Information':
+            case "Other Information":
                 return this.format(application.other);
 
-            case 'Special Needs Issues':
+            case "Special Needs Issues":
                 return this.format(application.specialNeeds);
 
-            case 'Notes':
-                return <NotesForm applicant={this.props.applicantId} {...this.props} />;
+            case "Notes":
+                return (
+                    <NotesForm
+                        applicant={this.props.applicantId}
+                        {...this.props}
+                    />
+                );
 
             default:
                 return null;
@@ -82,41 +94,47 @@ class Applicant extends React.Component {
         // this.props.config should be of the form { <label> : <expanded?> }
 
         this.props.createAssignmentForm(
-            this.defaultConfig.map(
-                panel =>
-                    this.props.config && panel.label in this.props.config
-                        ? { label: panel.label, expanded: this.props.config[panel.label] }
-                        : panel
+            this.defaultConfig.map(panel =>
+                this.props.config && panel.label in this.props.config
+                    ? {
+                          label: panel.label,
+                          expanded: this.props.config[panel.label]
+                      }
+                    : panel
             )
         );
     }
 
     render() {
         let fetchCheck = this.props.anyFetching();
-        let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
+        let cursorStyle = { cursor: fetchCheck ? "progress" : "auto" };
 
         return (
             <div style={cursorStyle}>
-                {this.props.getAssignmentForm().panels.map((panel, index) =>
+                {this.props.getAssignmentForm().panels.map((panel, index) => (
                     <Panel
                         collapsible
                         expanded={panel.expanded}
                         header={
                             <div
                                 style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    margin: '0',
-                                    cursor: 'pointer',
+                                    width: "100%",
+                                    height: "100%",
+                                    margin: "0",
+                                    cursor: "pointer"
                                 }}
-                                onClick={() => this.props.togglePanelExpanded(index)}>
+                                onClick={() =>
+                                    this.props.togglePanelExpanded(index)
+                                }
+                            >
                                 {panel.label}
                             </div>
                         }
-                        key={'panel-' + index}>
+                        key={"panel-" + index}
+                    >
                         {this.addPanelContent(panel.label)}
                     </Panel>
-                )}
+                ))}
             </div>
         );
     }
@@ -134,24 +152,20 @@ const PersonalInfo = props => {
         address = applicant.address.split(/\\r*\\n/);
         if (address.length > 3) {
             address.splice(3);
-            address[2] = address[2] + ' [...]';
+            address[2] = address[2] + " [...]";
         }
         address = [
             <tr key="address-0">
                 <td>
                     <b>Address:</b>
                 </td>
-                <td>
-                    {address[0]}
-                </td>
+                <td>{address[0]}</td>
             </tr>,
-            ...address.slice(1).map((line, i) =>
-                <tr key={'address-' + i}>
-                    <td>
-                        {line}
-                    </td>
+            ...address.slice(1).map((line, i) => (
+                <tr key={"address-" + i}>
+                    <td>{line}</td>
                 </tr>
-            ),
+            ))
         ];
     }
 
@@ -169,9 +183,7 @@ const PersonalInfo = props => {
                     </td>
                     <td rowSpan="3">
                         <table>
-                            <tbody>
-                                {address}
-                            </tbody>
+                            <tbody>{address}</tbody>
                         </table>
                     </td>
                 </tr>
@@ -197,19 +209,22 @@ const PersonalInfo = props => {
                 </tr>
                 <tr>
                     <td>
-                        <b>Enrolled as a U of T graduate student for the TA session?&ensp;</b>
-                        {applicant.fullTime ? 'Yes' : 'No'}
+                        <b>
+                            Enrolled as a U of T graduate student for the TA
+                            session?&ensp;
+                        </b>
+                        {applicant.fullTime ? "Yes" : "No"}
                     </td>
                     <td>
                         <b>Completed a U of T TA training session?&ensp;</b>
-                        {application.taTraining ? 'Yes' : 'No'}
+                        {application.taTraining ? "Yes" : "No"}
                     </td>
                     <td>
                         <b>
-                            Grant permission for the TA coordinator to access academic
-                            history?&ensp;
+                            Grant permission for the TA coordinator to access
+                            academic history?&ensp;
                         </b>
-                        {application.academicAccess ? 'Yes' : 'No'}
+                        {application.academicAccess ? "Yes" : "No"}
                     </td>
                 </tr>
                 <tr>
@@ -247,29 +262,35 @@ const Prefs = props => {
         <table className="panel_table">
             <tbody>
                 <tr>
-                    {columns.map((column, key) =>
+                    {columns.map((column, key) => (
                         <td key={key}>
-                            {column.map((item, key) =>
+                            {column.map((item, key) => (
                                 <p key={key}>
                                     {courses[item.positionId].code}
-                                    &nbsp;{item.preferred
-                                        ? <i className="fa fa-star-o" style={{ color: 'orange' }} />
-                                        : ''}
+                                    &nbsp;
+                                    {item.preferred ? (
+                                        <i
+                                            className="fa fa-star-o"
+                                            style={{ color: "orange" }}
+                                        />
+                                    ) : (
+                                        ""
+                                    )}
                                 </p>
-                            )}
+                            ))}
                         </td>
-                    )}
+                    ))}
                 </tr>
             </tbody>
         </table>
     );
 };
 
-const NotesForm = props =>
+const NotesForm = props => (
     <div>
         <textarea
             id="applicant-notes"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             defaultValue={props.getApplicantById(props.applicant).notes}
         />
         <br />
@@ -278,10 +299,13 @@ const NotesForm = props =>
             onClick={() =>
                 props.noteApplicant(
                     props.applicant,
-                    document.getElementById('applicant-notes').value
-                )}>
+                    document.getElementById("applicant-notes").value
+                )
+            }
+        >
             Save
         </Button>
-    </div>;
+    </div>
+);
 
 export { Applicant };

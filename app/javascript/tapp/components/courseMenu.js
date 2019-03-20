@@ -1,11 +1,13 @@
-import React from 'react';
-import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
+import React from "react";
+import { ListGroup, ListGroupItem, Panel } from "react-bootstrap";
 
 class CourseMenu extends React.Component {
     // acquire and sort courses in order of course code
     sortCourses() {
         this.courses = Object.entries(this.props.getCoursesList());
-        this.courses.sort(([A, valA], [B, valB]) => (valA.code < valB.code ? -1 : 1));
+        this.courses.sort(([A, valA], [B, valB]) =>
+            valA.code < valB.code ? -1 : 1
+        );
     }
 
     componentWillMount() {
@@ -20,14 +22,14 @@ class CourseMenu extends React.Component {
         const list = this.courses.map(([key, val]) => {
             return (
                 <ListGroupItem
-                    key={'course-' + key}
+                    key={"course-" + key}
                     onClick={() => this.props.toggleSelectedCourse(key)}
-                    active={this.props.isCourseSelected(key)}>
-                    <span className="course-code">
-                        {val.code}
-                    </span>
+                    active={this.props.isCourseSelected(key)}
+                >
+                    <span className="course-code">{val.code}</span>
                     <span className="counts">
-                        {this.props.getCourseAssignmentCount(key)}&nbsp;/{val.estimatedPositions}
+                        {this.props.getCourseAssignmentCount(key)}&nbsp;/
+                        {val.estimatedPositions}
                     </span>
                 </ListGroupItem>
             );

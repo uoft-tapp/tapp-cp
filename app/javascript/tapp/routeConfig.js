@@ -2,39 +2,39 @@
 
 const routeConfig = {
     courses: {
-        label: 'Courses',
-        route: '/courses',
-        id: 'courses',
+        label: "Courses",
+        route: "/courses",
+        id: "courses"
     },
     abc: {
-        label: 'Applicants by Course',
-        route: '/applicantsbycourse',
-        id: 'abc',
+        label: "Applicants by Course",
+        route: "/applicantsbycourse",
+        id: "abc"
     },
     assigned: {
-        label: 'All Assigned',
-        route: '/assigned',
-        id: 'assigned',
+        label: "All Assigned",
+        route: "/assigned",
+        id: "assigned"
     },
     unassigned: {
-        label: 'All Unassigned',
-        route: '/unassigned',
-        id: 'unassigned',
+        label: "All Unassigned",
+        route: "/unassigned",
+        id: "unassigned"
     },
     summary: {
-        label: 'Summary',
-        route: '/summary',
-        id: 'summary',
+        label: "Summary",
+        route: "/summary",
+        id: "summary"
     },
     assistant: {
-        label: 'Assistant Panel',
-        route: '/assistantPanel',
-        id: 'assistant',
+        label: "Assistant Panel",
+        route: "/assistantPanel",
+        id: "assistant"
     },
     instructor: {
-        label: 'Instructor Panel',
-        route: '/instructorPanel',
-        id: 'instructor',
+        label: "Instructor Panel",
+        route: "/instructorPanel",
+        id: "instructor"
     }
 };
 
