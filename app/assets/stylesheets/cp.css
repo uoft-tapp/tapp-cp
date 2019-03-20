@@ -119,7 +119,6 @@ footer div p {
 
 #offers-grid .table-container td,
 #offers-grid .table-container th {
-    word-break: break-all;
 }
 
 #offer-note-popover .popover-content {
@@ -504,7 +503,6 @@ footer div p {
 
 #ddahs-grid .table-container td,
 #ddahs-grid .table-container th {
-    word-break: break-all;
 }
 
 #ddahs-grid #table-total {

@@ -6,18 +6,7 @@ const THeader = props => (
     <thead>
         <tr>
             {props.config.map((field, i) => (
-                <th
-                    key={"header-" + i}
-                    style={
-                        field.style
-                            ? Object.assign({}, field.style, {
-                                  width: "calc(" + field.style.width + "*100vw)"
-                              })
-                            : {}
-                    }
-                >
-                    {field.header}
-                </th>
+                <th key={"header-" + i}>{field.header}</th>
             ))}
         </tr>
     </thead>
@@ -28,13 +17,7 @@ const OfferRow = props => (
         {props.config.map((field, i) => (
             <td
                 key={"offer-" + props.offerId + "-row-" + i}
-                style={
-                    field.style
-                        ? Object.assign({}, field.style, {
-                              width: "calc(" + field.style.width + "*100vw)"
-                          })
-                        : {}
-                }
+                style={field.style ? Object.assign({}, field.style) : null}
             >
                 {field.data({ offer: props.offer, offerId: props.offerId })}
             </td>
@@ -107,12 +90,9 @@ class TableInst extends React.Component {
     render() {
         return (
             <div className="table-container">
-                <Table striped bordered condensed hover>
-                    <THeader config={this.props.config} />
-                </Table>
-
                 <div className="table-body">
                     <Table striped bordered condensed hover>
+                        <THeader config={this.props.config} />
                         <tbody>
                             {this.offers.map((val, key) => (
                                 <OfferRow

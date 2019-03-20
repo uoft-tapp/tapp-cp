@@ -123,35 +123,28 @@ class AdminControlPanel extends React.Component {
                     />
                 ),
 
-                style: { width: 0.01, textAlign: "center" }
+                style: { textAlign: "center" }
             },
             {
                 header: "Last Name",
                 data: p => p.offer.get("lastName"),
-                sortData: p => p.get("lastName"),
-
-                style: { width: 0.08 }
+                sortData: p => p.get("lastName")
             },
             {
                 header: "First Name",
                 data: p => p.offer.get("firstName"),
-                sortData: p => p.get("firstName"),
-
-                style: { width: 0.08 }
+                sortData: p => p.get("firstName")
             },
             {
                 header: "Email",
                 data: p => p.offer.get("email"),
                 sortData: p => p.get("email"),
-
-                style: { width: 0.16 }
+                style:{maxWidth: "15vw", overflow: "hidden"}
             },
             {
                 header: "Student Number",
                 data: p => p.offer.get("studentNumber"),
-                sortData: p => p.get("studentNumber"),
-
-                style: { width: 0.07 }
+                sortData: p => p.get("studentNumber")
             },
             {
                 header: "Position",
@@ -163,16 +156,12 @@ class AdminControlPanel extends React.Component {
                 // filter out offers not to that position
                 filterFuncs: this.props.appState
                     .getPositions()
-                    .map(position => p => p.get("course") == position),
-
-                style: { width: 0.1 }
+                    .map(position => p => p.get("course") == position)
             },
             {
                 header: "Hours",
                 data: p => p.offer.get("hours"),
-                sortData: p => p.get("hours"),
-
-                style: { width: 0.03 }
+                sortData: p => p.get("hours")
             },
             {
                 header: "Status",
@@ -251,9 +240,7 @@ class AdminControlPanel extends React.Component {
                     "Accepted",
                     "Rejected",
                     "Withdrawn"
-                ].map(status => p => p.get("status") == status),
-
-                style: { width: 0.07 }
+                ].map(status => p => p.get("status") == status)
             },
             {
                 header: "Contract Send Date",
@@ -287,17 +274,13 @@ class AdminControlPanel extends React.Component {
                     ) : (
                         ""
                     ),
-                sortData: p => (p.get("sentAt") ? p.get("sentAt") : ""),
-
-                style: { width: 0.1 }
+                sortData: p => (p.get("sentAt") ? p.get("sentAt") : "")
             },
             {
                 header: "Nag Count",
                 data: p =>
                     p.offer.get("nagCount") ? p.offer.get("nagCount") : "",
-                sortData: p => (p.get("nagCount") ? p.get("nagCount") : ""),
-
-                style: { width: 0.05 }
+                sortData: p => (p.get("nagCount") ? p.get("nagCount") : "")
             },
             {
                 header: "HRIS Status",
@@ -311,9 +294,7 @@ class AdminControlPanel extends React.Component {
                     ["Processed", "Printed"].map(status => p =>
                         p.get("hrStatus") == status
                     )
-                ),
-
-                style: { width: 0.07 }
+                )
             },
             {
                 header: "Printed Date",
@@ -321,9 +302,7 @@ class AdminControlPanel extends React.Component {
                     p.offer.get("printedAt")
                         ? new Date(p.offer.get("printedAt")).toLocaleString()
                         : "",
-                sortData: p => (p.get("printedAt") ? p.get("printedAt") : ""),
-
-                style: { width: 0.08 }
+                sortData: p => (p.get("printedAt") ? p.get("printedAt") : "")
             },
             {
                 header: "DDAH Status",
