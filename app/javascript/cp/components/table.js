@@ -1,16 +1,67 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Table } from "react-bootstrap";
+import { Table, Glyphicon } from "react-bootstrap";
 
-const THeader = props => (
-    <thead>
-        <tr>
-            {props.config.map((field, i) => (
-                <th key={"header-" + i}>{field.header}</th>
-            ))}
-        </tr>
-    </thead>
-);
+function SortButton(props) {
+    let iconName = null;
+    const direction = +props.direction;
+    if (direction === 1) {
+        iconName = "sort-by-alphabet";
+    } else if (direction === -1) {
+        iconName = "sort-by-alphabet-alt";
+    }
+    if (!iconName) {
+        return null;
+    }
+    return <Glyphicon glyph={iconName} />;
+}
+
+const THeader = props => {
+    const { selectedSortFields, cycleSort } = props;
+    const sortDirs = {};
+    for (let [field, dir] of selectedSortFields) {
+        sortDirs[field] = dir;
+    }
+
+    function cycleSortFactory(i, dummy) {
+        if (dummy) {
+            return () => {};
+        }
+        return () => cycleSort(i);
+    }
+
+    return (
+        <thead>
+            <tr>
+                {props.config.map((field, i) => (
+                    <th
+                        key={"header-" + i}
+                        onClick={cycleSortFactory(i, field.headerNoSort)}
+                        style={{ cursor: "pointer" }}
+                        title={"Click to sort column"}
+                    >
+                        <div style={{ position: "relative" }}>
+                            {field.header}
+                            {!field.headerNoSort && (
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        right: "2px",
+                                        bottom: "0px",
+                                        color: "#a0a0a0",
+                                        background: "white"
+                                    }}
+                                >
+                                    <SortButton direction={sortDirs[i]} />
+                                </div>
+                            )}
+                        </div>
+                    </th>
+                ))}
+            </tr>
+        </thead>
+    );
+};
 
 const OfferRow = props => (
     <tr key={"offer-" + props.offerId + "-row"}>
@@ -88,11 +139,16 @@ class TableInst extends React.Component {
     }
 
     render() {
+        const selectedSortFields = this.props.getSelectedSortFields();
         return (
             <div className="table-container">
                 <div className="table-body">
                     <Table striped bordered condensed hover>
-                        <THeader config={this.props.config} />
+                        <THeader
+                            config={this.props.config}
+                            selectedSortFields={selectedSortFields}
+                            cycleSort={this.props.cycleSort}
+                        />
                         <tbody>
                             {this.offers.map((val, key) => (
                                 <OfferRow

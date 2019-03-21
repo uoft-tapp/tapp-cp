@@ -82,6 +82,7 @@ class DdahControlPanel extends React.Component {
                         }
                     />
                 ),
+                headerNoSort: true,
                 data: p => (
                     <input
                         type="checkbox"
@@ -305,6 +306,7 @@ class DdahControlPanel extends React.Component {
                     getOffers={() => this.props.appState.getOffersList()}
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
+                    cycleSort={field => this.props.appState.cycleSort(field)}
                 />
             </Grid>
         );

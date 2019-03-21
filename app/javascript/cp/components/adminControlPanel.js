@@ -50,7 +50,6 @@ class AdminControlPanel extends React.Component {
 
     render() {
         const role = this.props.appState.getSelectedUserRole();
-
         let nullCheck =
             this.props.appState.isOffersListNull() ||
             (role == "cp_admin" && this.props.appState.isSessionsListNull());
@@ -80,6 +79,7 @@ class AdminControlPanel extends React.Component {
                         }
                     />
                 ),
+                headerNoSort: true,
                 data: p => (
                     <input
                         type="checkbox"
@@ -139,7 +139,7 @@ class AdminControlPanel extends React.Component {
                 header: "Email",
                 data: p => p.offer.get("email"),
                 sortData: p => p.get("email"),
-                style:{maxWidth: "15vw", overflow: "hidden"}
+                style: { maxWidth: "15vw", overflow: "hidden" }
             },
             {
                 header: "Student Number",
@@ -243,37 +243,42 @@ class AdminControlPanel extends React.Component {
                 ].map(status => p => p.get("status") == status)
             },
             {
-                header: "Contract Send Date",
-                data: p =>
-                    p.offer.get("sentAt") ? (
-                        <span>
-                            {new Date(p.offer.get("sentAt")).toLocaleString()}
-                            &ensp;
-                            <i
-                                className="fa fa-search"
-                                style={{ fontSize: "16px", cursor: "pointer" }}
-                                title="Applicant View"
-                                onClick={() =>
-                                    this.props.appState.showContractApplicant(
-                                        p.offerId
-                                    )
-                                }
-                            />
-                            &nbsp;
-                            <i
-                                className="fa fa-search-plus"
-                                style={{ fontSize: "16px", cursor: "pointer" }}
-                                title="Office View"
-                                onClick={() =>
-                                    this.props.appState.showContractHr(
-                                        p.offerId
-                                    )
-                                }
-                            />
-                        </span>
-                    ) : (
-                        ""
-                    ),
+                header: "Contract",
+                data: p => (
+                    <div
+                        title={
+                            p.offer.get("sentAt") &&
+                            "Contract sent at " +
+                                new Date(p.offer.get("sentAt")).toLocaleString(
+                                    "en-CA"
+                                )
+                        }
+                    >
+                        {p.offer.get("sentAt") &&
+                            new Date(p.offer.get("sentAt")).toLocaleString(
+                                "en-CA",
+                                { month: "short", day: "numeric" }
+                            ) + " "}
+                        <i
+                            className="fa fa-search"
+                            style={{ fontSize: "16px", cursor: "pointer" }}
+                            title="Applicant View"
+                            onClick={() =>
+                                this.props.appState.showContractApplicant(
+                                    p.offerId
+                                )
+                            }
+                        />
+                        <i
+                            className="fa fa-search-plus"
+                            style={{ fontSize: "16px", cursor: "pointer" }}
+                            title="Office View"
+                            onClick={() =>
+                                this.props.appState.showContractHr(p.offerId)
+                            }
+                        />
+                    </div>
+                ),
                 sortData: p => (p.get("sentAt") ? p.get("sentAt") : "")
             },
             {
@@ -299,9 +304,18 @@ class AdminControlPanel extends React.Component {
             {
                 header: "Printed Date",
                 data: p =>
-                    p.offer.get("printedAt")
-                        ? new Date(p.offer.get("printedAt")).toLocaleString()
-                        : "",
+                    p.offer.get("printedAt") && (
+                        <div
+                            title={new Date(
+                                p.offer.get("printedAt")
+                            ).toLocaleString("en-CA")}
+                        >
+                            {new Date(p.offer.get("printedAt")).toLocaleString(
+                                "en-CA",
+                                { month: "short", day: "numeric" }
+                            )}
+                        </div>
+                    ),
                 sortData: p => (p.get("printedAt") ? p.get("printedAt") : "")
             },
             {
@@ -394,6 +408,7 @@ class AdminControlPanel extends React.Component {
                     getOffers={() => this.props.appState.getOffersList()}
                     getSelectedSortFields={() => this.props.appState.getSorts()}
                     getSelectedFilters={() => this.props.appState.getFilters()}
+                    cycleSort={field => this.props.appState.cycleSort(field)}
                 />
             </Grid>
         );

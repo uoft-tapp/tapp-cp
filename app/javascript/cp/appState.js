@@ -410,6 +410,24 @@ class AppState {
         this.set("selectedSortFields", sorts.delete(i));
     }
 
+    // cycle through sort+, sort-, no sort
+    cycleSort(field) {
+        const sorts = this.get("selectedSortFields");
+        const i = sorts.findIndex(f => f.get(0) === field);
+        if (i === -1) {
+            this.addSort(field);
+            return;
+        }
+
+        const dir = sorts.get(i).get(1);
+
+        if (dir === 1) {
+            this.toggleSortDir(field);
+        } else {
+            this.removeSort(field);
+        }
+    }
+
     // select a navbar tab
     selectNavTab(eventKey) {
         this.set("nav.selectedTab", eventKey);

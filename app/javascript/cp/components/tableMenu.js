@@ -55,62 +55,6 @@ class TableMenu extends React.Component {
                             )
                     )}
                 </ButtonGroup>
-
-                <ButtonGroup style={{ paddingLeft: "1vw" }}>
-                    {this.props
-                        .getSelectedSortFields()
-                        .map(([sortField, dir]) => {
-                            let name = this.props.config[sortField].header;
-
-                            return (
-                                <DropdownButton
-                                    title={
-                                        <span>
-                                            {name} {icon[dir]}
-                                        </span>
-                                    }
-                                    key={"sort-" + sortField}
-                                    id={"sort-" + sortField}
-                                    noCaret
-                                >
-                                    <MenuItem
-                                        onSelect={() =>
-                                            this.props.toggleSortDir(sortField)
-                                        }
-                                    >
-                                        {name} {icon[-dir]}
-                                    </MenuItem>
-
-                                    <MenuItem
-                                        onSelect={() =>
-                                            this.props.removeSort(sortField)
-                                        }
-                                    >
-                                        Clear field
-                                    </MenuItem>
-                                </DropdownButton>
-                            );
-                        })}
-
-                    <DropdownButton
-                        title="Add sort field"
-                        id="sort-dropdown"
-                        bsStyle="info"
-                        noCaret
-                    >
-                        {this.props.config.map(
-                            (field, i) =>
-                                field.sortData && (
-                                    <MenuItem
-                                        key={"sort-" + field.header}
-                                        onSelect={() => this.props.addSort(i)}
-                                    >
-                                        {field.header}
-                                    </MenuItem>
-                                )
-                        )}
-                    </DropdownButton>
-                </ButtonGroup>
             </div>
         );
     }
