@@ -1361,8 +1361,11 @@ class AppState {
     }
 
     updateSessionPay(session, pay, dbUpdate = false) {
-        if (dbUpdate) fetch.updateSessionPay(session, pay);
-        else this.set("sessions.list." + session + ".pay", pay);
+        if (dbUpdate) {
+            fetch.updateSessionPay(session, pay);
+        } else {
+            this.set("sessions.list." + session + ".pay", pay);
+        }
     }
 
     updateTemplate(template) {
