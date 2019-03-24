@@ -81,6 +81,7 @@ Rails.application.routes.draw do
   post "offers/send-contracts" => "offers#send_contracts"
   post "offers/print" => "offers#combine_contracts_print"
   post "offers/nag" => "offers#batch_email_nags"
+  post "offers/update_hours", to: "offers#update_batch_offers_hours"
   post "offers/can-clear-hris-status" => "offers#can_clear_hris_status"
   post "offers/clear-hris-status" => "offers#clear_hris_status"
   post "/offers/can-nag-instructor" => "offers#can_nag_instructor"

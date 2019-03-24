@@ -373,6 +373,12 @@ export const setOfferAccepted = offer => {
     );
 };
 
+export const setOfferDetails = offers => {
+    postData("/offers/update_hours", offers, () => {
+        getOffers();
+    })
+};
+
 // set status to unsent and clear other information
 export const resetOffer = offer => {
     postData("/offers/" + offer + "/reset", {}, () => {

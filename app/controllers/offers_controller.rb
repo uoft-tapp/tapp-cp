@@ -71,6 +71,16 @@ class OffersController < ApplicationController
     check_offers_status(params[:offers], :hr_status, [nil, "Processed", "Printed"])
   end
 
+  def update_batch_offers_hours
+    params["_json"].each do |offer_json|
+      puts "looping"
+      puts offer_json
+      offer = Offer.find(offer_json[:offer_id])
+      puts offer
+      offer.update_attributes!(hours: offer_json[:hours])
+    end
+  end
+
   def update
     if params[:id] == "batch-update"
       if params[:offers]
@@ -226,7 +236,7 @@ class OffersController < ApplicationController
   end
 
   def offer_params
-    params.permit(:hr_status, :ddah_status, :commentary)
+    params.permit(:hr_status, :ddah_status, :commentary, :hours)
   end
 
   def get_all_offers(offers)

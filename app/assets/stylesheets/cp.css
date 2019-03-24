@@ -521,3 +521,16 @@ footer div p {
   text-decoration: none;
   color: #555;
 }
+
+.show-on-hover-wrapper:hover .show-on-hover {
+    opacity: 1;
+}
+
+.show-on-hover {
+    transition: all .3s;
+    opacity: 0;
+}
+
+.edit-glyph {
+    cursor: pointer;
+}

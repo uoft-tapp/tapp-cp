@@ -48,7 +48,7 @@ class ContractGenerator
     case type
     when TITLE
       return {
-        font: "Times-Roman",
+        font: "Helvetica",
         font_size: 12,
         text: text,
         align: :center,

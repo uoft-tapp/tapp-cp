@@ -7,6 +7,8 @@ import {
     Button,
     OverlayTrigger,
     Popover,
+    Glyphicon,
+    Modal,
     Form,
     FormGroup,
     ControlLabel,
@@ -18,10 +20,100 @@ import { Table } from "./table.js";
 import { ImportMenu } from "./importMenu.js";
 import { SessionsForm } from "./sessionsForm.js";
 
-function EditHoursIcon(params) {
-    return (
-        <div style={{ position: "absolute", right: 2, bottom: 0 }}>hi you</div>
-    );
+class EditHoursDialog extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            hours: props.offer.get("hours"),
+            origHours: props.offer.get("hours")
+        };
+        this.setHours = this.setHours.bind(this);
+        this.cancelClick = this.cancelClick.bind(this);
+    }
+    setHours(hours) {
+        this.setState({ hours });
+    }
+    cancelClick() {
+        this.props.onHide();
+        this.setState({ hours: this.state.origHours });
+    }
+    render() {
+        const { show, onSave, onHide } = this.props;
+        const [hours, setHours] = [+this.state.hours, this.setHours];
+        const origHours = +this.state.origHours;
+
+        return (
+            <Modal show={show} onHide={this.cancelClick}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Hours</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <input
+                        value={hours}
+                        onChange={e => setHours(e.currentTarget.value)}
+                    />
+                    {+hours !== +origHours && (
+                        <span>
+                            Change hours from {origHours} to {hours}
+                        </span>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this.cancelClick}>Cancel</Button>
+                    <Button
+                        onClick={() => {
+                            if (hours !== origHours) {
+                                (onSave || (() => {}))(hours);
+                            }
+                            onHide();
+                        }}
+                    >
+                        Save
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
+class EditHoursIcon extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            dialogShow: false
+        };
+
+        this.setDialogShow = this.setDialogShow.bind(this);
+    }
+    setDialogShow(state) {
+        this.setState({ dialogShow: state });
+    }
+    render() {
+        const { offer, hidden, onSave } = this.props;
+        const setDialogShow = this.setDialogShow;
+        const dialogShow = this.state.dialogShow;
+
+        if (hidden) {
+            return null;
+        }
+        return (
+            <React.Fragment>
+                <div
+                    style={{ position: "absolute", right: 2, bottom: 0 }}
+                    className="show-on-hover edit-glyph"
+                    onClick={() => setDialogShow(true)}
+                >
+                    <Glyphicon glyph="edit" />
+                </div>
+                <EditHoursDialog
+                    offer={offer}
+                    show={dialogShow}
+                    onHide={() => this.setDialogShow(false)}
+                    onSave={onSave}
+                />
+            </React.Fragment>
+        );
+    }
 }
 
 const getCheckboxElements = () =>
@@ -44,6 +136,11 @@ class AdminControlPanel extends React.Component {
         if (this.props.appState.getSelectedNavTab() != this.props.navKey) {
             this.props.appState.selectNavTab(this.props.navKey);
         }
+    }
+
+    updateOffer(offer, attrs) {
+        attrs.offer_id = offer;
+        this.props.appState.setOfferDetails(attrs);
     }
 
     componentWillMount() {
@@ -163,7 +260,23 @@ class AdminControlPanel extends React.Component {
             },
             {
                 header: "Hours",
-                data: p => p.offer.get("hours"),
+                data: p => (
+                    <div
+                        style={{ position: "relative" }}
+                        className="show-on-hover-wrapper"
+                    >
+                        {p.offer.get("hours")}
+                        <EditHoursIcon
+                            offer={p.offer}
+                            hidden={["Accepted", "Pending"].includes(
+                                p.offer.get("status")
+                            )}
+                            onSave={hours => {
+                                this.updateOffer(p.offerId, { hours });
+                            }}
+                        />
+                    </div>
+                ),
                 sortData: p => p.get("hours")
             },
             {

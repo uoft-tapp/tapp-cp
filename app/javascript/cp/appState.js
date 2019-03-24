@@ -62,8 +62,12 @@ class AppState {
         // list of change listeners
         this._listeners = [];
         // notify listeners of change
-        var notifyListeners = () =>
-            this._listeners.forEach(listener => listener());
+        const notifyListeners = () => {
+            for (let listener of this._listeners) {
+                listener();
+            }
+            //this._listeners.forEach(listener => listener());
+        };
 
         // parses a property path into a list, as expected by Immutable
         var parsePath = path =>
@@ -1123,6 +1127,13 @@ class AppState {
         }
 
         fetch.resetOffer(offers[0]);
+    }
+
+    setOfferDetails(offers) {
+        if (!offers.length) {
+            offers = [offers];
+        }
+        fetch.setOfferDetails(offers);
     }
 
     sendContracts(offers) {
