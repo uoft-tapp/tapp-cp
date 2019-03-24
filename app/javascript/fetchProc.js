@@ -6,11 +6,13 @@ export const msgFailure = (text, appState) => {
     appState.alert("<b>Action Failed:</b> " + text);
     return Promise.reject();
 };
+
 export const respFailure = (resp, appState) => {
     // parse a response into an error message
     appState.alert("<b>Action Failed</b> " + resp.url + ": " + resp.statusText);
     return Promise.reject();
 };
+
 export const getHelper = (URL, appState) => {
     return fetchHelper(
         URL,
@@ -24,6 +26,7 @@ export const getHelper = (URL, appState) => {
         appState
     );
 };
+
 export const postHelper = (URL, body, appState) => {
     return fetchHelper(
         URL,
@@ -39,6 +42,7 @@ export const postHelper = (URL, body, appState) => {
         appState
     );
 };
+
 export const deleteHelper = (URL, appState) => {
     return fetchHelper(
         URL,
@@ -49,6 +53,7 @@ export const deleteHelper = (URL, appState) => {
         appState
     );
 };
+
 export const putHelper = (URL, body, appState) => {
     return fetchHelper(
         URL,
@@ -63,6 +68,7 @@ export const putHelper = (URL, body, appState) => {
         appState
     );
 };
+
 export const getResource = (
     route,
     onSuccess,
@@ -89,6 +95,7 @@ export const getResource = (
         return getResHelper(route, onSuccess, dataName, setData, appState);
     }
 };
+
 function getResHelper(route, onSuccess, dataName, setData, appState) {
     return getHelper(route)
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
@@ -402,6 +409,7 @@ function responseDealer(resp, data, appState, okay, error) {
         return respFailure(resp, appState);
     }
 }
+
 export const putData = (
     route,
     data,
@@ -416,6 +424,7 @@ export const putData = (
             if (fetch) return fetch(res);
         });
 };
+
 export const postData = (
     route,
     data,
@@ -430,6 +439,7 @@ export const postData = (
             if (fetch) return fetch();
         });
 };
+
 export const deleteData = (
     route,
     fetch,
@@ -443,6 +453,7 @@ export const deleteData = (
             fetch();
         });
 };
+
 export const downloadFile = (route, appState) => {
     let download = false;
     let filename = "";
@@ -502,6 +513,7 @@ export const importData = (route, data, fetch, appState) => {
             } else appState.setImporting(false);
         });
 };
+
 export const setRole = (roles, cp, appState) => {
     return getHelper("/roles", appState)
         .then(resp => (resp.ok ? resp.json().catch(msgFailure) : respFailure))
@@ -519,6 +531,7 @@ export const setRole = (roles, cp, appState) => {
             if (cp) appState.setTaCoordinator(resp.ta_coord);
         });
 };
+
 export const batchOfferAction = (
     canRoute,
     actionRoute,
@@ -565,6 +578,7 @@ export const batchDdahAction = (
         state
     );
 };
+
 /*
   non-export functions
 */

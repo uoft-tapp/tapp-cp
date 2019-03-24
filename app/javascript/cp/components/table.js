@@ -140,6 +140,14 @@ class TableInst extends React.Component {
 
     render() {
         const selectedSortFields = this.props.getSelectedSortFields();
+        const offerRows = this.offers.toArray().map(([key, val]) => {
+                                return <OfferRow
+                                    key={"offer-" + key}
+                                    offerId={key}
+                                    offer={val}
+                                    {...this.props}
+                                />
+                            })
         return (
             <div className="table-container">
                 <div className="table-body">
@@ -150,14 +158,7 @@ class TableInst extends React.Component {
                             cycleSort={this.props.cycleSort}
                         />
                         <tbody>
-                            {this.offers.map((val, key) => (
-                                <OfferRow
-                                    key={"offer-" + key}
-                                    offerId={key}
-                                    offer={val}
-                                    {...this.props}
-                                />
-                            ))}
+                            {offerRows}
                         </tbody>
                     </Table>
                 </div>

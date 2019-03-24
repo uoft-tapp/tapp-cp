@@ -18,6 +18,12 @@ import { Table } from "./table.js";
 import { ImportMenu } from "./importMenu.js";
 import { SessionsForm } from "./sessionsForm.js";
 
+function EditHoursIcon(params) {
+    return (
+        <div style={{ position: "absolute", right: 2, bottom: 0 }}>hi you</div>
+    );
+}
+
 const getCheckboxElements = () =>
     document.getElementsByClassName("offer-checkbox");
 
@@ -92,30 +98,27 @@ class AdminControlPanel extends React.Component {
                                 let first = false,
                                     last = false;
 
-                                Array.prototype.forEach.call(
-                                    getCheckboxElements(),
-                                    box => {
+                                for (let box of getCheckboxElements()) {
+                                    if (
+                                        !first &&
+                                        (box.id == p.offerId ||
+                                            box.id == this.lastClicked)
+                                    ) {
+                                        // starting box
+                                        first = true;
+                                        box.checked = true;
+                                    } else if (first && !last) {
+                                        // box is in range
                                         if (
-                                            !first &&
-                                            (box.id == p.offerId ||
-                                                box.id == this.lastClicked)
+                                            box.id == p.offerId ||
+                                            box.id == this.lastClicked
                                         ) {
-                                            // starting box
-                                            first = true;
-                                            box.checked = true;
-                                        } else if (first && !last) {
-                                            // box is in range
-                                            if (
-                                                box.id == p.offerId ||
-                                                box.id == this.lastClicked
-                                            ) {
-                                                // ending box
-                                                last = true;
-                                            }
-                                            box.checked = true;
+                                            // ending box
+                                            last = true;
                                         }
+                                        box.checked = true;
                                     }
-                                );
+                                }
                             }
 
                             this.lastClicked = p.offerId;
