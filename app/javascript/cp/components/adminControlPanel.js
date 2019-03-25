@@ -51,7 +51,7 @@ class EditHoursDialog extends React.Component {
                     <input
                         value={hours}
                         onChange={e => setHours(e.currentTarget.value)}
-                    />
+                    />{" "}
                     {+hours !== +origHours && (
                         <span>
                             Change hours from {origHours} to {hours}

@@ -1,4 +1,4 @@
-FROM ruby:2.4.1-alpine
+FROM ruby:2.6.2-alpine
 ARG RAILS_ENV
 ENV RAILS_ENV=${RAILS_ENV:-development}
 
