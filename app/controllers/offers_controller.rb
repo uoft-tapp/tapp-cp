@@ -185,7 +185,7 @@ class OffersController < ApplicationController
 
   def get_contract
     rendered = get_contract_pdf(Offer.find(params[:offer_id]))
-    render pdf: "offer-letter", inline: rendered
+    render pdf: "contract", inline: rendered
   end
 
   def get_contract_student
