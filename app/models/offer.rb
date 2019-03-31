@@ -27,6 +27,7 @@ class Offer < ApplicationRecord
       end_date: position[:end_date],
       applicant: applicant.format,
       session: session,
+      session_info: session.format,
       instructors: [],
       deadline: self.get_deadline,
     }
@@ -40,7 +41,8 @@ class Offer < ApplicationRecord
     instructors.each do |instructor|
       data[:instructors].push(instructor)
     end
-    return offer.merge(data)
+    # the Liquid templating engine assumes strings instead of symbols
+    return offer.merge(data).with_indifferent_access
   end
 
   def instructor_format
@@ -63,6 +65,7 @@ class Offer < ApplicationRecord
       :year,
       :session,
     ]
-    return offer.merge(data).except(*excludes)
+    # the Liquid templating engine assumes strings instead of symbols
+    return offer.merge(data).except(*excludes).with_indifferent_access
   end
 end

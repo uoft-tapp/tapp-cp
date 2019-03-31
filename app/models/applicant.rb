@@ -13,6 +13,7 @@ class Applicant < ApplicationRecord
       :full_time,
       :yip,
     ]
-    return applicant.except(*excludes)
+    # the Liquid templating engine assumes strings instead of symbols
+    return applicant.except(*excludes).with_indifferent_access
   end
 end

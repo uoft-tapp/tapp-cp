@@ -149,6 +149,14 @@ If you don't specify the environment variable that the docker-compose file shoul
 up with an error from postgres ("role "tapp" does not exist"). In that case stop/remove the containers and its volumes,
 `docker-compose down -v`, and restart deployment from step 2.
 
+### Setting up contract templates
+
+Templates for TA contracts and TA/Office short-form contracts are located in `app/views/contracts/default`. To create
+cusomized contracts for your department, copy the `default` folder to `<your department>` folder and change the `offer-template.html`
+and `offer-template-office.html` templates. They are regular HTML files that get rendered using the [Liquid](https://github.com/chamnap/liquid-rails)
+templating engine. After you've made changes, set the `CONTRACT_SUBDIR` in `.env` to `<your department>` so that contracts will
+be loaded from the correct folder.
+
 ### Recipe for updating a functioning deployment <a id="updateDeployment"></a>
 
 Update the app after a hotfix or other improvement:

@@ -172,18 +172,25 @@ class OffersController < ApplicationController
         update_print_status(offer_id)
       end
       offer = Offer.find(offer_id)
-      offers.push(offer.format)
+      offers.push(offer)
     end
-    generator = ContractGenerator.new(offers, true)
-    send_data generator.render, filename: "contracts.pdf", disposition: "inline"
+    # create a pdf concatenation of all the offers using CombinePDF
+    out_pdf = CombinePDF.new
+    offers.each do |offer|
+      rendered = render_to_string pdf: "contract", inline: get_contract_pdf(offer, true), encoding: "UTF-8"
+      out_pdf << CombinePDF.parse(rendered)
+    end
+    send_data out_pdf.to_pdf, filename: "contracts.pdf", disposition: "inline"
   end
 
   def get_contract
-    get_contract_pdf(params)
+    rendered = get_contract_pdf(Offer.find(params[:offer_id]))
+    render pdf: "offer-letter", inline: rendered
   end
 
   def get_contract_student
-    get_contract_pdf(params)
+    rendered = get_contract_pdf(Offer.find(params[:offer_id]))
+    render pdf: "offer-letter", inline: rendered
   end
 
   def set_status_student
@@ -229,10 +236,20 @@ class OffersController < ApplicationController
   end
 
   private
-  def get_contract_pdf(params)
-    offer = Offer.find(params[:offer_id])
-    generator = ContractGenerator.new([offer.format])
-    send_data generator.render, filename: "contract.pdf", disposition: "inline"
+  def get_contract_pdf(offer, office_template=false)
+    contract_dir = "#{Rails.root}/app/views/contracts/#{ENV["CONTRACT_SUBDIR"]}"
+    # load the offer as a Liquid template
+    if office_template
+      template = Liquid::Template.parse(File.read("#{contract_dir}/offer-template-office.html"))
+    else
+      template = Liquid::Template.parse(File.read("#{contract_dir}/offer-template.html"))
+    end
+    # font.css and header.css contain base64-encoded data since we need all
+    # data to be embedded in the HTML document
+    styles = { "style_font" => File.read("#{contract_dir}/font.css"),
+               "style_header" =>  File.read("#{contract_dir}/header.css")}
+    subs = offer.format.merge(styles)
+    rendered = template.render(subs)
   end
 
   def offer_params

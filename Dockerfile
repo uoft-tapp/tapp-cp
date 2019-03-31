@@ -1,4 +1,5 @@
-FROM ruby:2.6.2-alpine
+FROM madnight/docker-alpine-wkhtmltopdf as wkhtmltopdf_image
+FROM ruby:2.6.2-alpine3.8
 ARG RAILS_ENV
 ENV RAILS_ENV=${RAILS_ENV:-development}
 
@@ -9,6 +10,15 @@ WORKDIR /srv/app
 RUN apk --update --upgrade add curl-dev libcurl build-base openssh \
 	tzdata libxml2 libxml2-dev libxslt libxslt-dev postgresql-dev \
 	nodejs
+
+# For wkhtmltopdf
+RUN apk add --update --no-cache \
+    libgcc libstdc++ libx11 glib libxrender libxext libintl \
+    libcrypto1.0 libssl1.0 \
+    ttf-dejavu ttf-droid ttf-freefont ttf-liberation ttf-ubuntu-font-family
+
+COPY --from=wkhtmltopdf_image /bin/wkhtmltopdf /bin/
+
 
 # Add Yarn to the mix
 # hideous hack by matz. methinks yarn lastest tarball changed.

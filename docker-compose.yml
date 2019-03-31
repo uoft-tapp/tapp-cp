@@ -22,6 +22,7 @@ services:
       CP_ADMINS: ${CP_ADMINS}
       TAPP_ASSISTANTS: ${TAPP_ASSISTANTS}
       HR_ASSISTANTS: ${HR_ASSISTANTS}
+      CONTRACT_SUBDIR: ${CONTRACT_SUBDIR}
     networks:
       - default
     ports:
