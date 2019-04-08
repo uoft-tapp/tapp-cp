@@ -108,6 +108,7 @@ Rails.application.routes.draw do
   # student-facing
   get "/pb/:offer_id" => "app#student_view"
   get "/pb/:offer_id/pdf" => "offers#get_contract_student"
+  get "/pb/:offer_id/html" => "offers#get_contract_student_html"
   post "/pb/:offer_id/:status" => "offers#set_status_student"
 
   # student-facing for ddah

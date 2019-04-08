@@ -4,7 +4,7 @@ class OffersController < ApplicationController
   include Authorizer
   before_action :cp_admin, except: [:index, :show, :get_contract_student, :set_status_student, :can_print, :combine_contracts_print]
   before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
-  before_action only: [:get_contract_pdf, :get_contract, :can_print, :combine_contracts_print] do
+  before_action only: [:get_contract_html, :get_contract, :can_print, :combine_contracts_print] do
    cp_admin(true)
   end
   before_action only: [:index, :show] do
@@ -177,20 +177,25 @@ class OffersController < ApplicationController
     # create a pdf concatenation of all the offers using CombinePDF
     out_pdf = CombinePDF.new
     offers.each do |offer|
-      rendered = render_to_string pdf: "contract", inline: get_contract_pdf(offer, true), encoding: "UTF-8"
+      rendered = render_to_string pdf: "contract", inline: get_contract_html(offer, true), encoding: "UTF-8"
       out_pdf << CombinePDF.parse(rendered)
     end
     send_data out_pdf.to_pdf, filename: "contracts.pdf", disposition: "inline"
   end
 
   def get_contract
-    rendered = get_contract_pdf(Offer.find(params[:offer_id]))
+    rendered = get_contract_html(Offer.find(params[:offer_id]))
     render pdf: "contract", inline: rendered
   end
 
   def get_contract_student
-    rendered = get_contract_pdf(Offer.find(params[:offer_id]))
+    rendered = get_contract_html(Offer.find(params[:offer_id]))
     render pdf: "contract", inline: rendered
+  end
+
+  def get_contract_student_html
+    rendered = get_contract_html(Offer.find(params[:offer_id]))
+    render inline: rendered
   end
 
   def set_status_student
@@ -236,7 +241,7 @@ class OffersController < ApplicationController
   end
 
   private
-  def get_contract_pdf(offer, office_template=false)
+  def get_contract_html(offer, office_template=false)
     contract_dir = "#{Rails.root}/app/views/contracts/#{ENV["CONTRACT_SUBDIR"]}"
     # load the offer as a Liquid template
     if office_template

@@ -56,10 +56,14 @@
                 margin-left: 0;
             }
 
-            @media only screen and (min-width: 9in) {
+            @media only screen and (max-width: 9in) {
                 /* when printed, these styles won't show
 				because the "screen" is 8.5in */
                 body {
+			width: unset;
+			padding-bottom: .5in;
+			padding-left: 2em;
+			padding-right: 2em;
                 }
             }
         </style>
