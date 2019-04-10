@@ -55,4 +55,4 @@ fi
 EXPOSE 3022
 
 #TODO apparently cannot use variable in CMD instruction, but i hate the 5000 here!
-CMD ["rails", "server", "-b", "0.0.0.0", "-p", "3022"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "3022"]
