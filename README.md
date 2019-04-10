@@ -133,7 +133,34 @@ NB. subnet for docker networks that are created at docker-compose up time are co
 
 ### apache (reverse proxy)
 
-Lloyd to type here.
+In a typical setup, the production server runs on port `3022`. An apache reverse proxy proxies the appropriate
+url (on the standard http or https ports) to the production server. Instructions can be found [here](https://www.digitalocean.com/community/tutorials/how-to-use-apache-http-server-as-reverse-proxy-using-mod_proxy-extension#configuring-apache-to-proxy-connections)
+The gist of it is:
+
+1. Make sure the relevant proxy modules (`proxy proxy_ajp proxy_http rewrite deflate headers proxy_balancer proxy_connect proxy_html`) 
+are installed and enabled for apache. On a debian-based system you can run `a2enmod <module name>` to enable them.
+2. Modify the virtual host configuration file (e.g., `/etc/apache2/sites-enabled/000-default.conf`) to include:
+
+```
+<VirtualHost *:*>
+    ProxyPreserveHost On
+
+    # Servers to proxy the connection, or;
+    # List of application servers:
+    # Usage:
+    # ProxyPass / http://[IP Addr.]:[port]/
+    # ProxyPassReverse / http://[IP Addr.]:[port]/
+    # Example: 
+    ProxyPass / http://0.0.0.0:3022/
+    ProxyPassReverse / http://0.0.0.0:3022/
+
+    ServerName localhost
+</VirtualHost>
+```
+
+For SSL, the process is similar but a `SSLEngine On` and `SSLCertificateFile /path/to/cert.pem` needs to be added to the configuration.
+
+3. Restart Apache.
 
 ### Initial deployment
 
