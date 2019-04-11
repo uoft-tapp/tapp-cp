@@ -2,8 +2,8 @@ class OffersController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :set_domain
   include Authorizer
-  before_action :cp_admin, except: [:index, :show, :get_contract_student, :set_status_student, :can_print, :combine_contracts_print]
-  before_action :correct_applicant, only: [:get_contract_student, :set_status_student]
+  before_action :cp_admin, except: [:index, :show, :get_contract_student, :get_contract_student_html, :set_status_student, :can_print, :combine_contracts_print]
+  before_action :correct_applicant, only: [:get_contract_student, :get_contract_student_html, :set_status_student]
   before_action only: [:get_contract_html, :get_contract, :can_print, :combine_contracts_print] do
    cp_admin(true)
   end

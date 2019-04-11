@@ -1,5 +1,12 @@
 module Authorizer
 
+  require 'base64'
+  SECURITY = {
+    verify_user: ENV['RAILS_ENV'] == 'production' || ENV['AUTHENTICATE_IN_DEV_MODE'].downcase == 'true',
+    allow_basic_auth: ENV['ALLOW_BASIC_AUTH'].downcase == 'true',
+    basic_auth_ta_id: ENV['BASIC_AUTH_TA_ID']
+  }
+
   def tapp_access
     expected_roles = ["tapp_admin", "tapp_assistant", "instructor"]
     access(expected_roles)
@@ -38,11 +45,11 @@ module Authorizer
       end
       access(expected_roles)
     else
-      if ENV['RAILS_ENV'] == 'production'
+      if SECURITY[:verify_user]
         expected_roles = ["instructor"]
         if has_access(expected_roles)
           if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
-	    render status: 403, file: 'public/403.html'
+            render status: 403, file: 'public/403.html'
           end
         else
           render status: 403, file: 'public/403.html'
@@ -60,7 +67,7 @@ module Authorizer
       end
       access(expected_roles)
     else
-      if ENV['RAILS_ENV'] == 'production'
+      if SECURITY[:verify_user]
         expected_roles = ["instructor"]
         if has_access(expected_roles)
           if session[:utorid] == params[:utorid] && !has_access(["cp_admin"])
@@ -75,7 +82,7 @@ module Authorizer
 
 
   def both_cp_admin_instructor(model, attr_name = :id, array = false)
-    if ENV['RAILS_ENV'] == 'production'
+    if SECURITY[:verify_user]
       expected_roles = ["cp_admin", "instructor"]
       if has_access(expected_roles)
         if !has_access(["cp_admin"])
@@ -93,8 +100,16 @@ module Authorizer
     the utorid of the applicant the offer was made to.
   '''
   def correct_applicant
-    if ENV['RAILS_ENV'] == 'production'
+    if SECURITY[:verify_user]
       utorid = get_utorid
+      if session[:roles].nil?
+        set_roles
+      end
+      # When using basic auth, we allow anyone logged in with basic_auth_ta_id
+      # to access any TA information.
+      if SECURITY[:allow_basic_auth] and session[:roles].include? "ta"
+        return
+      end
       if utorid != utorid_of_applicant_corresponding_to_student_facing_route(params)
         render status: 403, file: 'public/403.html'
       end
@@ -103,7 +118,7 @@ module Authorizer
 
   private
   def logged_in
-    if ENV['RAILS_ENV'] == 'production'
+    if SECURITY[:verify_user]
       set_roles
       if request.env['PATH_INFO'] != '/reenter-session' && !session[:logged_in]
        render file: 'public/logout.html'
@@ -113,7 +128,7 @@ module Authorizer
 
   def access(expected_roles)
     set_roles
-    if ENV['RAILS_ENV'] == 'production'
+    if SECURITY[:verify_user]
       if !has_role(expected_roles)
         render status: 403, file: 'public/403.html'
       end
@@ -136,17 +151,18 @@ module Authorizer
     return false
   end
 
-  def listed_as(users)
+  def listed_as(users, utorid)
     users = users.split(',')
-    if ENV['RAILS_ENV'] == 'production'
-      return users.include?(get_utorid)
+    if SECURITY[:verify_user]
+      return users.include?(utorid)
     end
   end
 
   def is_instructor
-    if ENV['RAILS_ENV'] == 'production'
-      if get_utorid
-        instructor = Instructor.find_by(utorid: get_utorid)
+    if SECURITY[:verify_user]
+      utorid = get_utorid
+      if utorid
+        instructor = Instructor.find_by(utorid: utorid)
         return instructor
       else
         return nil
@@ -165,6 +181,24 @@ module Authorizer
     stuffing in request headers when it forwards.
   '''
   def get_utorid
+    if SECURITY[:allow_basic_auth] and request.env['HTTP_AUTHORIZATION']
+      begin
+        # Apache Basic auth will pass an the HTTP_AUTHORIZATION flag in
+        # formatted as `Basic <base64 encoded string>`. When decoded the string
+        # will be `user:password` separated by a colon.
+        method, encoded_credential = request.env['HTTP_AUTHORIZATION'].split(" ")
+        if method.downcase == "basic"
+          user, password = Base64.decode64(encoded_credential).split(":")
+        end
+      rescue
+      end
+      # Apache will only pass the HTTP_AUTHORIZATION if we have successfully
+      # logged in, according to apache. So we will trust this flag
+      session[:utorid] = user
+      if session[:logged_in].nil?
+        session[:logged_in] = true
+      end
+    end
     if request.env['HTTP_X_FORWARDED_USER']
       session[:utorid] = request.env['HTTP_X_FORWARDED_USER']
       if session[:logged_in].nil?
@@ -182,31 +216,36 @@ module Authorizer
     The data format is CSV.
   '''
   def set_roles
+    utorid = get_utorid
     session[:roles] = []
     roles = [
       {
-        access: listed_as(ENV['TAPP_ADMINS']),
         role: "tapp_admin",
+        access: listed_as(ENV['TAPP_ADMINS'], utorid),
       },
       {
-        access: listed_as(ENV['CP_ADMINS']),
         role: "cp_admin",
+        access: listed_as(ENV['CP_ADMINS'], utorid),
       },
       {
-        access: listed_as(ENV['TAPP_ASSISTANTS']),
         role: "tapp_assistant",
+        access: listed_as(ENV['TAPP_ASSISTANTS'], utorid),
       },
       {
-        access: listed_as(ENV['HR_ASSISTANTS']),
         role: "hr_assistant",
+        access: listed_as(ENV['HR_ASSISTANTS'], utorid),
       },
       {
-        access: is_instructor,
+        role: "ta",
+        access: listed_as("#{ENV['TAPP_ADMINS']},#{ENV['CP_ADMINS']},#{SECURITY[:basic_auth_ta_id]}", utorid)
+      },
+      {
         role: "instructor",
+        access: is_instructor,
       }
     ]
     roles.each do |role|
-      if ENV['RAILS_ENV'] == 'production'
+      if SECURITY[:verify_user]
         if role[:access]
           session[:roles].push(role[:role])
         end
