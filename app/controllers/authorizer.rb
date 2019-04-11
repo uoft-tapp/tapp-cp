@@ -2,8 +2,8 @@ module Authorizer
 
   require 'base64'
   SECURITY = {
-    verify_user: ENV['RAILS_ENV'] == 'production' || ENV['AUTHENTICATE_IN_DEV_MODE'].downcase == 'true',
-    allow_basic_auth: ENV['ALLOW_BASIC_AUTH'].downcase == 'true',
+    verify_user: ENV['RAILS_ENV'] == 'production' || (ENV['AUTHENTICATE_IN_DEV_MODE'] || "").downcase == 'true',
+    allow_basic_auth: (ENV['ALLOW_BASIC_AUTH'] || "").downcase == 'true',
     basic_auth_ta_id: ENV['BASIC_AUTH_TA_ID']
   }
 
