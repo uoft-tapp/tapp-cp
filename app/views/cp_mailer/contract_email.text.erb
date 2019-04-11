@@ -4,11 +4,8 @@ Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %
 
 We would like to offer you a position as a TA for <%= @offer[:position] %>.
 
-Please click the link below to view your offer and accept or reject it:
-<%= @url %>.
+Please visit the link below to view your offer and accept or reject it:
+<%= @url %>
 
 Have a great day!
-
-PS. we've noticed that some browsers don't display the contract
-properly. Please try using chrome. If you have any troubles please
-contact tacoord@cs.toronto.edu. Sorry for any inconvenience
+ - <%= ENV['TA_COORD'] %>
