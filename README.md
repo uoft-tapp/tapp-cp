@@ -94,7 +94,7 @@ To add a system dependency, modify the Dockerfile.
 If you are okay with losing all the data in the database, you can try `docker-compose down -v`, then `docker-compose up`. This should
 delete existing data for this project.
 
-`down -v` deletes all the volumes declared of the compose file. At time of writing, this blows away the files containing the postgress database in the postgress service, but has no effect on the rails service. The fact that it deletes ALL the volumes makes this a dangerous command, potentially disasterous in production.
+`down -v` deletes all the volumes declared of the compose file. At time of writing, this blows away the files containing the postgres database in the postgres service, but has no effect on the rails service. The fact that it deletes ALL the volumes makes this a dangerous command, potentially disasterous in production.
 
 To recreate the images the containers boot from, give `docker-compose up` the `--force-recreate` command line option like so:
 
@@ -113,7 +113,7 @@ To absolutely nuke all the docker images and networks:
 
 ### daemon.json
 
-Some of the security offered by docker containers is that docker sets up a private "bridge" network that the containers use to communicate. For instance, in the docker-compose.yml file a `link` stanza allows rails to connect to postgress over this private network. An intruder that penetrates the host cannot see the postgress server even though the rails container can!
+Some of the security offered by docker containers is that docker sets up a private "bridge" network that the containers use to communicate. For instance, in the docker-compose.yml file a `link` stanza allows rails to connect to postgres over this private network. An intruder that penetrates the host cannot see the postgress server even though the rails container can!
 
 The bad news is that to do this Docker has to guess some parameters of this private network, for instance what IP addresses to use. These are set in a file called `daemon.json`
 
@@ -346,6 +346,7 @@ While the application is running,
     ```
     docker exec -t tappcp_postgres_1 pg_dumpall -U postgres > filename
     ```
+    Here, `postgres` should be replaced with whatever you have set as your `POSTGRES_USER`
 2. Stop & remove all running containers and erase their volumes:
     ```
     docker-compose down -v
@@ -368,7 +369,7 @@ While the application is running,
 
 #### peeking at backups
 
-Hourly postgress sql dumps are stored in a safe place off the production machine, but remain in:
+Hourly postgres sql dumps are stored in a safe place off the production machine, but remain in:
 
 `tapp.cs.toronto.edu:/var/data/tapp`
 
