@@ -91,10 +91,12 @@ To add a system dependency, modify the Dockerfile.
 
 ## In case of container trouble
 
-If you are okay with losing all the data in the database, you can try `docker-compose down -v`, then `docker-compose up`. This should
+Try `docker-compose down -v` then `docker-compose up`. This should
 delete existing data for this project.
 
-`down -v` deletes all the volumes declared of the compose file. At time of writing, this blows away the files containing the postgres database in the postgres service, but has no effect on the rails service. The fact that it deletes ALL the volumes makes this a dangerous command, potentially disasterous in production.
+`down -v` deletes all the volumes declared of the compose file.  The fact that it deletes ALL the volumes makes this a dangerous command, potentially disastrous in production.
+
+Database information is stored in a named docker `volume` so it stays persistent. To see all docker volumes, run `docker volume ls`. You can run `docker volume rm <volume name>` to remove a volume. The volume storing the database data will be automatically recreated next time `docker-compose up` is run.
 
 To recreate the images the containers boot from, give `docker-compose up` the `--force-recreate` command line option like so:
 
@@ -175,6 +177,8 @@ On the production machine:
 If you don't specify the environment variable that the docker-compose file should reference, you might end
 up with an error from postgres ("role "tapp" does not exist"). In that case stop/remove the containers and its volumes,
 `docker-compose down -v`, and restart deployment from step 2.
+
+If you are switching between development and production environments, you might get an error about a missing database table. Run `docker-compose run rails-app rake db:create` to create any missing database.
 
 ### Setting up contract templates
 
