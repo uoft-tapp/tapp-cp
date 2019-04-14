@@ -2,6 +2,7 @@ class Offer < ApplicationRecord
   validates_uniqueness_of :position_id, scope: [:applicant_id]
   belongs_to :applicant
   belongs_to :position
+  before_create :randomize_id
   include Model
 
   def get_deadline
@@ -67,5 +68,12 @@ class Offer < ApplicationRecord
     ]
     # the Liquid templating engine assumes strings instead of symbols
     return offer.merge(data).except(*excludes).with_indifferent_access
+  end
+
+  private
+  def randomize_id
+    begin
+      self.id = SecureRandom.random_number(1_000_000_000)
+    end while Offer.where(id: self.id).exists?
   end
 end
