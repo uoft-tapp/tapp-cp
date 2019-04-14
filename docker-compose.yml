@@ -42,7 +42,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - /var/lib/postgresql/data
+      - tapp-db-data:/var/lib/postgresql/data
 
 networks:
   default:
@@ -50,3 +50,7 @@ networks:
     ipam:
       config:
       - subnet: ${DOCKER_DEFAULT_SUBNET}
+
+volumes:
+  tapp-db-data:
+    driver: local
