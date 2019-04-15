@@ -1136,6 +1136,10 @@ class AppState {
         fetch.setOfferDetails(offers);
     }
 
+    setApplicantDetails(details) {
+        fetch.setApplicantDetails(details);
+    }
+
     sendContracts(offers) {
         if (offers.length == 0) {
             this.alert("<b>Error</b>: No offer selected");
@@ -1269,7 +1273,7 @@ class AppState {
     }
 
     setSessionsList(list) {
-        let semesterOrder = ["Winter", "Spring", "Fall", "Year"];
+        let semesterOrder = ["Fall", "Winter", "Spring", "Year", "Summer"];
         // sort sesions in order of most recent to least recent
         list.sort((sessionA, sessionB) => {
             if (sessionA.get("year") > sessionB.get("year")) {

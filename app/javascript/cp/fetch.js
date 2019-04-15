@@ -376,7 +376,13 @@ export const setOfferAccepted = offer => {
 export const setOfferDetails = offers => {
     postData("/offers/update_hours", offers, () => {
         getOffers();
-    })
+    });
+};
+
+export const setApplicantDetails = details => {
+    putData("/applicants/" + details.id, details, () => {
+        getOffers();
+    });
 };
 
 // set status to unsent and clear other information

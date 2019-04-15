@@ -163,6 +163,7 @@ class ImportForm extends React.Component {
                             <option>Winter</option>
                             <option>Spring</option>
                             <option>Fall</option>
+                            <option>Summer</option>
                         </FormControl>
                         &nbsp;
                         <FormControl

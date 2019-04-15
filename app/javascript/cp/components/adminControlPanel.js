@@ -20,41 +20,42 @@ import { Table } from "./table.js";
 import { ImportMenu } from "./importMenu.js";
 import { SessionsForm } from "./sessionsForm.js";
 
-class EditHoursDialog extends React.Component {
+class EditFieldDialog extends React.Component {
     constructor(props) {
         super(props);
+        this.fieldName = props.field;
         this.state = {
-            hours: props.offer.get("hours"),
-            origHours: props.offer.get("hours")
+            field: props.offer.get(this.fieldName),
+            origField: props.offer.get(this.fieldName)
         };
-        this.setHours = this.setHours.bind(this);
+        this.setField = this.setField.bind(this);
         this.cancelClick = this.cancelClick.bind(this);
     }
-    setHours(hours) {
-        this.setState({ hours });
+    setField(val) {
+        this.setState({ field: val });
     }
     cancelClick() {
         this.props.onHide();
-        this.setState({ hours: this.state.origHours });
+        this.setState({ field: this.state.origField });
     }
     render() {
-        const { show, onSave, onHide } = this.props;
-        const [hours, setHours] = [+this.state.hours, this.setHours];
-        const origHours = +this.state.origHours;
+        const { show, onSave, onHide, header } = this.props;
+        const [fieldVal, setFieldVal] = [this.state.field, this.setField];
+        const origFieldVal = this.state.origField;
 
         return (
             <Modal show={show} onHide={this.cancelClick}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Hours</Modal.Title>
+                    <Modal.Title>{header}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <input
-                        value={hours}
-                        onChange={e => setHours(e.currentTarget.value)}
+                        value={fieldVal}
+                        onChange={e => setFieldVal(e.currentTarget.value)}
                     />{" "}
-                    {+hours !== +origHours && (
+                    {fieldVal != origFieldVal && (
                         <span>
-                            Change hours from {origHours} to {hours}
+                            Change from {origFieldVal} to {fieldVal}
                         </span>
                     )}
                 </Modal.Body>
@@ -62,8 +63,8 @@ class EditHoursDialog extends React.Component {
                     <Button onClick={this.cancelClick}>Cancel</Button>
                     <Button
                         onClick={() => {
-                            if (hours !== origHours) {
-                                (onSave || (() => {}))(hours);
+                            if (fieldVal !== origFieldVal) {
+                                (onSave || (() => {}))(fieldVal);
                             }
                             onHide();
                         }}
@@ -76,7 +77,7 @@ class EditHoursDialog extends React.Component {
     }
 }
 
-class EditHoursIcon extends React.Component {
+class EditFieldIcon extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -89,7 +90,7 @@ class EditHoursIcon extends React.Component {
         this.setState({ dialogShow: state });
     }
     render() {
-        const { offer, hidden, onSave } = this.props;
+        const { offer, hidden, onSave, field, header } = this.props;
         const setDialogShow = this.setDialogShow;
         const dialogShow = this.state.dialogShow;
 
@@ -105,9 +106,11 @@ class EditHoursIcon extends React.Component {
                 >
                     <Glyphicon glyph="edit" />
                 </div>
-                <EditHoursDialog
+                <EditFieldDialog
                     offer={offer}
                     show={dialogShow}
+                    field={field}
+                    header={header}
                     onHide={() => this.setDialogShow(false)}
                     onSave={onSave}
                 />
@@ -141,6 +144,10 @@ class AdminControlPanel extends React.Component {
     updateOffer(offer, attrs) {
         attrs.offer_id = offer;
         this.props.appState.setOfferDetails(attrs);
+    }
+
+    updateApplicant(attrs) {
+        this.props.appState.setApplicantDetails(attrs);
     }
 
     componentWillMount() {
@@ -227,23 +234,115 @@ class AdminControlPanel extends React.Component {
             },
             {
                 header: "Last Name",
-                data: p => p.offer.get("lastName"),
+                data: p => (
+                    <div
+                        style={{ position: "relative" }}
+                        className="show-on-hover-wrapper"
+                    >
+                        {p.offer.get("lastName")}
+                        <EditFieldIcon
+                            offer={p.offer}
+                            field={"lastName"}
+                            header={
+                                "Edit Last Name for " +
+                                p.offer.get("firstName") +
+                                " " +
+                                p.offer.get("lastName")
+                            }
+                            onSave={val => {
+                                this.updateApplicant({
+                                    id: p.offer.get("applicantId"),
+                                    last_name: val
+                                });
+                            }}
+                        />
+                    </div>
+                ),
                 sortData: p => p.get("lastName")
             },
             {
                 header: "First Name",
-                data: p => p.offer.get("firstName"),
+                data: p => (
+                    <div
+                        style={{ position: "relative" }}
+                        className="show-on-hover-wrapper"
+                    >
+                        {p.offer.get("firstName")}
+                        <EditFieldIcon
+                            offer={p.offer}
+                            field={"firstName"}
+                            header={
+                                "Edit First Name for " +
+                                p.offer.get("firstName") +
+                                " " +
+                                p.offer.get("lastName")
+                            }
+                            onSave={val => {
+                                this.updateApplicant({
+                                    id: p.offer.get("applicantId"),
+                                    first_name: val
+                                });
+                            }}
+                        />
+                    </div>
+                ),
                 sortData: p => p.get("firstName")
             },
             {
                 header: "Email",
-                data: p => p.offer.get("email"),
+                data: p => (
+                    <div
+                        style={{ position: "relative" }}
+                        className="show-on-hover-wrapper"
+                    >
+                        {p.offer.get("email")}
+                        <EditFieldIcon
+                            offer={p.offer}
+                            field={"email"}
+                            header={
+                                "Edit Email for " +
+                                p.offer.get("firstName") +
+                                " " +
+                                p.offer.get("lastName")
+                            }
+                            onSave={val => {
+                                this.updateApplicant({
+                                    id: p.offer.get("applicantId"),
+                                    email: val
+                                });
+                            }}
+                        />
+                    </div>
+                ),
                 sortData: p => p.get("email"),
                 style: { maxWidth: "15vw", overflow: "hidden" }
             },
             {
                 header: "Student Number",
-                data: p => p.offer.get("studentNumber"),
+                data: p => (
+                    <div
+                        style={{ position: "relative" }}
+                        className="show-on-hover-wrapper"
+                    >
+                        {p.offer.get("studentNumber")}
+                        <EditFieldIcon
+                            offer={p.offer}
+                            field={"studentNumber"}
+                            header={
+                                "Edit Student Number for " +
+                                p.offer.get("firstName") +
+                                " " +
+                                p.offer.get("lastName")
+                            }
+                            onSave={val => {
+                                this.updateApplicant({
+                                    id: p.offer.get("applicantId"),
+                                    student_number: val
+                                });
+                            }}
+                        />
+                    </div>
+                ),
                 sortData: p => p.get("studentNumber")
             },
             {
@@ -266,8 +365,10 @@ class AdminControlPanel extends React.Component {
                         className="show-on-hover-wrapper"
                     >
                         {p.offer.get("hours")}
-                        <EditHoursIcon
+                        <EditFieldIcon
                             offer={p.offer}
+                            field={"hours"}
+                            header={"Change offer hours"}
                             hidden={["Accepted", "Pending"].includes(
                                 p.offer.get("status")
                             )}

@@ -39,7 +39,16 @@ class ApplicantsController < ApplicationController
 
   private
   def applicant_params
-    params.permit(:commentary)
+    params.permit(:commentary,
+      :utorid,
+      :student_number,
+      :first_name,
+      :last_name,
+      :email,
+      :phone,
+      :address,
+      :dept,
+      :program_id)
   end
 
 end
