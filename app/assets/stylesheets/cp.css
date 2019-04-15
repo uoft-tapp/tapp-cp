@@ -522,6 +522,10 @@ footer div p {
   color: #555;
 }
 
+.show-on-hover-wrapper {
+    min-height: 2.5ex;
+}
+
 .show-on-hover-wrapper:hover .show-on-hover {
     opacity: 1;
 }
@@ -533,4 +537,14 @@ footer div p {
 
 .edit-glyph {
     cursor: pointer;
+}
+
+.field-dialog-formatted-name {
+    white-space: pre;
+    font-family: monospace;
+    color: blue;
+}
+.field-dialog-formatted-name::before, .field-dialog-formatted-name::after {
+    content: "'";
+    color: initial;
 }

@@ -30,6 +30,14 @@ class EditFieldDialog extends React.Component {
         };
         this.setField = this.setField.bind(this);
         this.cancelClick = this.cancelClick.bind(this);
+        this.onSave = this.onSave.bind(this);
+    }
+    onSave(val) {
+        this.props.onHide();
+        // if we save, our "original" value is now the currently
+        // saved one.
+        this.setState({ origField: val });
+        (this.props.onSave || (() => {}))(val);
     }
     setField(val) {
         this.setState({ field: val });
@@ -55,7 +63,14 @@ class EditFieldDialog extends React.Component {
                     />{" "}
                     {fieldVal != origFieldVal && (
                         <span>
-                            Change from {origFieldVal} to {fieldVal}
+                            Change from{" "}
+                            <span className="field-dialog-formatted-name">
+                                {origFieldVal}
+                            </span>{" "}
+                            to{" "}
+                            <span className="field-dialog-formatted-name">
+                                {fieldVal}
+                            </span>
                         </span>
                     )}
                 </Modal.Body>
@@ -64,7 +79,7 @@ class EditFieldDialog extends React.Component {
                     <Button
                         onClick={() => {
                             if (fieldVal !== origFieldVal) {
-                                (onSave || (() => {}))(fieldVal);
+                                this.onSave(fieldVal);
                             }
                             onHide();
                         }}
