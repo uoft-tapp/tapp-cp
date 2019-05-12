@@ -146,6 +146,7 @@ const NavbarInst = props => (
             <Navbar.Brand>
                 <NavDropdown id="1" title={<span>CP:TAPP</span>} noCaret>
                     <MenuItem href="/tapp">TAPP</MenuItem>
+                    <MenuItem href="/cq">Create TAs/Offers/Applicants</MenuItem>
                 </NavDropdown>
             </Navbar.Brand>
         </Navbar.Header>

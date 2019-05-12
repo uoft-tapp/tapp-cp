@@ -1,4 +1,5 @@
 class OffersController < ApplicationController
+  include Importer
   protect_from_forgery with: :null_session
   before_action :set_domain
   include Authorizer
@@ -78,6 +79,52 @@ class OffersController < ApplicationController
       offer = Offer.find(offer_json[:offer_id])
       puts offer
       offer.update_attributes!(hours: offer_json[:hours])
+    end
+  end
+
+  def add_or_update
+    exceptions = []
+    offers = params[:offers]
+
+    offers.each do |offer|
+      position = Position.find_by(position: offer["course_id"])
+      applicant = Applicant.find_by(utorid: offer["utorid"])
+      if position && applicant
+        ident = {position_id: position[:id], applicant_id: applicant[:id]}
+        exists = "offer with position #{offer[:position]} for applicant #{offer[:utorid]} already exists"
+        data = {
+          position_id: position[:id],
+          applicant_id: applicant[:id],
+          hours: offer["hours"],
+          session: offer["session"],
+          year: offer["year"],
+        }
+        begin
+          insertion_helper(Offer, data, ident, exists)
+        rescue
+          exceptions.push("Error: Unknown error when creating Position '#{offer["course_id"]}' for '#{offer["utorid"]}' for '#{data[:hours]}' hours.")
+        end
+      else
+        if position
+          exceptions.push("Error: Applicant #{offer["utorid"]} is invalid.")
+        else
+          exceptions.push("Error: either Position #{offer["course_id"]} or Applicant #{offer["utorid"]} is invalid.")
+        end
+      end
+    end
+    
+    if exceptions.length == offers.length
+      status = {success: false, errors: true, message: exceptions}
+    elsif exceptions.length > 0
+      status = {success: true, errors: true, message: exceptions}
+    else
+      status = {success: true, errors: false, message: ["Offers import was successful."]}
+    end
+    
+    if status[:success]
+      render json: {errors: status[:errors], message: status[:message]}
+    else
+      render status: 404, json: {message: status[:message], errors: status[:errors]}
     end
   end
 

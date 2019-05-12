@@ -2,6 +2,7 @@ include Authorizer
 Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
   get '/cp/(*z)', to: "app#cp"
+  get '/cq/(*z)', to: "app#cq"
   get '/roles', to: "app#roles"
 
   post '/logout', to: "app#logout"
@@ -15,6 +16,8 @@ Rails.application.routes.draw do
     resources :assignments, only: [:index]
     resources :positions, only: [:index]
     resources :offers, only: [:index]
+    post "offers/add_or_update", to: "offers#add_or_update"
+    post "positions/add_or_update", to: "positions#add_or_update"
     resources :ddahs, only: [:index]
   end
   scope '/sessions/:session_id/instructors/:utorid' do
@@ -92,6 +95,7 @@ Rails.application.routes.draw do
   post "/import/templates", to: "import#templates"
   get "/export/ddahs/:position_id", to: "export#ddahs"
   get "/export/session-ddahs/:session_id", to: "export#session_ddahs"
+  post "/applicants/add_or_update", to: "applicants#add_or_update"
 
   post "/ddahs/preview" => "ddahs#preview"
   post "/ddahs/can-preview" => "ddahs#can_preview"

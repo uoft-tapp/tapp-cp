@@ -1,0 +1,45 @@
+/* global vars */
+:root {
+    --footer-height: 4vh; /* includes margins */
+    --navbar-height: 71px; /* includes margins */
+    --table-menu-height: calc(34px + 1vh);
+    --main-div-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+    --min-row-height: 52px; /* assumes that header is two rows high */
+    --sessions-height: calc(55px + 1.5vh);
+}
+
+html, body, #root {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+	box-sizing: border-box;
+}
+
+.show-on-hover-wrapper {
+    min-height: 2.5ex;
+}
+
+.show-on-hover-wrapper:hover .show-on-hover {
+    opacity: 1;
+}
+
+.show-on-hover {
+    transition: all .3s;
+    opacity: 0;
+}
+
+.edit-glyph {
+    cursor: pointer;
+}
+
+.field-dialog-formatted-name {
+    white-space: pre;
+    font-family: monospace;
+    color: blue;
+}
+.field-dialog-formatted-name::before, .field-dialog-formatted-name::after {
+    content: "'";
+    color: initial;
+}
