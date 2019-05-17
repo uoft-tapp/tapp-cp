@@ -55,6 +55,9 @@
                 display: inline-block;
                 margin-left: 0;
             }
+	    .checkbox {
+		font-size: 18pt;
+	    }
 
             @media only screen and (max-width: 9in) {
                 /* when printed, these styles won't show
@@ -299,6 +302,17 @@
                 Tom Tomson<br />TA Coordinator<br />Some Department
             </div>
         </div>
+	<div>
+            <p>
+	    <span class="checkbox">{% if signature == blank %}☐{% else %}☑{% endif %}</span>
+	    	I confirm that I will be registered as a University of Toronto student
+		or PDF on the date that this appointment begins. I understand that if
+		I should cease to be registered as a University of Toronto student or
+		PDF during the period of this appointment, for any reason other than
+		convocation, I must immediately notify my supervisor, and my appointment
+		may be terminated.
+            </p>
+	</div>
         <div class="letter-foot applicant">
             <p>Please sign below to accept this offer.</p>
             <div class="signature">{{ signature }}</div>
