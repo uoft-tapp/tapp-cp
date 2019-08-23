@@ -76,7 +76,7 @@ export default {
                 const sessionId = payload.id;
 
                 await dispatch.data.fetchData({
-                    url: `/sessions/${sessionId}/applicants`,
+                    url: `/applicants`,
                     attr: "applicants"
                 });
                 await dispatch.data.fetchData({
