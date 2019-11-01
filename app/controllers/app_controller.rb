@@ -63,4 +63,12 @@ class AppController < ApplicationController
     session[:logged_in] = true
   end
 
+  def polyfill_css
+    generator = CssPolyfillGenerator.new
+    response = generator.polyfill_css(params[:file])
+    #render plain: response[:data]
+    send_data response[:data], filename: response[:file],
+    content_type: response[:type]
+  end
+
 end
