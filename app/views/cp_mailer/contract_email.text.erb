@@ -4,11 +4,14 @@ Dear <%= @offer[:applicant][:first_name] %> <%= @offer[:applicant][:last_name] %
 
 We would like to offer you a position as a TA for <%= @offer[:position] %>.
 
-Please click the link below to view your offer and accept or reject it:
-<%= @url %>.
+Please visit the link below to view your offer and accept or reject it:
+<%= @url %>
 
-Have a great day!
+A statement about the Union prepared by the Union, along with other information about the Union, can be found at href="http://cupe3902.org/unit-1/ All of this information is that of the Union, represents the views of the Union and has not been approved or endorsed by the University.
 
-PS. we've noticed that some browsers don't display the contract
-properly. Please try using chrome. If you have any troubles please
-contact tacoord@cs.toronto.edu. Sorry for any inconvenience
+<%= ENV['EMAIL_EXTRA_BLURB'] %>
+
+If you have any questions, please let me know.
+
+Thank you,
+ - <%= ENV['TA_COORD'] %>

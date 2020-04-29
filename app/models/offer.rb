@@ -2,6 +2,7 @@ class Offer < ApplicationRecord
   validates_uniqueness_of :position_id, scope: [:applicant_id]
   belongs_to :applicant
   belongs_to :position
+  before_create :randomize_id
   include Model
 
   def get_deadline
@@ -27,6 +28,7 @@ class Offer < ApplicationRecord
       end_date: position[:end_date],
       applicant: applicant.format,
       session: session,
+      session_info: session.format,
       instructors: [],
       deadline: self.get_deadline,
     }
@@ -40,7 +42,8 @@ class Offer < ApplicationRecord
     instructors.each do |instructor|
       data[:instructors].push(instructor)
     end
-    return offer.merge(data)
+    # the Liquid templating engine assumes strings instead of symbols
+    return offer.merge(data).with_indifferent_access
   end
 
   def instructor_format
@@ -63,6 +66,14 @@ class Offer < ApplicationRecord
       :year,
       :session,
     ]
-    return offer.merge(data).except(*excludes)
+    # the Liquid templating engine assumes strings instead of symbols
+    return offer.merge(data).except(*excludes).with_indifferent_access
+  end
+
+  private
+  def randomize_id
+    begin
+      self.id = SecureRandom.random_number(1_000_000_000)
+    end while Offer.where(id: self.id).exists?
   end
 end

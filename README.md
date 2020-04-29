@@ -29,7 +29,7 @@ directory, and run
 docker-compose up
 ```
 
-In a new tab, open http://localhost:3000 to see the Rails welcome page!
+In a new tab, open http://localhost:3022 to see the Rails welcome page!
 
 `docker-compose up` has launched two containers: `rails-app`
 and `webpack-dev-server`. The former runs the Rails app, while the latter
@@ -42,7 +42,7 @@ You have full control over Rails code, apply the usual methods. Check the next
 section for details on running commands like `rake …` and `rails …`.
 
 To get you started with React quicker, this app comes preloaded with a simple
-React app. Visiting http://localhost:3000/hello_react will load JavaScript code
+React app. Visiting http://localhost:3022/hello_react will load JavaScript code
 located in `app/javascript/packs/hello_react.jsx`.
 
 ## Running commands
@@ -91,10 +91,12 @@ To add a system dependency, modify the Dockerfile.
 
 ## In case of container trouble
 
-If you are okay with losing all the data in the database, you can try `docker-compose down -v`, then `docker-compose up`. This should
+Try `docker-compose down -v` then `docker-compose up`. This should
 delete existing data for this project.
 
-`down -v` deletes all the volumes declared of the compose file. At time of writing, this blows away the files containing the postgress database in the postgress service, but has no effect on the rails service. The fact that it deletes ALL the volumes makes this a dangerous command, potentially disasterous in production.
+`down -v` deletes all the volumes declared of the compose file.  The fact that it deletes ALL the volumes makes this a dangerous command, potentially disastrous in production.
+
+Database information is stored in a named docker `volume` so it stays persistent. To see all docker volumes, run `docker volume ls`. You can run `docker volume rm <volume name>` to remove a volume. The volume storing the database data will be automatically recreated next time `docker-compose up` is run.
 
 To recreate the images the containers boot from, give `docker-compose up` the `--force-recreate` command line option like so:
 
@@ -113,7 +115,7 @@ To absolutely nuke all the docker images and networks:
 
 ### daemon.json
 
-Some of the security offered by docker containers is that docker sets up a private "bridge" network that the containers use to communicate. For instance, in the docker-compose.yml file a `link` stanza allows rails to connect to postgress over this private network. An intruder that penetrates the host cannot see the postgress server even though the rails container can!
+Some of the security offered by docker containers is that docker sets up a private "bridge" network that the containers use to communicate. For instance, in the docker-compose.yml file a `link` stanza allows rails to connect to postgres over this private network. An intruder that penetrates the host cannot see the postgress server even though the rails container can!
 
 The bad news is that to do this Docker has to guess some parameters of this private network, for instance what IP addresses to use. These are set in a file called `daemon.json`
 
@@ -133,7 +135,34 @@ NB. subnet for docker networks that are created at docker-compose up time are co
 
 ### apache (reverse proxy)
 
-Lloyd to type here.
+In a typical setup, the production server runs on port `3022`. An apache reverse proxy proxies the appropriate
+url (on the standard http or https ports) to the production server. Instructions can be found [here](https://www.digitalocean.com/community/tutorials/how-to-use-apache-http-server-as-reverse-proxy-using-mod_proxy-extension#configuring-apache-to-proxy-connections)
+The gist of it is:
+
+1. Make sure the relevant proxy modules (`proxy proxy_ajp proxy_http rewrite deflate headers proxy_balancer proxy_connect proxy_html`) 
+are installed and enabled for apache. On a debian-based system you can run `a2enmod <module name>` to enable them.
+2. Modify the virtual host configuration file (e.g., `/etc/apache2/sites-enabled/000-default.conf`) to include:
+
+```
+<VirtualHost *:*>
+    ProxyPreserveHost On
+
+    # Servers to proxy the connection, or;
+    # List of application servers:
+    # Usage:
+    # ProxyPass / http://[IP Addr.]:[port]/
+    # ProxyPassReverse / http://[IP Addr.]:[port]/
+    # Example: 
+    ProxyPass / http://0.0.0.0:3022/
+    ProxyPassReverse / http://0.0.0.0:3022/
+
+    ServerName localhost
+</VirtualHost>
+```
+
+For SSL, the process is similar but a `SSLEngine On` and `SSLCertificateFile /path/to/cert.pem` needs to be added to the configuration.
+
+3. Restart Apache.
 
 ### Initial deployment
 
@@ -148,6 +177,16 @@ On the production machine:
 If you don't specify the environment variable that the docker-compose file should reference, you might end
 up with an error from postgres ("role "tapp" does not exist"). In that case stop/remove the containers and its volumes,
 `docker-compose down -v`, and restart deployment from step 2.
+
+If you are switching between development and production environments, you might get an error about a missing database table. Run `docker-compose run rails-app rake db:create` to create any missing database.
+
+### Setting up contract templates
+
+Templates for TA contracts and TA/Office short-form contracts are located in `app/views/contracts/default`. To create
+cusomized contracts for your department, copy the `default` folder to `<your department>` folder and change the `offer-template.html`
+and `offer-template-office.html` templates. They are regular HTML files that get rendered using the [Liquid](https://github.com/chamnap/liquid-rails)
+templating engine. After you've made changes, set the `CONTRACT_SUBDIR` in `.env` to `<your department>` so that contracts will
+be loaded from the correct folder.
 
 ### Recipe for updating a functioning deployment <a id="updateDeployment"></a>
 
@@ -311,6 +350,7 @@ While the application is running,
     ```
     docker exec -t tappcp_postgres_1 pg_dumpall -U postgres > filename
     ```
+    Here, `postgres` should be replaced with whatever you have set as your `POSTGRES_USER`
 2. Stop & remove all running containers and erase their volumes:
     ```
     docker-compose down -v
@@ -333,7 +373,7 @@ While the application is running,
 
 #### peeking at backups
 
-Hourly postgress sql dumps are stored in a safe place off the production machine, but remain in:
+Hourly postgres sql dumps are stored in a safe place off the production machine, but remain in:
 
 `tapp.cs.toronto.edu:/var/data/tapp`
 

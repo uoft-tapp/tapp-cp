@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
     Grid,
     ButtonToolbar,
@@ -8,10 +8,10 @@ import {
     Panel,
     Well,
     DropdownButton,
-    MenuItem,
-} from 'react-bootstrap';
+    MenuItem
+} from "react-bootstrap";
 
-import { DdahForm } from './ddahForm.js';
+import { DdahForm } from "./ddahForm.js";
 
 class InstrControlPanel extends React.Component {
     render() {
@@ -21,12 +21,14 @@ class InstrControlPanel extends React.Component {
         }
 
         let fetchCheck = this.props.appState.instrAnyFetching();
-        let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
+        let cursorStyle = { cursor: fetchCheck ? "progress" : "auto" };
 
         let selectedDdahId = this.props.appState.getSelectedDdahId();
 
         let status = this.props.appState.isOfferSelected()
-            ? this.props.appState.getOffersList().getIn([selectedDdahId, 'ddahStatus'])
+            ? this.props.appState
+                  .getOffersList()
+                  .getIn([selectedDdahId, "ddahStatus"])
             : null;
 
         return (
@@ -34,44 +36,56 @@ class InstrControlPanel extends React.Component {
                 <PanelGroup id="select-menu">
                     <TemplateSelectionMenu
                         selectedTemplate={
-                            this.props.appState.isTemplateSelected() ? selectedDdahId : null
+                            this.props.appState.isTemplateSelected()
+                                ? selectedDdahId
+                                : null
                         }
                         {...this.props}
                     />
                     <OfferSelectionMenu
                         selectedOffer={
-                            this.props.appState.isOfferSelected() ? selectedDdahId : null
+                            this.props.appState.isOfferSelected()
+                                ? selectedDdahId
+                                : null
                         }
                         {...this.props}
                     />
                 </PanelGroup>
-                {selectedDdahId != null
-                    ? <div id="ddah-menu-container">
-                          {this.props.appState.isTemplateSelected() &&
-                              <TemplateActionMenu
-                                  selectedTemplate={selectedDdahId}
-                                  {...this.props}
-                              />}
-                          {this.props.appState.isOfferSelected() &&
-                              (['None', 'Created'].includes(status)
-                                  ? <OfferActionMenu
-                                        selectedOffer={selectedDdahId}
-                                        {...this.props}
-                                    />
-                                  : <SubmittedActionMenu
-                                        selectedDdahId={selectedDdahId}
-                                        {...this.props}
-                                    />)}
-                          <DdahForm
-                              status={status}
-                              selectedDdahId={selectedDdahId}
-                              {...this.props}
-                          />
-                      </div>
-                    : <Well id="no-selection">
-                          <h4>Nothing here yet!</h4>
-                          <h5>Select a course and applicant to start, or create a template.</h5>
-                      </Well>}
+                {selectedDdahId != null ? (
+                    <div id="ddah-menu-container">
+                        {this.props.appState.isTemplateSelected() && (
+                            <TemplateActionMenu
+                                selectedTemplate={selectedDdahId}
+                                {...this.props}
+                            />
+                        )}
+                        {this.props.appState.isOfferSelected() &&
+                            (["None", "Created"].includes(status) ? (
+                                <OfferActionMenu
+                                    selectedOffer={selectedDdahId}
+                                    {...this.props}
+                                />
+                            ) : (
+                                <SubmittedActionMenu
+                                    selectedDdahId={selectedDdahId}
+                                    {...this.props}
+                                />
+                            ))}
+                        <DdahForm
+                            status={status}
+                            selectedDdahId={selectedDdahId}
+                            {...this.props}
+                        />
+                    </div>
+                ) : (
+                    <Well id="no-selection">
+                        <h4>Nothing here yet!</h4>
+                        <h5>
+                            Select a course and applicant to start, or create a
+                            template.
+                        </h5>
+                    </Well>
+                )}
             </Grid>
         );
     }
@@ -84,30 +98,38 @@ const TemplateSelectionMenu = props => {
         <Panel
             header={<h4>Templates</h4>}
             footer={
-                <span onClick={() => props.appState.createTemplate()}>Create a new template</span>
-            }>
+                <span onClick={() => props.appState.createTemplate()}>
+                    Create a new template
+                </span>
+            }
+        >
             <ul id="templates-menu">
                 {templates
-                    .sort(
-                        (a, b) =>
-                            a.get('name').toLowerCase() > b.get('name').toLowerCase() ? 1 : -1
+                    .sort((a, b) =>
+                        a.get("name").toLowerCase() >
+                        b.get("name").toLowerCase()
+                            ? 1
+                            : -1
                     )
-                    .map((template, i) =>
+                    .map((template, i) => (
                         <li
-                            className={i == props.selectedTemplate ? 'active' : ''}
+                            className={
+                                i == props.selectedTemplate ? "active" : ""
+                            }
                             onClick={() => {
                                 if (
                                     !props.appState.anyDdahWorksheetChanges() ||
                                     window.confirm(
-                                        'You have unsaved changes. Are you sure you want to leave?'
+                                        "You have unsaved changes. Are you sure you want to leave?"
                                     )
                                 ) {
                                     props.appState.toggleSelectedTemplate(i);
                                 }
-                            }}>
-                            {template.get('name')}
+                            }}
+                        >
+                            {template.get("name")}
                         </li>
-                    )}
+                    ))}
             </ul>
         </Panel>
     );
@@ -119,44 +141,70 @@ const OfferSelectionMenu = props => {
     return (
         <Panel header={<h4>Applicants</h4>}>
             <ul id="offers-menu">
-                {courses.sort((a, b) => (a.get('code') > b.get('code') ? 1 : -1)).map((course, i) =>
-                    <li
-                        onClick={() => {
-                            let submenu = document.getElementById(i + '-applicant-menu');
-                            submenu.style.display =
-                                submenu.style.display == 'block' ? 'none' : 'block';
-                        }}>
-                        {course.get('code')}
-                        <ul id={i + '-applicant-menu'} className="applicant-menu">
-                            {props.appState.getOffersForCourse(i).map((offer, i) =>
-                                <li
-                                    id={'offer-' + i}
-                                    className={i == props.selectedOffer ? 'active' : ''}
-                                    onClick={event => {
-                                        event.stopPropagation();
+                {courses
+                    .sort((a, b) => (a.get("code") > b.get("code") ? 1 : -1))
+                    .map((course, i) => (
+                        <li
+                            onClick={() => {
+                                let submenu = document.getElementById(
+                                    i + "-applicant-menu"
+                                );
+                                submenu.style.display =
+                                    submenu.style.display == "block"
+                                        ? "none"
+                                        : "block";
+                            }}
+                        >
+                            {course.get("code")}
+                            <ul
+                                id={i + "-applicant-menu"}
+                                className="applicant-menu"
+                            >
+                                {props.appState
+                                    .getOffersForCourse(i)
+                                    .map((offer, i) => (
+                                        <li
+                                            id={"offer-" + i}
+                                            className={
+                                                i == props.selectedOffer
+                                                    ? "active"
+                                                    : ""
+                                            }
+                                            onClick={event => {
+                                                event.stopPropagation();
 
-                                        if (
-                                            !props.appState.anyDdahWorksheetChanges() ||
-                                            window.confirm(
-                                                'You have unsaved changes. Are you sure you want to leave?'
-                                            )
-                                        ) {
-                                            props.appState.toggleSelectedOffer(i);
-                                        }
-                                    }}>
-                                    {offer.get('lastName')}&nbsp;&middot;&nbsp;{offer.get('utorid')}&ensp;
-                                    {offer.get('ddahStatus') != 'None' &&
-                                        offer.get('ddahStatus') != 'Created' &&
-                                        <i
-                                            className="fa fa-check-circle"
-                                            style={{ color: 'green' }}
-                                            title="Form submitted"
-                                        />}
-                                </li>
-                            )}
-                        </ul>
-                    </li>
-                )}
+                                                if (
+                                                    !props.appState.anyDdahWorksheetChanges() ||
+                                                    window.confirm(
+                                                        "You have unsaved changes. Are you sure you want to leave?"
+                                                    )
+                                                ) {
+                                                    props.appState.toggleSelectedOffer(
+                                                        i
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            {offer.get("lastName")}
+                                            &nbsp;&middot;&nbsp;
+                                            {offer.get("utorid")}&ensp;
+                                            {offer.get("ddahStatus") !=
+                                                "None" &&
+                                                offer.get("ddahStatus") !=
+                                                    "Created" && (
+                                                    <i
+                                                        className="fa fa-check-circle"
+                                                        style={{
+                                                            color: "green"
+                                                        }}
+                                                        title="Form submitted"
+                                                    />
+                                                )}
+                                        </li>
+                                    ))}
+                            </ul>
+                        </li>
+                    ))}
             </ul>
         </Panel>
     );
@@ -167,15 +215,23 @@ const TemplateActionMenu = props => {
 
     return (
         <ButtonToolbar id="action-menu">
-            <DropdownButton bsStyle="warning" title="Apply template" id="templates-dropdown">
-                {templates.map((template, i) =>
+            <DropdownButton
+                bsStyle="warning"
+                title="Apply template"
+                id="templates-dropdown"
+            >
+                {templates.map((template, i) => (
                     <MenuItem onClick={() => props.appState.applyTemplate(i)}>
-                        {template.get('name')}
+                        {template.get("name")}
                     </MenuItem>
-                )}
+                ))}
             </DropdownButton>
 
-            <Button id="clear" bsStyle="danger" onClick={() => props.appState.clearDdah()}>
+            <Button
+                id="clear"
+                bsStyle="danger"
+                onClick={() => props.appState.clearDdah()}
+            >
                 Clear
             </Button>
 
@@ -183,7 +239,10 @@ const TemplateActionMenu = props => {
                 bsStyle="primary"
                 id="save"
                 disabled={!props.appState.anyDdahWorksheetChanges()}
-                onClick={() => props.appState.updateTemplate(props.selectedTemplate)}>
+                onClick={() =>
+                    props.appState.updateTemplate(props.selectedTemplate)
+                }
+            >
                 Save
             </Button>
         </ButtonToolbar>
@@ -195,15 +254,23 @@ const OfferActionMenu = props => {
 
     return (
         <ButtonToolbar id="action-menu">
-            <DropdownButton bsStyle="warning" title="Apply template" id="templates-dropdown">
-                {templates.map((template, i) =>
+            <DropdownButton
+                bsStyle="warning"
+                title="Apply template"
+                id="templates-dropdown"
+            >
+                {templates.map((template, i) => (
                     <MenuItem onClick={() => props.appState.applyTemplate(i)}>
-                        {template.get('name')}
+                        {template.get("name")}
                     </MenuItem>
-                )}
+                ))}
             </DropdownButton>
 
-            <Button id="clear" bsStyle="danger" onClick={() => props.appState.clearDdah()}>
+            <Button
+                id="clear"
+                bsStyle="danger"
+                onClick={() => props.appState.clearDdah()}
+            >
                 Clear
             </Button>
 
@@ -211,7 +278,8 @@ const OfferActionMenu = props => {
                 id="submit"
                 bsStyle="success"
                 disabled={props.appState.anyDdahWorksheetChanges()}
-                onClick={() => props.appState.submitDdah(props.selectedOffer)}>
+                onClick={() => props.appState.submitDdah(props.selectedOffer)}
+            >
                 Submit for Review
             </Button>
 
@@ -219,13 +287,21 @@ const OfferActionMenu = props => {
                 <Button
                     bsStyle="primary"
                     disabled={!props.appState.anyDdahWorksheetChanges()}
-                    onClick={() => props.appState.updateDdah(props.selectedOffer)}>
+                    onClick={() =>
+                        props.appState.updateDdah(props.selectedOffer)
+                    }
+                >
                     Save
                 </Button>
                 <Button
                     bsStyle="info"
                     disabled={props.appState.anyDdahWorksheetChanges()}
-                    onClick={() => props.appState.createTemplateFromDdah(props.selectedOffer)}>
+                    onClick={() =>
+                        props.appState.createTemplateFromDdah(
+                            props.selectedOffer
+                        )
+                    }
+                >
                     Save as Template
                 </Button>
             </ButtonGroup>
@@ -233,7 +309,7 @@ const OfferActionMenu = props => {
     );
 };
 
-const SubmittedActionMenu = props =>
+const SubmittedActionMenu = props => (
     <ButtonToolbar id="action-menu">
         <ButtonGroup id="submit">
             <Button bsStyle="success" disabled>
@@ -241,10 +317,12 @@ const SubmittedActionMenu = props =>
             </Button>
             <Button
                 bsStyle="success"
-                onClick={() => props.appState.previewDdah(props.selectedDdahId)}>
+                onClick={() => props.appState.previewDdah(props.selectedDdahId)}
+            >
                 View as PDF
             </Button>
         </ButtonGroup>
-    </ButtonToolbar>;
+    </ButtonToolbar>
+);
 
 export { InstrControlPanel };

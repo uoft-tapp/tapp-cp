@@ -1,4 +1,5 @@
 class PositionsController < ApplicationController
+  include Importer
   protect_from_forgery with: :null_session
   include Authorizer
   include Model
@@ -47,6 +48,59 @@ class PositionsController < ApplicationController
     update_date(params[:start_date], position, :start_date)
     update_date(params[:end_date], position, :end_date)
   end
+  
+  def add_or_update
+    exceptions = []
+    session = params[:session_id]
+    positions = params[:positions]
+    begin
+      positions.each do |course_entry|
+        posting_id  = course_entry["course_id"]
+        course_id = posting_id
+        round_id = course_entry["round_id"]
+        dates = get_dates(course_entry["dates"])
+        if !dates
+          dates = [nil, nil]
+          exceptions.push("Error: The dates for Position #{course_entry["course_id"]} is malformed.")
+        end
+        exists = "Position #{posting_id} already exists"
+        ident = {position: posting_id, round_id: round_id}
+        campus_code = 1
+        data = {
+          position: posting_id,
+          round_id: round_id,
+          open: true,
+          campus_code: campus_code,
+          course_name: (course_entry["course_name"] || "").strip,
+          current_enrolment: course_entry["enrolment"],
+          duties: course_entry["duties"],
+          qualifications: course_entry["qualifications"],
+          hours: course_entry["n_hours"] || 0,
+          estimated_count: course_entry["n_positions"] || 0,
+          estimated_total_hours: course_entry["total_hours"],
+          session_id: session,
+          start_date: dates[0],
+          end_date: dates[1],
+        }
+        position = insertion_helper(Position, data, ident, exists)
+      end
+    rescue
+      exceptions.push("Error: Unknown error when creating Position")
+    end
+
+
+    if exceptions.length > 0
+      status = {success: true, errors: true, message: exceptions}
+    else
+      status = {success: true, errors: false, message: ["Positions import was successful."]}
+    end
+    
+    if status[:success]
+      render json: {errors: status[:errors], message: status[:message]}
+    else
+      render status: 404, json: {message: status[:message], errors: status[:errors]}
+    end
+  end
 
   private
   def position_params
@@ -85,5 +139,18 @@ class PositionsController < ApplicationController
     return positions
   end
 
+  def get_dates(dates)
+    if dates
+      dates = dates.split(" to ")
+      if dates.size == 2
+        return dates
+      else
+        dates = dates[0].split(" - ")
+        if dates.size == 2
+          return dates
+        end
+      end
+    end
+  end
 
 end

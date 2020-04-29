@@ -1,7 +1,7 @@
-import React from 'react';
-import { Grid, Row, Col, Well } from 'react-bootstrap';
-import { CourseMenu } from './courseMenu.js';
-import { CoursePanel } from './coursePanel.js';
+import React from "react";
+import { Grid, Row, Col, Well } from "react-bootstrap";
+import { CourseMenu } from "./courseMenu.js";
+import { CoursePanel } from "./coursePanel.js";
 
 class ABC extends React.Component {
     // determine the appropriate styling to produce the specified layout
@@ -13,63 +13,63 @@ class ABC extends React.Component {
                 return 0;
 
             case 1:
-                panel1style = { height: '100%', width: '100%' };
+                panel1style = { height: "100%", width: "100%" };
                 break;
 
             case 2:
                 // side-by-side (default)
-                panel1style = panel2style = { height: '100%', width: '50%' };
+                panel1style = panel2style = { height: "100%", width: "50%" };
                 break;
 
             case 2.1:
                 // stacked
-                panel1style = panel2style = { height: '50%', width: '100%' };
+                panel1style = panel2style = { height: "50%", width: "100%" };
                 break;
 
             case 3:
                 // side-by-side (default)
                 panel1style = panel2style = panel3style = {
-                    height: '100%',
-                    width: 'calc(100%/3)',
+                    height: "100%",
+                    width: "calc(100%/3)"
                 };
                 break;
 
             case 3.1:
                 // 1 panel left, 2 stacked panels right
-                panel1style = { height: '100%', width: '50%' };
-                panel2style = panel3style = { height: '50%', width: '50%' };
+                panel1style = { height: "100%", width: "50%" };
+                panel2style = panel3style = { height: "50%", width: "50%" };
                 break;
 
             case 3.2:
                 // 2 stacked panels left, 1 panel right
-                panel1style = panel3style = { height: '50%', width: '50%' };
-                panel2style = { height: '100%', width: '50%', float: 'right' };
+                panel1style = panel3style = { height: "50%", width: "50%" };
+                panel2style = { height: "100%", width: "50%", float: "right" };
                 break;
 
             case 3.3:
                 // 1 panel on top, 2 side-by-side panels on bottom
-                panel1style = { height: '50%', width: '100%' };
-                panel2style = panel3style = { height: '50%', width: '50%' };
+                panel1style = { height: "50%", width: "100%" };
+                panel2style = panel3style = { height: "50%", width: "50%" };
                 break;
 
             case 3.4:
                 // 2 side-by-side panels on top, 1 panel on bottom
-                panel1style = panel2style = { height: '50%', width: '50%' };
-                panel3style = { height: '50%', width: '100%' };
+                panel1style = panel2style = { height: "50%", width: "50%" };
+                panel3style = { height: "50%", width: "100%" };
                 break;
 
             case 3.5:
                 // stacked
                 panel1style = panel2style = panel3style = {
-                    height: 'calc(100%/3)',
-                    width: '100%',
+                    height: "calc(100%/3)",
+                    width: "100%"
                 };
                 break;
 
             case 4:
                 panel1style = panel2style = panel3style = panel4style = {
-                    height: '50%',
-                    width: '50%',
+                    height: "50%",
+                    width: "50%"
                 };
                 break;
         }
@@ -127,7 +127,7 @@ class ABC extends React.Component {
         }
 
         let fetchCheck = this.props.anyFetching();
-        let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
+        let cursorStyle = { cursor: fetchCheck ? "progress" : "auto" };
 
         let selected = this.props.getSelectedCourses();
         let layout = this.props.getCoursePanelLayout();
@@ -137,18 +137,20 @@ class ABC extends React.Component {
             <Grid fluid id="abc-grid" style={cursorStyle}>
                 <CourseMenu {...this.props} />
                 <div id="course-panel-layout">
-                    {styles == 0 &&
+                    {styles == 0 && (
                         <Well id="no-courses-well">
                             <p>Nothing here yet!</p>
                             <p>Select one or more courses to start.</p>
-                        </Well>}
-                    {selected.map((course, i) =>
+                        </Well>
+                    )}
+                    {selected.map((course, i) => (
                         <CoursePanel
                             key={"course-panel-" + course}
                             panelStyle={styles[i]}
                             course={course}
                             {...this.props}
-                        />)}
+                        />
+                    ))}
                 </div>
             </Grid>
         );

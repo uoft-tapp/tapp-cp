@@ -1,42 +1,80 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Table } from 'react-bootstrap';
+import React from "react";
+import PropTypes from "prop-types";
+import { Table, Glyphicon } from "react-bootstrap";
 
-const THeader = props =>
-    <thead>
-        <tr>
-            {props.config.map((field, i) =>
-                <th
-                    key={'header-' + i}
-                    style={
-                        field.style
-                            ? Object.assign({}, field.style, {
-                                  width: 'calc(' + field.style.width + '*100vw)',
-                              })
-                            : {}
-                    }>
-                    {field.header}
-                </th>
-            )}
-        </tr>
-    </thead>;
+function SortButton(props) {
+    let iconName = null;
+    const direction = +props.direction;
+    if (direction === 1) {
+        iconName = "sort-by-alphabet";
+    } else if (direction === -1) {
+        iconName = "sort-by-alphabet-alt";
+    }
+    if (!iconName) {
+        return null;
+    }
+    return <Glyphicon glyph={iconName} />;
+}
 
-const OfferRow = props =>
-    <tr key={'offer-' + props.offerId + '-row'}>
-        {props.config.map((field, i) =>
+const THeader = props => {
+    const { selectedSortFields, cycleSort } = props;
+    const sortDirs = {};
+    for (let [field, dir] of selectedSortFields) {
+        sortDirs[field] = dir;
+    }
+
+    function cycleSortFactory(i, dummy) {
+        if (dummy) {
+            return () => {};
+        }
+        return () => cycleSort(i);
+    }
+
+    return (
+        <thead>
+            <tr>
+                {props.config.map((field, i) => (
+                    <th
+                        key={"header-" + i}
+                        onClick={cycleSortFactory(i, field.headerNoSort)}
+                        style={{ cursor: "pointer" }}
+                        title={"Click to sort column"}
+                    >
+                        <div style={{ position: "relative" }}>
+                            {field.header}
+                            {!field.headerNoSort && (
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        right: "2px",
+                                        bottom: "0px",
+                                        color: "#a0a0a0",
+                                        background: "white"
+                                    }}
+                                >
+                                    <SortButton direction={sortDirs[i]} />
+                                </div>
+                            )}
+                        </div>
+                    </th>
+                ))}
+            </tr>
+        </thead>
+    );
+};
+
+const OfferRow = props => (
+    <tr key={"offer-" + props.offerId + "-row"}>
+        {props.config.map((field, i) => (
             <td
-                key={'offer-' + props.offerId + '-row-' + i}
-                style={
-                    field.style
-                        ? Object.assign({}, field.style, {
-                              width: 'calc(' + field.style.width + '*100vw)',
-                          })
-                        : {}
-                }>
+                key={"offer-" + props.offerId + "-row-" + i}
+                style={field.style ? Object.assign({}, field.style) : null}
+            >
                 {field.data({ offer: props.offer, offerId: props.offerId })}
             </td>
-        )}
-    </tr>;
+        ))}
+    </tr>
+);
 
 class TableInst extends React.Component {
     // acquire and process list of applicants
@@ -52,7 +90,10 @@ class TableInst extends React.Component {
                     .get(field)
                     .reduce(
                         (acc, category) =>
-                            acc || this.props.config[field].filterFuncs[category](offer),
+                            acc ||
+                            this.props.config[field].filterFuncs[category](
+                                offer
+                            ),
                         false
                     )
             );
@@ -60,7 +101,9 @@ class TableInst extends React.Component {
 
         // apply selected sorts
         let selectedSortFields = this.props.getSelectedSortFields();
-        this.offers = this.offers.sort((a, b) => this.sortOffers(a, b, selectedSortFields));
+        this.offers = this.offers.sort((a, b) =>
+            this.sortOffers(a, b, selectedSortFields)
+        );
     }
 
     // sort offers by the list of criteria, in order
@@ -96,29 +139,30 @@ class TableInst extends React.Component {
     }
 
     render() {
-        return (
-            <div className="table-container">
-                <Table striped bordered condensed hover>
-                    <THeader config={this.props.config} />
-                </Table>
-
-                <div className="table-body">
-                    <Table striped bordered condensed hover>
-                        <tbody>
-                            {this.offers.map((val, key) =>
-                                <OfferRow
-                                    key={'offer-' + key}
+        const selectedSortFields = this.props.getSelectedSortFields();
+        const offerRows = this.offers.toArray().map(([key, val]) => {
+                                return <OfferRow
+                                    key={"offer-" + key}
                                     offerId={key}
                                     offer={val}
                                     {...this.props}
                                 />
-                            )}
+                            })
+        return (
+            <div className="table-container">
+                <div className="table-body">
+                    <Table striped bordered condensed hover>
+                        <THeader
+                            config={this.props.config}
+                            selectedSortFields={selectedSortFields}
+                            cycleSort={this.props.cycleSort}
+                        />
+                        <tbody>
+                            {offerRows}
                         </tbody>
                     </Table>
                 </div>
-                <div id="table-total">
-                    Total = {this.offers.size}
-                </div>
+                <div id="table-total">Total = {this.offers.size}</div>
             </div>
         );
     }
@@ -128,7 +172,8 @@ TableInst.propTypes = {
     config: PropTypes.arrayOf(
         PropTypes.shape({
             // label for table column, used in table header
-            header: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+            header: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+                .isRequired,
             // function that produces the data needed for this column, for each row
             data: PropTypes.func.isRequired,
 
@@ -148,8 +193,8 @@ TableInst.propTypes = {
             // style applied to cells in table column
             style: PropTypes.shape({
                 // column width - this should be a number between 0 and 1
-                width: PropTypes.number,
-            }),
+                width: PropTypes.number
+            })
         })
     ).isRequired,
 
@@ -163,7 +208,7 @@ TableInst.propTypes = {
     // course id of the course to which these offers have applied (for the ABC view)
     course: PropTypes.string,
     // whether the offers in this table have been assigned to this course (for the ABC view)
-    assigned: PropTypes.bool,
+    assigned: PropTypes.bool
 };
 
 export { TableInst as Table };

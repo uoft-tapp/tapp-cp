@@ -1,5 +1,5 @@
-import React from 'react';
-import { ListGroupItem, Badge } from 'react-bootstrap';
+import React from "react";
+import { ListGroupItem, Badge } from "react-bootstrap";
 
 class CourseForm extends React.Component {
     render() {
@@ -52,13 +52,18 @@ class CourseForm extends React.Component {
                             <td className="col-3">
                                 <Form
                                     type="number"
-                                    defaultVal={this.props.course.estimatedEnrol}
+                                    defaultVal={
+                                        this.props.course.estimatedEnrol
+                                    }
                                     update={val => {
-                                        if (val != this.props.course.estimatedEnrol) {
+                                        if (
+                                            val !=
+                                            this.props.course.estimatedEnrol
+                                        ) {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'estimatedEnrol'
+                                                "estimatedEnrol"
                                             );
                                         }
                                     }}
@@ -71,7 +76,7 @@ class CourseForm extends React.Component {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'cap'
+                                                "cap"
                                             );
                                         }
                                     }}
@@ -84,7 +89,7 @@ class CourseForm extends React.Component {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'waitlist'
+                                                "waitlist"
                                             );
                                         }
                                     }}
@@ -101,13 +106,18 @@ class CourseForm extends React.Component {
                             <td className="col-5">
                                 <Form
                                     type="number"
-                                    defaultVal={this.props.course.estimatedPositions}
+                                    defaultVal={
+                                        this.props.course.estimatedPositions
+                                    }
                                     update={val => {
-                                        if (val != this.props.course.estimatedPositions) {
+                                        if (
+                                            val !=
+                                            this.props.course.estimatedPositions
+                                        ) {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'estimatedPositions'
+                                                "estimatedPositions"
                                             );
                                         }
                                     }}
@@ -116,11 +126,14 @@ class CourseForm extends React.Component {
                                     type="number"
                                     defaultVal={this.props.course.positionHours}
                                     update={val => {
-                                        if (val != this.props.course.positionHours) {
+                                        if (
+                                            val !=
+                                            this.props.course.positionHours
+                                        ) {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'positionHours'
+                                                "positionHours"
                                             );
                                         }
                                     }}
@@ -134,15 +147,19 @@ class CourseForm extends React.Component {
                                     type="date"
                                     defaultVal={
                                         this.props.course.startDate
-                                            ? this.props.course.startDate.split('T')[0]
+                                            ? this.props.course.startDate.split(
+                                                  "T"
+                                              )[0]
                                             : "hello"
                                     }
                                     update={val => {
-                                        if (val != this.props.course.startDate) {
+                                        if (
+                                            val != this.props.course.startDate
+                                        ) {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'startDate'
+                                                "startDate"
                                             );
                                         }
                                     }}
@@ -154,7 +171,9 @@ class CourseForm extends React.Component {
                                     type="date"
                                     defaultVal={
                                         this.props.course.endDate
-                                            ? this.props.course.endDate.split('T')[0]
+                                            ? this.props.course.endDate.split(
+                                                  "T"
+                                              )[0]
                                             : undefined
                                     }
                                     update={val => {
@@ -162,7 +181,7 @@ class CourseForm extends React.Component {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 val,
-                                                'endDate'
+                                                "endDate"
                                             );
                                         }
                                     }}
@@ -171,10 +190,15 @@ class CourseForm extends React.Component {
 
                             <td className="col-7">
                                 <p>
-                                    <b>Instructors
-                                     <i className="fa fa-pencil instructor-modal-opener clickable"
-                                      title="Open Instructor Editor"
-                                      onClick={()=> this.props.showInstructorModal()}></i>
+                                    <b>
+                                        Instructors
+                                        <i
+                                            className="fa fa-pencil instructor-modal-opener clickable"
+                                            title="Open Instructor Editor"
+                                            onClick={() =>
+                                                this.props.showInstructorModal()
+                                            }
+                                        />
                                     </b>
                                 </p>
                                 <InstructorForm
@@ -190,11 +214,14 @@ class CourseForm extends React.Component {
                                 </p>
                                 <textarea
                                     onBlur={event => {
-                                        if (event.target.value != this.props.course.qual) {
+                                        if (
+                                            event.target.value !=
+                                            this.props.course.qual
+                                        ) {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 event.target.value,
-                                                'qual'
+                                                "qual"
                                             );
                                         }
                                     }}
@@ -207,11 +234,14 @@ class CourseForm extends React.Component {
                                 </p>
                                 <textarea
                                     onBlur={event => {
-                                        if (event.target.value != this.props.course.resp) {
+                                        if (
+                                            event.target.value !=
+                                            this.props.course.resp
+                                        ) {
                                             this.props.updateCourse(
                                                 this.props.courseId,
                                                 event.target.value,
-                                                'resp'
+                                                "resp"
                                             );
                                         }
                                     }}
@@ -227,18 +257,20 @@ class CourseForm extends React.Component {
 }
 
 // input that allows form submission
-const Form = props =>
+const Form = props => (
     <form
         onSubmit={event => {
             props.update(event.target.elements[0].value);
             event.preventDefault();
-        }}>
+        }}
+    >
         <input
             type={props.type}
-            defaultValue={props.defaultVal != undefined ? props.defaultVal : ''}
+            defaultValue={props.defaultVal != undefined ? props.defaultVal : ""}
             onBlur={event => props.update(event.target.value)}
         />
-    </form>;
+    </form>
+);
 
 class InstructorForm extends React.Component {
     alreadyAddedInstructor(id, instructors) {
@@ -258,7 +290,7 @@ class InstructorForm extends React.Component {
                 } else {
                     this.props.addInstructor(course, i);
                 }
-                this.input.value = '';
+                this.input.value = "";
                 break;
             }
         }
@@ -267,15 +299,21 @@ class InstructorForm extends React.Component {
     render() {
         return (
             <div className="instructor_form" onClick={() => this.input.focus()}>
-                {this.props.instructors.map((instructor, key) =>
+                {this.props.instructors.map((instructor, key) => (
                     <Badge key={key}>
                         {this.props.instructor_data[instructor]}
                         <button
-                            onClick={() => this.props.removeInstructor(this.props.courseId, key)}>
+                            onClick={() =>
+                                this.props.removeInstructor(
+                                    this.props.courseId,
+                                    key
+                                )
+                            }
+                        >
                             <i className="fa fa-close" />
                         </button>
                     </Badge>
-                )}
+                ))}
                 <input
                     type="text"
                     list="instructors"
@@ -289,11 +327,14 @@ class InstructorForm extends React.Component {
                             this.props.courseId,
                             this.props.instructors,
                             this.props.instructor_data
-                        )}
+                        )
+                    }
                 />
                 <datalist id="instructors">
-                    {Object.entries(this.props.instructor_data).map((instructor, key) =>
-                        <option key={key} value={instructor[1]} />
+                    {Object.entries(this.props.instructor_data).map(
+                        (instructor, key) => (
+                            <option key={key} value={instructor[1]} />
+                        )
                     )}
                 </datalist>
             </div>

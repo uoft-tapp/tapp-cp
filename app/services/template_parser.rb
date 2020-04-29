@@ -4,7 +4,7 @@ class TemplateParser
   def initialize(files, data, type, template = false)
     if type == "offer"
       @offer = data
-    elsif type== "ddah"
+    elsif type == "ddah"
       @template = template
       @ddah = data
     end

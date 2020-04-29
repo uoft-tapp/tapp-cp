@@ -179,9 +179,11 @@ class ChassImporter
       if code[/[a-z0-9]{3}\d{3,4}[a-z0-9]\d[a-z]/] #i.e. csc108h1s
         mapping[code[/[a-z0-9]{3}\d{3,4}[a-z0-9]\d[a-z]/]] = id #i.e. csc108h1s
       end
-      if name.include? code[/[a-z0-9]{3}\d{3,4}/] #i.e. in course name: "Learning a subject csc108" a course code exists
-        index = name.index(code[/[a-z0-9]{3}\d{3,4}/])-1 #takes index of course code in course name
-        mapping[name[0..index].strip] = id #remove course code from course name and assign course name (without course code) to id
+      if code[/[a-z0-9]{3}\d{3,4}/]
+        if name.include? code[/[a-z0-9]{3}\d{3,4}/] #i.e. in course name: "Learning a subject csc108" a course code exists
+          index = name.index(code[/[a-z0-9]{3}\d{3,4}/])-1 #takes index of course code in course name
+          mapping[name[0..index].strip] = id #remove course code from course name and assign course name (without course code) to id
+        end
       end
       if split_code.size > 1 #i.e. in CSC142H1S/2400H1S, the part after slash exists
         mapping[split_code[1]] = id #i.e. 2400H1S
@@ -224,17 +226,22 @@ class ChassImporter
       end
       exists = "Position #{posting_id} already exists"
       ident = {position: posting_id, round_id: round_id}
+      begin
+        campus_code = course_id[course_id[/[A-Za-z0-9]{3}\d{3,4}/].size+1].to_i
+      rescue
+        campus_code = 1
+      end
       data = {
         position: posting_id,
         round_id: round_id,
         open: true,
-        campus_code: course_id[course_id[/[A-Za-z0-9]{3}\d{3,4}/].size+1].to_i,
-        course_name: course_entry["course_name"].strip,
+        campus_code: campus_code,
+        course_name: (course_entry["course_name"] || "").strip,
         current_enrolment: course_entry["enrolment"],
         duties: course_entry["duties"],
         qualifications: course_entry["qualifications"],
-        hours: course_entry["n_hours"],
-        estimated_count: course_entry["n_positions"],
+        hours: course_entry["n_hours"] || 0,
+        estimated_count: course_entry["n_positions"] || 0,
         estimated_total_hours: course_entry["total_hours"],
         session_id: @session[:id],
         start_date: dates[0],
@@ -243,7 +250,7 @@ class ChassImporter
       position = insertion_helper(Position, data, ident, exists)
 
       teaching_instructors = []
-      course_entry["instructor"].each do |instructor|
+      (course_entry["instructor"] || []).each do |instructor|
         name = instructor["first_name"].strip+" "+instructor["last_name"].strip
         ident = {name: name}
         exists = "Instructor #{name} alread exists"

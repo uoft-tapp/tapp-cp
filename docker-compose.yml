@@ -13,19 +13,26 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       EMAIL_TYPE: ${EMAIL_TYPE}
+      EMAIL_PORT: ${EMAIL_PORT}
       EMAIL_USER: ${EMAIL_USER}
+      EMAIL_EXTRA_BLURB: ${EMAIL_EXTRA_BLURB}
       TA_COORD: ${TA_COORD}
       RECIPIENT: ${RECIPIENT}
       HR_ADMIN_EMAIL: ${HR_ADMIN_EMAIL}
       HR_ADMIN_NAME: ${HR_ADMIN_NAME}
+      HR_ADMIN_DETAILS: ${HR_ADMIN_DETAILS}
       TAPP_ADMINS: ${TAPP_ADMINS}
       CP_ADMINS: ${CP_ADMINS}
       TAPP_ASSISTANTS: ${TAPP_ASSISTANTS}
       HR_ASSISTANTS: ${HR_ASSISTANTS}
+      CONTRACT_SUBDIR: ${CONTRACT_SUBDIR}
+      ALLOW_BASIC_AUTH: ${ALLOW_BASIC_AUTH}
+      BASIC_AUTH_TA_ID: ${BASIC_AUTH_TA_ID}
+      AUTHENTICATE_IN_DEV_MODE: ${AUTHENTICATE_IN_DEV_MODE}
     networks:
       - default
     ports:
-      - "3000:3000"
+      - "3022:3022"
     links:
       - postgres
 
@@ -36,7 +43,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - /var/lib/postgresql/data
+      - tapp-db-data:/var/lib/postgresql/data
 
 networks:
   default:
@@ -44,3 +51,7 @@ networks:
     ipam:
       config:
       - subnet: ${DOCKER_DEFAULT_SUBNET}
+
+volumes:
+  tapp-db-data:
+    driver: local

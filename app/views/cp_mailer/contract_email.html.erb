@@ -3,10 +3,15 @@
   We would like to offer you a position as a TA for <%= @offer[:position] %>.
 </p>
 <p>
-  Please click the link below to view your offer and accept or reject it:<br/>
-  <%= @url %>.
+  Please visit the link below to view your offer and accept or reject it:<br/>
+  <a href="<%= @url %>"><%= @url %></a>
 </p>
-<p>Have a great day!</p>
-<p>PS. we've noticed that some browsers don't display the contract
-properly. Please try using chrome. If you have any troubles please
-contact tacoord@cs.toronto.edu. Sorry for any inconvenience.</p>
+<p><%= ENV['EMAIL_EXTRA_BLURB'] %></p>
+<p>A statement about the Union prepared by the Union, 
+along with other information about the Union, can be found <a href="http://cupe3902.org/unit-1/">here</a>. 
+All of this information is that of the Union, represents the views 
+of the Union and has not been approved or endorsed by the University. </p>
+<p>If you have any questions, please let me know.<br/><br/>
+Thank you,<br/>
+ - <%= ENV['TA_COORD'] %>
+</p>

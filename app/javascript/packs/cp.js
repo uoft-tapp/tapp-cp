@@ -7,23 +7,28 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
-import '../cp-styles';
+import "../cp-styles";
 
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
-import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
+import {
+    BrowserRouter as Router,
+    Route,
+    Redirect,
+    Switch
+} from "react-router-dom";
 
-import { Alert } from 'react-bootstrap';
+import { Alert } from "react-bootstrap";
 
-import { appState } from '../cp/appState.js';
-import { fetchAuth } from '../cp/fetch.js';
+import { appState } from "../cp/appState.js";
+import { fetchAuth } from "../cp/fetch.js";
 
-import { routeConfig } from '../cp/routeConfig.js';
-import { Navbar } from '../cp/components/navbar.js';
-import { AdminControlPanel } from '../cp/components/adminControlPanel.js';
-import { DdahControlPanel } from '../cp/components/ddahControlPanel.js';
-import { InstrControlPanel } from '../cp/components/instrControlPanel.js';
+import { routeConfig } from "../cp/routeConfig.js";
+import { Navbar } from "../cp/components/navbar.js";
+import { AdminControlPanel } from "../cp/components/adminControlPanel.js";
+import { DdahControlPanel } from "../cp/components/ddahControlPanel.js";
+import { InstrControlPanel } from "../cp/components/instrControlPanel.js";
 
 /*** Main app component ***/
 
@@ -49,10 +54,10 @@ class App extends React.Component {
             return <div id="loader" />;
         }
 
-        switch (role){
-            case 'cp_admin':
+        switch (role) {
+            case "cp_admin":
                 return <AdminRouter {...this.props} />;
-            case 'hr_assistant':
+            case "hr_assistant":
                 return (
                     <div>
                         <Navbar {...this.props} />
@@ -60,7 +65,7 @@ class App extends React.Component {
                         <AlertContainer {...this.props} />
                     </div>
                 );
-            case 'instructor':
+            case "instructor":
                 return (
                     <div>
                         <Navbar {...this.props} />
@@ -74,7 +79,7 @@ class App extends React.Component {
     }
 }
 
-const AdminRouter = props =>
+const AdminRouter = props => (
     <Router basename="cp">
         <div>
             <Navbar {...props} />
@@ -82,32 +87,47 @@ const AdminRouter = props =>
             <Switch>
                 <Route
                     path={routeConfig.controlPanel.route}
-                    render={() =>
-                        <AdminControlPanel navKey={routeConfig.controlPanel.id} {...props} />}
+                    render={() => (
+                        <AdminControlPanel
+                            navKey={routeConfig.controlPanel.id}
+                            {...props}
+                        />
+                    )}
                 />
                 <Route
                     path={routeConfig.ddahs.route}
-                    render={() => <DdahControlPanel navKey={routeConfig.ddahs.id} {...props} />}
+                    render={() => (
+                        <DdahControlPanel
+                            navKey={routeConfig.ddahs.id}
+                            {...props}
+                        />
+                    )}
                 />
                 <Redirect from="/" to="/controlpanel" />
             </Switch>
 
             <AlertContainer {...props} />
         </div>
-    </Router>;
+    </Router>
+);
 
-const AlertContainer = props =>
+const AlertContainer = props => (
     <div className="container-fluid" id="alert-container">
-        {props.appState.getAlerts().map(alert =>
+        {props.appState.getAlerts().map(alert => (
             <Alert
-                key={'alert-' + alert.get('id')}
+                key={"alert-" + alert.get("id")}
                 className="alert alert-danger"
-                onDismiss={() => props.appState.dismissAlert(alert.get('id'))}>
-                <span dangerouslySetInnerHTML={{ __html: alert.get('text') }} />
+                onDismiss={() => props.appState.dismissAlert(alert.get("id"))}
+            >
+                <span dangerouslySetInnerHTML={{ __html: alert.get("text") }} />
             </Alert>
-        )}
-    </div>;
+        ))}
+    </div>
+);
 
-document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.render(<App appState={appState} />, document.getElementById('root'));
+document.addEventListener("DOMContentLoaded", () => {
+    ReactDOM.render(
+        <App appState={appState} />,
+        document.getElementById("root")
+    );
 });

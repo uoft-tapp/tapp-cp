@@ -2,6 +2,7 @@ include Authorizer
 Rails.application.routes.draw do
   get '/tapp/(*z)', to: "app#tapp"
   get '/cp/(*z)', to: "app#cp"
+  get '/cq/(*z)', to: "app#cq"
   get '/roles', to: "app#roles"
 
   post '/logout', to: "app#logout"
@@ -15,6 +16,8 @@ Rails.application.routes.draw do
     resources :assignments, only: [:index]
     resources :positions, only: [:index]
     resources :offers, only: [:index]
+    post "offers/add_or_update", to: "offers#add_or_update"
+    post "positions/add_or_update", to: "positions#add_or_update"
     resources :ddahs, only: [:index]
   end
   scope '/sessions/:session_id/instructors/:utorid' do
@@ -81,6 +84,7 @@ Rails.application.routes.draw do
   post "offers/send-contracts" => "offers#send_contracts"
   post "offers/print" => "offers#combine_contracts_print"
   post "offers/nag" => "offers#batch_email_nags"
+  post "offers/update_hours", to: "offers#update_batch_offers_hours"
   post "offers/can-clear-hris-status" => "offers#can_clear_hris_status"
   post "offers/clear-hris-status" => "offers#clear_hris_status"
   post "/offers/can-nag-instructor" => "offers#can_nag_instructor"
@@ -91,6 +95,7 @@ Rails.application.routes.draw do
   post "/import/templates", to: "import#templates"
   get "/export/ddahs/:position_id", to: "export#ddahs"
   get "/export/session-ddahs/:session_id", to: "export#session_ddahs"
+  post "/applicants/add_or_update", to: "applicants#add_or_update"
 
   post "/ddahs/preview" => "ddahs#preview"
   post "/ddahs/can-preview" => "ddahs#can_preview"
@@ -107,6 +112,7 @@ Rails.application.routes.draw do
   # student-facing
   get "/pb/:offer_id" => "app#student_view"
   get "/pb/:offer_id/pdf" => "offers#get_contract_student"
+  get "/pb/:offer_id/html" => "offers#get_contract_student_html"
   post "/pb/:offer_id/:status" => "offers#set_status_student"
 
   # student-facing for ddah

@@ -119,7 +119,6 @@ footer div p {
 
 #offers-grid .table-container td,
 #offers-grid .table-container th {
-    word-break: break-all;
 }
 
 #offer-note-popover .popover-content {
@@ -504,7 +503,6 @@ footer div p {
 
 #ddahs-grid .table-container td,
 #ddahs-grid .table-container th {
-    word-break: break-all;
 }
 
 #ddahs-grid #table-total {
@@ -522,4 +520,31 @@ footer div p {
   list-style: none;
   text-decoration: none;
   color: #555;
+}
+
+.show-on-hover-wrapper {
+    min-height: 2.5ex;
+}
+
+.show-on-hover-wrapper:hover .show-on-hover {
+    opacity: 1;
+}
+
+.show-on-hover {
+    transition: all .3s;
+    opacity: 0;
+}
+
+.edit-glyph {
+    cursor: pointer;
+}
+
+.field-dialog-formatted-name {
+    white-space: pre;
+    font-family: monospace;
+    color: blue;
+}
+.field-dialog-formatted-name::before, .field-dialog-formatted-name::after {
+    content: "'";
+    color: initial;
 }

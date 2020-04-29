@@ -3,22 +3,27 @@ class OfferImporter
 
   def import_json(file)
     exceptions = []
-    if file[:offers]==nil
+    if file.is_a?(Array)
+      offers = file
+    elsif file[:offers]==nil
       return {success: false, errors: true, message: ["Error: This file is not an offer JSON."]}
+    else
+      offers = file[:offers]
     end
-    file[:offers].each do |offer|
+
+    offers.each do |offer|
       position = Position.find_by(position: offer["course_id"], round_id: offer["round_id"])
       applicant = Applicant.find_by(utorid: offer["utorid"])
       if position && applicant
         ident = {position_id: position[:id], applicant_id: applicant[:id]}
         exists = "offer with position #{offer[:position]} for applicant #{offer[:utorid]} already exists"
-        data = get_data(position, applicant, offer["hours"],offer["session"], offer["year"])
+        data = get_data(position, applicant, offer["hours"], offer["session"], offer["year"])
         insertion_helper(Offer, data, ident, exists)
       else
         exceptions.push("Error: either Position #{offer["course_id"]} or Applicant #{offer["utorid"]} is invalid.")
       end
     end
-    if exceptions.length == file[:offers].length
+    if exceptions.length == offers.length
       return {success: false, errors: true, message: exceptions}
     elsif exceptions.length > 0
       return {success: true, errors: true, message: exceptions}

@@ -1,7 +1,16 @@
-import React from 'react';
-import { Grid, Panel, PanelGroup, ButtonGroup, Form, Button, Well, Table } from 'react-bootstrap';
-import { ImportForm } from './importForm.js';
-import { ExportForm } from './exportForm.js';
+import React from "react";
+import {
+    Grid,
+    Panel,
+    PanelGroup,
+    ButtonGroup,
+    Form,
+    Button,
+    Well,
+    Table
+} from "react-bootstrap";
+import { ImportForm } from "./importForm.js";
+import { ExportForm } from "./exportForm.js";
 
 class Summary extends React.Component {
     render() {
@@ -11,7 +20,7 @@ class Summary extends React.Component {
         }
 
         let fetchCheck = this.props.anyFetching();
-        let cursorStyle = { cursor: fetchCheck ? 'progress' : 'auto' };
+        let cursorStyle = { cursor: fetchCheck ? "progress" : "auto" };
 
         return (
             <Grid fluid id="summary-grid" style={cursorStyle}>
@@ -45,39 +54,63 @@ const Utilities = props => {
                 <Button
                     id="import-btn"
                     onClick={() => {
-                        let importForm = document.getElementById('import-form-container');
-                        if (!importForm.style.display || importForm.style.display == 'none') {
-                            importForm.style.display = 'block';
-                            document.getElementById('export-form-container').style.display = 'none';
+                        let importForm = document.getElementById(
+                            "import-form-container"
+                        );
+                        if (
+                            !importForm.style.display ||
+                            importForm.style.display == "none"
+                        ) {
+                            importForm.style.display = "block";
+                            document.getElementById(
+                                "export-form-container"
+                            ).style.display = "none";
                         } else {
-                            importForm.style.display = 'none';
+                            importForm.style.display = "none";
                         }
-                    }}>
-                    <i className="fa fa-upload" style={{ fontSize: '20px' }} />
+                    }}
+                >
+                    <i className="fa fa-upload" style={{ fontSize: "20px" }} />
                     <br />
                     <small>Import</small>
                 </Button>
                 <Button
                     id="export-btn"
                     onClick={() => {
-                        let exportForm = document.getElementById('export-form-container');
-                        if (!exportForm.style.display || exportForm.style.display == 'none') {
-                            exportForm.style.display = 'block';
-                            document.getElementById('import-form-container').style.display = 'none';
+                        let exportForm = document.getElementById(
+                            "export-form-container"
+                        );
+                        if (
+                            !exportForm.style.display ||
+                            exportForm.style.display == "none"
+                        ) {
+                            exportForm.style.display = "block";
+                            document.getElementById(
+                                "import-form-container"
+                            ).style.display = "none";
                         } else {
-                            exportForm.style.display = 'none';
+                            exportForm.style.display = "none";
                         }
-                    }}>
-                    <i className="fa fa-download" style={{ fontSize: '20px' }} />
+                    }}
+                >
+                    <i
+                        className="fa fa-download"
+                        style={{ fontSize: "20px" }}
+                    />
                     <br />
                     <small>Export</small>
                 </Button>
                 <Button
                     onClick={() =>
                         props.alert(
-                            '<b>Release assignments</b> This functionality is not currently supported.'
-                        )}>
-                    <i className="fa fa-share-square-o" style={{ fontSize: '20px' }} />
+                            "<b>Release assignments</b> This functionality is not currently supported."
+                        )
+                    }
+                >
+                    <i
+                        className="fa fa-share-square-o"
+                        style={{ fontSize: "20px" }}
+                    />
                     <br />
                     <small>Release</small>
                 </Button>
@@ -97,17 +130,25 @@ const Utilities = props => {
 const Stats = props => {
     let applicants = Object.entries(props.getApplicantsList());
     let gradApplicants = applicants.filter(([_, app]) =>
-        ['MSc', 'MASc', 'MScAC', 'MEng', 'OG', 'PhD'].includes(app.program)
+        ["MSc", "MASc", "MScAC", "MEng", "OG", "PhD"].includes(app.program)
     );
-    let dcsGradApplicants = gradApplicants.filter(([_, app]) => app.dept == 'Computer Science');
+    let dcsGradApplicants = gradApplicants.filter(
+        ([_, app]) => app.dept == "Computer Science"
+    );
 
     let assignments = props.getAssignmentsList();
-    let unassGradApplicants = gradApplicants.filter(([id, _]) => !assignments[id]);
-    let unassDcsGradApplicants = dcsGradApplicants.filter(([id, _]) => !assignments[id]);
+    let unassGradApplicants = gradApplicants.filter(
+        ([id, _]) => !assignments[id]
+    );
+    let unassDcsGradApplicants = dcsGradApplicants.filter(
+        ([id, _]) => !assignments[id]
+    );
 
     let courses = props.getCoursesList();
     let orderedCourses = Object.entries(courses);
-    orderedCourses.sort(([A, valA], [B, valB]) => (valA.code < valB.code ? -1 : 1));
+    orderedCourses.sort(([A, valA], [B, valB]) =>
+        valA.code < valB.code ? -1 : 1
+    );
 
     let assignmentsList = Object.entries(assignments);
     let applicationsList = Object.entries(props.getApplicationsList());
@@ -124,7 +165,8 @@ const Stats = props => {
                 </span>
                 <span className="divider">/</span>
                 <span className="stat">
-                    <h2>{unassGradApplicants.length}</h2> unassigned graduate applicants
+                    <h2>{unassGradApplicants.length}</h2> unassigned graduate
+                    applicants
                 </span>
                 <span className="divider">/</span>
                 <span className="stat">
@@ -132,7 +174,8 @@ const Stats = props => {
                 </span>
                 <span className="divider">/</span>
                 <span className="stat">
-                    <h2>{unassDcsGradApplicants.length}</h2> unassigned DCS graduate applicants
+                    <h2>{unassDcsGradApplicants.length}</h2> unassigned DCS
+                    graduate applicants
                 </span>
             </Well>
 
@@ -150,15 +193,15 @@ const Stats = props => {
                     </tr>
                 </thead>
                 <tbody>
-                    {orderedCourses.map(([id, course]) =>
+                    {orderedCourses.map(([id, course]) => (
                         <PerCourseStats
-                            key={id + '-stats'}
+                            key={id + "-stats"}
                             course={id}
                             courses={courses}
                             applications={applicationsList}
                             assignments={assignmentsList}
                         />
-                    )}
+                    ))}
                 </tbody>
             </Table>
         </Panel>
@@ -181,32 +224,22 @@ const PerCourseStats = props => {
 
     return (
         <tr>
-            <td>
-                {props.courses[props.course].code}
-            </td>
-            <td>
-                {props.courses[props.course].cap}
-            </td>
-            <td>
-                {props.courses[props.course].estimatedEnrol}
-            </td>
-            <td>
-                {props.courses[props.course].waitlist}
-            </td>
-            <td>
-                {applications.length}
-            </td>
-            <td>
-                {assignments.length}
-            </td>
-            <td>
-                {taHours}
-            </td>
-            {props.courses[props.course].estimatedEnrol == null
-                ? <td />
-                : <td>
-                      {(taHours / props.courses[props.course].estimatedEnrol).toFixed(2)}
-                  </td>}
+            <td>{props.courses[props.course].code}</td>
+            <td>{props.courses[props.course].cap}</td>
+            <td>{props.courses[props.course].estimatedEnrol}</td>
+            <td>{props.courses[props.course].waitlist}</td>
+            <td>{applications.length}</td>
+            <td>{assignments.length}</td>
+            <td>{taHours}</td>
+            {props.courses[props.course].estimatedEnrol == null ? (
+                <td />
+            ) : (
+                <td>
+                    {(
+                        taHours / props.courses[props.course].estimatedEnrol
+                    ).toFixed(2)}
+                </td>
+            )}
         </tr>
     );
 };

@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-const DdahAppendix = props =>
+const DdahAppendix = props => (
     <html>
         <head>
             <title>List of Suggested Tasks and Teaching Techniques</title>
@@ -10,11 +10,12 @@ const DdahAppendix = props =>
         <body>
             <h1>List of Suggested Tasks and Teaching Techniques</h1>
             <p>
-                This list is instructive only. It is not exhaustive nor, of course, will all duties
-                listed here apply to all Departments or all types of positions. The list of teaching
-                techniques aligns with the four categories of tutorials and is meant to offer
-                information that may help instructors identify appropriate tutorial training for
-                TAs.
+                This list is instructive only. It is not exhaustive nor, of
+                course, will all duties listed here apply to all Departments or
+                all types of positions. The list of teaching techniques aligns
+                with the four categories of tutorials and is meant to offer
+                information that may help instructors identify appropriate
+                tutorial training for TAs.
             </p>
 
             <table cellSpacing="0">
@@ -31,9 +32,16 @@ const DdahAppendix = props =>
                                 <li>Preparing handouts</li>
                                 <li>Preparing bibliographies</li>
                                 <li>Preparing tutorial/lecture notes</li>
-                                <li>Preparing/setting up laboratory materials</li>
-                                <li>Preparing/setting up audiovisual materials</li>
-                                <li>Attending supervisor&apos;s lectures/seminars</li>
+                                <li>
+                                    Preparing/setting up laboratory materials
+                                </li>
+                                <li>
+                                    Preparing/setting up audiovisual materials
+                                </li>
+                                <li>
+                                    Attending supervisor&apos;s
+                                    lectures/seminars
+                                </li>
                                 <li>Reading texts/manuals/source materials</li>
                             </ul>
                         </td>
@@ -42,21 +50,31 @@ const DdahAppendix = props =>
                                 <li>Selecting relevant texts</li>
                                 <li>Preparing reading lists</li>
                                 <li>Preparing assignments/problem sets</li>
-                                <li>Attending supervisor&apos;s labs/tutorials</li>
-                                <li>Designing &amp; preparing tests/examinations</li>
-                                <li>COnsulting/meeting with course supervisor</li>
+                                <li>
+                                    Attending supervisor&apos;s labs/tutorials
+                                </li>
+                                <li>
+                                    Designing &amp; preparing tests/examinations
+                                </li>
+                                <li>
+                                    COnsulting/meeting with course supervisor
+                                </li>
                                 <li>Announcing special seminars/workshops</li>
                                 <li>Developing/maintaining course web site</li>
                             </ul>
                         </td>
 
-                        <td style={{ borderLeft: '1px solid black' }}>
+                        <td style={{ borderLeft: "1px solid black" }}>
                             <ul>
                                 <li>Leading field trips</li>
                                 <li>Demonstrating problem solvung</li>
                                 <li>Demonstrating in language lab</li>
-                                <li>Demonstrating equipment outside of class</li>
-                                <li>Conducting tutorials/seminars/practicals</li>
+                                <li>
+                                    Demonstrating equipment outside of class
+                                </li>
+                                <li>
+                                    Conducting tutorials/seminars/practicals
+                                </li>
                                 <li>Office hours</li>
                             </ul>
                         </td>
@@ -102,10 +120,16 @@ const DdahAppendix = props =>
                             </ul>
                         </td>
 
-                        <td colSpan="2" style={{ textAlign: 'center' }}>
+                        <td colSpan="2" style={{ textAlign: "center" }}>
                             <ul>
-                                <li>Clerical (photocopying handouts/readings, etc.)</li>
-                                <li>Coordinating other TAs, Resource Centres, etc.</li>
+                                <li>
+                                    Clerical (photocopying handouts/readings,
+                                    etc.)
+                                </li>
+                                <li>
+                                    Coordinating other TAs, Resource Centres,
+                                    etc.
+                                </li>
                                 <li>Technical Support</li>
                                 <li>Meetings with other TAs</li>
                                 <li>Exam/test invigilation</li>
@@ -130,14 +154,18 @@ const DdahAppendix = props =>
                                 <li>Providing effective feedback</li>
                                 <li>Tutorial planning</li>
                                 <li>
-                                    Classroom management (including strategies for different sizes
-                                    of tutorials)
+                                    Classroom management (including strategies
+                                    for different sizes of tutorials)
                                 </li>
                                 <li>Presentation skills</li>
-                                <li>Respond to students&apos; questions effectively</li>
                                 <li>
-                                    Adapting teaching techniques (how to scale learning activities
-                                    for the number of students)
+                                    Respond to students&apos; questions
+                                    effectively
+                                </li>
+                                <li>
+                                    Adapting teaching techniques (how to scale
+                                    learning activities for the number of
+                                    students)
                                 </li>
                             </ul>
                         </td>
@@ -148,16 +176,17 @@ const DdahAppendix = props =>
                             <b>Discussion-Based</b>
                             <ul>
                                 <li>
-                                    Effective facilitation of small, large and/or online group
-                                    discussions
+                                    Effective facilitation of small, large
+                                    and/or online group discussions
                                 </li>
                                 <li>
-                                    Development of relevant examples/scenarios/questions for
-                                    discussion activities
+                                    Development of relevant
+                                    examples/scenarios/questions for discussion
+                                    activities
                                 </li>
                                 <li>
-                                    Selection and use of materials and examples appropriate to
-                                    discipline/course content
+                                    Selection and use of materials and examples
+                                    appropriate to discipline/course content
                                 </li>
                             </ul>
                         </td>
@@ -168,8 +197,8 @@ const DdahAppendix = props =>
                             <b>Skill Development</b>
                             <ul>
                                 <li>
-                                    Facilitating hands-on activities for different sizes of
-                                    tutorials
+                                    Facilitating hands-on activities for
+                                    different sizes of tutorials
                                 </li>
                                 <li>Monitoring practive-based learning</li>
                             </ul>
@@ -181,10 +210,13 @@ const DdahAppendix = props =>
                             <b>Laboratory/Practical</b>
                             <ul>
                                 <li>
-                                    Effective demonstrations and presentations in a lab or practical
+                                    Effective demonstrations and presentations
+                                    in a lab or practical
                                 </li>
                                 <li>Effective pre-lab talks</li>
-                                <li>Effective monitoring of students&apos; work</li>
+                                <li>
+                                    Effective monitoring of students&apos; work
+                                </li>
                             </ul>
                         </td>
                     </tr>
@@ -194,16 +226,21 @@ const DdahAppendix = props =>
                             <b>Review and Q&amp;A</b>
                             <ul>
                                 <li>
-                                    Consolidating and clarifying students&apos; areas of concern
+                                    Consolidating and clarifying students&apos;
+                                    areas of concern
                                 </li>
-                                <li>Modeling effective review strategies for students</li>
+                                <li>
+                                    Modeling effective review strategies for
+                                    students
+                                </li>
                             </ul>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </body>
-    </html>;
+    </html>
+);
 
 const stylesheet = `
 body { width: 1250px; }

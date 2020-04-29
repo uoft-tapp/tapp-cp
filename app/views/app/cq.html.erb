@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title> CQ </title>
+
+    <%= csrf_meta_tags %>
+
+    <% @polyfills = [
+          "fetch",
+          "Promise",
+          "Symbol",
+          "Object.entries",
+          "Array.prototype.includes",
+          "Array.prototype.map",
+          "Array.prototype.forEach",
+          "Array.prototype.@@iterator",
+          "String.prototype.includes",
+          "Symbol.iterator",
+        ]
+      %>
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=<%= @polyfills.join(",") %>"></script>
+    <%= javascript_pack_tag 'cq' %>
+    <%= stylesheet_pack_tag 'cq' %>
+    <%= javascript_pack_tag 'polyfill-css' %>
+
+      <!-- For development in Windows -->
+<!--
+    <% if ENV['RAILS_ENV'] == 'development' %>
+      <% @pack_url = "#{request.base_url.sub!("3000", "8080")}/packs/" %>
+      <script src="<%= @pack_url %>cq.js?v=<%= DateTime.now %>"></script>
+      <link rel="stylesheet" media="screen" href="<%= @pack_url %>cq.css?v=<%= DateTime.now %>">
+      <script src="<%= @pack_url %>polyfill-css.js?v=<%= DateTime.now %>"></script>
+    <% end %>
+    -->
+
+    <!-- FA icons -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
