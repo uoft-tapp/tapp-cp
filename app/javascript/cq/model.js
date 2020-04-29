@@ -155,7 +155,7 @@ export default {
             for (const applicant of applicants) {
                 json.offers.push({
                     course_id: position.position,
-                    round_id: 100,
+                    round_id: 20205,
                     utorid: applicant.utorid,
                     hours: hours,
                     session: session.semester,
