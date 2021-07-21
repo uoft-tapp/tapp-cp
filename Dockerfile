@@ -8,7 +8,7 @@ WORKDIR /srv/app
 
 RUN apk --update --upgrade add curl-dev libcurl build-base openssh \
 	tzdata libxml2 libxml2-dev libxslt libxslt-dev postgresql-dev \
-	nodejs
+	nodejs shared-mime-info
 
 # Add Yarn to the mix
 # hideous hack by matz. methinks yarn lastest tarball changed.
