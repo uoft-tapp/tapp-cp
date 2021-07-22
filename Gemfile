@@ -34,6 +34,8 @@ gem 'prawn', '~> 2.2'
 gem 'rubyzip', '>= 1.2.1'
 gem 'axlsx', '~> 3.0.0.pre'
 gem 'axlsx_rails'
+gem 'mimemagic', '~> 0.3.8'
+
 gem 'rake'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
