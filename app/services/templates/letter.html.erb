@@ -6,6 +6,10 @@ Your appointment will be for <b><%= '%.2f' % @offer[:hours] %></b> hours for <b>
 
 This appointment is being granted on the basis that you are a student or Post-Doctoral Fellow (PDF) at the University of Toronto on the starting date of the appointment. If you are not a student on the starting date of this appointment, this offer is revoked and the University will have no obligations under this letter.
 
+This appointment is also being granted on the condition that you are or will be legally authorized to work in Canada on the Starting Date and in particular will have a Social Insurance Number and if applicable the requisite Canadian government issued valid study permit ---and will present the originals of same to the Human Resources Department or Business Officer, upon request. If you are unable to satisfy this condition, this Offer Letter will be automatically deemed null and void. 
+
+This appointment is also conditional upon your being able to attend on and perform your duties on campus as of the Starting Date, or no later than 1 month of the Starting Date. For clarity, in the event that some or all of your duties may be performed remotely, you are required to be situated within a geographical proximity that would allow for attendance on campus. If you will not be able to be on campus on the Starting Date, but will be able to do so within 1 month of the Starting Date, please advise your supervisor. If you are not able to satisfy this condition at all, then you will be deemed to have abandoned your employment and this Offer Letter will be deemed null and void. 
+
 As a Teaching Assistant, you will be a member of the Canadian Union of Public Employees (CUPE) Local 3902, Unit 1 bargaining unit.  Your employment will be governed by the terms and conditions of the collective agreement between the University of Toronto and CUPE Local 3902, which may be found on the web at:
 
 <%= @tab %><%= set_link("http://agreements.hrandequity.utoronto.ca/#CUPE3902_Unit1")%>
@@ -16,7 +20,10 @@ Once you accept the offer of employment, a copy of the agreement will be given t
 
 You are required to take the following mandatory training. You must complete this training within 60 days of hire.
 
-<list>U of T AODA Online Training, provided by the Accessibility for Ontarians with Disabilities Act (AODA) Office, available at <%= set_link("http://aoda.hrandequity.utoronto.ca/")%>.
+
+<%= @tab %> 1. Basic Occupational Health and Safety Awareness Training Program provided by the Office of Environmental Health and Safety available at <%= set_link("https://ehs.utoronto.ca/basic-health-and-safety-training/")%>. This Program takes approximately 15 minutes to complete. Upon providing proof of completion, an adjustment will be made to your DDAH form if required. 
+
+<%= @tab %> 2. U of T AODA Online Training, provided by the Accessibility for Ontarians with Disabilities Act (AODA) Office, available at <%= set_link("http://aoda.hrandequity.utoronto.ca/")%>.
 
 Completion of this training will be automatically captured in the system and you will be paid for this training in accordance with the rates set out in your collective agreement. Please note that you only need to complete the above training program once with the University.
 
@@ -27,4 +34,6 @@ You should contact your supervisor as soon as possible to discuss any questions 
 
 Please sign below to indicate your acceptance of this offer, and return a copy of this letter to me as soon as possible but no later than 2 days after you have been provided with the DDAH form. If we have not heard from you by this deadline, this offer may be withdrawn. If you are unable to accept this offer, please advise me immediately.
 
-If you have any questions, please contact <%= ENV['TA_COORD']%>.
+By signing this letter, I understand and accept the above Teaching Assistantship for <%= @offer[:position] %> on the above-noted terms and conditions and understand and agree that the offer will be deemed null and void (or my employment will be deemed abandoned) if any of the above noted conditions are not satisfied.
+
+If you have any questions, please contact <%= ENV['TA_COORD']%> at tacoord@cs.toronto.edu.
