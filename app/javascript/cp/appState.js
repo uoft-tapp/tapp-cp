@@ -1138,6 +1138,11 @@ class AppState {
         this.set('offers.list', list);
     }
 
+/*
+    setSessionsList(list) {
+        this.set('sessions.list', list);
+    }
+    */
     setSessionsList(list) {
         let semesterOrder = ['Winter', 'Spring', 'Fall', 'Year'];
         // sort sesions in order of most recent to least recent
