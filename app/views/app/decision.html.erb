@@ -107,7 +107,8 @@
       <embed id="pdf_view_port" type='application/pdf' name="contract.pdf" src="/pb/<%= @offer[:id] %>/pdf"/>
     </div>
     <form id='decision'>
-      <p>I hereby accept the Teaching Assistantship position offered here:</p>
+	    <p>I understand and accept the above Teaching Assistantship for <%=@offer[:position]%> on the terms and conditions noted in the letter and understand and agree that the offer will be deemed null and void (or my employment will be deemed abandoned) if any of the noted conditions are not satisfied.
+	    </p>
       <p>
         <label><input onchange="showAcceptForm()" name="decision" type="radio" value="accept"/>Accept</label>
         <label><input onchange="showAcceptForm()" name="decision" type="radio" value="reject"/>Reject</label>
@@ -122,8 +123,7 @@
     <div id='status'>
     </div>
     <div class='admonishment'>
-      <p><b>Important:</b> In order to arrange payroll, if this is your first DCS TAship or your SIN number has been changed since your last TAship, you must see Lisa DeCaro in person during office hours (M-F, 9:30-11, 2-3:30) office BA7214.</p>
-      <p>If you have questions, please email Lisa DeCaro <a href="mailto:lisab@cs.toronto.edu">lisab@cs.toronto.edu</a>.</p>
+	    <p><b>Important:</b>  Our office will notify you on how to submit payroll documents in the coming weeks if we do not already have this information. </p>
     </div>
 
     <script>
