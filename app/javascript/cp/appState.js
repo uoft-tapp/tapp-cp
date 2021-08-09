@@ -1160,7 +1160,7 @@ class AppState {
     getLatestSession(){
       let latest = null;
       this.getSessionsList().forEach((key, id)=>{
-        if(!latest|| id>latest)
+        if(!latest|| parseInt(id) > parseInt(latest))
           latest = id;
       });
       return latest?latest:'N/A';
